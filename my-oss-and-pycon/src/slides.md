@@ -51,18 +51,29 @@ Software Developer / Indie Dev / OSS Enthusiast
 # My OSS contributions
 
 - Created:
-  - Awesome Emacs Keymap
-  - Stlite: In-browser Streamlit
+  - <span v-click><vscode-icons-file-type-js-official ma text-xl /> <vscode-icons-file-type-vscode ma text-xl /></span> Awesome Emacs Keymap
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Stlite: In-browser Streamlit
     <!-- - PyScriptが[PyCon US 2022で発表された](https://www.youtube.com/watch?v=qKfkCY7cmBQ&list=PL2Uw4_HvXqvYeXy8ab7iRHjA-9HiYhRQl)のに触発され -->
-  - Streamlit-WebRTC
-  - Gradio-Lite: Serverless Gradio
-  - Transformers.js.py
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Streamlit-WebRTC
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Gradio-Lite: Serverless Gradio
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Transformers.js.py
   <!-- - Anipres -->
 - Contributed:
-  - Streamlit
-  - Gradio
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Streamlit
+  - <span v-after><vscode-icons-file-type-python ma text-xl /> <vscode-icons-file-type-js-official ma text-xl /></span> Gradio
 
 </Transform>
+
+<style>
+.hidden-on-start {
+  display: inline-block;
+  width: 0;
+}
+.slidev-vclick-target {
+  width: initial;
+  transition: all 500ms ease;
+}
+</style>
 
 ---
 

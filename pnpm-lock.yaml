@@ -10,6 +10,9 @@ importers:
 
   my-oss-and-pycon/src:
     dependencies:
+      '@iconify/icons-vscode-icons':
+        specifier: ^1.2.29
+        version: 1.2.29
       '@iconify/json':
         specifier: ^2.2.303
         version: 2.2.303
@@ -24,7 +27,7 @@ importers:
         version: 0.25.0
       slidev-addon-anipres:
         specifier: '*'
-        version: 0.0.9(@slidev/client@51.1.0(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.1)(react@18.3.1)(rollup@4.34.4)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+        version: 0.0.10(@slidev/client@51.1.0(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.1)(react@18.3.1)(rollup@4.34.4)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -511,9 +514,6 @@ packages:
   '@floating-ui/dom@1.1.1':
     resolution: {integrity: sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==}
 
-  '@floating-ui/dom@1.6.13':
-    resolution: {integrity: sha512-umqzocjDgNRGTuO7Q8CU32dkHkECqI8ZdMZ5Swb6QAM0t5rnlrN3lGo1hdpscRd3WS8T6DKYK4ephgIH9iRh3w==}
-
   '@floating-ui/react-dom@2.1.2':
     resolution: {integrity: sha512-06okr5cgPzMNBy+Ycse2A6udMi4bqwW/zgBF/rwjcNqWkyr82Mcg8b0vjX8OJpZFy/FKjJmw6wV7t44kK6kW7A==}
     peerDependencies:
@@ -531,6 +531,9 @@ packages:
 
   '@iconify-json/svg-spinners@1.2.2':
     resolution: {integrity: sha512-DIErwfBWWzLfmAG2oQnbUOSqZhDxlXvr8941itMCrxQoMB0Hiv8Ww6Bln/zIgxwjDvSem2dKJtap+yKKwsB/2A==}
+
+  '@iconify/icons-vscode-icons@1.2.29':
+    resolution: {integrity: sha512-EwmcXfDO6iAbM8+0KlMV/akAxzN5GBS61cjuEy/blqUZ9+RU7jOyfHRV1AXXPisGMsB1fbOLoUoTTrhu1fXLnw==}
 
   '@iconify/json@2.2.303':
     resolution: {integrity: sha512-/s42MDeyZhJbL6g4uNjqqAPUi+tRnF0IRd99ZPhEV5iLHOQRhmURkjARHmnzhg8hQQtKP4/ZaXKS77W0gK+7ZQ==}
@@ -1556,8 +1559,8 @@ packages:
   alien-signals@0.2.2:
     resolution: {integrity: sha512-cZIRkbERILsBOXTQmMrxc9hgpxglstn69zm+F1ARf4aPAzdAFYd6sBq87ErO0Fj3DV94tglcyHG5kQz9nDC/8A==}
 
-  anipres@0.0.9:
-    resolution: {integrity: sha512-0zSQddglO/9jT/i1neNuFNSFP6Z8qNgj3sVo4ZpD2rVUWC63E2DnwI/4CtInHyz0RRg7oN4wzKZ4ho+9YlIM2A==}
+  anipres@0.0.10:
+    resolution: {integrity: sha512-IaSpkOUUv+HqS8Vf30ohHe6NyBFH0cjMPlVKEFoguqvKnNa/P4R3Z5o6PtxUbSHXDr3eqnGryoffgc4cKa2XPw==}
     peerDependencies:
       react: ^18.3.1
       react-dom: ^18.3.1
@@ -3058,8 +3061,8 @@ packages:
     resolution: {integrity: sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==}
     engines: {node: '>=14.16'}
 
-  slidev-addon-anipres@0.0.9:
-    resolution: {integrity: sha512-rCQKVLPM4aS37gWrH0+NBxRMB9+avvfkqb+ZT+CQ3Hy9CF0HQaoHf6/bMCm+n607ckePbCN+bCOrD9hhZiBiUw==}
+  slidev-addon-anipres@0.0.10:
+    resolution: {integrity: sha512-kCczsCT/Wc5/Z0lQVQJmyTxcnNqGBZJ1EB9w0ePRo9zsPAyfkYglc0kuC5jFr+OVYEv6BCwC6RbkFkwe6HcFNg==}
     peerDependencies:
       '@slidev/client': '>=0.49.0'
       vite: '>=5.0'
@@ -3157,9 +3160,6 @@ packages:
 
   tslib@2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-
-  tslib@2.8.1:
-    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tsx@4.19.2:
     resolution: {integrity: sha512-pOUl6Vo2LUq/bSa8S5q7b91cgNSjctn9ugq/+Mvow99qW6x/UZYwzxy/3NmqoT66eHYfCVvFvACC58UBPFf28g==}
@@ -3732,7 +3732,7 @@ snapshots:
   '@dnd-kit/accessibility@3.1.1(react@18.3.1)':
     dependencies:
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   '@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -3740,19 +3740,19 @@ snapshots:
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   '@dnd-kit/modifiers@9.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   '@dnd-kit/utilities@3.2.2(react@18.3.1)':
     dependencies:
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   '@drauu/core@0.4.2': {}
 
@@ -3911,14 +3911,9 @@ snapshots:
     dependencies:
       '@floating-ui/core': 1.6.9
 
-  '@floating-ui/dom@1.6.13':
-    dependencies:
-      '@floating-ui/core': 1.6.9
-      '@floating-ui/utils': 0.2.9
-
   '@floating-ui/react-dom@2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@floating-ui/dom': 1.6.13
+      '@floating-ui/dom': 1.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -3933,6 +3928,10 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/svg-spinners@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/icons-vscode-icons@1.2.29':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -5307,7 +5306,7 @@ snapshots:
 
   alien-signals@0.2.2: {}
 
-  anipres@0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
+  anipres@0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@dnd-kit/modifiers': 9.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -5335,7 +5334,7 @@ snapshots:
 
   aria-hidden@1.2.4:
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   asynckit@0.4.0: {}
 
@@ -6838,14 +6837,14 @@ snapshots:
     dependencies:
       react: 18.3.1
       react-style-singleton: 2.2.3(react@18.3.1)
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   react-remove-scroll@2.6.3(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-remove-scroll-bar: 2.3.8(react@18.3.1)
       react-style-singleton: 2.2.3(react@18.3.1)
-      tslib: 2.8.1
+      tslib: 2.4.0
       use-callback-ref: 1.3.3(react@18.3.1)
       use-sidecar: 1.1.3(react@18.3.1)
 
@@ -6853,7 +6852,7 @@ snapshots:
     dependencies:
       get-nonce: 1.0.1
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   react@18.3.1:
     dependencies:
@@ -7000,11 +6999,11 @@ snapshots:
   slash@5.1.0:
     optional: true
 
-  slidev-addon-anipres@0.0.9(@slidev/client@51.1.0(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.1)(react@18.3.1)(rollup@4.34.4)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3)):
+  slidev-addon-anipres@0.0.10(@slidev/client@51.1.0(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.1)(react@18.3.1)(rollup@4.34.4)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3)):
     dependencies:
       '@slidev/client': 51.1.0(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.1)(react@18.3.1)(rollup@4.34.4)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))
       '@vueuse/core': 12.5.0(typescript@5.7.3)
-      anipres: 0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      anipres: 0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       react-dom: 18.3.1(react@18.3.1)
       tldraw: 3.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       veaury: 2.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7124,8 +7123,6 @@ snapshots:
   tslib@1.14.1: {}
 
   tslib@2.4.0: {}
-
-  tslib@2.8.1: {}
 
   tsx@4.19.2:
     dependencies:
@@ -7349,13 +7346,13 @@ snapshots:
   use-callback-ref@1.3.3(react@18.3.1):
     dependencies:
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   use-sidecar@1.1.3(react@18.3.1):
     dependencies:
       detect-node-es: 1.1.0
       react: 18.3.1
-      tslib: 2.8.1
+      tslib: 2.4.0
 
   util-deprecate@1.0.2: {}
 

@@ -131,6 +131,8 @@ clicks: 23
 
 ---
 
+<Transform :scale="1.2">
+
 # わたしから見た各国のPyCon
 
 <v-clicks>
@@ -148,6 +150,8 @@ clicks: 23
   - 海外のPyConで会った人がPyCon JPに来るときに飲みに行く
 
 </v-clicks>
+
+</Transform>
 
 ---
 
@@ -213,6 +217,8 @@ clicks: 23
 
 ---
 
+<Transform :scale="1.4">
+
 # まとめ
 
 <v-clicks depth="2">
@@ -226,3 +232,5 @@ clicks: 23
   - 旅行にもなるし
 
 </v-clicks>
+
+</Transform>

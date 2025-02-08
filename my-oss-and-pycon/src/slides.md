@@ -21,7 +21,11 @@ transition: fade-out
 
 @whitphx
 
+<div mt-8>
 Software Developer / Indie Dev / OSS Enthusiast
+</div>
+
+<div mt-4>
 
 <v-clicks>
 
@@ -30,6 +34,8 @@ Software Developer / Indie Dev / OSS Enthusiast
 - Born in <span v-mark.red="4">Mishima</span>, grew up in <span v-mark.orange="4">Ohito</span>, <span v-mark.circle.green="4">Shizuoka</span> 🍵
 
 </v-clicks>
+
+</div>
 
 <div my-10 w-min flex="~ gap-1" items-center justify-center v-click>
   <div i-ri-user-3-line op50 ma text-xl />
@@ -46,7 +52,7 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 <style>
 .slide {
-  font-size: 1.5em;
+  font-size: 1.8em;
 }
 </style>
 

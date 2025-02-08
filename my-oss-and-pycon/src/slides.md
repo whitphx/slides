@@ -15,6 +15,8 @@ addons:
 transition: fade-out
 ---
 
+<Transform :scale="1.4">
+
 # Yuichiro Tachibana
 
 @whitphx
@@ -23,8 +25,9 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 <v-clicks>
 
-- ML Developer Advocate at Hugging Face
+- ML Developer Advocate at Hugging Face 🤗
 - Streamlit Creator
+- Born in Mishima, grew up in Ohito, Shizuoka 🍵
 
 </v-clicks>
 
@@ -39,7 +42,11 @@ Software Developer / Indie Dev / OSS Enthusiast
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
 
+</Transform>
+
 ---
+
+<Transform :scale="1.2">
 
 # My OSS contributions
 
@@ -54,6 +61,8 @@ Software Developer / Indie Dev / OSS Enthusiast
 - Contributed:
   - Streamlit
   - Gradio
+
+</Transform>
 
 ---
 
@@ -84,23 +93,23 @@ clicks: 23
 <div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
   <img src="./pyconlt2023/5R7A2914.JPG" />
   <img src="./pyconlt2023/5R7A3050.JPG" />
+  <img src="./pyconapac2023/flickr_53294859225.jpg" />
   <img src="./pycontw2023/PXL_20230903_124942666.jpg" />
-  <img src="./pycontw2023/IMG_2257.jpg" />
 </div>
 
 ---
 
 <div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
+  <img src="./pycontw2023/IMG_2257.jpg" />
   <img src="./pycontw2023/DSC_3364.JPG" />
   <img src="./pyconde2023/PyConDe 19.04.2023-2113.jpg" />
   <img src="./pyconde2023/PyConDe 19.04.2023-2147.jpg" />
-  <img src="./europython2022/PXL_20220712_183854051.MP.jpg" />
 </div>
 
 ---
 
 <div h-full w-full flex items-center justify-center>
-  <img src="./public/star-history-202528.png" max-h-full max-w-full />
+  <img src="./star-history-202528.png" max-h-full max-w-full />
 </div>
 
 ---
@@ -125,19 +134,21 @@ clicks: 23
 
 ---
 
-# (Bonus) PyCon-driven (海外)旅行
+# PyCon-driven (海外)旅行
 
 <div grid grid-cols-2 gap-4 h-80>
   <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br>
-    <h3 text-xl text-teal-800>旅費補助</h3>
+    <h3 text-xl>旅費補助</h3>
     <div p-2>
       "Travel Grant" や "Financial Aid"
     </div>
   </div>
 
   <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
-    <h3 text-xl text-teal-800>食事・飲み会 included</h3>
-    <div>
+    <h3 text-xl text-teal-800>食事・飲み会</h3>
+    <div grid grid-cols-2 gap-4>
+      <img src="./europython2022/PXL_20220713_114957669.jpg" />
+      <img src="./europython2022/PXL_20220712_183854051.MP.jpg" />
     </div>
   </div>
 
@@ -150,7 +161,7 @@ clicks: 23
   <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
     <h3 text-xl text-teal-800>観光</h3>
     <div>
-      <!-- <iframe src="https://ep2025.europython.eu/explore/" w-full w-30 /> -->
+      <iframe src="https://ep2025.europython.eu/explore/" class="w-200% scale-50% origin-top-left h-200%"/>
     </div>
   </div>
 </div>

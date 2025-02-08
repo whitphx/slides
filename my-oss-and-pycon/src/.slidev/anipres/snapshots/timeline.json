@@ -917,8 +917,8 @@
         "typeName": "shape"
       },
       "shape:WkZ7CD1nFnPDJbwwUes6A": {
-        "x": 2498.207511308789,
-        "y": 255.63882320973323,
+        "x": 0,
+        "y": 0,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -936,8 +936,8 @@
         },
         "id": "shape:WkZ7CD1nFnPDJbwwUes6A",
         "type": "group",
-        "parentId": "page:page",
-        "index": "aQA4L",
+        "parentId": "shape:Af4jC7atf4seUkx1GueQ2",
+        "index": "a1",
         "props": {},
         "typeName": "shape"
       },
@@ -1464,8 +1464,8 @@
         "typeName": "shape"
       },
       "shape:HpF3YFyTfoLgoiylWQi58": {
-        "x": 11491.291069246881,
-        "y": 248.1271475015792,
+        "x": 11477.904891354548,
+        "y": 249.33858013675422,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -1475,8 +1475,8 @@
         "props": {
           "color": "black",
           "size": "m",
-          "w": 403.890625,
-          "text": "\"Gonna join PyCon US this year!\"",
+          "w": 424.53125,
+          "text": "\"Gonna go to PyCon US this year!\"",
           "font": "draw",
           "textAlign": "start",
           "autoSize": true,
@@ -2405,6 +2405,65 @@
         },
         "parentId": "page:page",
         "index": "b0I7ot",
+        "typeName": "shape"
+      },
+      "shape:R-Ev96XDTviiOn0kLcJsx": {
+        "x": -4.192380867913016,
+        "y": 98.08846660696787,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {},
+        "id": "shape:R-Ev96XDTviiOn0kLcJsx",
+        "type": "line",
+        "props": {
+          "dash": "draw",
+          "size": "xl",
+          "color": "blue",
+          "spline": "line",
+          "points": {
+            "a1": {
+              "id": "a1",
+              "index": "a1",
+              "x": 4.192380867913016,
+              "y": 6.358080780249509
+            },
+            "a20UP": {
+              "id": "a20UP",
+              "index": "a20UP",
+              "x": 106.51192751683757,
+              "y": 6.607417281435744
+            }
+          },
+          "scale": 1
+        },
+        "parentId": "shape:Af4jC7atf4seUkx1GueQ2",
+        "index": "a22jx",
+        "typeName": "shape"
+      },
+      "shape:Af4jC7atf4seUkx1GueQ2": {
+        "x": 2498.207511308789,
+        "y": 255.63882320973323,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {
+          "frame": {
+            "id": "shape:Af4jC7atf4seUkx1GueQ2",
+            "type": "cue",
+            "globalIndex": 7,
+            "trackId": "tFr4j0Aha1RunEf-gQf8Q",
+            "action": {
+              "type": "shapeAnimation"
+            }
+          },
+          "hiddenDuringAnimation": false
+        },
+        "id": "shape:Af4jC7atf4seUkx1GueQ2",
+        "type": "group",
+        "parentId": "page:page",
+        "index": "b0J9Vo",
+        "props": {},
         "typeName": "shape"
       }
     },

@@ -1,7 +1,7 @@
 ---
 theme: seriph
 background: https://cover.sli.dev
-title: My OSS and PyCon
+title: OSS, PyCon, and me
 class: text-center
 drawings:
   persist: false
@@ -10,6 +10,8 @@ mdc: true
 addons:
   - anipres
 ---
+
+# OSS, PyCon, and me
 
 ---
 transition: fade-out

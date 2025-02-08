@@ -31,7 +31,7 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 - ML Developer Advocate at Hugging Face 🤗
 - Streamlit Creator
-- Born in <span v-mark.red="4">Mishima</span>, grew up in <span v-mark.orange="4">Ohito</span>, <span v-mark.circle.green="4">Shizuoka</span> 🍵
+- Born in <span v-mark.red="3">Mishima</span>, grew up in <span v-mark.orange="3">Ohito</span>, <span v-mark.circle.green="3">Shizuoka</span> 🍵
 
 </v-clicks>
 
@@ -189,6 +189,7 @@ clicks: 23
     <h3 text-xl>交流</h3>
     <div p-2>
       <ul>
+        <li>会場で、街角で、ふらっと</li>
         <li>懇親会、パーティー</li>
       </ul>
     </div>

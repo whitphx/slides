@@ -1,6 +1,6 @@
 ---
 theme: seriph
-background: https://cover.sli.dev
+layout: Title
 title: OSS, PyCon, and me
 class: text-center
 drawings:
@@ -11,7 +11,9 @@ addons:
   - anipres
 ---
 
-# OSS, PyCon, and me
+<h1 data-text="OSS, PyCon, and me">OSS, PyCon, and me</h1>
+
+PyCon mini Shizuoka 2024 continue
 
 ---
 transition: fade-out

@@ -15,7 +15,7 @@ addons:
 transition: fade-out
 ---
 
-<Transform :scale="1.4">
+<div class="slide">
 
 # Yuichiro Tachibana
 
@@ -27,7 +27,7 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 - ML Developer Advocate at Hugging Face 🤗
 - Streamlit Creator
-- Born in Mishima, grew up in Ohito, Shizuoka 🍵
+- Born in <span v-mark.red="4">Mishima</span>, grew up in <span v-mark.orange="4">Ohito</span>, <span v-mark.circle.green="4">Shizuoka</span> 🍵
 
 </v-clicks>
 
@@ -42,7 +42,13 @@ Software Developer / Indie Dev / OSS Enthusiast
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
 
-</Transform>
+</div>
+
+<style>
+.slide {
+  font-size: 1.5em;
+}
+</style>
 
 ---
 

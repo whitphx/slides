@@ -153,32 +153,48 @@ clicks: 23
 
 # PyCon-driven (海外)旅行
 
-<div grid grid-cols-2 gap-4 h-80>
-  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br>
+<div grid grid-cols-2 grid-rows-2 h-90 max-h-90 gap-2>
+  <div v-click border-rounded relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
     <h3 text-xl>旅費補助</h3>
     <div p-2>
       "Travel Grant" や "Financial Aid"
     </div>
   </div>
 
-  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
-    <h3 text-xl text-teal-800>食事・飲み会</h3>
-    <div grid grid-cols-2 gap-4>
-      <img src="./europython2022/PXL_20220713_114957669.jpg" />
-      <img src="./europython2022/PXL_20220712_183854051.MP.jpg" />
+  <div v-click border-rounded relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2 flex flex-col gap-2>
+    <h3 text-xl>食事・飲み会</h3>
+    <div p-2>
+      <ul>
+        <li>チケットに含まれてたり</li>
+        <li>そのチケットがFinancial Aidでカバーされたり</li>
+      </ul>
+    </div>
+      <!-- <div>
+        <img src="./europython2022/PXL_20220713_114957669.jpg" />
+      </div>
+      <div>
+        <img src="./europython2022/PXL_20220712_183854051.MP.jpg" />
+      </div> -->
+  </div>
+
+  <div v-click border-rounded relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+    <h3 text-xl>交流</h3>
+    <div p-2>
+      <ul>
+        <li>懇親会、パーティー</li>
+      </ul>
     </div>
   </div>
 
-  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
-    <h3 text-xl text-teal-800>交流</h3>
-    <div>
-    </div>
-  </div>
-
-  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
-    <h3 text-xl text-teal-800>観光</h3>
-    <div>
-      <iframe src="https://ep2025.europython.eu/explore/" class="w-200% scale-50% origin-top-left h-200%"/>
+  <div v-click border-rounded relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+    <h3 text-xl>観光</h3>
+    <div p-2>
+      <ul>
+        <li>会った人におすすめ聞いたり</li>
+        <li>
+        <iframe src="https://ep2025.europython.eu/explore/" class="w-200% scale-50% origin-top-left h-200%"/>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

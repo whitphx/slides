@@ -59,8 +59,6 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 # My PyCon attendance
 
-<v-clicks>
-
 - 2021
   - PyCon JP (LT)
 - 2022
@@ -74,13 +72,36 @@ Software Developer / Indie Dev / OSS Enthusiast
 - 2024
   - PyCon FR
 
-</v-clicks>
+---
+clicks: 23
+---
+
+<SlidevAnipres id="timeline" />
 
 
 ---
 
-<img src="./pyconlt2023/5R7A2914.JPG" class="w-1/2" />
-<img src="./pyconlt2023/5R7A3050.JPG" class="w-1/2" />
+<div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
+  <img src="./pyconlt2023/5R7A2914.JPG" />
+  <img src="./pyconlt2023/5R7A3050.JPG" />
+  <img src="./pycontw2023/PXL_20230903_124942666.jpg" />
+  <img src="./pycontw2023/IMG_2257.jpg" />
+</div>
+
+---
+
+<div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
+  <img src="./pycontw2023/DSC_3364.JPG" />
+  <img src="./pyconde2023/PyConDe 19.04.2023-2113.jpg" />
+  <img src="./pyconde2023/PyConDe 19.04.2023-2147.jpg" />
+  <img src="./europython2022/PXL_20220712_183854051.MP.jpg" />
+</div>
+
+---
+
+<div h-full w-full flex items-center justify-center>
+  <img src="./public/star-history-202528.png" max-h-full max-w-full />
+</div>
 
 ---
 
@@ -106,15 +127,33 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 # (Bonus) PyCon-driven (海外)旅行
 
-<v-clicks>
+<div grid grid-cols-2 gap-4 h-80>
+  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br>
+    <h3 text-xl text-teal-800>旅費補助</h3>
+    <div p-2>
+      "Travel Grant" や "Financial Aid"
+    </div>
+  </div>
 
-- 旅費補助
-- 食事・飲み会 included
-- 交流
-- （カンファレンスによっては）観光情報提供
-  <iframe src="https://ep2025.europython.eu/explore/" w-full w-30 />
+  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
+    <h3 text-xl text-teal-800>食事・飲み会 included</h3>
+    <div>
+    </div>
+  </div>
 
-</v-clicks>
+  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
+    <h3 text-xl text-teal-800>交流</h3>
+    <div>
+    </div>
+  </div>
+
+  <div v-click border-rounded px3 py3 pb-12 relative from-sky:20 to-fuchsia:15 bg-gradient-to-br >
+    <h3 text-xl text-teal-800>観光</h3>
+    <div>
+      <!-- <iframe src="https://ep2025.europython.eu/explore/" w-full w-30 /> -->
+    </div>
+  </div>
+</div>
 
 <v-click>
 
@@ -131,3 +170,15 @@ Software Developer / Indie Dev / OSS Enthusiast
 ---
 
 # まとめ
+
+<v-clicks depth="2">
+
+- 各地のPyConに参加してトークしたおかげで
+  - 自分のプロジェクトがより良くなった
+  - 友人が増えた
+  - 仕事にもいい影響があった（かも）
+
+- 各地のPyConに行くのいいよ
+  - 旅行にもなるし
+
+</v-clicks>

@@ -4,7 +4,9 @@ title: OSS, PyCon, and me
 class: text-center
 drawings:
   persist: false
-transition: slide-left
+transition: fade-out
+defaults:
+  transition: slide-left
 mdc: true
 addons:
   - anipres
@@ -14,8 +16,6 @@ addons:
 
 PyCon mini Shizuoka 2024 continue
 
----
-transition: fade-out
 ---
 
 <div class="slide">

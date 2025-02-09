@@ -1,0 +1,12 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "./scripts/build.sh",
+  "framework": null,
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/:title/:rest+",
+      "destination": "/:title"
+    }
+  ]
+}

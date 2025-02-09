@@ -9,22 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
           version: 8
           run_install: false
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-            
+
       - name: Install dependencies
         run: pnpm install
       - name: Find and build presentations
@@ -39,9 +39,24 @@ jobs:
               cd ../..
             fi
           done
-          
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: presentations
-          path: dist/
+          path: dist
+
+  deploy:
+    if: github.ref_name == github.event.repository.default_branch
+    needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

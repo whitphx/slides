@@ -10,7 +10,7 @@ addons:
   - anipres
 ---
 
-<h1 data-text="OSS, PyCon, and me">OSS, PyCon, and me</h1>
+# OSS, PyCon, and me
 
 PyCon mini Shizuoka 2024 continue
 

@@ -1,9 +1,9 @@
 {
-  "buildCommand": "pnpm install && mkdir -p dist && for pkg in */src; do if [ -f \"$pkg/package.json\" ]; then pkg_name=$(dirname \"$pkg\") && cd \"$pkg\" && pnpm build --base /talks/$pkg_name --out ../../dist/$pkg_name && cd ../..; fi done",
+  "buildCommand": "pnpm install && mkdir -p dist && for pkg in */src; do if [ -f \"$pkg/package.json\" ]; then pkg_name=$(dirname \"$pkg\") && cd \"$pkg\" && pnpm build --base /$pkg_name --out ../../dist/$pkg_name && cd ../..; fi done",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
   "framework": null,
   "buildEnvironment": {
-    "BASE_PATH": "/talks"
+    "BASE_PATH": "/"
   }
 }

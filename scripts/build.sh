@@ -19,8 +19,10 @@ for pkgDir in "${talksDir}"/*; do
   if [ -d "$pkgDir" ]; then
     dirName="$(basename "$pkgDir")"
 
-    pushd "$pkgDir"
-    pnpm build --base ${dirName} --out ${rootDist}/${dirName}
-    popd
+    if [ -f "${pkgDir}/package.json" ]; then
+      pushd "$pkgDir"
+      pnpm build --base ${dirName} --out ${rootDist}/${dirName}
+      popd
+    fi
   fi
 done

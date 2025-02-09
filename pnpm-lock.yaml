@@ -24,7 +24,7 @@ importers:
         specifier: ^8.23.0
         version: 8.23.0(eslint@9.20.0(jiti@2.4.2))(typescript@5.7.3)
 
-  talks/202502-oss-pycon-and-me:
+  decks/202502-oss-pycon-and-me:
     dependencies:
       '@iconify/icons-vscode-icons':
         specifier: ^1.2.29

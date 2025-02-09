@@ -20,8 +20,7 @@ const { isDark } = useDarkMode();
   </section>
 </template>
 
-<style lang="scss">
-
+<style lang="postcss">
 /*base*/
 .wrapper {
   --stripe-color: #fff;

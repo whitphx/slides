@@ -11,4 +11,4 @@ This site is deployed on Vercel. The build process:
 4. Deploys static files to Vercel
 
 Environment variables:
-- BASE_PATH=/talks
+- BASE_PATH=/

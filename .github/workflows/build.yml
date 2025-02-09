@@ -1,0 +1,59 @@
+name: Build Presentations
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Find and build presentations
+        run: |
+          mkdir -p dist
+          for pkg in */src; do
+            if [ -f "$pkg/package.json" ]; then
+              pkg_name=$(dirname "$pkg")
+              echo "Building $pkg_name..."
+              cd "$pkg"
+              pnpm build --out ../../dist/$pkg_name
+              cd ../..
+            fi
+          done
+          
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: presentations
+          path: dist/

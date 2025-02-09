@@ -13,4 +13,5 @@ export default [
   ...pluginVue.configs["flat/essential"],
   {files: ["**/*.vue"], languageOptions: {parserOptions: {parser: tseslint.parser}}},
   {files: ["**/layouts/*.vue"], rules: {"vue/multi-word-component-names": "off"}},
+  {ignores: ["**/dist/", "**/public/"]}
 ];

@@ -2,7 +2,7 @@
 
 rootDir="$(pwd)"
 rootDist="${rootDir}/dist"
-talksDir="${rootDir}/talks"
+decksDir="${rootDir}/decks"
 
 if [ -d "$rootDist" ]; then
   echo "Cleaning existing ${rootDist} folder..."
@@ -10,12 +10,12 @@ if [ -d "$rootDist" ]; then
 fi
 mkdir -p "$rootDist"
 
-if [ ! -d "$talksDir" ]; then
-  echo "Error: ${talksDir} directory not found." >&2
+if [ ! -d "$decksDir" ]; then
+  echo "Error: ${decksDir} directory not found." >&2
   exit 1
 fi
 
-for pkgDir in "${talksDir}"/*; do
+for pkgDir in "${decksDir}"/*; do
   if [ -d "$pkgDir" ]; then
     dirName="$(basename "$pkgDir")"
 

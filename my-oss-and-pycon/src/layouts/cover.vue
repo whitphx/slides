@@ -21,33 +21,6 @@ const { isDark } = useDarkMode();
 </template>
 
 <style lang="scss">
-/*houdini*/
-@property --blink-opacity {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 1;
-}
-
-/* #fallback @keyframes blink-animation {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}*/
-
-@keyframes blink-animation {
-  0%,
-  100% {
-    opacity: var(--blink-opacity, 1);
-  }
-  50% {
-    opacity: 0;
-  }
-}
-/*houdini*/
 
 /*base*/
 .wrapper {

@@ -9,6 +9,3 @@ This site is deployed on Vercel. The build process:
 2. Builds each presentation with Slidev
 3. Outputs to the dist directory
 4. Deploys static files to Vercel
-
-Environment variables:
-- BASE_PATH=/

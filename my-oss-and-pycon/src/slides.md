@@ -116,25 +116,25 @@ clicks: 23
 ---
 
 <div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
-  <img src="./pyconlt2023/5R7A2914.JPG" />
-  <img src="./pyconlt2023/5R7A3050.JPG" />
-  <img src="./pyconapac2023/flickr_53294859225.jpg" />
-  <img src="./pycontw2023/PXL_20230903_124942666.jpg" />
+  <img src="/pyconlt2023/5R7A2914.jpg" />
+  <img src="/pyconlt2023/5R7A3050.jpg" />
+  <img src="/pyconapac2023/flickr_53294859225.jpg" />
+  <img src="/pycontw2023/PXL_20230903_124942666.jpg" />
 </div>
 
 ---
 
 <div grid grid-cols-2 grid-rows-2 gap-4 h-full absolute top-0 left-0>
-  <img src="./pycontw2023/IMG_2257.jpg" />
-  <img src="./pycontw2023/DSC_3364.JPG" />
-  <img src="./pyconde2023/PyConDe 19.04.2023-2113.jpg" />
-  <img src="./pyconde2023/PyConDe 19.04.2023-2147.jpg" />
+  <img src="/pycontw2023/IMG_2257.jpg" />
+  <img src="/pycontw2023/DSC_3364.jpg" />
+  <img src="/pyconde2023/PyConDe 19.04.2023-2113.jpg" />
+  <img src="/pyconde2023/PyConDe 19.04.2023-2147.jpg" />
 </div>
 
 ---
 
 <div h-full w-full flex items-center justify-center>
-  <img src="./star-history-202528.png" max-h-full max-w-full />
+  <img src="/star-history-202528.png" max-h-full max-w-full />
 </div>
 
 ---

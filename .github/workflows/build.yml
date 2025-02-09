@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  BASE_PATH: /talks
+
+concurrency:
+  # https://stackoverflow.com/a/72408109
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,7 +43,7 @@ jobs:
               pkg_name=$(dirname "$pkg")
               echo "Building $pkg_name..."
               cd "$pkg"
-              pnpm build --out ../../dist/$pkg_name
+              pnpm build --base ${{ env.BASE_PATH }}/$pkg_name --out ../../dist/$pkg_name
               cd ../..
             fi
           done

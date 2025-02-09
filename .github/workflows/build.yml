@@ -1,0 +1,47 @@
+name: Build Presentations
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+            
+      - name: Install dependencies
+        run: pnpm install
+      - name: Find and build presentations
+        run: |
+          mkdir -p dist
+          for pkg in */src; do
+            if [ -f "$pkg/package.json" ]; then
+              pkg_name=$(dirname "$pkg")
+              echo "Building $pkg_name..."
+              cd "$pkg"
+              pnpm build --out ../../dist/$pkg_name
+              cd ../..
+            fi
+          done
+          
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: presentations
+          path: dist/

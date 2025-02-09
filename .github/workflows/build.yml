@@ -35,18 +35,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      - name: Find and build presentations
-        run: |
-          mkdir -p dist
-          for pkg in */src; do
-            if [ -f "$pkg/package.json" ]; then
-              pkg_name=$(dirname "$pkg")
-              echo "Building $pkg_name..."
-              cd "$pkg"
-              pnpm build --base ${{ env.BASE_PATH }}/$pkg_name --out ../../dist/$pkg_name
-              cd ../..
-            fi
-          done
+
+      - name: Build presentations
+        run: scripts/build.sh
 
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3

@@ -20,7 +20,7 @@ const { isDark } = useDarkMode();
   </section>
 </template>
 
-<style>
+<style lang="scss">
 /*houdini*/
 @property --blink-opacity {
   syntax: "<number>";

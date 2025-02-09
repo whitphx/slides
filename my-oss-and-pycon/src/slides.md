@@ -1,6 +1,5 @@
 ---
 theme: seriph
-layout: Title
 title: OSS, PyCon, and me
 class: text-center
 drawings:

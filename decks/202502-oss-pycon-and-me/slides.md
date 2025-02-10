@@ -90,7 +90,7 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 ---
 
-# My PyCon attendance
+# My PyCon presentations
 
 - 2021
   - PyCon JP (LT)

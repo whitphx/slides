@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@iconify/collections':
+        specifier: ^1.0.519
+        version: 1.0.519
     devDependencies:
       '@eslint/js':
         specifier: ^9.20.0
@@ -632,6 +636,9 @@ packages:
 
   '@iconify-json/svg-spinners@1.2.2':
     resolution: {integrity: sha512-DIErwfBWWzLfmAG2oQnbUOSqZhDxlXvr8941itMCrxQoMB0Hiv8Ww6Bln/zIgxwjDvSem2dKJtap+yKKwsB/2A==}
+
+  '@iconify/collections@1.0.519':
+    resolution: {integrity: sha512-XAPskD6bgLzdjaZBn2fUZn5Q73gSqhEqi1k5P9iDKjV+WnPIUvvHPsrUjNcwEAIgtuv0UhsPMD++1/U6O1Uvjg==}
 
   '@iconify/icons-vscode-icons@1.2.29':
     resolution: {integrity: sha512-EwmcXfDO6iAbM8+0KlMV/akAxzN5GBS61cjuEy/blqUZ9+RU7jOyfHRV1AXXPisGMsB1fbOLoUoTTrhu1fXLnw==}
@@ -4736,6 +4743,10 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/svg-spinners@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/collections@1.0.519':
     dependencies:
       '@iconify/types': 2.0.0
 

@@ -141,9 +141,26 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excali
 
 # Anipres
 
-* Excalidraw-like diagrams and texts
-* Diagram animations
-* Frame transitions
+<div flex="~ items-center gap-2" text-2xl>
+
+  <div i-carbon-logo-github text-2xl text-black />
+
+  <a href="https://github.com/whitphx/anipres" target="_blank" border-0 font-mono opacity-80>
+    whitphx/anipres
+  </a>
+
+</div>
+
+
+<div flex="~ items-center gap-2" text-2xl>
+
+  <div i-carbon-link text-2xl text-black />
+
+  <a href="https://anipres.app" target="_blank" border-0 font-mono opacity-80>
+    anipres.app
+  </a>
+
+</div>
 
 ---
 

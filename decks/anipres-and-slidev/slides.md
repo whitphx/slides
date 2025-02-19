@@ -166,12 +166,62 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excali
 clicks: 10
 ---
 
-<SlidevAnipres id="fig-webrtc" />
+
+<div :w="$clicks >= 10 ? '1/2' : 'full'" h-full>
+
+  <SlidevAnipres id="fig-webrtc" />
+
+</div>
+
+<div :w="$clicks >= 10 ? '1/2' : '0'" h-full absolute right-0 top-0 bottom-0>
+
+````javascript
+function handleVideoOfferMsg(msg) {
+  let localStream = null;
+
+  targetUsername = msg.name;
+  createPeerConnection();
+
+  const desc = new RTCSessionDescription(msg.sdp);
+
+  myPeerConnection
+    .setRemoteDescription(desc)
+    .then(() => navigator.mediaDevices.getUserMedia(mediaConstraints))
+    .then((stream) => {
+      localStream = stream;
+      document.getElementById("local_video").srcObject = localStream;
+
+      localStream
+        .getTracks()
+        .forEach((track) => myPeerConnection.addTrack(track, localStream));
+    })
+    .then(() => myPeerConnection.createAnswer())
+    .then((answer) => myPeerConnection.setLocalDescription(answer))
+    .then(() => {
+      const msg = {
+        name: myUsername,
+        target: targetUsername,
+        type: "video-answer",
+        sdp: myPeerConnection.localDescription,
+      };
+
+      sendToServer(msg);
+    })
+    .catch(handleGetUserMediaError);
+}
+````
+
+</div>
+
 
 <footer absolute bottom-0 left-0 right-0 p-2 text-xs>
   <div text-center>
-    Ref: <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity" target="_blank" border-0 font-mono opacity-80>
+    Refs:
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity" target="_blank" border-0 font-mono opacity-80>
       https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity
+    </a>,
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling#the_client_application" target="_blank" border-0 font-mono opacity-80>
+      https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling#the_client_application
     </a>
   </div>
 </footer>

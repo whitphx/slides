@@ -8,6 +8,8 @@ mdc: true
 addons:
   - anipres
   - fancy-arrow
+defaults:
+  transition: slide-left
 transition: fade-out
 ---
 
@@ -74,18 +76,18 @@ At [第七届FEDAY](https://fequan.com/2024/),
 
   <div i-ph-subtract-square text-2xl text-orange-500 />
 
-  Intuitive editing of complex diagrams with animation like **Slides.com**{ #item-slidescom } (or PowerPoint, Keynote)
+  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange>Slides.com</strong> (or PowerPoint, Keynote)
 
 </div>
 
-<FancyArrow id1="item-slidescom" pos1="bottomleft" id2="item-anipres" pos2="topright" color="orange" />
+<FancyArrow id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
 
-<div w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg">
+<div w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg" id="card-anipres">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
-    <span id="item-anipres">
+    <span id="card-anipres-title">
       Anipres
-      <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
     </span>
+    <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
   </div>
 
   <div ml2 p2>
@@ -96,41 +98,41 @@ At [第七届FEDAY](https://fequan.com/2024/),
   </div>
 </div>
 
-<FancyArrow id1="item-excalidraw" pos1="topleft" id2="item-anipres" pos2="bottomright" color="orange" />
+<FancyArrow id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="orange" arc="0.1" seed="2" />
 
 <div flex="~ items-center gap-2">
 
   <div i-ph-slideshow-duotone text-2xl text-teal-500 />
 
-Textured diagrams like **Excalidraw** and animation like its **Obsidian plugin**{ #item-excalidraw }
+Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excalidraw</strong> and animation like its **Obsidian plugin**
 
 </div>
 
-<FancyArrow id1="item-anipres" pos1="bottom" id2="item-anipres-slidev-addon" pos2="top" color="blue" arc="0.5" />
+<FancyArrow id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
 
 <div w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
-    <span id="item-anipres-slidev-addon">
+    <span id="card-anipres-slidev-addon-title">
       Anipres addon for Slidev
-      <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
     </span>
+    <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
   </div>
 
   <div ml2 p2>
 
-  - Embed Anipres diagrams in Slidev
+  - <span id="anipres-addon-embed" v-mark.underline.blue>Embed</span> Anipres diagrams in Slidev
   - Integrated slide transitions
 
   </div>
 </div>
 
-<FancyArrow id1="item-anipres-slidev-addon" pos1="bottomright" id2="item-slidev" pos2="top" color="lime" arc="0.1" roughness="0.5" />
+<FancyArrow id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
 
 <div flex="~ items-center gap-2">
 
   <div text-2xl  i-ph-text-align-left text-lime-500 />
 
-  Structured contents, cool designs, and dev-friendly features like **Slidev**{ #item-slidev }
+  Structured contents, cool designs, and dev-friendly features like <strong id="item-slidev" v-mark.underline.lime>Slidev</strong>
 
 </div>
 
@@ -150,3 +152,8 @@ Textured diagrams like **Excalidraw** and animation like its **Obsidian plugin**
 <!-- https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity -->
 
 <!-- // https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Express_Nodejs/forms -->
+
+
+---
+
+<SlidevAnipres id="fig-stlite" />

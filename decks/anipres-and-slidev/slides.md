@@ -163,8 +163,18 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excali
 </div>
 
 ---
+clicks: 10
+---
 
 <SlidevAnipres id="fig-webrtc" />
+
+<footer absolute bottom-0 left-0 right-0 p-2 text-xs>
+  <div text-center>
+    Ref: <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity" target="_blank" border-0 font-mono opacity-80>
+      https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity
+    </a>
+  </div>
+</footer>
 
 <!-- https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity -->
 

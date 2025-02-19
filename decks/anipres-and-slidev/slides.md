@@ -172,5 +172,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excali
 
 
 ---
+clicks: 12
+---
 
-<SlidevAnipres id="fig-stlite" />
+<SlidevAnipres id="fig-gradio-lite" />

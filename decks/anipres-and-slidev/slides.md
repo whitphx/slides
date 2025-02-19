@@ -76,13 +76,13 @@ At [第七届FEDAY](https://fequan.com/2024/),
 
   <div i-ph-subtract-square text-2xl text-orange-500 />
 
-  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange>Slides.com</strong> (or PowerPoint, Keynote)
+  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange="2">Slides.com</strong> (or PowerPoint, Keynote)
 
 </div>
 
-<FancyArrow id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
+<FancyArrow v-click="2" id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
 
-<div w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg" id="card-anipres">
+<div v-click="1" w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg" id="card-anipres">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
     <span id="card-anipres-title">
       Anipres
@@ -98,19 +98,19 @@ At [第七届FEDAY](https://fequan.com/2024/),
   </div>
 </div>
 
-<FancyArrow id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="orange" arc="0.1" seed="2" />
+<FancyArrow v-click="2" id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
 
 <div flex="~ items-center gap-2">
 
   <div i-ph-slideshow-duotone text-2xl text-teal-500 />
 
-Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excalidraw</strong> and animation like its **Obsidian plugin**
+Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Excalidraw</strong> and animation like its **Obsidian plugin**
 
 </div>
 
-<FancyArrow id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
+<FancyArrow v-click="3" id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
 
-<div w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg">
+<div v-click="3" w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
     <span id="card-anipres-slidev-addon-title">
       Anipres addon for Slidev
@@ -120,19 +120,19 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal>Excali
 
   <div ml2 p2>
 
-  - <span id="anipres-addon-embed" v-mark.underline.blue>Embed</span> Anipres diagrams in Slidev
+  - <span id="anipres-addon-embed" v-mark.underline.blue="4">Embed</span> Anipres diagrams in Slidev
   - Integrated slide transitions
 
   </div>
 </div>
 
-<FancyArrow id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
+<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
 
 <div flex="~ items-center gap-2">
 
   <div text-2xl  i-ph-text-align-left text-lime-500 />
 
-  Structured contents, cool designs, and dev-friendly features like <strong id="item-slidev" v-mark.underline.lime>Slidev</strong>
+  Structured contents, cool designs, and dev-friendly features like <strong id="item-slidev" v-mark.underline.lime="4">Slidev</strong>
 
 </div>
 

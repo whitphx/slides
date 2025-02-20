@@ -35,37 +35,53 @@ At [第七届FEDAY](https://fequan.com/2024/),
 
 <div bg-orange:10 border="~ orange/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>Slides.com</div>
-  https://www.bilibili.com/video/BV1tUcBemE2r
+    <SlidevVideo autoplay muted controls loop>
+      <source src="/feday_whitphx_4x.mp4" type="video/mp4" />
+    </SlidevVideo>
 
+<!-- Key parts:
+Original: https://www.bilibili.com/video/BV1tUcBemE2r
+* 07:54 - 09:04
+* 12:36 - 13:15
+-->
+  <!-- <iframe
+    src="//player.bilibili.com/player.html?isOutside=true&aid=113832169051645&bvid=BV1tUcBemE2r&cid=27883799748&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe> -->
 
-  // 12:36 - 13:15
-  <iframe
-    src="//player.bilibili.com/player.html?isOutside=true&aid=113832169051645&bvid=BV1tUcBemE2r&cid=27883799748&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
-
-  * WYSIWYG / Slide style
+  * WYSIWYG / Slide
   * Flexible figure designs and animations
-  * Dev-friendly features e.g. Codeblocks
+  * Dev-friendly features e.g. codeblocks
 </div>
 
 <div bg-gray:10 border="~ gray/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-gray:10 px4 py2 rounded>Excalidraw (+ Obsidian)</div>
-  https://www.bilibili.com/video/BV1iQ6EYHENU/
+    <SlidevVideo autoplay muted controls loop>
+      <source src="/feday_maieul_4x.mp4" type="video/mp4" />
+    </SlidevVideo>
 
-  // 15:02
-  // 19:40
+<!-- Key parts:
+Original: https://www.bilibili.com/video/BV1iQ6EYHENU/
+* 14:14 - 15:02 = 854s + 48s -> (4x) 3:33 + 12s
+* 21:21 - 22:50 = 1281s + 89s -> (4x) 5:20 + 22s
+/-->
 
   * WYSIWYG / Whiteboard
   * Tidy font and diagrams
-  * Sliding animations on a single whiteboard.
+  * Sliding animations on a single whiteboard
 </div>
 
 <div bg-lime:10 border="~ lime/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-lime:10 px4 py2 rounded>Slidev</div>
-  https://www.bilibili.com/video/BV1Z4qdYpEUE/
+    <SlidevVideo autoplay muted controls loop>
+      <source src="/feday_antfu_10x.mp4" type="video/mp4" />
+    </SlidevVideo>
 
-  // 04:23
+<!--
+Original: https://www.bilibili.com/video/BV1Z4qdYpEUE/
+Key parts:
+* 04:22 - 09:44 = 262s + 322s -> (10x) 27s + 32s
+-->
 
-  * Markdown / Slide style
+  * Markdown / Slide
   * Structured contents
   * Stylish theming
   * More dev-friendly components

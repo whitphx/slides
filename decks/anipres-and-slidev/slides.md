@@ -39,7 +39,7 @@ clicks: 5
 
 <div bg-orange:10 border="~ orange/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>Slides.com</div>
-    <div :class="$clicks === 0 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+    <div p1 :class="$clicks === 0 ? 'absolute top-1 left-1 right-1 bottom-1 z-modal' : ''">
       <SlidevVideo autoplay muted controls loop>
         <source src="/feday_whitphx_4x.mp4" type="video/mp4" />
       </SlidevVideo>
@@ -60,7 +60,7 @@ Original: https://www.bilibili.com/video/BV1tUcBemE2r
 
 <div v-click="2" bg-gray:10 border="~ gray/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-gray:10 px4 py2 rounded>Excalidraw (+ Obsidian)</div>
-    <div :class="$clicks === 2 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+    <div p1 :class="$clicks === 2 ? 'absolute top-1 left-1 right-1 bottom-1 z-modal' : ''">
       <SlidevVideo autoplay muted controls loop>
         <source src="/feday_maieul_4x.mp4" type="video/mp4" />
       </SlidevVideo>
@@ -79,7 +79,7 @@ Original: https://www.bilibili.com/video/BV1iQ6EYHENU/
 
 <div v-click="4" bg-lime:10 border="~ lime/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-lime:10 px4 py2 rounded>Slidev</div>
-    <div :class="$clicks === 4 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+    <div p1 :class="$clicks === 4 ? 'absolute top-1 left-1 right-1 bottom-1 z-modal' : ''">
       <SlidevVideo autoplay muted controls loop>
         <source src="/feday_antfu_10x.mp4" type="video/mp4" />
       </SlidevVideo>
@@ -98,6 +98,21 @@ Key parts:
 </div>
 
 </div>
+
+<footer text-xs absolute bottom-0 left-0 right-0 text-center>
+
+Refs:
+<a href="https://www.bilibili.com/video/BV1tUcBemE2r/" target="_blank" border-0 opacity-70>
+  使用 Gradio 和 Transformers 构建 Web AI 应用 - Yuichiro
+</a>,
+<a v-click="2" href="https://www.bilibili.com/video/BV1iQ6EYHENU/" target="_blank" border-0 opacity-70>
+  Qwik: Resumability(可恢复性) 将引领时代 - 毛雨乐
+</a>,
+<a v-click="4" href="https://www.bilibili.com/video/BV1Z4qdYpEUE/" target="_blank" border-0 opacity-70>
+  ESLint 通用配置方案：化繁为简 - Anthony Fu
+</a>
+
+</footer>
 
 ---
 

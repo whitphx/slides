@@ -169,10 +169,12 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 
 ---
+layout: center
+---
 
-# Anipres
+<div flex-col items-center align-center text-4xl>
 
-<div flex="~ items-center gap-2" text-2xl>
+<div flex="~ items-center gap-2">
 
   <div i-carbon-logo-github text-2xl/>
 
@@ -183,7 +185,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 </div>
 
 
-<div flex="~ items-center gap-2" text-2xl>
+<div flex="~ items-center gap-2">
 
   <div i-carbon-link text-2xl />
 
@@ -193,55 +195,66 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 </div>
 
+</div>
+
+
 ---
-clicks: 10
+clicks: 9
 ---
 
 # Example: WebRTC signaling protocol
 
-<div :w="$clicks >= 10 ? '1/2' : 'full'" h-100>
+<div :w="$clicks >= 1 ? '1/2' : 'full'" h-100 :ml="$clicks >= 1 ? '1/2' : '0'">
 
   <SlidevAnipres id="fig-webrtc" />
 
 </div>
 
-<div :w="$clicks >= 10 ? '1/2' : '0'" h-full absolute right-0 top-0 bottom-0>
+<div :w="$clicks >= 1 ? '1/2' : '0'" absolute left-0 top-30 bottom-20>
 
-````javascript
-function handleVideoOfferMsg(msg) {
-  let localStream = null;
-
-  targetUsername = msg.name;
-  createPeerConnection();
-
-  const desc = new RTCSessionDescription(msg.sdp);
-
-  myPeerConnection
-    .setRemoteDescription(desc)
-    .then(() => navigator.mediaDevices.getUserMedia(mediaConstraints))
-    .then((stream) => {
-      localStream = stream;
-      document.getElementById("local_video").srcObject = localStream;
-
-      localStream
-        .getTracks()
-        .forEach((track) => myPeerConnection.addTrack(track, localStream));
-    })
-    .then(() => myPeerConnection.createAnswer())
-    .then((answer) => myPeerConnection.setLocalDescription(answer))
-    .then(() => {
-      const msg = {
-        name: myUsername,
-        target: targetUsername,
-        type: "video-answer",
-        sdp: myPeerConnection.localDescription,
-      };
-
-      sendToServer(msg);
-    })
-    .catch(handleGetUserMediaError);
+```javascript {*|4-5|21-32|33-34,35-36|*|6-20}{lines:true,maxHeight:'100%'}
+function negotiate() {
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
+    return pc.createOffer().then((offer) => {
+        return pc.setLocalDescription(offer);
+    }).then(() => {
+        // wait for ICE gathering to complete
+        return new Promise((resolve) => {
+            if (pc.iceGatheringState === 'complete') {
+                resolve();
+            } else {
+                const checkState = () => {
+                    if (pc.iceGatheringState === 'complete') {
+                        pc.removeEventListener('icegatheringstatechange', checkState);
+                        resolve();
+                    }
+                };
+                pc.addEventListener('icegatheringstatechange', checkState);
+            }
+        });
+    }).then(() => {
+        var offer = pc.localDescription;
+        return fetch('/offer', {
+            body: JSON.stringify({
+                sdp: offer.sdp,
+                type: offer.type,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
+        });
+    }).then((response) => {
+        return response.json();
+    }).then((answer) => {
+        return pc.setRemoteDescription(answer);
+    }).catch((e) => {
+        alert(e);
+    });
 }
-````
+
+```
 
 </div>
 
@@ -252,8 +265,8 @@ function handleVideoOfferMsg(msg) {
     <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity" target="_blank" border-0 font-mono opacity-80>
       https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity
     </a>,
-    <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling#the_client_application" target="_blank" border-0 font-mono opacity-80>
-      https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling#the_client_application
+    <a href="https://github.com/aiortc/aiortc/blob/65cd5653f9cc922777b706563be7f4b0058d19c4/examples/webcam/client.js" target="_blank" border-0 font-mono opacity-80>
+      https://github.com/aiortc/aiortc/blob/65cd5653f9cc922777b706563be7f4b0058d19c4/examples/webcam/client.js
     </a>
   </div>
 </footer>
@@ -272,3 +285,5 @@ clicks: 12
 <div h-100>
 <SlidevAnipres id="fig-gradio-lite"/>
 </div>
+
+---

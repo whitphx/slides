@@ -30,14 +30,20 @@ layout: quote
 At [第七届FEDAY](https://fequan.com/2024/),
 
 ---
+clicks: 5
+---
+
+# Various presentation styles
 
 <div grid="~ cols-3 gap-6">
 
 <div bg-orange:10 border="~ orange/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>Slides.com</div>
-    <SlidevVideo autoplay muted controls loop>
-      <source src="/feday_whitphx_4x.mp4" type="video/mp4" />
-    </SlidevVideo>
+    <div :class="$clicks === 0 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+      <SlidevVideo autoplay muted controls loop>
+        <source src="/feday_whitphx_4x.mp4" type="video/mp4" />
+      </SlidevVideo>
+    </div>
 
 <!-- Key parts:
 Original: https://www.bilibili.com/video/BV1tUcBemE2r
@@ -52,11 +58,13 @@ Original: https://www.bilibili.com/video/BV1tUcBemE2r
   * Dev-friendly features e.g. codeblocks
 </div>
 
-<div bg-gray:10 border="~ gray/50 rounded-lg">
+<div v-click="2" bg-gray:10 border="~ gray/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-gray:10 px4 py2 rounded>Excalidraw (+ Obsidian)</div>
-    <SlidevVideo autoplay muted controls loop>
-      <source src="/feday_maieul_4x.mp4" type="video/mp4" />
-    </SlidevVideo>
+    <div :class="$clicks === 2 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+      <SlidevVideo autoplay muted controls loop>
+        <source src="/feday_maieul_4x.mp4" type="video/mp4" />
+      </SlidevVideo>
+    </div>
 
 <!-- Key parts:
 Original: https://www.bilibili.com/video/BV1iQ6EYHENU/
@@ -69,11 +77,13 @@ Original: https://www.bilibili.com/video/BV1iQ6EYHENU/
   * Sliding animations on a single whiteboard
 </div>
 
-<div bg-lime:10 border="~ lime/50 rounded-lg">
+<div v-click="4" bg-lime:10 border="~ lime/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-lime:10 px4 py2 rounded>Slidev</div>
-    <SlidevVideo autoplay muted controls loop>
-      <source src="/feday_antfu_10x.mp4" type="video/mp4" />
-    </SlidevVideo>
+    <div :class="$clicks === 4 ? 'absolute top-1 left-1 right-1 bottom-1' : ''">
+      <SlidevVideo autoplay muted controls loop>
+        <source src="/feday_antfu_10x.mp4" type="video/mp4" />
+      </SlidevVideo>
+    </div>
 
 <!--
 Original: https://www.bilibili.com/video/BV1Z4qdYpEUE/

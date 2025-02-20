@@ -27,7 +27,11 @@ layout: quote
 layout: center
 ---
 
-At [第七届FEDAY](https://fequan.com/2024/)...
+<div text-2xl>
+
+At [第七届FEDAY](https://fequan.com/2024/) in Xiamen, China on Dec 2024...
+
+</div>
 
 ---
 clicks: 5
@@ -187,11 +191,11 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 layout: center
 ---
 
-<div flex-col items-center align-center text-4xl>
+<div flex="~ col gap-6" text-5xl>
 
 <div flex="~ items-center gap-2">
 
-  <div i-carbon-logo-github text-2xl/>
+  <div i-carbon-logo-github/>
 
   <a href="https://github.com/whitphx/anipres" target="_blank" border-0 font-mono opacity-80>
     whitphx/anipres
@@ -202,7 +206,7 @@ layout: center
 
 <div flex="~ items-center gap-2">
 
-  <div i-carbon-link text-2xl />
+  <div i-carbon-link />
 
   <a href="https://anipres.app" target="_blank" border-0 font-mono opacity-80>
     anipres.app
@@ -304,3 +308,68 @@ clicks: 12
 ---
 
 # Anipres & its Slidev addon were just bootstrapped!
+
+<div mt-4 flex="~ col gap-6">
+
+<div v-click w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
+  <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
+    <span id="card-anipres-slidev-addon-title">
+      Anipres
+    </span>
+    <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
+  </div>
+
+  <div ml2 p2>
+
+  * WYSIWYG drawing on a whiteboard
+  * Frame transitions & diagram morphing
+  * Embeddable and exportable
+
+  </div>
+</div>
+
+<div v-click w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
+  <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
+    <span id="card-anipres-slidev-addon-title">
+      Anipres addon for Slidev
+    </span>
+    <sup text-fuchsia-500 bg-fuchsia:15 px1.5 rounded text-md>New Project</sup>
+  </div>
+
+  <div ml2 p2>
+
+  * Embeddable in Slidev
+  * Integrated slide transitions
+  * Take advantages of both Anipres and Slidev
+
+  </div>
+</div>
+
+
+<div v-click w="2/3" m-auto flex="~ col gap-2" text-xl>
+
+<div flex="~ items-center gap-2">
+
+  <div i-carbon-logo-github/>
+
+  <a href="https://github.com/whitphx/anipres" target="_blank" border-0 font-mono opacity-80>
+    whitphx/anipres
+  </a>
+
+</div>
+
+
+<div flex="~ items-center gap-2">
+
+  <div i-carbon-link />
+
+  <a href="https://anipres.app" target="_blank" border-0 font-mono opacity-80>
+    anipres.app
+  </a>
+
+</div>
+
+</div>
+
+
+</div>

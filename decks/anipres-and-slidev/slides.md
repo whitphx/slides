@@ -229,7 +229,7 @@ clicks: 9
 
 </div>
 
-<div :w="$clicks >= 1 ? '1/2' : '0'" absolute left-0 top-30 bottom-20>
+<div :w="$clicks >= 1 ? '1/2' : '0'" absolute left-0 top-30 bottom-20 transition-width duration-500>
 
 ```javascript {*|4-5|21-32|33-34,35-36|*|6-20}{lines:true,maxHeight:'100%'}
 function negotiate() {

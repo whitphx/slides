@@ -197,7 +197,7 @@ Refs:
   </div>
 </div>
 
-<FancyArrow v-click="2" x1="300" y1="310" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
+<FancyArrow v-click="2" id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
 
 <div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--30' : ''" transition duration-500>
 
@@ -225,7 +225,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
   </div>
 </div>
 
-<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" x2="580" y2="470" color="blue" arc="0" roughness="0.3" seed="4" />
+<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
 
 <div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--60' : $clicks < 3 ? 'translate-y--30' : ''" transition duration-500>
 

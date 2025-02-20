@@ -18,6 +18,12 @@ transition: fade-out
 Structured slides and animated diagrams
 
 ---
+layout: quote
+---
+
+# What presentation tool do you like?
+
+---
 
 # Story
 
@@ -143,7 +149,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 <div flex="~ items-center gap-2" text-2xl>
 
-  <div i-carbon-logo-github text-2xl text-black />
+  <div i-carbon-logo-github text-2xl/>
 
   <a href="https://github.com/whitphx/anipres" target="_blank" border-0 font-mono opacity-80>
     whitphx/anipres
@@ -154,7 +160,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 <div flex="~ items-center gap-2" text-2xl>
 
-  <div i-carbon-link text-2xl text-black />
+  <div i-carbon-link text-2xl />
 
   <a href="https://anipres.app" target="_blank" border-0 font-mono opacity-80>
     anipres.app
@@ -165,7 +171,6 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 ---
 clicks: 10
 ---
-
 
 <div :w="$clicks >= 10 ? '1/2' : 'full'" h-full>
 

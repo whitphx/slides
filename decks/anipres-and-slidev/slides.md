@@ -113,8 +113,8 @@ Key parts:
 
 <FancyArrow v-click="2" id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
 
-<div v-click="1" w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg" id="card-anipres">
-  <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
+<div v-click="1" w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg" id="card-anipres">
+  <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
     <span id="card-anipres-title">
       Anipres
     </span>
@@ -141,8 +141,8 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 <FancyArrow v-click="3" id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
 
-<div v-click="3" w="2/3" m-auto bg-purple:10 border="~ purple/50 rounded-lg">
-  <div flex="~ items-center gap-2" bg-orange:10 px4 py2 rounded text-md>
+<div v-click="3" w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
+  <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
     <span id="card-anipres-slidev-addon-title">
       Anipres addon for Slidev
     </span>
@@ -287,3 +287,8 @@ clicks: 12
 </div>
 
 ---
+
+# Summary
+
+- Anipres: beautiful diagrams with animation
+- Anipres addon for Slidev: integrate Anipres diagrams in Slidev

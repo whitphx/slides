@@ -103,7 +103,6 @@ Key parts:
 
 # What I want
 
-
 <div flex="~ items-center gap-2">
 
   <div i-ph-subtract-square text-2xl text-orange-500 />
@@ -198,7 +197,9 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 clicks: 10
 ---
 
-<div :w="$clicks >= 10 ? '1/2' : 'full'" h-full>
+# Example: WebRTC signaling protocol
+
+<div :w="$clicks >= 10 ? '1/2' : 'full'" h-100>
 
   <SlidevAnipres id="fig-webrtc" />
 
@@ -266,4 +267,8 @@ function handleVideoOfferMsg(msg) {
 clicks: 12
 ---
 
-<SlidevAnipres id="fig-gradio-lite" />
+# Example: Gradio-Lite architecture
+
+<div h-100>
+<SlidevAnipres id="fig-gradio-lite"/>
+</div>

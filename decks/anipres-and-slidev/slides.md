@@ -15,7 +15,7 @@ transition: fade-out
 
 <h1 data-text="Slidev meets Anipres">Slidev meets Anipres</h1>
 
-Structured slides and animated diagrams
+<div text-2xl>Structured slides and animated diagrams</div>
 
 ---
 layout: quote
@@ -24,10 +24,10 @@ layout: quote
 # What presentation tool do you like?
 
 ---
+layout: center
+---
 
-# Story
-
-At [第七届FEDAY](https://fequan.com/2024/),
+At [第七届FEDAY](https://fequan.com/2024/)...
 
 ---
 clicks: 5
@@ -303,7 +303,4 @@ clicks: 12
 
 ---
 
-# Summary
-
-- Anipres: beautiful diagrams with animation
-- Anipres addon for Slidev: integrate Anipres diagrams in Slidev
+# Anipres & its Slidev addon were just bootstrapped!

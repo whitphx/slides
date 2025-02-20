@@ -53,3 +53,35 @@ Software Developer / Indie Dev / OSS Enthusiast
   font-size: 1.8em;
 }
 </style>
+
+---
+
+# "I don't want to show my immature work"
+
+<div v-click text-4xl>
+No one cares.
+</div>
+
+---
+
+# "I will make it public in the future"
+
+<div v-click text-4xl>
+The chance never comes.
+</div>
+
+---
+
+# "This code may be our business asset"
+
+<div v-click text-4xl>
+Someone else will make better one soon.
+</div>
+
+---
+layout: center
+---
+
+<h1 text-4xl>
+MAKE <span v-mark.underline.orange="0">PUBLIC</span> DEFAULT
+</h1>

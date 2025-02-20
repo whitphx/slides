@@ -15,7 +15,10 @@ transition: fade-out
 
 <h1 data-text="Slidev meets Anipres">Slidev meets Anipres</h1>
 
-<div text-2xl>Structured slides and animated diagrams</div>
+<div text-2xl>
+  Structured slides and animated diagrams<br />
+  for developers' presentations
+</div>
 
 ---
 
@@ -25,16 +28,16 @@ transition: fade-out
 
 @whitphx
 
-<div mt-8>
-Software Developer / Indie Dev / OSS Enthusiast
+<div mt-8 v-click>
+Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast</span>
 </div>
 
 <div mt-4>
 
 <v-clicks>
 
-- ML Developer Advocate at Hugging Face 🤗
-- Streamlit Creator
+- ML Developer Advocate at <span v-mark.underline.yellow="2">Hugging Face</span> 🤗
+- <span v-mark.underline.red="3">Streamlit</span> Creator
 
 </v-clicks>
 
@@ -63,13 +66,17 @@ Software Developer / Indie Dev / OSS Enthusiast
 layout: quote
 ---
 
-# What presentation tool do you like?
+<h1 text-4xl>
+
+What presentation tool do you like?
+
+</h1>
 
 ---
 layout: center
 ---
 
-<div text-2xl>
+<div text-4xl>
 
 At [第七届FEDAY](https://fequan.com/2024/) in Xiamen, China on Dec 2024...
 
@@ -164,17 +171,17 @@ Refs:
 
 # What I want
 
-<div flex="~ items-center gap-2">
+<div flex="~ items-center gap-2" text-xl>
 
   <div i-ph-subtract-square text-2xl text-orange-500 />
 
-  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange="2">Slides.com</strong> (or PowerPoint, Keynote)
+  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange="2">Slides.com</strong> (or PowerPoint)
 
 </div>
 
 <FancyArrow v-click="2" id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
 
-<div v-click="1" w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg" id="card-anipres">
+<div v-click="1" forward:delay-300 w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg" id="card-anipres">
   <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
     <span id="card-anipres-title">
       Anipres
@@ -190,9 +197,9 @@ Refs:
   </div>
 </div>
 
-<FancyArrow v-click="2" id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
+<FancyArrow v-click="2" x1="300" y1="310" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
 
-<div flex="~ items-center gap-2">
+<div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--30' : ''" transition duration-500>
 
   <div i-ph-slideshow-duotone text-2xl text-teal-500 />
 
@@ -202,7 +209,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 <FancyArrow v-click="3" id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
 
-<div v-click="3" w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
+<div v-click="3" forward:delay-300 w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
     <span id="card-anipres-slidev-addon-title">
       Anipres addon for Slidev
@@ -218,9 +225,9 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
   </div>
 </div>
 
-<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
+<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" x2="580" y2="470" color="blue" arc="0" roughness="0.3" seed="4" />
 
-<div flex="~ items-center gap-2">
+<div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--60' : $clicks < 3 ? 'translate-y--30' : ''" transition duration-500>
 
   <div text-2xl  i-ph-text-align-left text-lime-500 />
 

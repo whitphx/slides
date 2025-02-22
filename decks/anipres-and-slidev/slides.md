@@ -179,7 +179,7 @@ Refs:
 
 </div>
 
-<FancyArrow v-click="2" id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="0.1" seed="2" />
+<FancyArrow v-click="2" id1="item-slidescom" pos1="bottomleft" id2="card-anipres-title" pos2="right" color="orange" arc="-0.1" seed="2" />
 
 <div v-click="1" forward:delay-300 w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg" id="card-anipres">
   <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
@@ -197,7 +197,7 @@ Refs:
   </div>
 </div>
 
-<FancyArrow v-click="2" id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="teal" arc="0.1" seed="2" />
+<FancyArrow v-click="2" id1="item-excalidraw" pos1="top" id2="card-anipres-title" pos2="bottomright" color="teal" arc="-0.1" seed="2" />
 
 <div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--30' : ''" transition duration-500>
 
@@ -207,7 +207,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
 </div>
 
-<FancyArrow v-click="3" id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="-0.5" />
+<FancyArrow v-click="3" id1="card-anipres" pos1="bottomleft" id2="card-anipres-slidev-addon-title" pos2="topleft" color="blue" arc="0.5" />
 
 <div v-click="3" forward:delay-300 w="2/3" m-auto bg-fuchsia:10 border="~ fuchsia/50 rounded-lg">
   <div flex="~ items-center gap-2" bg-fuchsia:10 px4 py2 rounded text-md>
@@ -225,7 +225,7 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
   </div>
 </div>
 
-<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="0.3" seed="4" />
+<FancyArrow v-click="4" id1="anipres-addon-embed" pos1="bottom" id2="item-slidev" pos2="top" color="blue" arc="0" roughness="-0.3" seed="4" />
 
 <div flex="~ items-center gap-2" text-xl :class="$clicks < 1 ? 'translate-y--60' : $clicks < 3 ? 'translate-y--30' : ''" transition duration-500>
 

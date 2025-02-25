@@ -1,6 +1,6 @@
 ---
 theme: seriph
-title: ""
+title: "In-browser AI and its standardization"
 class: text-center
 drawings:
   persist: false

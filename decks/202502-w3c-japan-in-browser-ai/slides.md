@@ -25,7 +25,7 @@ its standardization
 
 @whitphx
 
-<img src="/public/profile.jpg" w-30 rounded-full absolute top-10 right-60 />
+<img src="/profile.jpg" w-30 rounded-full absolute top-10 right-60 />
 
 <div mt-20 v-click>
 Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast</span>
@@ -71,6 +71,8 @@ Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast
 * I had a presentation at [FEDay 2024](https://fequan.com/2024/) about Gradio-Lite and Transformers.js.
   * [使用 Gradio 和 Transformers 构建 Web AI 应用 - Yuichiro](https://www.bilibili.com/video/BV1tUcBemE2r/)
 * I met some W3C members at the conference and they introduced me to the <span v-mark.underline.green="3">Web Machine Learning WG</span> at W3C.
+  * Xiaoqian Wu
+  * Dom, Anssi, and Naomi
 
 </v-clicks>
 
@@ -86,7 +88,11 @@ Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast
 
 # In-browser AI
 
+<div>
+
 <span text-4xl>Execute AI models in the browser</span>
+
+</div>
 
 ---
 
@@ -111,3 +117,80 @@ Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast
 ---
 
 <SlidevAnipres id="tech-layers" />
+
+---
+
+# Incubated Task-based API vs Transformers.js
+
+<div>
+
+### Example: Translation
+
+<div grid="~ cols-2 gap-4">
+
+<div>
+
+#### WebML Task-based API
+
+```js {1-6|*}{lines:true}
+const translator = await ai.translator.create({
+  sourceLanguage: "en",
+  targetLanguage: "ja"
+});
+
+const text = await translator.translate("Hello, world!");
+const readableStreamOfText = await translator.translateStreaming(`
+  Four score and seven years ago our fathers brought forth, upon this...
+`);
+```
+
+</div>
+
+<div>
+
+#### Transformers.js
+
+```js {*}{lines:true}
+const translator = await pipeline('translation', 'Xenova/nllb-200-distilled-600M');
+const text = await translator('Hello, world!', {
+  src_lang: 'en',
+  tgt_lang: 'ja',
+});
+```
+
+</div>
+
+</div>
+
+</div>
+
+<div v-click mt-4>
+
+### Supported models/tasks
+
+<div grid="~ cols-2 gap-4">
+
+<div>
+
+#### WebML Task-based API
+
+- Translator and Language Detector APIs
+- Writing Assistance APIs
+- Prompt API
+
+</div>
+
+<div>
+
+#### Transformers.js
+
+👉 [Supported tasks/models](https://huggingface.co/docs/transformers.js/en/index#supported-tasksmodels)
+
+* 30+ tasks
+* 100+ models
+
+</div>
+
+</div>
+
+</div>

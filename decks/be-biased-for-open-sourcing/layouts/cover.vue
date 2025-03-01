@@ -115,7 +115,7 @@ const { isDark } = useDarkMode();
 }
 
 h1 {
-  font-size: calc(1rem - -5vw);
+  font-size: 5rem;
   position: relative;
 }
 

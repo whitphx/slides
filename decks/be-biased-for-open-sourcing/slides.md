@@ -10,7 +10,9 @@ defaults:
 transition: fade-out
 ---
 
-<h1 data-text="Be biased for open-sourcing">Be biased for open-sourcing</h1>
+<h1>
+Be biased for open-sourcing
+</h1>
 
 ---
 
@@ -56,6 +58,10 @@ Software Developer / Indie Dev / OSS Enthusiast
 
 ---
 
+Why don't you make your work open?
+
+---
+
 # "I don't want to show my immature work"
 
 <div v-click text-4xl>
@@ -70,13 +76,32 @@ No one cares.
 The chance never comes.
 </div>
 
+<!-- https://github.com/whitphx/tasquet -->
+
 ---
 
 # "This code may be our business asset"
 
 <div v-click text-4xl>
-Someone else will make better one soon.
+Someone else will make a better one soon.
 </div>
+
+Source code alone doesn't make any market value.
+
+---
+
+Open-sourcing can be a great promotion for your project.
+
+---
+
+Open-sourcing motivates you to continue the work.
+
+---
+
+# Public repositories can grow by contributions from all over the world
+
+
+---
 
 ---
 layout: center

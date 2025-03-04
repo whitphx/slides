@@ -77,10 +77,10 @@ importers:
         version: 0.25.0
       slidev-addon-anipres:
         specifier: ^0.0.16
-        version: 0.0.16(@slidev/client@51.2.2(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.3)(react@18.3.1)(vite@6.1.1(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.1(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+        version: 0.0.16(@slidev/client@51.2.2(@nuxt/kit@3.15.4)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.3)(react@18.3.1)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)))(react@18.3.1)(typescript@5.7.3)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       slidev-addon-fancy-arrow:
-        specifier: ^0.6.0
-        version: 0.6.0(@babel/parser@7.26.8)(@nuxt/kit@3.15.4)(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)(typescript@5.7.3)
+        specifier: ^0.7.0
+        version: 0.7.0(typescript@5.7.3)
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -3716,8 +3716,8 @@ packages:
       vite: '>=5.0'
       vue: ^3.0.0
 
-  slidev-addon-fancy-arrow@0.6.0:
-    resolution: {integrity: sha512-c4RKWnbxSsbZboptYmorMoiw9Yc/bDeNAIUCEtJF4cl2DQLaGBSgiATkURvAZVtS8OdTfIBp57PtAwEMrqyUrQ==}
+  slidev-addon-fancy-arrow@0.7.0:
+    resolution: {integrity: sha512-L6tZimHyDRHCTLdwhC2r+IVdeA6imhLndGznqOuCqNkg3GblE90jZdmtvPzVoobvE4nRYKXKkTcm1izdlI4iAA==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -9157,40 +9157,12 @@ snapshots:
       - react
       - typescript
 
-  slidev-addon-fancy-arrow@0.6.0(@babel/parser@7.26.8)(@nuxt/kit@3.15.4)(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)(typescript@5.7.3):
+  slidev-addon-fancy-arrow@0.7.0(typescript@5.7.3):
     dependencies:
-      '@slidev/cli': 51.2.2(@babel/parser@7.26.8)(@nuxt/kit@3.15.4)(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(markdown-it-async@2.0.0)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       roughjs: 4.6.6
       vue: 3.5.13(typescript@5.7.3)
     transitivePeerDependencies:
-      - '@babel/parser'
-      - '@nuxt/kit'
-      - '@svgr/core'
-      - '@svgx/core'
-      - '@types/markdown-it'
-      - '@types/node'
-      - '@unocss/webpack'
-      - '@vue/compiler-sfc'
-      - '@vue/composition-api'
-      - less
-      - lightningcss
-      - magicast
-      - markdown-it-async
-      - playwright-chromium
-      - postcss
-      - react
-      - sass
-      - sass-embedded
-      - solid-js
-      - stylus
-      - sugarss
-      - supports-color
-      - svelte
-      - terser
-      - tsx
       - typescript
-      - vue-template-compiler
-      - vue-template-es2015-compiler
 
   source-map-js@1.2.1: {}
 

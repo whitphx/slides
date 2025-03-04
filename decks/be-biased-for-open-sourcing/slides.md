@@ -22,16 +22,16 @@ Be biased for open-sourcing
 
 @whitphx
 
-<div mt-8>
-Software Developer / Indie Dev / OSS Enthusiast
+<div mt-8 v-click>
+Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast</span>
 </div>
 
 <div mt-4>
 
 <v-clicks>
 
-- ML Developer Advocate at Hugging Face 🤗
-- Streamlit Creator
+- ML Developer Advocate at <span v-mark.underline.yellow="2">Hugging Face</span> 🤗
+- <span v-mark.underline.red="3">Streamlit</span> Creator
 
 </v-clicks>
 

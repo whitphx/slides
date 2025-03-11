@@ -21,7 +21,7 @@ for pkgDir in "${decksDir}"/*; do
 
     if [ -f "${pkgDir}/package.json" ]; then
       pushd "$pkgDir"
-      pnpm build --base ${dirName} --out ${rootDist}/${dirName}
+      pnpm build --base /${dirName} --out ${rootDist}/${dirName}
       popd
     fi
   fi

@@ -1,11 +1,41 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { readdir } from 'fs/promises';
+import { join } from 'path';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Get all deck directories at build time
+const decksDir = join(process.cwd(), '..', '..', 'dist');
+const decks = await readdir(decksDir, { withFileTypes: true })
+  .then(entries => entries
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name)
+    .filter(name => !name.startsWith('.')) // Exclude hidden directories
+    .sort() // Sort alphabetically
+  );
 ---
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>whitphx's slide decks</title>
+	</head>
+	<body>
+		<h1>Presentation Decks</h1>
+		<ul>
+		  {decks.map(deck => (
+			<li>
+			  <a href={`/${deck}`}>{deck}</a>
+			</li>
+		  ))}
+		</ul>
+	</body>
+</html>
 
-<Layout>
-	<Welcome />
-</Layout>
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

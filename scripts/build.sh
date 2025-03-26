@@ -26,3 +26,6 @@ for pkgDir in "${decksDir}"/*; do
     fi
   fi
 done
+
+pnpm --filter index build
+mv packages/index/dist/* "${rootDist}/."

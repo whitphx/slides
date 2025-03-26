@@ -11,6 +11,8 @@ const decks = await readdir(decksDir, { withFileTypes: true })
     .filter(name => !name.startsWith('.')) // Exclude hidden directories
     .sort() // Sort alphabetically
   );
+
+import "../styles/global.css";
 ---
 <!doctype html>
 <html lang="en">
@@ -30,12 +32,3 @@ const decks = await readdir(decksDir, { withFileTypes: true })
 		</ul>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

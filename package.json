@@ -7,13 +7,13 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "eslint": "^9.20.0",
-    "eslint-plugin-vue": "^9.32.0",
-    "globals": "^15.14.0",
-    "typescript-eslint": "^8.23.0"
+    "@eslint/js": "^9.23.0",
+    "eslint": "^9.23.0",
+    "eslint-plugin-vue": "^9.33.0",
+    "globals": "^15.15.0",
+    "typescript-eslint": "^8.28.0"
   },
   "dependencies": {
-    "@iconify/collections": "^1.0.519"
+    "@iconify/collections": "^1.0.532"
   }
 }

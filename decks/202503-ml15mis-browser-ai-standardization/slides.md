@@ -47,9 +47,10 @@ its standardization
 
 ### Frameworks/Libraries
 
-- **TensorFlow.js**: General-purpose, supports training and inference
-- **ONNX Runtime Web**: Runs ONNX models via WebAssembly/WebGPU
-- **Transformers.js**: Hugging Face model inference in JavaScript
+- [**TensorFlow.js**](https://www.tensorflow.org/js): General-purpose, supports training and inference
+- [**ONNX Runtime Web**](https://onnxruntime.ai/docs/tutorials/web/): Runs ONNX models via WebAssembly/WebGPU
+- [**Transformers.js**](https://huggingface.co/docs/transformers.js/en/index): Hugging Face model inference in JavaScript
+- [**MLC LLM**](https://llm.mlc.ai/): Runs LLMs in various platforms including browser
 
 ### Model optimization
 - Quantization, Pruning, Knowledge Distillation

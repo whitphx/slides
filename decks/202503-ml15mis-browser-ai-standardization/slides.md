@@ -22,7 +22,7 @@ its standardization
 
 <div class="slide">
 
-# Yuichiro Tachibana
+<h1 text-3xl>Yuichiro Tachibana</h1>
 
 @whitphx
 
@@ -56,7 +56,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <style>
 .slide {
-  font-size: 1.8em;
+  font-size: 2.2em;
 }
 </style>
 
@@ -123,7 +123,7 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 
 # In-Browser AI tools
 
-<Transform scale="1.2">
+<Transform scale="1.3">
 
 ## Runtime
 
@@ -138,13 +138,14 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 
 </Transform>
 
-<aside absolute bottom-10>
+<aside absolute bottom-4>
 We don't talk about model optimizations such as quantization, pruning, knowledge distillation in this talk.
 </aside>
 
 ---
 
 # ONNX Runtime Web
+https://onnxruntime.ai/docs/tutorials/web/
 
 <iframe src="https://onnxruntime.ai/docs/tutorials/web/" class="w-200% scale-50% origin-top-left h-100" mb="-40" />
 

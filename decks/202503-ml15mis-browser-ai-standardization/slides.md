@@ -146,6 +146,8 @@ We don't talk about model optimizations such as quantization, pruning, knowledge
 
 # ONNX Runtime Web
 
+<iframe src="https://onnxruntime.ai/docs/tutorials/web/" class="w-200% scale-50% origin-top-left h-100" mb="-40" />
+
 > ONNX (Open Neural Network Exchange) is an open standard for computer vision and machine learning models.
 > The ONNX standard provides a common format enabling the transfer of models between popular machine learning frameworks. It promotes interoperability between different deep learning frameworks for simple model sharing and deployment.
 >
@@ -164,24 +166,30 @@ https://huggingface.co/docs/transformers.js/en/index
 - Backend: ONNX Runtime Web, WebGPU (under development)
 - Examples: https://github.com/huggingface/transformers.js-examples
 
+<div border="rounded 2 gray-300" p-2 mt-4>
+
 ### Example: Text-to-Speech
 
 <sub>
-https://huggingface.co/spaces/Xenova/text-to-speech-client
+<a href="https://huggingface.co/spaces/Xenova/text-to-speech-client">https://huggingface.co/spaces/Xenova/text-to-speech-client</a>
 </sub>
 
-```js
+```js {*}{class:'!children:text-xl'}
 const synthesizer = await pipeline('text-to-speech', 'Xenova/speecht5_tts', { quantized: false });
 const speaker_embeddings = 'https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/speaker_embeddings.bin';
 const out = await synthesizer('Hello, my dog is cute', { speaker_embeddings });
 ```
+
+</div>
 
 ---
 
 # Example: Transformers.js.py + Gradio-Lite
 For Python devs
 
-```html
+<div text-xl overflow-scroll h-100>
+
+```html {*}{class:'!children:text-lg'}
 <html>
     <head>
         <script type="module" crossorigin src="https://cdn.jsdelivr.net/npm/@gradio/lite/dist/lite.js"></script>
@@ -231,7 +239,13 @@ demo.launch()
 </html>
 ```
 
+</div>
+
 ---
+
+# Text-to-Speech app with Transformers.js + Gradio-Lite
+
+https://huggingface.co/spaces/whitphx/gradio-lite-text-to-speech
 
 <SlidevVideo src="https://s3.amazonaws.com/media-p.slid.es/videos/2387029/whwjCa59/cleanshot_2024-12-07_at_00.mp4" autoplay controls />
 
@@ -241,7 +255,7 @@ demo.launch()
 
 https://developer.chrome.com/docs/ai
 
-```js
+```js {*}{class:'!children:text-xl'}
 const canCreate = await window.ai.canCreateTextSession();
 
 if (canCreate !== "no") {
@@ -256,11 +270,17 @@ if (canCreate !== "no") {
 
 ---
 
-# Example: Gemini Nano + Gradio-Lite
+# Chat app with Gemini Nano in Chrome + Gradio-Lite
 
 https://huggingface.co/blog/whitphx/in-browser-llm-gemini-nano-gradio-lite
 
 <SlidevVideo src="https://cdn-uploads.huggingface.co/production/uploads/63da49043b8591bd11f52dca/7i_S75sgql42Cc45pnvy5.mp4" autoplay controls />
+
+---
+layout: section
+---
+
+# Standardization
 
 ---
 
@@ -282,11 +302,34 @@ Initiatives to standardize the in-browser AI APIs.
 
 # Web Neural Network API (WebNN)
 
+> A dedicated low-level API for neural network inference hardware acceleration.
+>
+> <sub>https://www.w3.org/TR/webnn/</sub>
+
 ---
 
 # What WebNN standardizes
 
 <iframe src="https://webmachinelearning.github.io/webnn-status/" w="100%" h-120 />
+
+---
+
+# Standardization process/participants
+https://www.w3.org/groups/wg/webmachinelearning/participants/
+
+- Participants from
+  - W3C
+  - Microsoft Corporation
+  - Samsung Electronics Co., Ltd.
+  - Google LLC
+  - Intel Corporation
+  - Apple Inc.
+  - Alibaba Group
+  - Baidu, Inc.
+  - Qualcomm
+  - ByteDance
+  - Centre for Inclusive Design
+  - Electronics and Telecommunications Research Institute (ETRI)
 
 ---
 
@@ -296,7 +339,7 @@ https://webmachinelearning.github.io/incubations/
 
 ### Example: Translator API
 
-```js
+```js {*}{class:'!children:text-xl'}
 const translator = await Translator.create({
   sourceLanguage: "en",
   targetLanguage: "ja"

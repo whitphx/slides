@@ -23,7 +23,7 @@
     "defaults": {
       "fonts": {
         "mono": "PT Mono",
-        "sans": "Calibri",
+        "sans": "Noto Sans JP",
         "serif": "Cambria",
         "italic": true,
         "weights": "400, 700"

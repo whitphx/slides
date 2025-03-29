@@ -328,6 +328,8 @@ https://www.w3.org/groups/wg/webmachinelearning/participants/
   - Baidu, Inc.
   - Qualcomm
   - ByteDance
+  - ARM Limited
+  - Mozilla Foundation
   - Centre for Inclusive Design
   - Electronics and Telecommunications Research Institute (ETRI)
 
@@ -351,6 +353,8 @@ const readableStreamOfText = await translator.translateStreaming(`
 `);
 ```
 
+---
+clicks: 2
 ---
 
 <SlidevAnipres id="tech-layers" />
@@ -442,7 +446,7 @@ https://onnxruntime.ai/docs/tutorials/web/ep-webnn.html
 
 ## Gemini Nano in Chrome
 
-```js
+```js {*}{class:'!children:text-xl'}
 const translator = await self.ai.translator.create({
   sourceLanguage: 'en',
   targetLanguage: 'fr',

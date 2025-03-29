@@ -218,6 +218,8 @@ https://huggingface.co/blog/whitphx/in-browser-llm-gemini-nano-gradio-lite
 
 # Web Machine Learning Community/WG at W3C
 
+Initiatives to standardize the in-browser AI APIs.
+
 <div>
 
 👉 https://webmachinelearning.github.io/community/
@@ -227,6 +229,10 @@ https://huggingface.co/blog/whitphx/in-browser-llm-gemini-nano-gradio-lite
 👉 https://www.w3.org/groups/wg/webmachinelearning/
 
 </div>
+
+---
+
+# Web Neural Network API (WebNN)
 
 ---
 
@@ -260,7 +266,7 @@ const readableStreamOfText = await translator.translateStreaming(`
 
 ---
 
-# Incubated Task-based API vs Transformers.js vs Gemini Nano
+# WebML Task-based API vs Transformers.js
 
 <div>
 
@@ -337,11 +343,13 @@ const text = await translator('Hello, world!', {
 
 ---
 
-# Gemini Nano in Chrome
+# Existing frameworks/libraries adapting to WebNN
 
-<div>
+## ONNX Runtime Web
 
-#### Gemini Nano in Chrome
+https://onnxruntime.ai/docs/tutorials/web/ep-webnn.html
+
+## Gemini Nano in Chrome
 
 ```js
 const translator = await self.ai.translator.create({
@@ -353,4 +361,12 @@ await translator.translate('Where is the next bus stop, please?');
 
 [They are working on standardizing the API](https://developer.chrome.com/docs/ai/translator-api#standardization)
 
-</div>
+---
+
+# Summary
+
+- There are several frameworks/libraries to develop in-browser AI applications.
+- Standardization is ongoing in W3C WebML WG.
+  - Join the WG if interested in the standardization process!
+    - https://www.w3.org/community/webmachinelearning/2018/10/03/call-for-participation-in-machine-learning-for-the-web-community-group/
+    - https://www.w3.org/groups/wg/webmachinelearning/instructions/

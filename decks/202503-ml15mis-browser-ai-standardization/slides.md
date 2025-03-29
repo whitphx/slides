@@ -146,6 +146,11 @@ We don't talk about model optimizations such as quantization, pruning, knowledge
 
 # ONNX Runtime Web
 
+> ONNX (Open Neural Network Exchange) is an open standard for computer vision and machine learning models.
+> The ONNX standard provides a common format enabling the transfer of models between popular machine learning frameworks. It promotes interoperability between different deep learning frameworks for simple model sharing and deployment.
+>
+> <sub>https://viso.ai/computer-vision/onnx-explained/</sub>
+
 ---
 
 # Transformers.js

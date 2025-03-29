@@ -20,6 +20,48 @@ its standardization
 
 ---
 
+<div class="slide">
+
+# Yuichiro Tachibana
+
+@whitphx
+
+<div mt-8 v-click>
+Software Artisan / Indie Dev / OSS Enthusiast
+</div>
+
+<div mt-4>
+
+<v-clicks>
+
+- ML Developer Advocate at <span v-mark.underline.yellow="2">Hugging Face</span> 🤗
+- <span v-mark.underline.red="3">Streamlit</span> Creator
+
+</v-clicks>
+
+</div>
+
+<div my-10 w-min flex="~ gap-1" items-center justify-center v-click>
+  <div i-ri-user-3-line op50 ma text-xl />
+  <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
+  <div i-ri-github-line op50 ma text-xl ml4/>
+  <div><a href="https://github.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+  <div i-ri-linkedin-line op50 ma text-xl ml4/>
+  <div><a href="https://www.linkedin.com/in/whitphx/" target="_blank" class="border-none! font-300">whitphx</a></div>
+  <div i-ri-twitter-x-line op50 ma text-xl ml4/>
+  <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+</div>
+
+</div>
+
+<style>
+.slide {
+  font-size: 1.8em;
+}
+</style>
+
+---
+
 # In-browser AI
 
 <div flex="~ row" max-h-120>
@@ -81,17 +123,18 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 
 # In-Browser AI tools
 
-<Transform scale="1.3">
+<Transform scale="1.2">
 
 ## Runtime
 
-- [**TensorFlow.js**](https://www.tensorflow.org/js): General-purpose, supports training and inference
-- [**ONNX Runtime Web**](https://onnxruntime.ai/docs/tutorials/web/): Runs ONNX models via WebAssembly/WebGPU
+- [**TensorFlow.js**](https://www.tensorflow.org/js)
+- [**ONNX Runtime Web**](https://onnxruntime.ai/docs/tutorials/web/)
+- [WebDNN](https://mil-tokyo.github.io/webdnn/ja/)
 
 ## Frameworks/Libraries
 
-- [**Transformers.js**](https://huggingface.co/docs/transformers.js/en/index): Hugging Face model inference in JavaScript
-- [**MLC LLM**](https://llm.mlc.ai/): Runs LLMs in various platforms including browser
+- [**Transformers.js**](https://huggingface.co/docs/transformers.js/en/index)
+- [**MLC LLM**](https://llm.mlc.ai/)
 
 </Transform>
 

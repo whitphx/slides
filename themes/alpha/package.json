@@ -24,7 +24,7 @@
       "fonts": {
         "mono": "PT Mono",
         "sans": "Noto Sans JP",
-        "serif": "Cambria",
+        "serif": "Playfair Display",
         "italic": true,
         "weights": "400, 700"
       }

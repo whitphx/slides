@@ -22,15 +22,49 @@ its standardization
 
 # In-browser AI
 
-<div>
+<div flex="~ row" max-h-120>
 
-<span text-4xl>Execute AI models in the browser</span>
+<div w="50%">
+
+<div p-2>
+
+<img src="https://lh3.googleusercontent.com/8lXXHoS-ibHI8hXPnU8mbqnckhXY2Gj8aHv4mE9HOxQWZzKQsGETiSao2BGsgvEBgVAFWfzYcalKA2ZHE8WS14Sw1JjwJw" />
+
+<sub>
+https://www.tensorflow.org/js/demos
+</sub>
+
+</div>
+
+<div p-2>
+
+<SlidevVideo src="https://media.slid.es/videos/2387029/S1X1nuCK/cleanshot_2024-12-03_at_20.mp4" autoplay controls />
+
+</div>
+
+</div>
+
+<div w="50%">
+
+<div p-2>
+<SlidevVideo src="https://cdn-uploads.huggingface.co/production/uploads/61b253b7ac5ecaae3d1efe0c/LhlrHN9bLO2zV_MTgBA_5.mp4" autoplay controls />
+
+<sub>
+https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
+</sub>
+</div>
+
+</div>
+
+<!-- <iframe src="https://microsoft.github.io/onnxruntime-web-demo/#/yolo" w="100%" /> -->
 
 </div>
 
 ---
 
 # Benefits of In-Browser AI
+
+<Transform scale="1.8">
 
 <v-clicks>
 
@@ -41,9 +75,13 @@ its standardization
 
 </v-clicks>
 
+</Transform>
+
 ---
 
 # In-Browser AI tools
+
+<Transform scale="1.3">
 
 ## Runtime
 
@@ -55,6 +93,7 @@ its standardization
 - [**Transformers.js**](https://huggingface.co/docs/transformers.js/en/index): Hugging Face model inference in JavaScript
 - [**MLC LLM**](https://llm.mlc.ai/): Runs LLMs in various platforms including browser
 
+</Transform>
 
 <aside absolute bottom-10>
 We don't talk about model optimizations such as quantization, pruning, knowledge distillation in this talk.

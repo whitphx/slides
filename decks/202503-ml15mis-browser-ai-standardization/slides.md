@@ -456,9 +456,13 @@ await translator.translate('Where is the next bus stop, please?');
 
 # Summary
 
+<Transform scale="1.2">
+
 - There are several frameworks/libraries to develop in-browser AI applications.
   - Choose a right one for your purpose.
 - Standardization is ongoing in W3C WebML WG.
   - Join the WG if interested in the standardization process!
     - https://www.w3.org/community/webmachinelearning/2018/10/03/call-for-participation-in-machine-learning-for-the-web-community-group/
     - https://www.w3.org/groups/wg/webmachinelearning/instructions/
+
+</Transform>

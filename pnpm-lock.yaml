@@ -46,8 +46,8 @@ importers:
         specifier: ^0.25.0
         version: link:../../themes/alpha
       slidev-addon-anipres:
-        specifier: ^0.2.9
-        version: 0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.2.10
+        version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -61,8 +61,8 @@ importers:
         specifier: latest
         version: link:../../themes/alpha
       slidev-addon-anipres:
-        specifier: ^0.2.9
-        version: 0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.2.10
+        version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -73,8 +73,8 @@ importers:
         specifier: ^51.4.0
         version: 51.4.0(@babel/parser@7.27.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(lightningcss@1.29.2)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
-        specifier: ^0.2.9
-        version: 0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.2.10
+        version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -85,8 +85,8 @@ importers:
         specifier: ^51.4.0
         version: 51.4.0(@babel/parser@7.27.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(lightningcss@1.29.2)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
-        specifier: ^0.2.9
-        version: 0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.2.10
+        version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -100,8 +100,8 @@ importers:
         specifier: latest
         version: link:../../themes/alpha
       slidev-addon-anipres:
-        specifier: ^0.2.9
-        version: 0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.2.10
+        version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       slidev-addon-fancy-arrow:
         specifier: ^0.7.0
         version: 0.7.0(typescript@5.8.2)
@@ -4821,8 +4821,8 @@ packages:
     resolution: {integrity: sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==}
     engines: {node: '>=14.16'}
 
-  slidev-addon-anipres@0.2.9:
-    resolution: {integrity: sha512-zRdO6X/QYIAHPatU2BKTRboWE3lDoJh7ocUuvUbuQbz/3i0dwylq2s/GuD4hn8vNdf5PwhJ5FnR677kj14nwaA==}
+  slidev-addon-anipres@0.2.10:
+    resolution: {integrity: sha512-7T/bhEuHdnnsUe0iaJdCZyXKMXpGcRRUBsZXiQGwnUbo9UXWUC0O4fEXaxbmhgU+O14cR59yJwWhxPflgvjKhA==}
     peerDependencies:
       '@slidev/client': '>=0.49.0'
       vite: '>=5.0'
@@ -11261,7 +11261,7 @@ snapshots:
   slash@5.1.0:
     optional: true
 
-  slidev-addon-anipres@0.2.9(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2)):
+  slidev-addon-anipres@0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@slidev/client': 51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))
       '@vueuse/core': 12.8.2(typescript@5.8.2)

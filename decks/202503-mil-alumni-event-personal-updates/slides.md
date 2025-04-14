@@ -202,8 +202,6 @@ st.write("Hello,", name or "world")
 </div>
 
 ---
-clicks: 11
----
 
 <SlidevAnipres id="timeline" excalidraw-like-font />
 

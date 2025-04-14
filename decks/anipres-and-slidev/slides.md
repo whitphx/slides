@@ -83,8 +83,6 @@ At [第七届FEDAY](https://fequan.com/2024/) in Xiamen, China on Dec 2024...
 </div>
 
 ---
-clicks: 5
----
 
 # Various presentation styles
 
@@ -267,8 +265,6 @@ layout: center
 
 
 ---
-clicks: 9
----
 
 # Example: WebRTC signaling protocol
 
@@ -344,8 +340,6 @@ function negotiate() {
 <!-- // https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Express_Nodejs/forms -->
 
 
----
-clicks: 12
 ---
 
 # Example: Gradio-Lite architecture

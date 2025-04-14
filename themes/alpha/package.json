@@ -1,16 +1,10 @@
 {
-  "name": "@slidev/theme-seriph",
-  "version": "0.25.0",
-  "description": "Seriph theme for Slidev",
-  "author": "antfu <anthonyfu117@hotmail.com>",
+  "name": "slidev-theme-alpha",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Ejected from @slidev/theme-seriph@0.25.0",
+  "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
   "license": "MIT",
-  "funding": "https://github.com/sponsors/antfu",
-  "homepage": "https://sli.dev",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/slidevjs/themes"
-  },
-  "bugs": "https://github.com/slidevjs/themes/issues",
   "keywords": [
     "slidev-theme",
     "slidev"

@@ -44,7 +44,7 @@ importers:
         version: 0.25.0
       '@slidev/theme-seriph':
         specifier: ^0.25.0
-        version: link:../../themes/alpha
+        version: 0.25.0
       slidev-addon-anipres:
         specifier: ^0.2.10
         version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
@@ -59,7 +59,7 @@ importers:
         version: 51.4.0(@babel/parser@7.27.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(lightningcss@1.29.2)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       '@slidev/theme-seriph':
         specifier: latest
-        version: link:../../themes/alpha
+        version: 0.25.0
       slidev-addon-anipres:
         specifier: ^0.2.10
         version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
@@ -98,7 +98,7 @@ importers:
         version: 51.4.0(@babel/parser@7.27.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(lightningcss@1.29.2)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       '@slidev/theme-seriph':
         specifier: latest
-        version: link:../../themes/alpha
+        version: 0.25.0
       slidev-addon-anipres:
         specifier: ^0.2.10
         version: 0.2.10(@slidev/client@51.4.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.13)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(typescript@5.8.2)(vite@6.2.3(@types/node@18.19.75)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
@@ -116,7 +116,7 @@ importers:
         version: 51.4.0(@babel/parser@7.27.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@18.19.75)(@vue/compiler-sfc@3.5.13)(lightningcss@1.29.2)(magicast@0.3.5)(postcss@8.5.3)(react@18.3.1)(tsx@4.19.2)
       '@slidev/theme-seriph':
         specifier: latest
-        version: link:../../themes/alpha
+        version: 0.25.0
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -1547,6 +1547,10 @@ packages:
 
   '@slidev/theme-default@0.25.0':
     resolution: {integrity: sha512-iWvthH1Ny+i6gTwRnEeeU+EiqsHC56UdEO45bqLSNmymRAOWkKUJ/M0o7iahLzHSXsiPu71B7C715WxqjXk2hw==}
+    engines: {node: '>=14.0.0', slidev: '>=v0.47.0'}
+
+  '@slidev/theme-seriph@0.25.0':
+    resolution: {integrity: sha512-PnFQbn4I70+/cVie5iAr0Im6sYvnwjkO7Yj5KonTyJZFFJFytckLTrD3ijft/J4cRnz7OmSzTyQKNX1FN/x0YQ==}
     engines: {node: '>=14.0.0', slidev: '>=v0.47.0'}
 
   '@slidev/types@0.47.5':
@@ -7092,6 +7096,12 @@ snapshots:
       roughjs: 4.6.6
 
   '@slidev/theme-default@0.25.0':
+    dependencies:
+      '@slidev/types': 0.47.5
+      codemirror-theme-vars: 0.1.2
+      prism-theme-vars: 0.2.5
+
+  '@slidev/theme-seriph@0.25.0':
     dependencies:
       '@slidev/types': 0.47.5
       codemirror-theme-vars: 0.1.2

@@ -29,7 +29,7 @@ transition: fade-out
 @whitphx
 
 <div mt-8 v-click>
-Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast</span>
+Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
 <div mt-4>
@@ -106,7 +106,7 @@ Original: https://www.bilibili.com/video/BV1tUcBemE2r
   <!-- <iframe
     src="//player.bilibili.com/player.html?isOutside=true&aid=113832169051645&bvid=BV1tUcBemE2r&cid=27883799748&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe> -->
 
-  * WYSIWYG / Slide
+  * WYSIWYG / Slide-based
   * Flexible figure designs and animations
   * Dev-friendly features e.g. codeblocks
 </div>
@@ -125,9 +125,9 @@ Original: https://www.bilibili.com/video/BV1iQ6EYHENU/
 * 21:21 - 22:50 = 1281s + 89s -> (4x) 5:20 + 22s
 /-->
 
-  * WYSIWYG / Whiteboard
+  * WYSIWYG / Canvas-based
   * Tidy font and diagrams
-  * Sliding animations on a single whiteboard
+  * Transitions on an infinite single canvas
 </div>
 
 <div v-click="4" bg-lime:10 border="~ lime/50 rounded-lg">
@@ -144,7 +144,7 @@ Key parts:
 * 04:22 - 09:44 = 262s + 322s -> (10x) 27s + 32s
 -->
 
-  * Markdown / Slide
+  * Markdown / Slide-based
   * Structured contents
   * Stylish theming
   * More dev-friendly components
@@ -175,7 +175,7 @@ Refs:
 
   <div i-ph-subtract-square text-2xl text-orange-500 />
 
-  Intuitive editing of complex diagrams with animation like <strong id="item-slidescom" v-mark.underline.orange="2">Slides.com</strong> (or PowerPoint)
+  Intuitive editing of complex diagrams with animations like <strong id="item-slidescom" v-mark.underline.orange="2">Slides.com</strong> (or PowerPoint)
 
 </div>
 
@@ -192,7 +192,7 @@ Refs:
   <div ml2 p2>
 
   - WYSIWYG Excalidraw-like diagrams
-  - Animations: frame transitions, diagram morphing, etc
+  - Animations: frame transitions, shape morphing, etc
 
   </div>
 </div>
@@ -203,7 +203,7 @@ Refs:
 
   <div i-ph-slideshow-duotone text-2xl text-teal-500 />
 
-Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Excalidraw</strong> and animation like its **Obsidian plugin**
+Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Excalidraw</strong> and animations like its **Obsidian plugin**
 
 </div>
 
@@ -219,8 +219,8 @@ Textured diagrams like <strong id="item-excalidraw" v-mark.underline.teal="2">Ex
 
   <div ml2 p2>
 
-  - <span id="anipres-addon-embed" v-mark.underline.blue="4">Embed</span> Anipres diagrams in Slidev
-  - Integrated slide transitions
+  - <span id="anipres-addon-embed" v-mark.underline.blue="4">Embed</span> Anipres presentations in Slidev's
+  - Integrated click actions
 
   </div>
 </div>
@@ -265,14 +265,13 @@ layout: center
 
 </div>
 
-
 ---
 
 # Example: WebRTC signaling protocol
 
 <div :w="$clicks >= 1 ? '1/2' : 'full'" h-100 :ml="$clicks >= 1 ? '1/2' : '0'">
 
-  <SlidevAnipres id="fig-webrtc" />
+  <SlidevAnipres id="fig-webrtc" at="0" />
 
 </div>
 
@@ -347,7 +346,7 @@ function negotiate() {
 # Example: Gradio-Lite architecture
 
 <div h-100>
-<SlidevAnipres id="fig-gradio-lite"/>
+<SlidevAnipres id="fig-gradio-lite" />
 </div>
 
 ---

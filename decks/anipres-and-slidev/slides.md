@@ -83,6 +83,8 @@ At [第七届FEDAY](https://fequan.com/2024/) in Xiamen, China on Dec 2024...
 </div>
 
 ---
+clicks: 5
+---
 
 # Various presentation styles
 

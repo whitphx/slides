@@ -355,8 +355,6 @@ const readableStreamOfText = await translator.translateStreaming(`
 ```
 
 ---
-clicks: 2
----
 
 <SlidevAnipres id="tech-layers" />
 

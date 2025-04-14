@@ -106,8 +106,6 @@ Software Developer / Indie Dev / OSS Enthusiast
   - PyCon FR
 
 ---
-clicks: 23
----
 
 <SlidevAnipres id="timeline" />
 

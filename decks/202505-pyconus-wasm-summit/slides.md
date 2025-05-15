@@ -85,7 +85,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <div flex="~ row">
 
-<div w="1/2" h-120>
+<div w="1/2" h-110>
 
 ```html {*|19-41}{lines:true,maxHeight:'100%'}
 <!doctype html>
@@ -145,6 +145,12 @@ tab2.dataframe(data, height=250, use_container_width=True)
 
 </div>
 
+<div>
+
+https://github.com/whitphx/stlite, https://edit.share.stlite.net/
+
+</div>
+
 ---
 
 # Combinations with AI frameworks, e.g. Transformers
@@ -175,12 +181,20 @@ One typical use case of such frameworks is to build serverless AI apps.
 
 ---
 
-# Potential demands/growth
+# Potentials?
+
+<div text-2xl>
+
+<v-clicks>
 
 * More interoperability with Python
   * Support more synchronous code
 * AI/ML library integrations
 * WebML field
-  * Web Machine Learning Community/WG at W3C: Standardizing JavaScript API for in-browser ML
+  * e.g. Web Machine Learning Community/WG at W3C: Standardizing the JavaScript API for in-browser ML
     * Web Neural Network API (WebNN)
     * WebML Task-based API
+
+</v-clicks>
+
+</div>

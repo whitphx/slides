@@ -1,6 +1,6 @@
 ---
 theme: ../../themes/alpha
-title: ""
+title: "My activities and random thoughts about Pyodide applications"
 drawings:
   persist: false
 mdc: true
@@ -13,7 +13,7 @@ addons:
 ---
 
 <h1 text="6xl/20">
-My activities and thoughts<br />
+My activities and random thoughts<br />
 about Pyodide applications
 </h1>
 
@@ -67,9 +67,9 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 | Framework | Wasm ver. |
 | --------- | --------- |
-| [Streamlit](https://streamlit.io/) | <span data-id="stlite" pr-2>[Stlite](https://github.com/whitphx/stlite)</span> |
-| [Gradio](https://www.gradio.app/) | <span data-id="gradio-lite" pr-2>[Gradio Lite](https://www.gradio.app/guides/gradio-lite)</span> |
-| [Shiny for Python](https://shiny.posit.co/py/) | [Shinylive](https://posit-dev.github.io/r-shinylive/) |
+| [Streamlit](https://streamlit.io/) | <span data-id="stlite" pr-2>[Stlite](https://github.com/whitphx/stlite)</span> → [Streamlit Playground](https://streamlit.io/playground) |
+| [Gradio](https://www.gradio.app/) | <span data-id="gradio-lite" pr-2>[Gradio Lite](https://www.gradio.app/guides/gradio-lite)</span> → [Gradio Playground](https://www.gradio.app/playground) |
+| [Shiny for Python](https://shiny.posit.co/py/) | [Shinylive](https://github.com/posit-dev/shinylive) → [Shiny Examples](https://shinylive.io/py/examples/) |
 | [Panel](https://panel.holoviz.org/) | [Panel](https://panel.holoviz.org/how_to/wasm/index.html) |
 
 <v-click>
@@ -81,6 +81,69 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </v-click>
 
+---
+
+<div flex="~ row">
+
+<div w="1/2" h-120>
+
+```html {*|19-41}{lines:true,maxHeight:'100%'}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Stlite App</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.81.6/build/style.css"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.81.6/build/stlite.js";
+      mount(
+        `
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+st.write("Streamlit supports a wide range of data visualizations, including [Plotly, Altair, and Bokeh charts](https://docs.streamlit.io/develop/api-reference/charts). 📊 And with over 20 input widgets, you can easily make your data interactive!")
+
+all_users = ["Alice", "Bob", "Charly"]
+with st.container(border=True):
+    users = st.multiselect("Users", all_users, default=all_users)
+    rolling_average = st.toggle("Rolling average")
+
+np.random.seed(42)
+data = pd.DataFrame(np.random.randn(20, len(users)), columns=users)
+if rolling_average:
+    data = data.rolling(7).mean().dropna()
+
+tab1, tab2 = st.tabs(["Chart", "Dataframe"])
+tab1.line_chart(data, height=250)
+tab2.dataframe(data, height=250, use_container_width=True)
+
+`,
+        document.getElementById("root"),
+      );
+    </script>
+  </body>
+</html>
+```
+
+</div>
+
+<div w="1/2">
+<img src="/assets/stlite-sample.png">
+</div>
+
+</div>
 
 ---
 
@@ -88,28 +151,36 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 One typical use case of such frameworks is to build serverless AI apps.
 
-- TODO: Link to Gradio-Lite + Transformers presentation.
+- [Example: Gradio-Lite + Transformers.js.py](https://slides.com/whitphx/feday2024-gradio-lite-transformers-js-py#/55)
 
-- Transformers is one of the most common ML framework, but it doesn't work on Pyodide due to its backend frameworks.
+- **Transformers** is one of the most popular ML framework, but it doesn't work on Pyodide due to its backend frameworks.
 - I created `transformers.js.py` that is a Pyodide wrapper of `transformers.js` that is a JavaScript port of Transformers.
   - There are still some incompatibility with the original Python ver.
-    - Sync vs Async: WebGL/WebGPU APIs which Transformers.js relies on are async while the original Transformers' API are synchronous.
+    - Sync vs Async: WebGL/WebGPU APIs which Transformers.js relies on are async while the original Transformers' APIs are synchronous.
 
 ---
 
-# Support Synchronous API on Pyodide
+# Support Synchronous API on Pyodide?
 
 [WgPy: GPU-accelerated NumPy-like array library for web browsers](https://arxiv.org/abs/2503.00279)
 
 - WebGL/WebGPU accelerated matrix calculations with **NumPy-compatible API** that are synchronous.
-- Atomics API
+- Uses **Atomics API** for synchronous code on Pyodide
   - Blocks the worker thread where the Pyodide code is running to make the Python API synchronous from the main thread where WebGL/WebGPU APIs are called asynchronously.
+
+<div h-70 flex gap-4>
+<img src="/assets/wgpy-fig1.png"/>
+<img src="/assets/wgpy-fig3.png"/>
+</div>
 
 ---
 
 # Potential demands/growth
 
-- More interoperability with Python
-  - Support more synchronous code
-- AI library support
-- WebML collaboration
+* More interoperability with Python
+  * Support more synchronous code
+* AI/ML library integrations
+* WebML field
+  * Web Machine Learning Community/WG at W3C: Standardizing JavaScript API for in-browser ML
+    * Web Neural Network API (WebNN)
+    * WebML Task-based API

@@ -1,6 +1,6 @@
 ---
 theme: ../../themes/alpha
-title: "My activities and random thoughts about Pyodide applications"
+title: "In-browser Python Web UI frameworks, and my random thoughts about Pyodide applications"
 drawings:
   persist: false
 mdc: true
@@ -12,9 +12,8 @@ addons:
   - fancy-arrow
 ---
 
-<h1 text="6xl/20">
-My activities and random thoughts<br />
-about Pyodide applications
+<h1 text="5xl/20">
+Intro of in-browser Python Web UI frameworks,<br />and my random thoughts about<br />Pyodide applications
 </h1>
 
 PyCon US 2025 Wasm Summit

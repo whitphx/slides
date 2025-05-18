@@ -24,8 +24,6 @@ MIL Alumni Event, 2025-03-09
 
 ---
 
-<div class="slide">
-
 # Yuichiro Tachibana
 
 @whitphx
@@ -55,14 +53,6 @@ Software Developer / Indie Dev / <span v-mark.underline.green="1">OSS Enthusiast
   <div i-ri-twitter-x-line op50 ma text-xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
-
-</div>
-
-<style>
-.slide {
-  font-size: 1.8em;
-}
-</style>
 
 ---
 

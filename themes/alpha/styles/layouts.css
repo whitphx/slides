@@ -3,6 +3,8 @@
 }
 
 .slidev-layout {
+  font-size: 24px;
+
   h1 {
     color: var(--slidev-theme-primary);
   }
@@ -41,6 +43,10 @@
 
   h6:not(.opacity-100) {
     @apply opacity-40;
+  }
+
+  th {
+    @apply font-600;
   }
 }
 

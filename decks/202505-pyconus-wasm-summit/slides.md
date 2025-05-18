@@ -20,8 +20,6 @@ PyCon US 2025 Wasm Summit
 
 ---
 
-<div class="slide">
-
 <h1 text-4xl>Yuichiro Tachibana</h1>
 
 @whitphx
@@ -51,14 +49,6 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
-
-</div>
-
-<style>
-.slide {
-  font-size: 1.8em;
-}
-</style>
 
 ---
 

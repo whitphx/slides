@@ -20,8 +20,6 @@ its standardization
 
 ---
 
-<div class="slide">
-
 <h1 text-3xl>Yuichiro Tachibana</h1>
 
 @whitphx
@@ -51,14 +49,6 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div i-ri-twitter-x-line op50 ma text-xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
-
-</div>
-
-<style>
-.slide {
-  font-size: 2.2em;
-}
-</style>
 
 ---
 
@@ -106,7 +96,7 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 
 # Benefits of In-Browser AI
 
-<Transform scale="1.8">
+<div text-4xl mt-20>
 
 <v-clicks>
 
@@ -117,13 +107,13 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 
 </v-clicks>
 
-</Transform>
+</div>
 
 ---
 
 # In-Browser AI tools
 
-<Transform scale="1.3">
+<div text-2xl mt-10>
 
 ## Runtime
 
@@ -136,9 +126,9 @@ https://huggingface.co/blog/Xenova/run-gemini-nano-in-your-browser
 - [**Transformers.js**](https://huggingface.co/docs/transformers.js/en/index)
 - [**MLC LLM**](https://llm.mlc.ai/)
 
-</Transform>
+</div>
 
-<aside absolute bottom-4>
+<aside absolute bottom-4 text-base>
 We don't talk about model optimizations such as quantization, pruning, knowledge distillation in this talk.
 </aside>
 
@@ -161,9 +151,7 @@ https://onnxruntime.ai/docs/tutorials/web/
 https://huggingface.co/docs/transformers.js/en/index
 
 - 🤗
-- [Supported tasks/models](https://huggingface.co/docs/transformers.js/en/index#supported-tasksmodels)
-  - 30+ tasks
-  - 100+ models
+- [Supported tasks/models](https://huggingface.co/docs/transformers.js/en/index#supported-tasksmodels): 30+ tasks, 100+ models
 - Backend: ONNX Runtime Web, WebGPU (under development)
 - Examples: https://github.com/huggingface/transformers.js-examples
 
@@ -244,7 +232,7 @@ demo.launch()
 
 ---
 
-# Text-to-Speech app with Transformers.js + Gradio-Lite
+# Text-to-Speech app w/ Transformers.js + Gradio-Lite
 
 https://huggingface.co/spaces/whitphx/gradio-lite-text-to-speech
 
@@ -414,9 +402,13 @@ const text = await translator('Hello, world!', {
 
 #### WebML Task-based API
 
+<div text-base>
+
 - Translator and Language Detector APIs
 - Writing Assistance APIs
 - Prompt API
+
+</div>
 
 </div>
 
@@ -424,10 +416,14 @@ const text = await translator('Hello, world!', {
 
 #### Transformers.js
 
+<div text-base>
+
 👉 [Supported tasks/models](https://huggingface.co/docs/transformers.js/en/index#supported-tasksmodels)
 
 * 30+ tasks
 * 100+ models
+
+</div>
 
 </div>
 
@@ -459,13 +455,9 @@ await translator.translate('Where is the next bus stop, please?');
 
 # Summary
 
-<Transform scale="1.2">
-
 - There are several frameworks/libraries to develop in-browser AI applications.
   - Choose a right one for your purpose.
 - Standardization is ongoing in W3C WebML WG.
   - Join the WG if interested in the standardization process!
     - https://www.w3.org/community/webmachinelearning/2018/10/03/call-for-participation-in-machine-learning-for-the-web-community-group/
     - https://www.w3.org/groups/wg/webmachinelearning/instructions/
-
-</Transform>

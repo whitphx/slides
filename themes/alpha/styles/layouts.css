@@ -46,6 +46,10 @@
   }
 
   th {
+    /*
+      Looks like `font-400` is set intentionally by default as https://github.com/slidevjs/slidev/commit/ee222716e8267de77674cef7cf3443908941cc77#diff-2d45265538930fb0a344b149516cb2f941190c23b9079901f27f242129dfca72R65
+      but we prefer a bold font to distinguish headers from normal text.
+    */
     @apply font-600;
   }
 }

@@ -49,8 +49,8 @@ importers:
         specifier: ^0.25.0
         version: 0.25.0
       slidev-addon-anipres:
-        specifier: ^0.4.0
-        version: 0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^0.5.2
+        version: 0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -64,8 +64,8 @@ importers:
         specifier: latest
         version: 0.25.0
       slidev-addon-anipres:
-        specifier: ^0.4.0
-        version: 0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
+        specifier: ^0.5.2
+        version: 0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -76,8 +76,8 @@ importers:
         specifier: ^51.4.0
         version: 51.4.0(@babel/parser@7.28.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.17)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
-        specifier: ^0.4.0
-        version: 0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
+        specifier: ^0.5.2
+        version: 0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -88,8 +88,8 @@ importers:
         specifier: ^51.4.0
         version: 51.4.0(@babel/parser@7.28.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.17)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
-        specifier: ^0.4.0
-        version: 0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
+        specifier: ^0.5.2
+        version: 0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -112,8 +112,8 @@ importers:
         specifier: ^52.0.0
         version: 52.0.0(@babel/parser@7.28.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.17)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
-        specifier: ^0.4.0
-        version: 0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
+        specifier: ^0.5.2
+        version: 0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
       slidev-addon-fancy-arrow:
         specifier: ^0.8.0
         version: 0.8.0(typescript@5.8.3)
@@ -2835,8 +2835,8 @@ packages:
       react-dom: ^18.3.1
       tldraw: ^3.11.0
 
-  anipres@0.6.2:
-    resolution: {integrity: sha512-mnu5GmR6YdFcLnYde7D5UYoTevsXsncdE+2hzevMErIPG5HTq7kGw+NQVsg1P9b14DpqxXjoWX2U5inpG09ShA==}
+  anipres@0.6.4:
+    resolution: {integrity: sha512-jBYAywSwHsl7oqACT+48ltIVi/z/bUu5XkUM/4QwCbtQWyU5tzH4x5VVMQiia/CFMTTfOzzPMgG7xEnPXedxPQ==}
     peerDependencies:
       react: ^18.3.1
       react-dom: ^18.3.1
@@ -5510,8 +5510,8 @@ packages:
       vite: '>=5.0'
       vue: ^3.0.0
 
-  slidev-addon-anipres@0.4.0:
-    resolution: {integrity: sha512-cZGXz5mXIufoRGHs/m8GMJkn1PZPMeIromAkCXh1MtaI26N6iyv0dImmsmK/tUy9sj2x8wHDhrK4LT+qXVde3A==}
+  slidev-addon-anipres@0.5.2:
+    resolution: {integrity: sha512-HHBDq5ng/67a7x7ixzrcSgiHP4YKiRQgH0FjFlTbr6P9/2pwZ9T8UAVN8jF7a5eabO0zlM/njUifRhPrwN6feA==}
     peerDependencies:
       '@slidev/client': '>=0.49.0'
       vite: '>=5.0'
@@ -10402,7 +10402,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tldraw: 3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  anipres@0.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
+  anipres@0.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@dnd-kit/modifiers': 9.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -13818,11 +13818,11 @@ snapshots:
       - encoding
       - react
 
-  slidev-addon-anipres@0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2)):
+  slidev-addon-anipres@0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1)))(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@slidev/client': 52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@6.2.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.7.1))
       '@vueuse/core': 13.5.0(vue@3.5.13(typescript@5.8.2))
-      anipres: 0.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      anipres: 0.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       react-dom: 18.3.1(react@18.3.1)
       regexp.escape: 2.0.1
       tldraw: 3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -13836,11 +13836,11 @@ snapshots:
       - encoding
       - react
 
-  slidev-addon-anipres@0.4.0(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3)):
+  slidev-addon-anipres@0.5.2(@slidev/client@52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3)):
     dependencies:
       '@slidev/client': 52.0.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.17)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.0.3(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))
       '@vueuse/core': 13.5.0(vue@3.5.13(typescript@5.8.3))
-      anipres: 0.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      anipres: 0.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       react-dom: 18.3.1(react@18.3.1)
       regexp.escape: 2.0.1
       tldraw: 3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

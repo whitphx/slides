@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@slidev/cli": "^51.4.0",
-    "slidev-addon-anipres": "^0.3.1",
     "slidev-addon-fancy-arrow": "^0.8.0",
     "vue": "^3.5.13"
   }

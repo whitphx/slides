@@ -8,7 +8,6 @@ defaults:
   transition: slide-left
 transition: fade-out
 addons:
-  - anipres
   - fancy-arrow
 ---
 

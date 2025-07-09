@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+pnpm cn-font-split i default
+
 rootDir="$(pwd)"
 rootDist="${rootDir}/dist"
 decksDir="${rootDir}/decks"

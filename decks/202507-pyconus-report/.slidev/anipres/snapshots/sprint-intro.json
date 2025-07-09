@@ -163,7 +163,7 @@
           "frame": {
             "id": "shape:1LXPack3UNJEZZ8waf_UH",
             "type": "cue",
-            "globalIndex": 4,
+            "globalIndex": 3,
             "trackId": "track-1752056046855-WXjTZzbfcjfU4zx1znc7p",
             "action": {
               "type": "shapeAnimation"
@@ -1016,7 +1016,7 @@
             "trackId": "o8C4y9p99DRJAoD8EWLB-",
             "action": {
               "type": "cameraZoom",
-              "duration": 1000
+              "duration": 500
             }
           },
           "hiddenDuringAnimation": false
@@ -1041,7 +1041,7 @@
           "frame": {
             "id": "shape:11P0tv12Icwwd-_WQvLkQ",
             "type": "cue",
-            "globalIndex": 3,
+            "globalIndex": 2,
             "trackId": "track-1752055508859-wKmtxJhxVcoWJ8aR1C9OL",
             "action": {
               "type": "shapeAnimation",

@@ -245,6 +245,8 @@ clicks: 1
 - こういう機会は PyCon US と EuroPython くらい？
 
 ---
+clicks: 3
+---
 
 <SlidevAnipres id="sprint-intro" excalidraw-like-font />
 
@@ -260,7 +262,7 @@ clicks: 1
 
 ---
 
-<SlidevAnipres id="sprint-intro" excalidraw-like-font />
+<SlidevAnipres id="sprint-intro" excalidraw-like-font :offset="3" />
 
 ---
 

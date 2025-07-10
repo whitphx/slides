@@ -68,19 +68,32 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <div grid="~ cols-3" gap-2 text-sm pt-4>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day1 (Thurs., May 15th)
+    </span>
+    <sup text-sky-500 bg-sky:15 my2 rounded text-md>Tutorials</sup>
+  </div>
 
-### Day1 (Thurs., May 15th)
+<div ml2 p2>
 
 - <span v-mark.circle.red="1">WebAssembly Summit</span>
 - Sponsor/Community Booths
 - Anaconda Party
 
 </div>
+</div>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day2 (Fri., May 16th)
+    </span>
+    <sup text-sky-500 bg-sky:15 my2 rounded text-md>Main conference</sup>
+  </div>
 
-### Day2 (Fri., May 16th)
+<div ml2 p2>
 
 - Breakfast
 - Talks
@@ -89,10 +102,17 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - Duolingo Party
 
 </div>
+</div>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day3 (Sat., May 17th)
+    </span>
+    <sup text-sky-500 bg-sky:15 my2 rounded text-md>Main conference</sup>
+  </div>
 
-### Day3 (Sat., May 17th)
+<div ml2 p2>
 
 - Breakfast
 - Talks
@@ -101,10 +121,17 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - PyLadies Auction
 
 </div>
+</div>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day4 (Sun., May 18th)
+    </span>
+    <sup text-sky-500 bg-sky:15 my2 rounded text-md>Main conference</sup>
+  </div>
 
-### Day4 (Sun., May 18th)
+<div ml2 p2>
 
 - Breakfast
 - Talks
@@ -113,23 +140,37 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - PAO Party
 
 </div>
+</div>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day5 (Mon., May 19th)
+    </span>
+    <sup text-sky-500 bg-sky:15 my2 rounded text-md>Sprints</sup>
+  </div>
 
-### Day5 (Mon., May 19th)
+<div ml2 p2>
 
 - <span v-mark.circle.red="1">Sprint</span>
 - Lunch
 - Drinking Party
 
 </div>
+</div>
 
-<div rounded-md relative from-sky:20 to-fuchsia:15 bg-gradient-to-br p-2>
+<div border="~ sky/50 rounded-lg" from-sky:10 to-indigo:10 bg-gradient-to-br>
+  <div flex gap-2 items-center bg-sky:10 px4 py2 rounded text-md>
+    <span grow>
+      Day6 (Tues., May 20th)
+    </span>
+  </div>
 
-### Day6 (Tues., May 20th)
+<div ml2 p2>
 
 - Driving to Chicago
 
+</div>
 </div>
 
 </div>

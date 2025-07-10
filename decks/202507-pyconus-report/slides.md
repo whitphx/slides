@@ -20,7 +20,7 @@ PyCon US 2025 参加報告会
 
 ---
 
-<h1 text-4xl>Yuichiro Tachibana</h1>
+<h1 text-4xl>Yuichiro Tachibana / 橘 祐一郎</h1>
 
 @whitphx
 

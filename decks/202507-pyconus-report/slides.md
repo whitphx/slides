@@ -646,3 +646,17 @@ Tomas
 - PyCon USはコンテンツがたくさんあって楽しめました
 - この発表ではSummitとSprintについてだけ紹介しました
   - この2つだけでもかなり密度が高かったです
+
+---
+
+<div grid="~ cols-2 md:cols-3 gap-4">
+  <img src="/random-photos/PXL_20250515_205134345.MP.jpg" />
+  <img src="/random-photos/PXL_20250515_212648967.MP.jpg" />
+  <img src="/random-photos/PXL_20250516_224016499.jpg" />
+  <img src="/random-photos/PXL_20250516_224115034.jpg" />
+  <img src="/random-photos/PXL_20250516_232329696.jpg" />
+  <img src="/random-photos/PXL_20250517_231122529.jpg" />
+  <img src="/random-photos/PXL_20250517_231154628.jpg" />
+  <img src="/random-photos/PXL_20250517_231910281.jpg" />
+  <img src="/random-photos/PXL_20250518_231032529.jpg" />
+</div>

@@ -157,12 +157,13 @@ clicks: 1
 ---
 
 <a href="https://us.pycon.org/2025/" target="_blank" rel="noopener noreferrer">
-<img :src="$clicks === 0 ? '/PyConUS2025_screenshot_event.png' : '/PyConUS2025_screenshot_event_wasm_focus.png'" alt="Screenshot of the events menu of PyCon US 2025">
+<img v-if="$clicks === 0" src="/PyConUS2025_screenshot_event.png" alt="Screenshot of the events menu of PyCon US 2025">
+<img v-if="$clicks !== 0" src="/PyConUS2025_screenshot_event_wasm_focus.png" alt="Screenshot of the events menu of PyCon US 2025">
 </a>
 
 ---
 
-<img src="./public/stlite-hero.png" alt="stlite hero image" h="100%" m="auto">
+<img src="/stlite-hero.png" alt="stlite hero image" h="100%" m="auto">
 
 <div v-click="1" absolute top-105 left-100 text-5xl transform rotate-60>👉</div>
 <div v-click="1" absolute top-118 left-100 text-2xl v-mark.circle.red="1" opacity-0>________________________</div>

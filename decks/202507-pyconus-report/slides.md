@@ -302,7 +302,9 @@ clicks: 1
 
 `easy` label で検索...
 
+<a href="https://github.com/python/cpython/issues?q=is%3Aopen+is%3Aissue+label%3Aeasy" target="_blank" rel="noopener noreferrer">
 <img src="/github_cpython_easy_label.png" alt="GitHub search for CPython issues with the 'easy' label">
+</a>
 
 ---
 

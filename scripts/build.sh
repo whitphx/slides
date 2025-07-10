@@ -3,7 +3,9 @@
 # Build environment was changed since 7.6.0 (https://github.com/KonghaYao/cn-font-split/commit/f3c35d546b47cae3cb8be735091654558defafcc)
 # and the newer environment (Ubuntu 22.04) has a version of glibc incompatible with the Vercel environment.
 # So we need to install the older version of cn-font-split core.
-pnpm dlx cn-font-split i default@7.5.5
+if [ "$VERCEL" = "1" ]; then
+  pnpm dlx cn-font-split i default@7.5.5
+fi
 
 rootDir="$(pwd)"
 rootDist="${rootDir}/dist"

@@ -16,10 +16,5 @@
   },
   "dependencies": {
     "@iconify/collections": "^1.0.532"
-  },
-  "pnpm": {
-    "overrides": {
-      "cn-font-split": "7.2.4"
-    }
   }
 }

@@ -24,7 +24,11 @@ PyCon US 2025 参加報告会
 
 @whitphx
 
-<div mt-8 v-click>
+<div absolute top-40 right-40>
+<img src="https://avatars.githubusercontent.com/u/3135397?v=4" alt="whitphx" w="130px">
+</div>
+
+<div mt-8>
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
@@ -32,8 +36,8 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <v-clicks>
 
-- ML Developer Advocate at <span v-mark.underline.yellow="2">Hugging Face</span> 🤗
-- <span v-mark.underline.red="3">Streamlit</span> Creator
+- ML Developer Advocate at <span v-mark.underline.yellow="1">Hugging Face</span> 🤗
+- <span v-mark.underline.red="2">Streamlit</span> Creator
 
 </v-clicks>
 
@@ -163,10 +167,12 @@ clicks: 1
 
 ---
 
-<img src="/stlite-hero.png" alt="stlite hero image" h="100%" m="auto">
+# こんなものを作っているので…
+
+<img src="/stlite-hero.png" alt="stlite hero image" h="85%" m="auto">
 
 <div v-click="1" absolute top-105 left-100 text-5xl transform rotate-60>👉</div>
-<div v-click="1" absolute top-118 left-100 text-2xl v-mark.circle.red="1" opacity-0>________________________</div>
+<div v-click="1" absolute top-116 left-100 text-2xl v-mark.circle.red="1" opacity-0>_______________________</div>
 
 <div text-base flex justify-center>
 <a href="https://github.com/whitphx/stlite" target="_blank" rel="noopener noreferrer">https://github.com/whitphx/stlite</a>

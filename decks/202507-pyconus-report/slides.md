@@ -293,24 +293,8 @@ clicks: 1
 - こういう機会は PyCon US と EuroPython くらい？
 
 ---
-clicks: 3
----
 
 <SlidevAnipres id="sprint-intro" excalidraw-like-font />
-
----
-
-# ドキュメントが充実
-
-- [What to expect at PyCon US sprints](https://pycon.blogspot.com/2025/04/pyconus-sprints.html)
-  - スプリントの概要や注意点などが書かれている
-  - スプリント前に読んでくるのが望ましいかも
-- [Python Developer’s Guide](https://devguide.python.org/)
-  - 書いてある通りにセットアップして手元でCPythonがビルドできた
-
----
-
-<SlidevAnipres id="sprint-intro" excalidraw-like-font :offset="3" />
 
 ---
 

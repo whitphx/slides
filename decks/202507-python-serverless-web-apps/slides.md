@@ -478,7 +478,7 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 
 <div flex="~ col" h="100%">
 
-<img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM" max-h="100%">
+<img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM" max-h="100%" object-cover>
 
 <div>
 <a href="https://c2amowmwbb5niziwazeduq.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">

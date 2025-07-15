@@ -326,7 +326,6 @@ layout: section
 # Streamlit
 
 <SlidevVideo autoplay controls>
-  <!-- Anything that can go in an HTML video element. -->
   <source src="https://s3-us-west-2.amazonaws.com/assets.streamlit.io/videos/hero-video.mp4" type="video/mp4" />
 </SlidevVideo>
 
@@ -671,6 +670,12 @@ Open in Stlite Sharing
 
 </a>
 </div>
+
+---
+
+<SlidevVideo autoplay controls>
+  <source src="/stlite_llm_static.mp4" type="video/mp4" />
+</SlidevVideo>
 
 ---
 

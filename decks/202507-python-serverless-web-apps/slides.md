@@ -99,6 +99,8 @@ Input
 
 <div class="i-ph:file-csv" text-6xl data-id="input-csv"></div>
 
+<<< @/example/sales_data.csv
+
 </div>
 
 <div w="2/3">
@@ -173,11 +175,41 @@ Output
 
 <div class="i-ph:file-csv" text-6xl data-id="output-csv"></div>
 
+<<< @/example/processed_sales_data.csv
+
 </div>
 
 </div>
 
 <!-- At this point, we use remote LLM API -->
+
+---
+
+```shell
+❯ uv run python main.py --input sales_data.csv
+INFO:__main__:Loading sales data from sales_data.csv
+INFO:__main__:Processing structured data...
+INFO:__main__:Processing unstructured data with local LLM...
+Device set to use mps:0
+Device set to use mps:0
+INFO:__main__:Processing sentiment analysis with local LLM...
+INFO:__main__:Processing note classification with local LLM...
+INFO:__main__:Applying privacy protection...
+
+=== PROCESSING SUMMARY ===
+Total orders processed: 200
+Revenue categories: {'Low': 129, 'High': 66, 'Medium': 5}
+Sentiment distribution: {'POSITIVE': 173, 'NEGATIVE': 27}
+Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technical_issue': 35, 'pricing_negotiation': 2}
+
+=== SAMPLE RESULTS ===
+       order_id revenue_category sentiment          note_category identified_issues
+0  ORD-2024-001           Medium  POSITIVE        technical_issue              none
+1  ORD-2024-002              Low  POSITIVE  customer_relationship             delay
+2  ORD-2024-003              Low  POSITIVE  customer_relationship           improve
+3  ORD-2024-004             High  POSITIVE    pricing_negotiation              none
+4  ORD-2024-005           Medium  NEGATIVE  customer_relationship           improve
+```
 
 ---
 
@@ -189,16 +221,69 @@ Output
 
 ---
 
-# Create a web app
+# Convert your script to a web app
+
+- Shareable
+- Interactive
+- Easy to use
 
 ---
 
+# Tools you can use
+
+### Notebook
 - Jupyter Notebook
+- Marimo
+
+### Web UI frameworks
 - Streamlit
 - Gradio
 - Shiny for Python
 - Panel
 - ...
+
+---
+
+# Streamlit
+
+<SlidevVideo autoplay controls>
+  <!-- Anything that can go in an HTML video element. -->
+  <source src="https://s3-us-west-2.amazonaws.com/assets.streamlit.io/videos/hero-video.mp4" type="video/mp4" />
+</SlidevVideo>
+
+---
+
+# Streamlit
+
+<div flex="~ row" gap-4>
+
+<div w="1/2" data-id="python-code">
+
+```python
+...
+```
+
+</div>
+
+<FancyArrow
+    q1="[data-id=python-code]"
+    pos1="top"
+    q2="[data-id=streamlit-app]"
+    pos2="top"
+    arc="0.3"
+/>
+
+<div w="1/2">
+
+<div data-id="streamlit-app">
+
+IMG
+
+</div>
+
+</div>
+
+</div>
 
 ---
 layout: section
@@ -218,6 +303,7 @@ layout: section
 ---
 
 # Run open LLMs in your local machine
+Transformers library 🤗
 
 ---
 

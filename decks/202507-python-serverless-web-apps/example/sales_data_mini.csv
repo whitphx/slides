@@ -1,0 +1,11 @@
+order_id,customer_segment,purchase_amount,payment_method,delivery_address_area,sales_note,customer_feedback
+ORD-2024-001,Enterprise,45000,Bank Transfer,New York NY,First-time client requiring technical consultation,The product exceeded our expectations and integration was smooth
+ORD-2024-002,SMB,8500,Credit Card,Los Angeles CA,Repeat customer with good payment history,Delivery was delayed but customer service handled it well
+ORD-2024-003,Individual,1200,PayPal,Chicago IL,Online purchase through website,Great product but the packaging could be improved
+ORD-2024-004,Enterprise,67500,Bank Transfer,Houston TX,Large order negotiated with 15% volume discount,Implementation team was very professional and knowledgeable
+ORD-2024-005,SMB,12000,Credit Card,Phoenix AZ,Customer requested extended warranty,The software is intuitive but documentation needs improvement
+ORD-2024-006,Individual,850,Credit Card,Philadelphia PA,Customer service escalation due to billing issue,Quick resolution to my problem thanks to the support team
+ORD-2024-007,Enterprise,89000,Wire Transfer,San Antonio TX,Multi-year contract with quarterly payments,Excellent ROI and our productivity increased significantly
+ORD-2024-008,SMB,3200,Bank Transfer,San Diego CA,Small business owner looking for cost-effective solution,Perfect fit for our small team but setup was complicated
+ORD-2024-009,Individual,2400,PayPal,Dallas TX,Gift purchase for corporate client,Beautiful presentation and arrived exactly on time
+ORD-2024-010,Enterprise,125000,Bank Transfer,San Jose CA,Fortune 500 company with strict compliance requirements,The security features meet all our enterprise standards

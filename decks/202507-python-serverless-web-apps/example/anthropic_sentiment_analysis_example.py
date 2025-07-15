@@ -13,4 +13,6 @@ response = client.messages.create(
     }]
 )
 
-print(response.content[0].text.strip())
+result = response.content[0].text.strip()
+
+print(result)

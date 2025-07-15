@@ -540,7 +540,9 @@ All processing happens locally, keeping user data private and secure.
 
 ---
 
-# Typical problems serverless web apps solve
+# What "serverless" solves
+
+<v-clicks text-4xl>
 
 * Privacy
 * Low latency
@@ -548,15 +550,18 @@ All processing happens locally, keeping user data private and secure.
 * Scalability without servers​
 * Low cost
 
+</v-clicks>
+
 ---
 
 # Serverless versions of these frameworks
 
-- Stlite
-- Gradio-Lite
-- Shinylive
-- Panel
-- ...
+| Python Framework | Wasm ver. |
+| --------- | --------- |
+| [Streamlit](https://streamlit.io/) | <span v-mark.circle.red="1">[Stlite](https://github.com/whitphx/stlite)</span> → [Streamlit Playground](https://streamlit.io/playground) |
+| [Gradio](https://www.gradio.app/) | [Gradio Lite](https://www.gradio.app/guides/gradio-lite) → [Gradio Playground](https://www.gradio.app/playground) |
+| [Shiny for Python](https://shiny.posit.co/py/) | [Shinylive](https://github.com/posit-dev/shinylive) → [Shiny Examples](https://shinylive.io/py/examples/) |
+| [Panel](https://panel.holoviz.org/) | [Panel](https://panel.holoviz.org/how_to/wasm/index.html) |
 
 ---
 
@@ -582,83 +587,159 @@ All processing happens locally, keeping user data private and secure.
 layout: section
 ---
 
-# So what about LLM?
+# So, what about LLM?
 
 ---
 
 # Serverless version of Transformers 🤗
 
+<div flex="~ col" gap-4>
 
----
+<Modal title="Transformers" v-click="1">
 
-# Architecture of the serverless frameworks
+- Python library to run AI/ML models.
 
-<!-- アーキテクチャを理解して、サーバレスの安全性を技術的に理解するのが目的 -->
+</Modal>
 
+<Modal title="Transformers.js" v-click="2">
 
----
+- JS version of Transformers.
+- Run pretrained AI/ML models **in the browser**.
 
-# Data privacy with app servicer and LLM provider
+</Modal>
 
-<div grid="~ cols-2 rows-2">
+<Modal title="Transformers.js.py" v-click="3">
 
-<div>
+- Use Transformers.js from in-browser Python.
 
-Server-side app + LLM API
-
-</div>
-
-<div>
-
-Server-side app + Local LLM
-
-</div>
-
-<div>
-
-Client-side (serverless) app + LLM API
-
-</div>
-
-<div>
-
-Client-side (serverless) app + Local (**in-browser**) LLM
-
-</div>
+</Modal>
 
 </div>
 
 ---
 
-# Typical situations where Python serverless web apps are useful
-
-* Data processing
-* Data analysis
-* Data visualization
-* Data engineering
-* Machine learning
-
-...where
-* Python has a strong ecosystem
-* data privacy/transparency/control/cost is important
-
----
-
-# Wrap-up: serverless web apps with Python
+# Transformers.js.py
 
 <div flex="~ row" gap-4>
 
-<div w="1/3">
-Write a Python script that solves your problem
+<Modal title="Transformers" w="1/2">
+
+<<< @/example/transformers_sentiment_analysis_sample.py py {*}
+
+</Modal>
+
+<Modal title="Transformers.js.py" w="1/2">
+
+```python
+from transformers_js_py import pipeline
+
+sentiment_analyzer = await pipeline(
+    "sentiment-analysis",
+    "Xenova/distilbert-base-uncased-finetuned-sst-2-english",
+)
+
+text = "I love LLMs!"
+
+result = await sentiment_analyzer(text)
+
+print(result)
+```
+
+- All methods are async; you need to `await` them.
+
+</Modal>
+
 </div>
 
-<div w="1/3">
-Share it with others as a web app
+---
+
+# Put them together into a serverless AI app
+
+TODO
+
+---
+
+# Typical use cases for Python serverless web apps
+
+<div text-3xl>
+
+<v-clicks>
+
+* Data processing
+* Data analysis
+* Visualization
+* Machine learning
+
+</v-clicks>
+
+<v-clicks>
+
+...where
+
+* Python has a strong ecosystem
+* Data privacy/transparency/control/cost is important
+
+</v-clicks>
+
 </div>
 
-<div w="1/3">
-<small>Bonus</small>
-Make it serverless
-</div>
+---
+
+# Wrap-up
+
+<div flex="~ col" gap-4>
+
+<Modal v-click="1">
+  <template #title>
+    Python script <span text-xl>that solves your problem</span>
+  </template>
+
+- Launched from the terminal
+
+</Modal>
+
+<Modal v-click="2">
+  <template #title>
+    Web app <span text-xl>that shares your solution</span>
+  </template>
+
+- Pure-Python Web UI frameworks
+- Easy to share, use, and understand
+
+</Modal>
+
+<Modal v-click="3">
+  <template #title>
+    Serverless web app <span text-xl>that runs in the browser</span>
+  </template>
+
+- Serverless versions of the frameworks
+- Data privacy / Easy server management / Cost control / ...
+
+</Modal>
 
 </div>
+
+---
+
+<h1 text-4xl>Yuichiro Tachibana / 橘 祐一郎</h1>
+
+@whitphx
+
+<div absolute top-40 right-40>
+<img src="https://avatars.githubusercontent.com/u/3135397?v=4" alt="whitphx" w="130px">
+</div>
+
+<div my-10 w-min flex="~ gap-1" items-center justify-center>
+  <div i-ri-user-3-line op50 ma text-2xl />
+  <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
+  <div i-ri-github-line op50 ma text-2xl ml4/>
+  <div><a href="https://github.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+  <div i-ri-linkedin-line op50 ma text-2xl ml4/>
+  <div><a href="https://www.linkedin.com/in/whitphx/" target="_blank" class="border-none! font-300">whitphx</a></div>
+  <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
+  <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+</div>
+
+- [Stlite: `whitphx/stlite`](https://github.com/whitphx/stlite)
+- [Transformers.js.py: `whitphx/transformers.js.py`](https://github.com/huggingface/transformers.js.py)

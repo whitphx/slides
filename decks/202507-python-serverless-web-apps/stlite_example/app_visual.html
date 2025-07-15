@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
+      mount(
+        {
+            entrypoint: "app.py",
+            files: {
+                "app.py": {
+                    url: "/streamlit_app_visual.py"
+                },
+                "process_data.py": {
+                    url: "/process_data.py"
+                },
+            }
+        },
+        document.getElementById("root"),
+      );
+    </script>
+  </body>
+</html>

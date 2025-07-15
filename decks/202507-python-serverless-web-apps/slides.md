@@ -55,45 +55,64 @@ Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
 ---
-
-<div flex="~ row" gap-4>
-
-<div w="1/3">
-Write a Python script that solves your problem
-</div>
-
-<div w="1/3">
-Share it with others as a web app
-</div>
-
-<div w="1/3">
-<small>Bonus</small>
-Make it serverless
-</div>
-
-</div>
-
----
 layout: section
 ---
 
-# Pure-Python Web UI frameworks
+<h1>
+What do you use Python for?
+</h1>
+
+---
+
+<div text-6xl h="100%" flex items-center justify-center>
+
+<v-clicks>
+
+- Data processing
+- Machine learning (AI)
+- Web development
+- ...
+
+</v-clicks>
+
+</div>
 
 ---
 
 # You write a Python script for your business...
 
+<div flex="~ row">
+
+<div grow>
+
+* Process CSV files
+* Generate reports
+* Process image/video/audio files
+* ...or even more complex tasks
+
+</div>
+
+<div>
+
+<div flex="~ col" items-center justify-center>
+
 <img src="https://automatetheboringstuff.com/images/cover-automate3.webp" alt="Automate the Boring Stuff with Python" w="300px">
 
-<small>https://automatetheboringstuff.com/</small>
+<small text-sm>https://automatetheboringstuff.com/</small>
+
+</div>
+
+</div>
+
+</div>
 
 ---
 
-# Example: data processing
+# Example: processing sales data...
 
 <div flex="~ row" gap-4>
 
-<div w="1/6">
+<div :w="$clicks === 0 ? '100%' : '1/6'">
 
 Input
 
@@ -103,7 +122,7 @@ Input
 
 </div>
 
-<div w="2/3">
+<div w="2/3" v-click="1">
 
 Python script
 
@@ -115,9 +134,10 @@ Python script
     q2="[data-id=normalize-data]"
     pos2="left"
     arc="0.3"
+    v-click="2"
 />
 
-<Modal title="Normalize the data" w="100%" data-id="normalize-data">
+<Modal title="Normalize the data" w="100%" data-id="normalize-data" v-click="2">
 
 ```python
 df["payment_type"] = df["payment_method"].map(payment_mapping)
@@ -131,9 +151,10 @@ df["payment_type"] = df["payment_method"].map(payment_mapping)
     q2="[data-id=convert-data]"
     pos2="left"
     arc="-0.7"
+    v-click="3"
 />
 
-<Modal title="Extract the data" w="100%" data-id="convert-data">
+<Modal title="Extract the data" w="100%" data-id="convert-data" v-click="3">
 
 ```python
 df["state"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
@@ -147,9 +168,10 @@ df["state"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
     q2="[data-id=anonymize-data]"
     pos2="left"
     arc="-0.7"
+    v-click="4"
 />
 
-<Modal title="Anonymize the data" w="100%" data-id="anonymize-data">
+<Modal title="Anonymize the data" w="100%" data-id="anonymize-data" v-click="4">
 
 ```python
 df = anonymize_data(df)
@@ -167,9 +189,10 @@ df = anonymize_data(df)
     q2="[data-id=output-csv]"
     pos2="left"
     arc="0.3"
+    v-click="5"
 />
 
-<div w="1/6">
+<div w="1/6" v-click="5">
 
 Output
 
@@ -216,17 +239,17 @@ Top 10 states by revenue: {'CA': 1076290, 'TX': 865260, 'FL': 610090, 'IL': 5332
 
 # Problem: difficult to share
 
-<div flex="~ row" gap-4>
+<div flex="~ col" gap-4>
 
-<div w="1/2">
+<div>
 
-- Share it with **your teammates** for their own use
-- Share it with **the sales team** for them to use it with higher cadence
-- Share the visualizations with **your manager** to show the results
+With **your teammates**, **the sales team**, **your manager**, and **your clients**
+- for their own use with higher cadence
+- for better understanding of the data
 
 </div>
 
-<div w="1/2">
+<div>
 
 <img src="/terminal.png" alt="Terminal-based script">
 
@@ -240,11 +263,12 @@ Top 10 states by revenue: {'CA': 1076290, 'TX': 865260, 'FL': 610090, 'IL': 5332
 
 <div flex="~ row" gap-4>
 
-<div w="1/2">
+<div w="1/2" text-3xl>
 
 - Shareable
 - Interactive
 - Easy to use
+- Visually appealing
 
 </div>
 
@@ -256,17 +280,29 @@ Top 10 states by revenue: {'CA': 1076290, 'TX': 865260, 'FL': 610090, 'IL': 5332
 
 </div>
 
+---
+layout: section
+---
+
+# Pure-Python Web UI frameworks
 
 ---
 
 # Tools you can use
+
+### Web framework + frontend
+- FastAPI
+- Flask
+- Django
+
+... with JavaScript app
 
 ### Notebook
 - Jupyter Notebook
 - Marimo
 
 ### Web UI frameworks
-- Streamlit
+- <span v-mark.circle.red="1">Streamlit</span>
 - Gradio
 - Shiny for Python
 - Panel
@@ -337,10 +373,6 @@ IMG
 
 ---
 
-TODO: Streamlit アプリの画像を追加
-
----
-
 # Data visualization
 We now have a web screen to display the visual outputs!
 
@@ -360,7 +392,16 @@ layout: section
 
 ---
 
-# Example: LLM to extract insights from unstructured data
+# The power of AI/LLM
+
+---
+
+# Transformers 🤗
+
+
+---
+
+# Example: LLM to extract more insights in data processing
 
 ---
 
@@ -393,32 +434,8 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 # Side note: Local LLMs vs LLM APIs?
 
 ---
-layout: section
----
 
-# AI/LLM choice for privacy/transparency
-
----
-
-# Problems with proprietary LLM API
-
-- Cost
-- Privacy
-- Transparency
-- Control
-
----
-
-# Run open LLMs in your local machine
-Transformers library 🤗
-
----
-
-# Example: replace the API calls with local LLM
-
----
-
-# Wrap-up: local and open LLMs for privacy
+# Wrap-up: LLM-powered data processing
 
 ---
 layout: section
@@ -481,8 +498,15 @@ Serverless web apps
 </div>
 
 ---
+layout: section
+---
 
-# Serverless version of Transformers
+# So what about LLM?
+
+---
+
+# Serverless version of Transformers 🤗
+
 
 ---
 
@@ -540,3 +564,20 @@ Client-side (serverless) app + Local (**in-browser**) LLM
 ---
 
 # Wrap-up: serverless web apps with Python
+
+<div flex="~ row" gap-4>
+
+<div w="1/3">
+Write a Python script that solves your problem
+</div>
+
+<div w="1/3">
+Share it with others as a web app
+</div>
+
+<div w="1/3">
+<small>Bonus</small>
+Make it serverless
+</div>
+
+</div>

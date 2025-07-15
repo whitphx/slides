@@ -55,6 +55,25 @@ Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
 ---
+
+<div flex="~ row" gap-4>
+
+<div w="1/3">
+Write a Python script that solves your problem
+</div>
+
+<div w="1/3">
+Share it with others as a web app
+</div>
+
+<div w="1/3">
+<small>Bonus</small>
+Make it serverless
+</div>
+
+</div>
+
+---
 layout: section
 ---
 
@@ -66,7 +85,15 @@ layout: section
 
 ---
 
-# Example: Sales analysis
+# Example: data processing script
+
+Sales analysis...
+
+* CSV input
+* Process structured/unstructured data
+* CSV output
+
+<!-- At this point, we use remote LLM API -->
 
 ---
 
@@ -93,9 +120,44 @@ layout: section
 layout: section
 ---
 
+# AI/LLM choice for privacy/transparency
+
+---
+
+# Problems with proprietary LLM API
+
+- Cost
+- Privacy
+- Transparency
+- Control
+
+---
+
+# Run open LLMs in your local machine
+
+---
+
+# Example: replace the API calls with local LLM
+
+---
+
+# Wrap-up: local and open LLMs for privacy
+
+---
+layout: section
+---
+
 # One step further: serverless web apps
 
 ---
+
+# Example: share the app with your customers
+
+More strict privacy requirements
+
+---
+
+# Typical problems serverless web apps solve
 
 * Privacy
 * Low latency
@@ -115,10 +177,64 @@ layout: section
 
 ---
 
+# Serverless version of Transformers
+
+---
+
+# Architecture of the serverless frameworks
+
+<!-- アーキテクチャを理解して、サーバレスの安全性を技術的に理解するのが目的 -->
+
+---
+
 # Walkthrough: development of pure-Python serverless web apps
 
 ---
 
-# AI/LLM integration
+# Data privacy with app servicer and LLM provider
+
+<div grid="~ cols-2 rows-2">
+
+<div>
+
+Server-side app + LLM API
+
+</div>
+
+<div>
+
+Server-side app + Local LLM
+
+</div>
+
+<div>
+
+Client-side (serverless) app + LLM API
+
+</div>
+
+<div>
+
+Client-side (serverless) app + Local (**in-browser**) LLM
+
+</div>
+
+</div>
 
 ---
+
+# Typical situations where Python serverless web apps are useful
+
+* Data processing
+* Data analysis
+* Data visualization
+* Data engineering
+* Machine learning
+
+...where
+* Python has a strong ecosystem
+* data privacy/transparency/control/cost is important
+
+---
+
+# Wrap-up: serverless web apps with Python

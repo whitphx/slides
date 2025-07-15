@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
+      mount(
+        `
+import streamlit as st
+
+name = st.text_input('Your name')
+st.write("Hello,", name or "world")
+`,
+        document.getElementById("root"),
+      );
+    </script>
+  </body>
+</html>

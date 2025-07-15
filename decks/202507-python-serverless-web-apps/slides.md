@@ -388,6 +388,9 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 4  ORD-2024-005           Medium  NEGATIVE  customer_relationship           improve
 ```
 
+---
+
+# Side note: Local LLMs vs LLM APIs?
 
 ---
 layout: section
@@ -421,13 +424,21 @@ Transformers library 🤗
 layout: section
 ---
 
-# One step further: serverless web apps
+<h1>
+One step further:<br>
+Serverless web apps
+</h1>
 
 ---
 
 # Example: share the app with your customers
 
-More strict privacy requirements
+- More strict privacy requirements
+- Difficulty to manage the web server
+
+---
+
+# The concept of "serverless"
 
 ---
 
@@ -451,6 +462,26 @@ More strict privacy requirements
 
 ---
 
+# Development of serverless web apps in Python
+
+<div max-h="80vh">
+
+````md magic-move {lines: true, maxHeight: '100%'}
+
+<<< @/stlite_example/simple_fragment0.html html
+
+<<< @/stlite_example/simple_fragment1.html html {6,11}
+
+<<< @/stlite_example/simple_fragment2.html html {10-18}
+
+<<< @/stlite_example/simple.html html {15-18|*}
+
+````
+
+</div>
+
+---
+
 # Serverless version of Transformers
 
 ---
@@ -459,9 +490,6 @@ More strict privacy requirements
 
 <!-- アーキテクチャを理解して、サーバレスの安全性を技術的に理解するのが目的 -->
 
----
-
-# Walkthrough: development of pure-Python serverless web apps
 
 ---
 

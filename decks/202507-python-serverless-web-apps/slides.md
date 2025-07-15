@@ -53,3 +53,72 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
+
+---
+layout: section
+---
+
+# Pure-Python Web UI frameworks
+
+---
+
+# When you have business logic in Python...
+
+---
+
+# Example: Sales analysis
+
+---
+
+# Problem: difficult to share
+
+- Share it with **your teammates** for their own use
+- Share it with **the sales team** for them to use it with higher cadence
+- Share the visualizations with **your manager** to show the results
+
+---
+
+# Create a web app
+
+---
+
+- Jupyter Notebook
+- Streamlit
+- Gradio
+- Shiny for Python
+- Panel
+- ...
+
+---
+layout: section
+---
+
+# One step further: serverless web apps
+
+---
+
+* Privacy
+* Low latency
+* Offline capability​
+* Scalability without servers​
+* Low cost
+
+---
+
+# Serverless versions of these frameworks
+
+- Stlite
+- Gradio-Lite
+- Shinylive
+- Panel
+- ...
+
+---
+
+# Walkthrough: development of pure-Python serverless web apps
+
+---
+
+# AI/LLM integration
+
+---

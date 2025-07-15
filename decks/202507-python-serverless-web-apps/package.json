@@ -8,6 +8,7 @@
     "export": "slidev export"
   },
   "dependencies": {
+    "@iconify/icons-vscode-icons": "^1.2.29",
     "@slidev/cli": "^52.0.0",
     "slidev-addon-anipres": "^0.5.2",
     "slidev-addon-fancy-arrow": "^0.8.0",

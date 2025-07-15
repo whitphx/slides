@@ -81,17 +81,101 @@ layout: section
 
 ---
 
-# When you have business logic in Python...
+# You write a Python script for your business...
+
+<img src="https://automatetheboringstuff.com/images/cover-automate3.webp" alt="Automate the Boring Stuff with Python" w="300px">
+
+<small>https://automatetheboringstuff.com/</small>
 
 ---
 
-# Example: data processing script
+# Example: data processing
 
-Sales analysis...
+<div flex="~ row" gap-4>
 
-* CSV input
-* Process structured/unstructured data
-* CSV output
+<div w="1/6">
+
+Input
+
+<div class="i-ph:file-csv" text-6xl data-id="input-csv"></div>
+
+</div>
+
+<div w="2/3">
+
+Python script
+
+<div flex="~ col" gap-4 m-2>
+
+<FancyArrow
+    q1="[data-id=input-csv]"
+    pos1="right"
+    q2="[data-id=normalize-data]"
+    pos2="left"
+    arc="0.3"
+/>
+
+<Modal title="Normalize the data" w="100%" data-id="normalize-data">
+
+```python
+...
+```
+
+</Modal>
+
+<FancyArrow
+    q1="[data-id=normalize-data]"
+    pos1="left"
+    q2="[data-id=convert-data]"
+    pos2="left"
+    arc="-0.7"
+/>
+
+<Modal title="Convert the data" w="100%" data-id="convert-data">
+
+```python
+...
+```
+
+</Modal>
+
+<FancyArrow
+    q1="[data-id=convert-data]"
+    pos1="left"
+    q2="[data-id=llm]"
+    pos2="left"
+    arc="-0.7"
+/>
+
+<Modal title="LLM" w="100%" data-id="llm">
+
+```python
+...
+```
+
+</Modal>
+
+</div>
+
+</div>
+
+<FancyArrow
+    q1="[data-id=llm]"
+    pos1="right"
+    q2="[data-id=output-csv]"
+    pos2="left"
+    arc="0.3"
+/>
+
+<div w="1/6">
+
+Output
+
+<div class="i-ph:file-csv" text-6xl data-id="output-csv"></div>
+
+</div>
+
+</div>
 
 <!-- At this point, we use remote LLM API -->
 

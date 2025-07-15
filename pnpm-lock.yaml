@@ -123,6 +123,9 @@ importers:
 
   decks/202507-python-serverless-web-apps:
     dependencies:
+      '@iconify/icons-vscode-icons':
+        specifier: ^1.2.29
+        version: 1.2.29
       '@slidev/cli':
         specifier: ^52.0.0
         version: 52.0.0(@babel/parser@7.28.0)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.17)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)

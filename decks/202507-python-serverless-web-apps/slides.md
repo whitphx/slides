@@ -521,21 +521,32 @@ Serverless web apps
 
 # Example: share the app with your customers
 
+<div text-4xl>
+
 - More strict privacy requirements
 - Difficulty to manage the web server
+
+</div>
 
 ---
 
 # The concept of "serverless"
 
-- No server-side runtime
-The app runs entirely in the browser—there’s no backend code or server process involved.
+<div flex="~ col" gap-4 mt-8>
 
-- All logic runs on the client
-Application logic is shipped as static files and executed in the user’s device.
+<Modal title="No server-side runtime" v-click>
+The app runs entirely in the browser — there’s no backend code or server process involved.
+</Modal>
 
-- No data sent to remote servers
+<Modal title="All logic runs on the client" v-click>
+Source files are loaded to the user’s device and executed there.
+</Modal>
+
+<Modal title="No data sent to remote servers" v-click>
 All processing happens locally, keeping user data private and secure.
+</Modal>
+
+</div>
 
 ---
 
@@ -581,6 +592,10 @@ All processing happens locally, keeping user data private and secure.
 ````
 
 </div>
+
+---
+
+# Easier way: Stlite Sharing
 
 ---
 layout: section

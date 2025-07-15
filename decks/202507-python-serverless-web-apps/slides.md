@@ -360,11 +360,34 @@ layout: section
 
 ---
 
-TODO: LLM追加版のコード
+# Example: LLM to extract insights from unstructured data
 
 ---
 
-その出力
+<<< @/example/process_data_with_llm.py py {*}{lines:true,maxHeight:'100%'}
+
+---
+
+```shell
+❯ uv run python process_data_with_llm.py --input sales_data.csv --output processed_sales_data_with_llm.csv
+Device set to use mps:0
+Device set to use mps:0
+
+=== PROCESSING SUMMARY ===
+Total orders processed: 200
+Revenue categories: {'Low': 129, 'High': 66, 'Medium': 5}
+Sentiment distribution: {'POSITIVE': 173, 'NEGATIVE': 27}
+Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technical_issue': 35, 'pricing_negotiation': 2}
+
+=== SAMPLE RESULTS ===
+       order_id revenue_category sentiment          note_category identified_issues
+0  ORD-2024-001           Medium  POSITIVE        technical_issue              none
+1  ORD-2024-002              Low  POSITIVE  customer_relationship             delay
+2  ORD-2024-003              Low  POSITIVE  customer_relationship           improve
+3  ORD-2024-004             High  POSITIVE    pricing_negotiation              none
+4  ORD-2024-005           Medium  NEGATIVE  customer_relationship           improve
+```
+
 
 ---
 layout: section

@@ -69,7 +69,7 @@ What do you use Python for?
 <v-clicks>
 
 - Data processing
-- Machine learning (AI)
+- Machine Learning (AI)
 - Web development
 - ...
 
@@ -208,11 +208,11 @@ Output
 
 ---
 
-<<< @/example/process_data.py py {*}{lines:true,maxHeight:'100%'}
+<<< @/example/process_data.py py {*|117-118|95|97|61|69|9|10-13|15-22|24-25|27-30|69|72|97|99|101-114}{lines:true,maxHeight:'100%'}
 
 ---
 
-```bash
+```bash {1|1-6|*}
 ❯ python process_data.py --input sales_data.csv --output processed_sales_data.csv
 
 === PROCESSING SUMMARY ===
@@ -268,7 +268,7 @@ With **your teammates**, **the sales team**, **your manager**, and **your client
 - Shareable
 - Interactive
 - Easy to use
-- Visually appealing
+- Easy to understand
 
 </div>
 
@@ -281,32 +281,45 @@ With **your teammates**, **the sales team**, **your manager**, and **your client
 </div>
 
 ---
-layout: section
----
-
-# Pure-Python Web UI frameworks
-
----
 
 # Tools you can use
 
-### Web framework + frontend
+<div flex="~ row" gap-2>
+
+<Modal title="Server-side framework & Frontend app" w="1/3" v-click="1">
+
 - FastAPI
 - Flask
 - Django
 
 ... with JavaScript app
 
-### Notebook
+</Modal>
+
+<Modal title="Notebook" w="1/3" v-click="2">
+
 - Jupyter Notebook
 - Marimo
 
-### Web UI frameworks
-- <span v-mark.circle.red="1">Streamlit</span>
+</Modal>
+
+<Modal title="Web UI frameworks" w="1/3" v-click="3">
+
+- <span v-mark.circle.red="4">Streamlit</span>
 - Gradio
 - Shiny for Python
 - Panel
 - ...
+
+</Modal>
+
+</div>
+
+---
+layout: section
+---
+
+# Pure-Python Web UI frameworks
 
 ---
 
@@ -321,13 +334,11 @@ layout: section
 
 # Streamlit
 
-<div flex="~ row" gap-4>
+<div flex="~ row" gap-4 h="90%" overflow-hidden>
 
-<div w="1/2" data-id="python-code">
+<div :w="$clicks === 0 ? '100%' : '1/2'" data-id="python-code">
 
-```python
-...
-```
+<<< @/example/streamlit_intro_sample.py py {*}{lines:true,maxHeight:'100%'}
 
 </div>
 
@@ -336,14 +347,19 @@ layout: section
     pos1="top"
     q2="[data-id=streamlit-app]"
     pos2="top"
-    arc="0.3"
-/>
+    arc="0.1"
+    v-click="1"
+>
 
-<div w="1/2">
+<code text-nowrap>streamlit run app.py</code>
+
+</FancyArrow>
+
+<div w="1/2" v-click="1">
 
 <div data-id="streamlit-app">
 
-IMG
+<img src="/streamlit_intro.png" alt="Streamlit app">
 
 </div>
 
@@ -352,6 +368,8 @@ IMG
 </div>
 
 ---
+
+# Streamlit UI on top of the data processing script
 
 <div flex="~ row" gap-4>
 
@@ -510,6 +528,15 @@ Serverless web apps
 ---
 
 # The concept of "serverless"
+
+- No server-side runtime
+The app runs entirely in the browser—there’s no backend code or server process involved.
+
+- All logic runs on the client
+Application logic is shipped as static files and executed in the user’s device.
+
+- No data sent to remote servers
+All processing happens locally, keeping user data private and secure.
 
 ---
 

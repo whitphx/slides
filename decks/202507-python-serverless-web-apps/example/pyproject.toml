@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.3.1",
+    "plotly>=6.2.0",
     "pydantic-ai>=0.4.2",
     "streamlit>=1.46.1",
     "transformers[torch]>=4.53.2",

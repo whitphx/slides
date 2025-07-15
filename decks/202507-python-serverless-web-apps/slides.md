@@ -403,6 +403,18 @@ layout: section
 
 # Example: LLM to extract more insights in data processing
 
+<<< @/example/transformers_sentiment_analysis_sample.py py {*}{maxHeight:'100%'}
+
+<v-click>
+
+```bash
+❯ python transformers_sentiment_analysis_sample.py
+Device set to use mps:0
+[{'label': 'POSITIVE', 'score': 0.9998774528503418}]
+```
+
+</v-click>
+
 ---
 
 <<< @/example/process_data_with_llm.py py {*}{lines:true,maxHeight:'100%'}
@@ -431,7 +443,49 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 
 ---
 
+# Streamlit-ify the LLM version as well!
+
+<<< @/example/streamlit_app_with_llm.py py {*}{lines:true,maxHeight:'100%'}
+
+---
+
+<img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM">
+
+---
+
 # Side note: Local LLMs vs LLM APIs?
+
+<div flex="~ row" gap-4 mt-4>
+
+<Modal title="Local LLMs" w="1/2">
+
+- Open, Transparent
+- More control over the data, privacy, and cost
+- Requires compute resources
+
+<div max-h="60" overflow-y-scroll>
+
+<<< @/example/transformers_sentiment_analysis_sample.py py {*}
+
+</div>
+
+</Modal>
+
+<Modal title="LLM APIs" w="1/2">
+
+- Easy to use
+- Cost
+- Trust on the provider
+
+<div max-h="60" overflow-y-scroll>
+
+<<< @/example/anthropic_sentiment_analysis_example.py py {*}
+
+</div>
+
+</Modal>
+
+</div>
 
 ---
 
@@ -479,7 +533,7 @@ Serverless web apps
 
 ---
 
-# Development of serverless web apps in Python
+# Development of serverless Streamlit app
 
 <div max-h="80vh">
 

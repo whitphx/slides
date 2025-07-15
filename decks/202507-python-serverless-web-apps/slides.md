@@ -397,9 +397,19 @@ We now have a web screen to display the visual outputs!
 
 ---
 
-<SlidevVideo autoplay controls>
+<div flex="~ col" h="100%">
+
+<SlidevVideo autoplay controls max-h="100%">
   <source src="/streamlit_app_visual.mp4" type="video/mp4" />
 </SlidevVideo>
+
+<div>
+<a href="https://uwftsvlkjdv58mgvxfrku6.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
+https://uwftsvlkjdv58mgvxfrku6.streamlit.app/
+</a>
+</div>
+
+</div>
 
 ---
 layout: section
@@ -466,7 +476,17 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 
 ---
 
-<img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM">
+<div flex="~ col" h="100%">
+
+<img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM" max-h="100%">
+
+<div>
+<a href="https://c2amowmwbb5niziwazeduq.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
+https://c2amowmwbb5niziwazeduq.streamlit.app/
+</a>
+</div>
+
+</div>
 
 ---
 

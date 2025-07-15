@@ -120,7 +120,7 @@ Python script
 <Modal title="Normalize the data" w="100%" data-id="normalize-data">
 
 ```python
-...
+df["payment_type"] = df["payment_method"].map(payment_mapping)
 ```
 
 </Modal>
@@ -133,10 +133,10 @@ Python script
     arc="-0.7"
 />
 
-<Modal title="Convert the data" w="100%" data-id="convert-data">
+<Modal title="Extract the data" w="100%" data-id="convert-data">
 
 ```python
-...
+df["state"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
 ```
 
 </Modal>
@@ -144,15 +144,15 @@ Python script
 <FancyArrow
     q1="[data-id=convert-data]"
     pos1="left"
-    q2="[data-id=llm]"
+    q2="[data-id=anonymize-data]"
     pos2="left"
     arc="-0.7"
 />
 
-<Modal title="LLM" w="100%" data-id="llm">
+<Modal title="Anonymize the data" w="100%" data-id="anonymize-data">
 
 ```python
-...
+df = anonymize_data(df)
 ```
 
 </Modal>
@@ -162,7 +162,7 @@ Python script
 </div>
 
 <FancyArrow
-    q1="[data-id=llm]"
+    q1="[data-id=anonymize-data]"
     pos1="right"
     q2="[data-id=output-csv]"
     pos2="left"
@@ -181,51 +181,81 @@ Output
 
 </div>
 
-<!-- At this point, we use remote LLM API -->
+<!-- At this point, we don't use LLM -->
 
 ---
 
-```shell
-❯ uv run python main.py --input sales_data.csv
-INFO:__main__:Loading sales data from sales_data.csv
-INFO:__main__:Processing structured data...
-INFO:__main__:Processing unstructured data with local LLM...
-Device set to use mps:0
-Device set to use mps:0
-INFO:__main__:Processing sentiment analysis with local LLM...
-INFO:__main__:Processing note classification with local LLM...
-INFO:__main__:Applying privacy protection...
+<<< @/example/process_data.py py {*}{lines:true,maxHeight:'100%'}
+
+---
+
+```bash
+❯ python process_data.py --input sales_data.csv --output processed_sales_data.csv
 
 === PROCESSING SUMMARY ===
 Total orders processed: 200
 Revenue categories: {'Low': 129, 'High': 66, 'Medium': 5}
-Sentiment distribution: {'POSITIVE': 173, 'NEGATIVE': 27}
-Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technical_issue': 35, 'pricing_negotiation': 2}
+Top 10 states by revenue: {'CA': 1076290, 'TX': 865260, 'FL': 610090, 'IL': 533200, 'WA': 524800, 'NM': 510000, 'NV': 431200, 'OR': 409200, 'OH': 404280, 'MI': 398930}
 
 === SAMPLE RESULTS ===
-       order_id revenue_category sentiment          note_category identified_issues
-0  ORD-2024-001           Medium  POSITIVE        technical_issue              none
-1  ORD-2024-002              Low  POSITIVE  customer_relationship             delay
-2  ORD-2024-003              Low  POSITIVE  customer_relationship           improve
-3  ORD-2024-004             High  POSITIVE    pricing_negotiation              none
-4  ORD-2024-005           Medium  NEGATIVE  customer_relationship           improve
+       order_id revenue_category delivery_area_masked                                 sales_note_cleaned                               feedback_generalized
+0  ORD-2024-001           Medium                   NY  First-time client requiring technical consulta...  The product exceeded our expectations and inte...
+1  ORD-2024-002              Low                   CA          Repeat customer with good payment history  Delivery was delayed but customer service hand...
+2  ORD-2024-003              Low                   IL                    Online purchase through website  Great product but the packaging could be improved
+3  ORD-2024-004             High                   TX  Large order negotiated with [PERCENTAGE] volum...  [DEPARTMENT] was very professional and knowled...
+4  ORD-2024-005           Medium                   AZ               Customer requested extended warranty  The software is intuitive but documentation ne...
 ```
+
+<v-click>
+
+<<< @/example/processed_sales_data.csv
+
+</v-click>
 
 ---
 
 # Problem: difficult to share
 
+<div flex="~ row" gap-4>
+
+<div w="1/2">
+
 - Share it with **your teammates** for their own use
 - Share it with **the sales team** for them to use it with higher cadence
 - Share the visualizations with **your manager** to show the results
+
+</div>
+
+<div w="1/2">
+
+<img src="/terminal.png" alt="Terminal-based script">
+
+</div>
+
+</div>
 
 ---
 
 # Convert your script to a web app
 
+<div flex="~ row" gap-4>
+
+<div w="1/2">
+
 - Shareable
 - Interactive
 - Easy to use
+
+</div>
+
+<div w="1/2">
+
+<img src="/visualization.png" alt="Web-based shareable visualization app">
+
+</div>
+
+</div>
+
 
 ---
 
@@ -284,6 +314,57 @@ IMG
 </div>
 
 </div>
+
+---
+
+<div flex="~ row" gap-4>
+
+<div w="1/2">
+
+<<< @/example/streamlit_app_simple.py py {*}{lines:true,maxHeight:'100%'}
+
+</div>
+
+<div w="1/2">
+
+<SlidevVideo autoplay controls>
+  <source src="/streamlit_app_simple.mp4" type="video/mp4" />
+</SlidevVideo>
+
+</div>
+
+</div>
+
+---
+
+TODO: Streamlit アプリの画像を追加
+
+---
+
+# Data visualization
+We now have a web screen to display the visual outputs!
+
+<<< @/example/streamlit_app_visual.py py {*}{lines:true,maxHeight:'100%'}
+
+---
+
+<SlidevVideo autoplay controls>
+  <source src="/streamlit_app_visual.mp4" type="video/mp4" />
+</SlidevVideo>
+
+---
+layout: section
+---
+
+# Empower your app with AI/LLM
+
+---
+
+TODO: LLM追加版のコード
+
+---
+
+その出力
 
 ---
 layout: section

@@ -5,25 +5,302 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
     />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"></script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module">
-      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
-      mount(
-        {
-            entrypoint: "app.py",
-            files: {
-                "app.py": {
-                    url: "/streamlit_app_visual.py"
-                },
-                "process_data.py": {
-                    url: "/process_data.py"
-                },
-            }
-        },
-        document.getElementById("root"),
-      );
-    </script>
+    <streamlit-app>
+      <app-file name="app.py" entrypoint>
+import streamlit as st
+import pandas as pd
+import altair as alt
+
+from process_data import process_sales_data
+
+
+st.title("Sales Data Processor")
+
+st.write("Upload a CSV file to process:")
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+
+if uploaded_file is None:
+    st.stop()
+
+df = pd.read_csv(uploaded_file)
+with st.spinner("Processing data..."):
+    df = process_sales_data(df)
+
+st.write(df)
+st.download_button(
+    label="Download processed data",
+    data=df.to_csv(index=False),
+    file_name="processed_sales_data.csv",
+    mime="text/csv",
+)
+
+
+### Metrics
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(label="Total orders", value=len(df))
+with col2:
+    total_revenue = df["purchase_amount"].sum()
+    if total_revenue >= 1_000_000:
+        revenue_display = f"${total_revenue / 1_000_000:.1f}M"
+    elif total_revenue >= 1_000:
+        revenue_display = f"${total_revenue / 1_000:.0f}K"
+    else:
+        revenue_display = f"${total_revenue:,.0f}"
+    st.metric(label="Total revenue", value=revenue_display)
+with col3:
+    avg_order_value = df["purchase_amount"].mean()
+    st.metric(label="Average order value", value=f"${avg_order_value:,.0f}")
+
+### Charts
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Revenue by Customer Segment")
+    segment_revenue = (
+        df.groupby("customer_segment")["purchase_amount"].sum().reset_index()
+    )
+    st.bar_chart(segment_revenue.set_index("customer_segment")["purchase_amount"])
+
+
+with col2:
+    st.subheader("Payment Method Distribution")
+    payment_counts = df["payment_method"].value_counts()
+    st.altair_chart(
+        alt.Chart(payment_counts.reset_index())
+        .mark_bar()
+        .encode(x=alt.X("payment_method", sort=None), y=alt.Y("count")),
+        use_container_width=True,
+    )
+
+st.subheader("Top 10 States by Revenue")
+state_revenue = (
+    df.groupby("state")["purchase_amount"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+)
+st.altair_chart(
+    alt.Chart(state_revenue.reset_index())
+    .mark_bar()
+    .encode(x=alt.X("state", sort=None), y=alt.Y("purchase_amount")),
+    use_container_width=True,
+)
+
+st.subheader("Sales Note Analysis")
+st.write("Sample sales notes:")
+# Show a sample of sales notes in an expandable section
+with st.expander("View sales notes samples"):
+    sample_notes = df[["order_id", "customer_segment", "sales_note"]].head(10)
+    st.dataframe(sample_notes, use_container_width=True)
+
+st.subheader("Browse Data with Filters")
+
+# Create filter columns
+filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+with filter_col1:
+    # Customer segment filter
+    segments = ["All"] + sorted(df["customer_segment"].unique().tolist())
+    selected_segment = st.selectbox("Customer Segment", segments)
+
+    # Revenue category filter
+    revenue_categories = ["All"] + sorted(df["revenue_category"].unique().tolist())
+    selected_revenue_cat = st.selectbox("Revenue Category", revenue_categories)
+
+with filter_col2:
+    # Payment method filter
+    payment_methods = ["All"] + sorted(df["payment_method"].unique().tolist())
+    selected_payment = st.selectbox("Payment Method", payment_methods)
+
+with filter_col3:
+    # State filter
+    states = ["All"] + sorted(df["state"].unique().tolist())
+    selected_state = st.selectbox("State", states)
+
+# Purchase amount range filter
+st.write("Purchase Amount Range:")
+min_amount = float(df["purchase_amount"].min())
+max_amount = float(df["purchase_amount"].max())
+amount_range = st.slider(
+    "Select range",
+    min_value=min_amount,
+    max_value=max_amount,
+    value=(min_amount, max_amount),
+    format="$%.0f",
+)
+
+# Apply filters
+filtered_df = df.copy()
+
+if selected_segment != "All":
+    filtered_df = filtered_df[filtered_df["customer_segment"] == selected_segment]
+if selected_revenue_cat != "All":
+    filtered_df = filtered_df[filtered_df["revenue_category"] == selected_revenue_cat]
+if selected_payment != "All":
+    filtered_df = filtered_df[filtered_df["payment_method"] == selected_payment]
+if selected_state != "All":
+    filtered_df = filtered_df[filtered_df["state"] == selected_state]
+
+# Apply amount range filter
+filtered_df = filtered_df[
+    (filtered_df["purchase_amount"] >= amount_range[0])
+    & (filtered_df["purchase_amount"] <= amount_range[1])
+]
+
+# Show filtered results
+st.write(f"Showing {len(filtered_df)} out of {len(df)} records")
+
+# Display filtered data
+st.dataframe(filtered_df, use_container_width=True)
+
+# Show summary metrics for filtered data
+if len(filtered_df) > 0:
+    st.subheader("Filtered Data Summary")
+    summary_col1, summary_col2, summary_col3 = st.columns(3)
+
+    with summary_col1:
+        st.metric("Filtered Records", len(filtered_df))
+    with summary_col2:
+        filtered_revenue = filtered_df["purchase_amount"].sum()
+        if filtered_revenue >= 1_000_000:
+            revenue_display = f"${filtered_revenue / 1_000_000:.1f}M"
+        elif filtered_revenue >= 1_000:
+            revenue_display = f"${filtered_revenue / 1_000:.0f}K"
+        else:
+            revenue_display = f"${filtered_revenue:,.0f}"
+        st.metric("Total Revenue", revenue_display)
+    with summary_col3:
+        avg_amount = filtered_df["purchase_amount"].mean()
+        st.metric("Average Amount", f"${avg_amount:,.0f}")
+
+      </app-file>
+
+      <app-file name="process_data.py">
+
+import argparse
+import logging
+import pandas as pd
+import re
+
+logger = logging.getLogger(__name__)
+
+
+def process_data(df):
+    # 1. Calculate sales metrics
+    df["revenue_category"] = df["purchase_amount"].apply(
+        lambda x: "High" if x > 50000 else "Medium" if x > 10000 else "Low"
+    )
+
+    # 2. Standardize payment methods
+    payment_mapping = {
+        "Credit Card": "Card",
+        "Bank Transfer": "Transfer",
+        "Wire Transfer": "Transfer",
+        "PayPal": "Digital",
+    }
+    df["payment_type"] = df["payment_method"].map(payment_mapping)
+
+    # 3. Extract state from address
+    df["state"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
+
+    # 4. Categorize customer segments
+    df["segment_priority"] = df["customer_segment"].map(
+        {"Enterprise": 1, "SMB": 2, "Individual": 3}
+    )
+
+    return df
+
+def anonymize_data(df):
+    """Apply privacy protection measures"""
+
+    # 1. Mask specific locations (keep only state)
+    df["delivery_area_masked"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
+
+    # 2. Remove sensitive information from notes
+    def clean_sensitive_info(text):
+        # Remove specific company names, numbers, and personal details
+        text = re.sub(r"\b[A-Z][a-z]+ \d+\b", "[COMPANY_ID]", text)
+        text = re.sub(r"\$\d+", "[AMOUNT]", text)
+        text = re.sub(r"\d{2,}%", "[PERCENTAGE]", text)
+        return text
+
+    df["sales_note_cleaned"] = df["sales_note"].apply(clean_sensitive_info)
+
+    # 3. Generalize customer feedback
+    def generalize_feedback(text):
+        # Remove specific product names and replace with generic terms
+        text = re.sub(r"\b[A-Z][a-z]+\s+(team|service|support)\b", "[DEPARTMENT]", text)
+        return text
+
+    df["feedback_generalized"] = df["customer_feedback"].apply(generalize_feedback)
+
+    return df
+
+
+def process_sales_data(df):
+    """
+    Process sales data with different LLM processing methods.
+
+    Args:
+        df: Input DataFrame
+    """
+    logger.info("Processing structured data...")
+    df = process_data(df)
+
+    logger.info("Applying privacy protection...")
+    df = anonymize_data(df)
+
+    return df
+
+
+def cli():
+    parser = argparse.ArgumentParser(description="Process sales data")
+    parser.add_argument(
+        "--input", type=str, default="sales_data.csv", help="Input CSV file"
+    )
+    parser.add_argument(
+        "--output", type=str, default="processed_sales_data.csv", help="Output CSV file"
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Verbose output"
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING)
+
+    logger.info(f"Loading sales data from {args.input}")
+    df = pd.read_csv(args.input)
+
+    df = process_sales_data(df)
+
+    df.to_csv(args.output, index=False)
+
+    print("\n=== PROCESSING SUMMARY ===")
+    print(f"Total orders processed: {len(df)}")
+    print(f"Revenue categories: {df['revenue_category'].value_counts().to_dict()}")
+    print(f"Top 10 states by revenue: {df.groupby('state')['purchase_amount'].sum().sort_values(ascending=False).head(10).to_dict()}")
+
+    print("\n=== SAMPLE RESULTS ===")
+    sample_cols = [
+        "order_id",
+        "revenue_category",
+        "delivery_area_masked",
+        "sales_note_cleaned",
+        "feedback_generalized",
+    ]
+    print(df[sample_cols].head())
+
+
+if __name__ == "__main__":
+    cli()
+
+      </app-file>
+    </streamlit-app>
   </body>
 </html>

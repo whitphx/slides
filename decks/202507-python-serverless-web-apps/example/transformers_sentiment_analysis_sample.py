@@ -6,7 +6,5 @@ sentiment_analyzer = pipeline(
 )
 
 text = "I love LLMs!"
-
 result = sentiment_analyzer(text)
-
 print(result)

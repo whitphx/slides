@@ -1,32 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>Stlite app</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
     />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"></script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module">
-import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"
-mount(
-  {
-    requirements: ["transformers-js-py"],
-    entrypoint: "streamlit_app.py",
-    files: {
-"streamlit_app.py": `import streamlit as st
+    <streamlit-app>
+      <app-file name="app.py" entrypoint>
+import streamlit as st
 import pandas as pd
 import altair as alt
 
-from main import process_sales_data
+from process_data import process_sales_data
 
 
 st.title("Sales Data Processor")
@@ -56,15 +44,15 @@ with col1:
 with col2:
     total_revenue = df["purchase_amount"].sum()
     if total_revenue >= 1_000_000:
-        revenue_display = f"\${total_revenue / 1_000_000:.1f}M"
+        revenue_display = f"${total_revenue / 1_000_000:.1f}M"
     elif total_revenue >= 1_000:
-        revenue_display = f"\${total_revenue / 1_000:.0f}K"
+        revenue_display = f"${total_revenue / 1_000:.0f}K"
     else:
-        revenue_display = f"\${total_revenue:,.0f}"
+        revenue_display = f"${total_revenue:,.0f}"
     st.metric(label="Total revenue", value=revenue_display)
 with col3:
     avg_order_value = df["purchase_amount"].mean()
-    st.metric(label="Average order value", value=f"\${avg_order_value:,.0f}")
+    st.metric(label="Average order value", value=f"${avg_order_value:,.0f}")
 with col4:
     positive_sentiment = len(df[df["sentiment"] == "POSITIVE"])
     sentiment_rate = positive_sentiment / len(df) * 100
@@ -229,15 +217,15 @@ if len(filtered_df) > 0:
     with summary_col2:
         filtered_revenue = filtered_df["purchase_amount"].sum()
         if filtered_revenue >= 1_000_000:
-            revenue_display = f"\${filtered_revenue / 1_000_000:.1f}M"
+            revenue_display = f"${filtered_revenue / 1_000_000:.1f}M"
         elif filtered_revenue >= 1_000:
-            revenue_display = f"\${filtered_revenue / 1_000:.0f}K"
+            revenue_display = f"${filtered_revenue / 1_000:.0f}K"
         else:
-            revenue_display = f"\${filtered_revenue:,.0f}"
+            revenue_display = f"${filtered_revenue:,.0f}"
         st.metric("Total Revenue", revenue_display)
     with summary_col3:
         avg_amount = filtered_df["purchase_amount"].mean()
-        st.metric("Average Amount", f"\${avg_amount:,.0f}")
+        st.metric("Average Amount", f"${avg_amount:,.0f}")
     with summary_col4:
         if len(filtered_df) > 0:
             positive_count = len(filtered_df[filtered_df["sentiment"] == "POSITIVE"])
@@ -245,8 +233,11 @@ if len(filtered_df) > 0:
             st.metric("Positive Sentiment", f"{positive_rate:.1f}%")
         else:
             st.metric("Positive Sentiment", "0%")
-`,
-"main.py": `import argparse
+
+      </app-file>
+
+      <app-file name="process_data.py">
+import argparse
 import logging
 import pandas as pd
 from transformers_js_py import pipeline
@@ -349,9 +340,9 @@ def anonymize_data(df):
     # 2. Remove sensitive information from notes
     def clean_sensitive_info(text):
         # Remove specific company names, numbers, and personal details
-        text = re.sub(r"\\b[A-Z][a-z]+ \\d+\\b", "[COMPANY_ID]", text)
-        text = re.sub(r"\\$\\d+", "[AMOUNT]", text)
-        text = re.sub(r"\\d{2,}%", "[PERCENTAGE]", text)
+        text = re.sub(r"\b[A-Z][a-z]+ \d+\b", "[COMPANY_ID]", text)
+        text = re.sub(r"\$\d+", "[AMOUNT]", text)
+        text = re.sub(r"\d{2,}%", "[PERCENTAGE]", text)
         return text
 
     df["sales_note_cleaned"] = df["sales_note"].apply(clean_sensitive_info)
@@ -359,7 +350,7 @@ def anonymize_data(df):
     # 3. Generalize customer feedback
     def generalize_feedback(text):
         # Remove specific product names and replace with generic terms
-        text = re.sub(r"\\b[A-Z][a-z]+\\s+(team|service|support)\\b", "[DEPARTMENT]", text)
+        text = re.sub(r"\b[A-Z][a-z]+\s+(team|service|support)\b", "[DEPARTMENT]", text)
         return text
 
     df["feedback_generalized"] = df["customer_feedback"].apply(generalize_feedback)
@@ -397,13 +388,13 @@ def cli():
 
     df.to_csv("processed_sales_data.csv", index=False)
 
-    print("\\n=== PROCESSING SUMMARY ===")
+    print("\n=== PROCESSING SUMMARY ===")
     print(f"Total orders processed: {len(df)}")
     print(f"Revenue categories: {df['revenue_category'].value_counts().to_dict()}")
     print(f"Sentiment distribution: {df['sentiment'].value_counts().to_dict()}")
     print(f"Note categories: {df['note_category'].value_counts().to_dict()}")
 
-    print("\\n=== SAMPLE RESULTS ===")
+    print("\n=== SAMPLE RESULTS ===")
     sample_cols = [
         "order_id",
         "revenue_category",
@@ -416,14 +407,12 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-`,
 
-},
-  },
-  document.getElementById("root")
-)
+      </app-file>
 
-    </script>
+      <app-requirements>
+transformers-js-py
+      </app-requirements>
+    </streamlit-app>
   </body>
-  <!-- Generated from Stlite Sharing (https://edit.share.stlite.net/), and the source version is c8c2889917c4dfef0fc8d485071b2927aadd06f0 -->
 </html>

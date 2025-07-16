@@ -5,20 +5,19 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
     />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"
+    ></script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module">
-      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
-      mount(
-        `
+    <streamlit-app>
+      <app-file name="app.py" entrypoint>
 import streamlit as st
 
 name = st.text_input('Your name')
 st.write("Hello,", name or "world")
-`,
-        document.getElementById("root"),
-      );
-    </script>
+      </app-file>
+    </streamlit-app>
   </body>
 </html>

@@ -1,6 +1,6 @@
 ---
 theme: ../../themes/alpha
-title: "Democratize serverless web apps for Python devs (with AI)"
+title: "Democratize serverless web AI apps for Python devs"
 drawings:
   persist: false
 mdc: true
@@ -13,7 +13,7 @@ addons:
 ---
 
 <h1 text="5xl/20">
-Democratize serverless web apps for Python devs (with AI)
+Democratize serverless web AI apps for Python devs
 </h1>
 
 EuroPython 2025
@@ -32,18 +32,7 @@ EuroPython 2025
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
-<div mt-4>
-
-<v-clicks>
-
-- ML Developer Advocate at <span v-mark.underline.yellow="1">Hugging Face</span> 🤗
-- <span v-mark.underline.red="2">Streamlit</span> Creator
-
-</v-clicks>
-
-</div>
-
-<div my-10 w-min flex="~ gap-1" items-center justify-center v-click>
+<div mt-8 w-min flex="~ gap-1" items-center justify-center>
   <div i-ri-user-3-line op50 ma text-2xl />
   <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
   <div i-ri-github-line op50 ma text-2xl ml4/>
@@ -52,6 +41,17 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div><a href="https://www.linkedin.com/in/whitphx/" target="_blank" class="border-none! font-300">whitphx</a></div>
   <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+</div>
+
+<div mt-8>
+
+<v-clicks>
+
+- ML Developer Advocate at <span v-mark.underline.yellow="1">Hugging Face</span> 🤗
+- <span v-mark.underline.red="2">Streamlit</span> Creator
+
+</v-clicks>
+
 </div>
 
 ---
@@ -397,7 +397,7 @@ layout: section
 
 </div>
 
-<div v-click="1" v-click.hide="6" w="1/2" h="100">
+<div v-click="1" v-click.hide="6" w="1/2" h="100" :class="$clicks >= 1 ? 'visible' : 'invisible'">
 
 <<< @/example/process_data.py {61-74}{lines:true,maxHeight:'100%'}
 
@@ -432,7 +432,7 @@ We now have a web screen to display the visual outputs!
   <source src="/streamlit_app_visual.mp4" type="video/mp4" />
 </SlidevVideo>
 
-<div>
+<div flex justify-center items-center mt-4>
 <a href="https://uwftsvlkjdv58mgvxfrku6.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
 https://uwftsvlkjdv58mgvxfrku6.streamlit.app/
 </a>
@@ -448,7 +448,7 @@ layout: section
 
 ---
 
-# The power of AI/LLM
+# The power of AI
 
 <v-clicks>
 
@@ -526,7 +526,7 @@ pip install "transformers[torch]"
 
 # Example: LLM to extract more insights in data processing
 
-<<< @/example/transformers_sentiment_analysis_sample.py py {*}{maxHeight:'100%'}
+<<< @/example/transformers_sentiment_analysis_sample.py py {*|1|3-6|8-10}{maxHeight:'100%'}
 
 <v-click>
 
@@ -547,7 +547,7 @@ Device set to use mps:0
 
 ---
 
-<<< @/example/process_data_with_llm.py py {*|121-138|133|36-91|39-56|58-73}{lines:true,maxHeight:'100%'}
+<<< @/example/process_data_with_llm.py py {*|121-138|133|36-91|39-53|55-73}{lines:true,maxHeight:'100%'}
 
 <style>
 .slidev-code {
@@ -557,7 +557,7 @@ Device set to use mps:0
 
 ---
 
-```shell
+```shell {*|5-9|11-17}
 ❯ uv run python process_data_with_llm.py --input sales_data.csv --output processed_sales_data_with_llm.csv
 Device set to use mps:0
 Device set to use mps:0
@@ -577,11 +577,17 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 4  ORD-2024-005           Medium  NEGATIVE  customer_relationship           improve
 ```
 
+<style>
+.slidev-code {
+    font-size: 18px !important;
+}
+</style>
+
 ---
 
 # Streamlit-ify the LLM version as well!
 
-<<< @/example/streamlit_app_with_llm.py py {*}{lines:true,maxHeight:'100%'}
+<<< @/example/streamlit_app_with_llm.py py {*|48-51}{lines:true,maxHeight:'100%'}
 
 ---
 
@@ -589,7 +595,7 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 
 <img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM" max-h="100%" object-cover>
 
-<div>
+<div flex justify-center items-center mt-4>
 <a href="https://c2amowmwbb5niziwazeduq.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
 https://c2amowmwbb5niziwazeduq.streamlit.app/
 </a>
@@ -733,6 +739,8 @@ https://pyodide.org/
 </div>
 
 ---
+hide: true
+---
 
 # Easier way: Stlite Sharing
 
@@ -874,32 +882,6 @@ Open in Stlite Sharing
 
 ---
 
-# Typical use cases for Python serverless web apps
-
-<div text-3xl>
-
-<v-clicks>
-
-* Data processing
-* Data analysis
-* Visualization
-* Machine learning
-
-</v-clicks>
-
-<v-clicks>
-
-...where
-
-* Python has a strong ecosystem
-* Data privacy/transparency/control/cost is important
-
-</v-clicks>
-
-</div>
-
----
-
 # Wrap-up
 
 <div flex="~ col" gap-3>
@@ -932,6 +914,32 @@ Open in Stlite Sharing
 - Data privacy / Easy server management / Cost control / ...
 
 </Modal>
+
+</div>
+
+---
+
+# Typical use cases for Python serverless web apps
+
+<div text-3xl>
+
+<v-clicks>
+
+* Data processing
+* Data analysis
+* Visualization
+* Machine learning
+
+</v-clicks>
+
+<v-clicks>
+
+...where
+
+* Python has a strong ecosystem
+* Data privacy/transparency/control/cost is important
+
+</v-clicks>
 
 </div>
 

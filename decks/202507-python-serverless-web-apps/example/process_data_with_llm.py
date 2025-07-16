@@ -42,9 +42,6 @@ def process_unstructured_data_with_local_llm(df):
         model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
     )
 
-    # Initialize text classification pipeline
-    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-
     # 1. Sentiment analysis on customer feedback
     logger.info("Processing sentiment analysis with local LLM...")
     df["sentiment"] = pd.Series(dtype="string")
@@ -54,6 +51,9 @@ def process_unstructured_data_with_local_llm(df):
         result = sentiment_analyzer(text)[0]
         df.loc[idx, "sentiment"] = result["label"]
         df.loc[idx, "sentiment_score"] = result["score"]
+
+    # Initialize text classification pipeline
+    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 
     # 2. Classify sales notes into categories
     note_categories = [

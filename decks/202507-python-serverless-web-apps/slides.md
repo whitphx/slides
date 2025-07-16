@@ -28,7 +28,7 @@ EuroPython 2025
 <img src="https://avatars.githubusercontent.com/u/3135397?v=4" alt="whitphx" w="130px">
 </div>
 
-<div mt-8>
+<div mt-16>
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
@@ -41,17 +41,6 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div><a href="https://www.linkedin.com/in/whitphx/" target="_blank" class="border-none! font-300">whitphx</a></div>
   <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
-</div>
-
-<div mt-8>
-
-<v-clicks>
-
-- ML Developer Advocate at <span v-mark.underline.yellow="1">Hugging Face</span> 🤗
-- <span v-mark.underline.red="2">Streamlit</span> Creator
-
-</v-clicks>
-
 </div>
 
 ---
@@ -83,7 +72,7 @@ What do you use Python for?
 
 <div flex="~ row">
 
-<div grow>
+<div grow text-3xl>
 
 * Process CSV files
 * Generate reports
@@ -208,7 +197,7 @@ Output
 
 ---
 
-<<< @/example/process_data.py py {*|117-118|95|97|61|69|9|10-13|15-22|24-25|27-30|69|72|97|99|101-114}{lines:true,maxHeight:'100%'}
+<<< @/example/process_data.py py {*|117-118|95|97|9-32|97|99|101-114}{lines:true,maxHeight:'100%'}
 
 <style>
 .slidev-code {
@@ -279,7 +268,7 @@ With **your teammates**, **the sales team**, **your manager**, and **your client
 
 <div flex="~ row" gap-4>
 
-<div w="1/2" text-3xl>
+<div w="1/2" text-4xl>
 
 - Shareable
 - Interactive
@@ -397,7 +386,7 @@ layout: section
 
 </div>
 
-<div v-click="1" v-click.hide="6" w="1/2" h="100" :class="$clicks >= 1 ? 'visible' : 'invisible'">
+<div v-click="1" v-click.hide="6" w="1/2" h="100" :class="$clicks == 1 ? 'visible' : 'invisible'">
 
 <<< @/example/process_data.py {61-74}{lines:true,maxHeight:'100%'}
 

@@ -131,50 +131,50 @@ Python script
 <FancyArrow
     q1="[data-id=input-csv]"
     pos1="right"
-    q2="[data-id=normalize-data]"
+    q2="[data-id=read-data]"
     pos2="left"
     arc="0.3"
     v-click="2"
 />
 
-<Modal title="Normalize the data" w="100%" data-id="normalize-data" v-click="2">
+<Modal title="Read the file" w="100%" data-id="read-data" v-click="2">
 
 ```python
-df["payment_type"] = df["payment_method"].map(payment_mapping)
+df = pd.read_csv(args.input)
 ```
 
 </Modal>
 
 <FancyArrow
-    q1="[data-id=normalize-data]"
+    q1="[data-id=read-data]"
     pos1="left"
-    q2="[data-id=convert-data]"
+    q2="[data-id=process-data]"
     pos2="left"
     arc="-0.7"
     v-click="3"
 />
 
-<Modal title="Extract the data" w="100%" data-id="convert-data" v-click="3">
+<Modal title="Process the data" w="100%" data-id="process-data" v-click="3">
 
 ```python
-df["state"] = df["delivery_address_area"].str.extract(r"([A-Z]{2})$")
+df = process_sales_data(df)
 ```
 
 </Modal>
 
 <FancyArrow
-    q1="[data-id=convert-data]"
+    q1="[data-id=process-data]"
     pos1="left"
-    q2="[data-id=anonymize-data]"
+    q2="[data-id=write-data]"
     pos2="left"
     arc="-0.7"
     v-click="4"
 />
 
-<Modal title="Anonymize the data" w="100%" data-id="anonymize-data" v-click="4">
+<Modal title="Write the file" w="100%" data-id="write-data" v-click="4">
 
 ```python
-df = anonymize_data(df)
+df.to_csv(args.output)
 ```
 
 </Modal>
@@ -184,7 +184,7 @@ df = anonymize_data(df)
 </div>
 
 <FancyArrow
-    q1="[data-id=anonymize-data]"
+    q1="[data-id=write-data]"
     pos1="right"
     q2="[data-id=output-csv]"
     pos2="left"
@@ -291,8 +291,9 @@ With **your teammates**, **the sales team**, **your manager**, and **your client
 - FastAPI
 - Flask
 - Django
+- ...
 
-... with JavaScript app
+with JavaScript app
 
 </Modal>
 
@@ -681,6 +682,8 @@ All processing happens locally, keeping user data private and secure.
 ---
 
 # Easier way: Stlite Sharing
+
+https://edit.share.stlite.net/
 
 <a href="https://edit.share.stlite.net/" target="_blank" rel="noopener noreferrer">
 <img src="/stlite_sharing.png" alt="Stlite Sharing" max-h="100%" object-cover m-auto>

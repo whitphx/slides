@@ -738,9 +738,20 @@ https://pyodide.org/
 
 https://edit.share.stlite.net/
 
-<a href="https://edit.share.stlite.net/" target="_blank" rel="noopener noreferrer">
+<div relative h="100">
+
+<a href="https://edit.share.stlite.net/" target="_blank" rel="noopener noreferrer" v-click.hide="1">
 <img src="/stlite_sharing.png" alt="Stlite Sharing" max-h="100%" object-cover m-auto>
 </a>
+
+<div absolute top-0 left-0 right-0 bottom-0>
+<SlidevVideo v-click="1" autoplay controls max-h="100%" m-auto>
+<source src="/StliteSharing_demo.mp4" type="video/mp4" />
+</SlidevVideo>
+</div>
+
+</div>
+
 
 ---
 layout: section

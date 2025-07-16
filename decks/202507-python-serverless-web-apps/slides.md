@@ -450,12 +450,36 @@ layout: section
 
 # The power of AI
 
+<div text-4xl>
+
 <v-clicks>
 
 - More intelligent data processing
 - More modalities, unstructured data
 
 </v-clicks>
+
+</div>
+
+---
+
+# Transformers 🤗
+https://github.com/huggingface/transformers
+
+Python library to run various AI/ML models in a unified way.
+
+<div mt-4 text-4xl>
+```shell
+pip install "transformers[torch]"
+```
+</div>
+
+<style>
+.slidev-code {
+    font-size: 36px !important;
+}
+</style>
+
 
 <div grid="~ cols-2" gap-4 mt-4 v-click>
 
@@ -468,7 +492,6 @@ layout: section
     Question Answering, Summarization, Text Classification, Text Generation, Text-to-text Generation, Token Classification, Translation, Zero-Shot Classification, Feature Extraction, etc...
 </div>
 </div>
-
 
 <div border="~ teal/50 rounded-lg" from-teal:10 to-indigo:10 bg-gradient-to-br>
 <div flex gap-2 items-center bg-teal:10 p2 rounded text-xl>
@@ -502,25 +525,6 @@ layout: section
 </div>
 
 </div>
-
----
-
-# Transformers 🤗
-https://github.com/huggingface/transformers
-
-Python library to run various AI/ML models in a unified way.
-
-<div mt-16 text-4xl>
-```shell
-pip install "transformers[torch]"
-```
-</div>
-
-<style>
-.slidev-code {
-    font-size: 36px !important;
-}
-</style>
 
 ---
 

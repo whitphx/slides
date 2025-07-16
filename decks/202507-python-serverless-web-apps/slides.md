@@ -333,6 +333,8 @@ layout: section
 
 # Streamlit
 
+<img absolute top-5 right-10 src="/streamlit-mark-color.svg" alt="Streamlit logo" h="15">
+
 <div flex="~ row" gap-4 h="90%" overflow-hidden>
 
 <div :w="$clicks === 0 ? '100%' : '1/2'" data-id="python-code">
@@ -390,10 +392,14 @@ layout: section
 
 ---
 
-# Data visualization
+# Extra: Data visualization
 We now have a web screen to display the visual outputs!
 
+<div h="100">
+
 <<< @/example/streamlit_app_visual.py py {*}{lines:true,maxHeight:'100%'}
+
+</div>
 
 ---
 
@@ -421,9 +427,71 @@ layout: section
 
 # The power of AI/LLM
 
+<v-clicks>
+
+- More intelligent data processing
+- More modalities, unstructured data
+
+</v-clicks>
+
+<div grid="~ cols-2" gap-4 mt-4 v-click>
+
+<div border="~ slate/50 rounded-lg" from-slate:10 to-indigo:10 bg-gradient-to-br>
+<div flex gap-2 items-center bg-slate:10 p2 rounded text-xl>
+    <mdi:text-box-outline />
+    Text
+</div>
+<div text-sm p-2>
+    Question Answering, Summarization, Text Classification, Text Generation, Text-to-text Generation, Token Classification, Translation, Zero-Shot Classification, Feature Extraction, etc...
+</div>
+</div>
+
+
+<div border="~ teal/50 rounded-lg" from-teal:10 to-indigo:10 bg-gradient-to-br>
+<div flex gap-2 items-center bg-teal:10 p2 rounded text-xl>
+    <mdi:image-outline />
+    Image/Video
+</div>
+<div text-sm p-2>
+    Depth Estimation, Image Classification, Image SegmentationImage-to-Image, Mask Generation, Object Detection, Video Classification, Unconditional Image Generation, Image Feature Extraction
+</div>
+</div>
+
+<div border="~ lime/50 rounded-lg" from-lime:10 to-indigo:10 bg-gradient-to-br>
+<div flex gap-2 items-center bg-lime:10 p2 rounded text-xl>
+    <vscode-icons:file-type-audio />
+    Audio
+</div>
+<div text-sm p-2>
+    Audio Classification, Audio-to-Audio, Automatic Speech Recognition, Text-to-Speech
+</div>
+</div>
+
+
+<div border="~ amber/50 rounded-lg" from-amber:10 to-indigo:10 bg-gradient-to-br>
+<div flex gap-2 items-center bg-amber:10 p2 rounded text-xl>
+    <icon-park-outline:multi-ring />
+    Multimodal
+</div>
+<div text-sm p-2>
+    Document Question Answering, Image-to-Text, Text-to-Image, Visual Question Answering, Zero-Shot Audio Classification, Zero-Shot Image Classification, Zero-Shot Object Detection
+</div>
+</div>
+
+</div>
+
 ---
 
 # Transformers 🤗
+https://github.com/huggingface/transformers
+
+Python library to run various AI/ML models in a unified way.
+
+<div mt-4 text-4xl>
+```shell
+pip install "transformers[torch]"
+```
+</div>
 
 
 ---
@@ -525,10 +593,6 @@ https://c2amowmwbb5niziwazeduq.streamlit.app/
 </div>
 
 ---
-
-# Wrap-up: LLM-powered data processing
-
----
 layout: section
 ---
 
@@ -551,6 +615,7 @@ Serverless web apps
 ---
 
 # The concept of "serverless"
+a.k.a. "client-side" or "in-browser"
 
 <div flex="~ col" gap-4 mt-8>
 
@@ -570,7 +635,7 @@ All processing happens locally, keeping user data private and secure.
 
 ---
 
-# What "serverless" solves
+# What "serverless" provides
 
 <v-clicks text-4xl>
 
@@ -588,7 +653,7 @@ All processing happens locally, keeping user data private and secure.
 
 | Python Framework | Wasm ver. |
 | --------- | --------- |
-| [Streamlit](https://streamlit.io/) | <span v-mark.circle.red="1">[Stlite](https://github.com/whitphx/stlite)</span> → [Streamlit Playground](https://streamlit.io/playground) |
+| <span v-mark.circle.red="1">[Streamlit](https://streamlit.io/)</span> | <span v-mark.circle.red="1">[Stlite](https://github.com/whitphx/stlite)</span> → [Streamlit Playground](https://streamlit.io/playground) |
 | [Gradio](https://www.gradio.app/) | [Gradio Lite](https://www.gradio.app/guides/gradio-lite) → [Gradio Playground](https://www.gradio.app/playground) |
 | [Shiny for Python](https://shiny.posit.co/py/) | [Shinylive](https://github.com/posit-dev/shinylive) → [Shiny Examples](https://shinylive.io/py/examples/) |
 | [Panel](https://panel.holoviz.org/) | [Panel](https://panel.holoviz.org/how_to/wasm/index.html) |
@@ -616,6 +681,10 @@ All processing happens locally, keeping user data private and secure.
 ---
 
 # Easier way: Stlite Sharing
+
+<a href="https://edit.share.stlite.net/" target="_blank" rel="noopener noreferrer">
+<img src="/stlite_sharing.png" alt="Stlite Sharing" max-h="100%" object-cover m-auto>
+</a>
 
 ---
 layout: section
@@ -742,7 +811,7 @@ Open in Stlite Sharing
 
 # Wrap-up
 
-<div flex="~ col" gap-4>
+<div flex="~ col" gap-3>
 
 <Modal v-click="1">
   <template #title>
@@ -758,7 +827,7 @@ Open in Stlite Sharing
     Web app <span text-xl>that shares your solution</span>
   </template>
 
-- Pure-Python Web UI frameworks
+- Pure-Python Web UI frameworks, e.g. Streamlit
 - Easy to share, use, and understand
 
 </Modal>
@@ -768,7 +837,7 @@ Open in Stlite Sharing
     Serverless web app <span text-xl>that runs in the browser</span>
   </template>
 
-- Serverless versions of the frameworks
+- Serverless versions of the frameworks, e.g. Stlite
 - Data privacy / Easy server management / Cost control / ...
 
 </Modal>

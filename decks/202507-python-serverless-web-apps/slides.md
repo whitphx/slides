@@ -391,13 +391,19 @@ layout: section
 
 <div flex="~ row" gap-4>
 
-<div w="1/2">
+<div w="1/2" h="100">
 
-<<< @/example/streamlit_app_simple.py py {*}{lines:true,maxHeight:'100%'}
+<<< @/example/streamlit_app_simple.py py {*|4|10-13|15|17|19-25|*}{lines:true,maxHeight:'100%'}
 
 </div>
 
-<div w="1/2">
+<div v-click="1" v-click.hide="6" w="1/2" h="100">
+
+<<< @/example/process_data.py {61-74}{lines:true,maxHeight:'100%'}
+
+</div>
+
+<div w="1/2" v-click="7" absolute top-30 right-0>
 
 <SlidevVideo autoplay controls>
   <source src="/streamlit_app_simple.mp4" type="video/mp4" />
@@ -414,7 +420,7 @@ We now have a web screen to display the visual outputs!
 
 <div h="100">
 
-<<< @/example/streamlit_app_visual.py py {*}{lines:true,maxHeight:'100%'}
+<<< @/example/streamlit_app_visual.py py {*|29-166}{lines:true,maxHeight:'100%'}
 
 </div>
 
@@ -541,7 +547,13 @@ Device set to use mps:0
 
 ---
 
-<<< @/example/process_data_with_llm.py py {*}{lines:true,maxHeight:'100%'}
+<<< @/example/process_data_with_llm.py py {*|121-138|133|36-91|39-56|58-73}{lines:true,maxHeight:'100%'}
+
+<style>
+.slidev-code {
+    font-size: 18px !important;
+}
+</style>
 
 ---
 

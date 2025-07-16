@@ -650,6 +650,19 @@ All processing happens locally, keeping user data private and secure.
 
 ---
 
+# Serverless Python
+https://pyodide.org/
+
+<div flex justify-center items-center h="80">
+
+<a href="https://pyodide.org/" target="_blank" rel="noopener noreferrer">
+<img src="/pyodide.png" alt="Pyodide" max-h="100%" object-cover m-auto>
+</a>
+
+</div>
+
+---
+
 # Serverless versions of these frameworks
 
 | Python Framework | Wasm ver. |

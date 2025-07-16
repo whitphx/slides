@@ -802,6 +802,24 @@ print(result)
 
 # Put them together into a serverless AI app
 
+<div max-h="80vh">
+
+````md magic-move {lines: true, maxHeight: '100%'}
+
+<<< @/stlite_example/simple_fragment2.html html {*}
+
+<<< @/stlite_example/simple_fragment_req_0.html html {*|19-21}
+
+<<< @/stlite_example/simple_fragment_req_1.html html {20}
+
+````
+
+</div>
+
+---
+
+# Put them together into a serverless AI app
+
 <div h="80%" max-h="80%">
 
 <<< @/stlite_example/app_llm.html html {*}{maxHeight: '100%'}

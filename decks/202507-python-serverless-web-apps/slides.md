@@ -433,8 +433,8 @@ We now have a web screen to display the visual outputs!
 </SlidevVideo>
 
 <div flex justify-center items-center mt-4>
-<a href="https://uwftsvlkjdv58mgvxfrku6.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
-https://uwftsvlkjdv58mgvxfrku6.streamlit.app/
+<a href="https://6hikbz9eivappboaibej2qd.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
+https://6hikbz9eivappboaibej2qd.streamlit.app/
 </a>
 </div>
 
@@ -466,9 +466,13 @@ layout: section
 # Transformers 🤗
 https://github.com/huggingface/transformers
 
+<v-click>
+
 Python library to run various AI/ML models in a unified way.
 
-<div mt-4 text-4xl>
+</v-click>
+
+<div mt-4 text-4xl v-click>
 ```shell
 pip install "transformers[torch]"
 ```
@@ -600,8 +604,8 @@ Note categories: {'product_feedback': 126, 'customer_relationship': 37, 'technic
 <img src="/streamlit_app_with_llm.png" alt="Streamlit app with LLM" max-h="100%" object-cover>
 
 <div flex justify-center items-center mt-4>
-<a href="https://c2amowmwbb5niziwazeduq.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
-https://c2amowmwbb5niziwazeduq.streamlit.app/
+<a href="https://4utyhusobtktt6nfsntsiw.streamlit.app/" text-xs target="_blank" rel="noopener noreferrer">
+https://4utyhusobtktt6nfsntsiw.streamlit.app/
 </a>
 </div>
 

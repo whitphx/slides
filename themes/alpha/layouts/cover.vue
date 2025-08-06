@@ -111,7 +111,7 @@ const { isDark } = useDarkMode();
   gap: 4.5%;
   text-align: center;
   mix-blend-mode: difference;
-  -webbkit-mix-blend-mode: difference;
+  -webkit-mix-blend-mode: difference;
 }
 
 h1 {

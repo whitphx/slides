@@ -21,14 +21,13 @@ const { isDark } = useDarkMode();
 </template>
 
 <style>
-/*base*/
 .wrapper {
   --stripe-color: #fff;
-  --bg: var(--stripe-color);
-  --maincolor: var(--bg);
+}
+.wrapper.dark {
+  --stripe-color: #000;
 }
 
-/*custom*/
 @keyframes smoothBg {
   from {
     background-position: 50% 50%, 50% 50%;
@@ -73,7 +72,12 @@ const { isDark } = useDarkMode();
   background-size: 300%, 200%;
   background-position: 50% 50%, 50% 50%;
 
-  filter: blur(10px) invert(100%);
+  filter:
+    blur(10px)
+    opacity(50%)
+    saturate(200%) /* Make the color more vivid */
+    invert(100%) /* Make the color for light mode */
+    ;
 
   mask-image: radial-gradient(ellipse at 100% 0%, black 40%, transparent 70%);
   &::after {
@@ -87,16 +91,12 @@ const { isDark } = useDarkMode();
     mix-blend-mode: difference;
   }
 }
-
-.wrapper.dark {
-  --stripe-color: #000;
-}
-.dark .hero,
-.dark .hero::after {
-  filter: blur(10px) opacity(50%) saturate(200%);
-}
-.wrapper:not(.dark) .content {
-  filter: invert(1);
+.dark .hero {
+  filter:
+    blur(10px)
+    opacity(50%)
+    saturate(200%) /* Make the color more vivid */
+    ;
 }
 
 .content {
@@ -110,8 +110,6 @@ const { isDark } = useDarkMode();
   flex-flow: column;
   gap: 4.5%;
   text-align: center;
-  mix-blend-mode: difference;
-  -webkit-mix-blend-mode: difference;
 }
 
 h1 {

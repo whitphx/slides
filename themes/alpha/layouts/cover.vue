@@ -15,7 +15,9 @@ const { isDark } = useDarkMode();
     <div class='hero'>
     </div>
     <div class='content'>
-      <slot />
+      <div w="100%" p-16 :backdrop-blur="isDark ? 24 : 48">
+        <slot />
+      </div>
     </div>
   </section>
 </template>

@@ -1,0 +1,40 @@
+{
+  "name": "slidev-theme-triangle",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "slidev-theme",
+    "slidev"
+  ],
+  "engines": {
+    "node": ">=14.0.0",
+    "slidev": ">=v0.47.0"
+  },
+  "scripts": {
+    "format": "prettier --write *.{vue,ts} **/*.{vue,ts}"
+  },
+  "slidev": {
+    "defaults": {
+      "fonts": {
+        "mono": "PT Mono",
+        "sans": "Noto Sans JP",
+        "serif": "Playfair Display",
+        "italic": true,
+        "weights": "100, 200, 300, 400, 500, 600, 700, 800, 900"
+      }
+    }
+  },
+  "dependencies": {
+    "@slidev/types": "^0.47.0",
+    "codemirror-theme-vars": "^0.1.2",
+    "delaunator": "^5.0.1",
+    "prism-theme-vars": "^0.2.4",
+    "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/seedrandom": "^3.0.8",
+    "prettier": "^3.6.2"
+  }
+}

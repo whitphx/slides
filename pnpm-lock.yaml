@@ -193,6 +193,31 @@ importers:
         specifier: ^0.2.4
         version: 0.2.5
 
+  themes/triangle:
+    dependencies:
+      '@slidev/types':
+        specifier: ^0.47.0
+        version: 0.47.5
+      codemirror-theme-vars:
+        specifier: ^0.1.2
+        version: 0.1.2
+      delaunator:
+        specifier: ^5.0.1
+        version: 5.0.1
+      prism-theme-vars:
+        specifier: ^0.2.4
+        version: 0.2.5
+      seedrandom:
+        specifier: ^3.0.5
+        version: 3.0.5
+    devDependencies:
+      '@types/seedrandom':
+        specifier: ^3.0.8
+        version: 3.0.8
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+
 packages:
 
   '@ampproject/remapping@2.3.0':
@@ -2372,6 +2397,9 @@ packages:
 
   '@types/node@22.16.2':
     resolution: {integrity: sha512-Cdqa/eJTvt4fC4wmq1Mcc0CPUjp/Qy2FGqLza3z3pKymsI969TcZ54diNJv8UYUgeWxyb8FSbCkhdR6WqmUFhA==}
+
+  '@types/seedrandom@3.0.8':
+    resolution: {integrity: sha512-TY1eezMU2zH2ozQoAFAQFOPpvP15g+ZgSfTZt31AUUH/Rxtnz3H+A/Sv1Snw2/amp//omibc+AEkTaA8KUeOLQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -5045,11 +5073,6 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.5.3:
-    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
-    engines: {node: '>=14'}
-    hasBin: true
-
   prettier@3.6.2:
     resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
     engines: {node: '>=14'}
@@ -5385,6 +5408,9 @@ packages:
   section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
     engines: {node: '>=4'}
+
+  seedrandom@3.0.5:
+    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -8562,7 +8588,7 @@ snapshots:
       monaco-editor: 0.51.0
       nanotar: 0.2.0
       pptxgenjs: 3.12.0
-      prettier: 3.5.3
+      prettier: 3.6.2
       recordrtc: 5.6.2
       shiki: 3.2.1
       shiki-magic-move: 1.1.0(react@18.3.1)(shiki@3.2.1)(vue@3.5.17(typescript@5.8.2))
@@ -9443,6 +9469,8 @@ snapshots:
   '@types/node@22.16.2':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/seedrandom@3.0.8': {}
 
   '@types/trusted-types@2.0.7':
     optional: true
@@ -13136,8 +13164,6 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.5.3: {}
-
   prettier@3.6.2: {}
 
   prism-theme-vars@0.2.5: {}
@@ -13621,6 +13647,8 @@ snapshots:
     dependencies:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
+
+  seedrandom@3.0.5: {}
 
   semver@6.3.1: {}
 

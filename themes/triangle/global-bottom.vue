@@ -78,33 +78,7 @@ watch(
   { immediate: true },
 );
 
-const baseColor = computed(() => {
-  const color =
-    configs.themeConfig.tile || configs.themeConfig.primary || "#888888";
-  return color;
-});
-
-// Render each point color based on given base image.
-function getPointColor(base: BaseRadialGradientConfig, point: Point): string {
-  const x = (point.x - base.x) / base.rx;
-  const y = (point.y - base.y) / base.ry;
-  const normL1 = (Math.abs(x) + Math.abs(y)) / 2;
-  const alpha = mapNormalizedRange(normL1, 0.5, 0);
-  return `rgb(from ${baseColor.value} r g b / ${alpha})`;
-}
-
 const { currentSlideNo } = useNav();
-
-const triangles = useTriangleTiles(
-  {
-    triangleSize: 60,
-    bleed: 120,
-    noise: 30,
-    globalSeed: "hello",
-    perturbationSeedRef: currentSlideNo,
-  },
-  (point: Point) => getPointColor(currentBaseImage.value, point),
-);
 
 // Animate the base image on slide changes
 watch(
@@ -165,6 +139,32 @@ watch(
     }
   },
   { immediate: true },
+);
+
+const baseColor = computed(() => {
+  const color =
+    configs.themeConfig.tile || configs.themeConfig.primary || "#888888";
+  return color;
+});
+
+// Render each point color based on given base image.
+function getPointColor(base: BaseRadialGradientConfig, point: Point): string {
+  const x = (point.x - base.x) / base.rx;
+  const y = (point.y - base.y) / base.ry;
+  const normL1 = (Math.abs(x) + Math.abs(y)) / 2;
+  const alpha = mapNormalizedRange(normL1, 0.5, 0);
+  return `rgb(from ${baseColor.value} r g b / ${alpha})`;
+}
+
+const triangles = useTriangleTiles(
+  {
+    triangleSize: 60,
+    bleed: 120,
+    noise: 30,
+    globalSeed: "hello",
+    perturbationSeedRef: currentSlideNo,
+  },
+  (point: Point) => getPointColor(currentBaseImage.value, point),
 );
 </script>
 

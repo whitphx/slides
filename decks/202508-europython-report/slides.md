@@ -180,10 +180,31 @@ Waiting Listに入ったら資料は作ろう
 
 # スピーカーになるともっと楽しめる
 
-<!-- 写真を挿入 -->
+<div grid="~ cols-2 rows-2">
+  <img src="/PXL_20250715_181402473.jpg">
+  <img src="/PXL_20250715_182707767.jpg" alt="Speaker dinner" >
+  <SlidevVideo autoplay muted>
+    <source src="/PXL_20250716_172526065.LS.mp4" type="video/mp4" />
+  </SlidevVideo>
+  <img src="/PXL_20250716_183504190.jpg">
+</div>
 
 ---
 
 # EuroPythonはいいぞ
 
----
+<div relative>
+<div grid="~ cols-2 rows-2" absolute top-0 left-0>
+  <img src="/PXL_20250717_100143452.jpg" v-click>
+  <img src="/PXL_20250717_110805036.jpg" v-click>
+  <img src="/PXL_20250717_143559100.jpg" v-click>
+  <img src="/PXL_20250717_185413871.jpg" v-click>
+</div>
+
+<div grid="~ cols-2 rows-2" absolute top-0 left-0>
+  <img src="/PXL_20250718_144331707.jpg" v-click>
+  <img src="/PXL_20250718_183611150.jpg" v-click>
+  <img src="/PXL_20250719_094329321.jpg" v-click>
+  <img src="/PXL_20250719_095207808.jpg" v-click>
+</div>
+</div>

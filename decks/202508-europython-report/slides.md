@@ -72,28 +72,49 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 ---
 
-# D-2: 到着
+# D-2 昼: 到着
+
+<img src="/PXL_20250714_091256434.jpg" alt="Arrival" absolute bottom-0 h-110 object-contain >
 
 ---
 
 # D-2 夕方
 
-<img src="/email_ask.png" alt="Email notifying that my talk is in waiting list" absolute bottom-0 h-110 object-contain >
+<img src="/email_ask.png" alt="Email notifying that there was an opening for a talk" absolute bottom--20 h-130 object-contain >
+
+<img src="/email_answer.png" alt="Email notifying that my talk is in waiting list" absolute bottom--20 h-130 object-contain v-click>
+
+---
+
+# D-2 夜
+
+<img src="/PXL_20250714_182624469.jpg" alt="Dinner with TW and JP members" absolute bottom-0 h-110 object-contain >
 
 ---
 
 # D-1: ひたすら準備
-<!-- 1日半で準備 -->
+
+<img src="/irasutoya_pc.png" absolute bottom-30 h-80 object-contain>
 
 ---
+
 # D-1 夜: スピーカーディナー
 
-<!-- スピーカーディナー -->
+<img src="/PXL_20250715_182707767.jpg" alt="Speaker dinner" absolute bottom-0 h-110 object-contain >
 
 ---
-# D-0: カンファレンス初日午後に発表
 
-<!-- 発表 -->
+# D-0 午前: まだ準備
+
+<img src="/PXL_20250716_080925626.MP.jpg" alt="Speaker dinner" absolute bottom-0 h-110 object-contain >
+
+<img src="/irasutoya_pc.png" absolute bottom--10 h-120 object-contain v-click >
+
+---
+
+# D-0 午後: カンファレンス初日午後に発表
+
+<img src="/2025-07-16 22.28.53.jpg" alt="My talk" absolute bottom-0 h-110 object-contain >
 
 ---
 
@@ -101,7 +122,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 （非推奨）
 
-<v-clicks>
+<v-clicks text-5xl>
 
 1. プロポーザルを再確認
 2. 構成をざっくり考える

@@ -55,6 +55,18 @@ Software Artisan / Indie Dev / OSS Enthusiast
   <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
 </div>
 
+---
+
+# Pyodide
+https://pyodide.org/
+
+<div flex justify-center items-center h="80">
+
+<a href="https://pyodide.org/" target="_blank" rel="noopener noreferrer">
+  <img src="/pyodide.png" alt="Pyodide" max-h="100%" object-cover m-auto>
+</a>
+
+</div>
 
 ---
 

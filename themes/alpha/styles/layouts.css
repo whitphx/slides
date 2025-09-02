@@ -56,6 +56,10 @@
   li {
     list-style-type: circle;
   }
+
+  a:has(img:only-child) {
+    border-style: none;
+  }
 }
 
 .slidev-layout.cover,

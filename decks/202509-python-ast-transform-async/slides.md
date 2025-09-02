@@ -104,29 +104,22 @@ Python in JavaScript
 
 ---
 
+# Pyodide runs Python code in browsers
+
+
+## It has some limitations
+
+TODO
+
+---
+
 # The problem: interoperability
 
-## `time.sleep()`
+## Example 1: `asyncio.run()`
 
 <div grid="~ cols-2" gap-4>
 
-```py
-import time
-
-time.sleep(1)
-```
-
-```py
-import asyncio
-
-await asyncio.sleep(1)
-```
-
-</div>
-
-## `asyncio.run()`
-
-<div grid="~ cols-2" gap-4>
+<div>
 
 ```py
 import asyncio
@@ -136,6 +129,16 @@ async def fn():
 
 asyncio.run(fn())
 ```
+
+```
+Traceback (most recent call last):
+  ...
+  File "/lib/python311.zip/asyncio/runners.py", line 186, in run
+    raise RuntimeError(
+RuntimeError: asyncio.run() cannot be called from a running event loop
+```
+
+</div>
 
 
 ```py
@@ -151,19 +154,90 @@ await fn()
 
 ---
 
+# The problem: interoperability
+
+## Example 2: `time.sleep()`
+
+<div grid="~ cols-2" gap-4>
+
+<div>
+
+```py
+import asyncio
+import time
+
+async def async_timer():
+    print("Async time start", time.time())
+    await asyncio.sleep(1)
+    print("Async time end", time.time())
+
+
+print("Script start", time.time())
+# asyncio.run(async_timer())
+asyncio.create_task(async_timer())
+time.sleep(1)
+```
+
+### Expected
+
+```
+Script start 1756823376.8114681
+Async time start 1756823376.811596
+Async time end 1756823377.812911
+```
+
+### Actual
+```
+Script start 1756822802.754
+Async time start 1756822803.755
+Async time end 1756822804.757
+```
+
+</div>
+
+```py
+import asyncio
+
+await asyncio.sleep(1)
+```
+
+</div>
+
+---
+
+# Motivation: we don't want to rewrite the code
+
+---
+
+# AST transformation to the rescue
+
+---
+
+# Python code execution flow
+
+---
+
+# `ast` module
+
+---
+
+# Metaprogramming!
+
+---
+
 # Background: Pyodide-based Web UI framework
 
 ---
 
-# Case1: `time.sleep()` -> `asyncio.sleep()`
+# Case1: `asyncio.run(coro())` -> `await coro()`
 
 ---
 
-# Case2: `asyncio.run(coro())` -> `await coro()`
+# Case2: `time.sleep()` -> `asyncio.sleep()`
 
 ---
 
-# Case3: `def fn(): ...` -> `async def fn(): ... await fn()`
+# Case3: `def fn(): ...; fn()` -> `async def fn(): ...; await fn()`
 
 ---
 

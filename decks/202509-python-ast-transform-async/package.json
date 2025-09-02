@@ -1,0 +1,16 @@
+{
+  "name": "202509-python-ast-transform-async",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.1.0",
+    "slidev-addon-anipres": "^0.6.0",
+    "slidev-addon-fancy-arrow": "^0.13.1",
+    "vue": "^3.5.13"
+  }
+}

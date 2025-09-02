@@ -1,0 +1,9 @@
+{
+  "name": "202509-python-ast-transform-async-samples",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {
+    "pyodide": "^0.28.2"
+  }
+}

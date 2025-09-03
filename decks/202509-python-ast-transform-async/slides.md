@@ -598,10 +598,6 @@ to the rescue
 
 ---
 
-# `ast` module
-
----
-
 # Script Runner
 
 ```py

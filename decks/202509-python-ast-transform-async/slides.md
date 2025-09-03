@@ -76,7 +76,7 @@ x = 1 + 2
 
 <div grid="~ cols-2" gap-4 grow v-click="2">
 
-``` {*|1-2|3-9|4-5|6-9}{at: 3}
+``` {*|1-2|3-9|4-5|6-9|6-9|*}{at: 3}
 Module(
     body=[
         Assign(
@@ -93,6 +93,125 @@ Module(
 </div>
 
 </div>
+
+---
+
+# AST transformation
+
+<div grid="~ cols-3" gap-4 mt-16>
+
+<Modal>
+  <template #title>
+    <span data-id="modal-python-code">Python code</span>
+  </template>
+
+```py
+a = 1
+x = a + 2
+print(x)
+```
+</Modal>
+
+<Modal>
+  <template #title>
+    <span data-id="modal-ast">
+      AST
+    </span>
+  </template>
+
+<div>
+
+````md magic-move
+
+```
+...
+BinOp(
+    left=Name(id='a', ctx=Load()),
+    op=Add(),
+    right=Constant(value=2))
+...
+```
+
+``` {*}{maxHeight:'200px'}
+...
+BinOp(
+    left=Name(id='a', ctx=Load()),
+    op=Mult(),
+    right=Constant(value=2))
+...
+```
+
+````
+
+</div>
+
+</Modal>
+
+<Modal>
+  <template #title>
+    <span data-id="modal-bytecode">
+    Byte code
+    </span>
+  </template>
+
+````md magic-move {'data-id': 'codeblock-bytecode'}
+
+```
+...
+  3   LOAD_NAME     0 (a)
+      LOAD_CONST    1 (2)
+      BINARY_OP     0 (+)
+      STORE_NAME    1 (x)
+...
+```
+
+```
+...
+  3   LOAD_NAME     0 (a)
+      LOAD_CONST    1 (2)
+      BINARY_OP     5 (*)
+      STORE_NAME    1 (x)
+...
+```
+
+````
+
+</Modal>
+
+</div>
+
+<FancyArrow from="[data-id=modal-python-code] @ right" to="[data-id=modal-ast] @ left" arc="0.6">
+
+`ast.parse(code)`
+
+</FancyArrow>
+
+<FancyArrow from="[data-id=modal-ast] @ right" to="[data-id=modal-bytecode] @ left" arc="0.35">
+
+`compile(tree)`
+
+</FancyArrow>
+
+<div mt-20>
+
+````md magic-move {'data-id': 'ast-transform-sample-result'}
+```
+3
+```
+
+```
+2
+```
+
+````
+
+</div>
+
+<FancyArrow from="[data-id=codeblock-bytecode] @ bottom" to="[data-id=ast-transform-sample-result] @ top">
+
+`exec(bytecode)`
+
+</FancyArrow>
 
 ---
 layout: section

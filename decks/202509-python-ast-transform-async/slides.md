@@ -407,7 +407,7 @@ else:
 
 ---
 
-# Case1: `asyncio.run(coro())` -> `await coro()`
+# Case 1: `asyncio.run(coro())` -> `await coro()`
 
 ```
 Call(
@@ -439,7 +439,7 @@ def transform_asyncio_run(node):
 
 ---
 
-# Case2: `time.sleep()` -> `asyncio.sleep()`
+# Case 2: `time.sleep()` -> `asyncio.sleep()`
 
 ```
 Call(
@@ -483,7 +483,111 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 
 ---
 
-# Case3: `def fn(): ...; fn()` -> `async def fn(): ...; await fn()`
+# Case 3: `def fn(): ...; fn()` -> `async def fn(): ...; await fn()`
+
+---
+
+# Case 4: `st.navigation().run()` -> `await (st.navigation()).run()`
+
+---
+layout: section
+---
+
+<h1>
+More cases
+</h1>
+
+---
+
+# Inside control flows
+
+```py
+if cond:
+  time.sleep(1)
+```
+
+---
+
+# Import types
+```py
+import time
+
+time.sleep(1)
+```
+
+```py
+from time import sleep
+
+sleep(1)
+```
+
+```py
+import time as t
+
+t.sleep(1)
+```
+
+```py
+from time import sleep as wait
+
+wait(1)
+```
+
+---
+
+# Aliased
+
+```py
+from time import sleep
+
+wait = sleep
+
+wait(1)
+```
+
+---
+
+# Conditionally aliased
+
+```py
+import time
+import asyncio
+
+wait = time.sleep if cond else asyncio.sleep
+
+wait(1)
+```
+
+---
+
+# Import in scope
+
+```py
+from asyncio import sleep
+
+def foo():
+    from time import sleep
+
+    sleep(1)
+```
+
+---
+
+# Overridden package
+
+```py
+import time
+
+time.sleep(1)
+```
+
+`time.py`
+```py
+import asyncio
+
+async def sleep(delay):
+    await asyncio.sleep(delay)
+```
 
 ---
 

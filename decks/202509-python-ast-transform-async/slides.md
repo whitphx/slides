@@ -56,11 +56,23 @@ Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
 ---
+layout: section
+---
+
+<h1>
+Background
+
+<div text-4xl>
+Incompatibility between Python and Pyodide
+</div>
+</h1>
+
+---
 
 # Pyodide
 https://pyodide.org/
 
-<div flex justify-center items-center h="80">
+<div flex justify-center items-center h="60">
 
 <a href="https://pyodide.org/" target="_blank" rel="noopener noreferrer">
   <img src="/pyodide.png" alt="Pyodide" max-h="100%" object-cover m-auto>
@@ -68,9 +80,11 @@ https://pyodide.org/
 
 </div>
 
+> Pyodide is a Python distribution for the browser and Node.js based on WebAssembly.
+
 ---
 
-# Pyodide
+# How Python code is run on Pyodide
 Python in JavaScript
 
 <div mt-8>
@@ -104,18 +118,116 @@ Python in JavaScript
 
 ---
 
-# Pyodide runs Python code in browsers
+# Python in JavaScript = Python on browsers/NodeJS
+
+```shell
+❯ node
+Welcome to Node.js v22.16.0.
+Type ".help" for more information.
+> const { loadPyodide } = require("pyodide")
+undefined
+> const pyodide = await loadPyodide();
+undefined
+> pyodide.runPython('print("Hello from Python")')
+Hello from Python
+undefined
+```
+
+<style>
+* {
+  --slidev-code-font-size: 18px;
+}
+</style>
+
+---
+
+# A Python framework ported to Pyodide
+Streamlit for Pyodide: Stlite
+
+<div grid="~ cols-2" gap-4>
+
+<div>
+
+[`streamlit/streamlit`](https://github.com/streamlit/streamlit)
+
+<img src="/streamlit-logo-primary-colormark-darktext.svg" alt="Streamlit logo">
 
 
-## It has some limitations
+```py
+import streamlit as st
 
-TODO
+st.write("Hello World")
+```
+
+```shell
+❯ streamlit run app.py
+```
+
+</div>
+
+<div>
+
+[`whitphx/stlite`](https://github.com/whitphx/stlite)
+
+<img src="/stlite.svg" alt="Stlite logo">
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"
+    ></script>
+  </head>
+  <body>
+    <streamlit-app>
+      <app-file name="app.py" entrypoint>
+import streamlit as st
+
+name = st.text_input('Your name')
+st.write("Hello,", name or "world")
+      </app-file>
+    </streamlit-app>
+  </body>
+</html>
+```
+
+</div>
+
+</div>
+
+---
+
+<div h-100 flex justify-center>
+
+<SlidevVideo autoplay controls max-h="100%">
+  <source src="/stlite_llm_static.mp4" type="video/mp4" />
+</SlidevVideo>
+
+</div>
+
+<div>
+
+👉 [Streamlit meets WebAssembly - stlite, PyConTW 2023](https://www.youtube.com/watch?v=fYB5hhM7P8k)
+
+👉 [Democratize serverless web AI apps for Python devs, EuroPython 2025](https://ep2025.europython.eu/session/democratize-serverless-web-ai-apps-for-python-devs)
+
+</div>
 
 ---
 
 # The problem: interoperability
 
-## Example 1: `asyncio.run()`
+
+
+---
+
+# Example 1: `asyncio.run()`
 
 <div grid="~ cols-2" gap-4>
 
@@ -154,9 +266,7 @@ await fn()
 
 ---
 
-# The problem: interoperability
-
-## Example 2: `time.sleep()`
+# Example 2: `time.sleep()`
 
 <div grid="~ cols-2" gap-4>
 
@@ -208,8 +318,13 @@ await asyncio.sleep(1)
 # Motivation: we don't want to rewrite the code
 
 ---
+layout: section
+---
 
-# AST transformation to the rescue
+<h1>
+AST transformation<br>
+to the rescue
+</h1>
 
 ---
 
@@ -217,27 +332,162 @@ await asyncio.sleep(1)
 
 ---
 
-# `ast` module
-
----
-
 # Metaprogramming!
 
 ---
 
-# Background: Pyodide-based Web UI framework
+# `ast` module
+
+---
+
+# Example: AST Transformation
+Replace `+` with `*` at runtime
+
+`add.py`
+
+<<< @/samples/py/add.py py {*}
+
+```shell
+❯ python add.py
+2 + 3 = 5
+20 + 22 = 42
+```
+
+`run_noop.py`
+<<< @/samples/py/run_noop.py
+
+```shell
+❯ ./run_noop.py add.py
+2 + 3 = 5
+20 + 22 = 42
+```
+
+`run_add_as_mul.py`
+<<< @/samples/py/run_add_as_mul.py py {*}
+
+```shell
+❯ ./run_add_as_mul.py add.py
+2 + 3 = 6
+20 + 22 = 440
+```
+
+---
+
+# `ast.NodeVisitor` and `ast.NodeTransformer`
+
+---
+
+# Script Runner
+
+```py
+with open_python_file(script_path) as f:
+    filebody = f.read()
+
+filebody = codemod.patch(filebody, script_path)
+
+bytecode = compile(  # type: ignore
+    filebody,
+    # Pass in the file path so it can show up in exceptions.
+    script_path,
+    # We're compiling entire blocks of Python, so we need "exec"
+    # mode (as opposed to "eval" or "single").
+    mode="exec",
+    # Don't inherit any flags or "future" statements.
+    flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT,
+    dont_inherit=1,
+    # Use the default optimization options.
+    optimize=-1,
+)
+
+if bytecode.co_flags & CO_COROUTINE:
+    await eval(bytecode, module.__dict__)
+else:
+    exec(bytecode, module.__dict__)
+```
 
 ---
 
 # Case1: `asyncio.run(coro())` -> `await coro()`
 
+```
+Call(
+    func=Attribute(
+        value=Name(id='asyncio', ctx=Load()),
+        attr='run',
+        ctx=Load()),
+    args=[
+        Call(
+            func=Name(id='coro', ctx=Load()),
+            args=[
+                Name(id='arg', ctx=Load())])])
+```
+
+```
+Await(
+    value=Call(
+        func=Name(id='coro', ctx=Load()),
+        args=[
+            Name(id='arg', ctx=Load())]))
+```
+
+```py
+def transform_asyncio_run(node):
+    return ast.Await(
+        value=node.args[0],
+    )
+```
+
 ---
 
 # Case2: `time.sleep()` -> `asyncio.sleep()`
 
+```
+Call(
+    func=Attribute(
+        value=Name(id='time', ctx=Load()),
+        attr='sleep',
+        ctx=Load()),
+    args=[
+        Name(id='arg', ctx=Load())])
+```
+
+```
+Await(
+    value=Call(
+        func=Attribute(
+            value=Name(id='asyncio', ctx=Load()),
+            attr='sleep',
+            ctx=Load()),
+        args=[
+            Name(id='arg', ctx=Load())]))
+```
+
+```py
+def transform_time_sleep(node):
+    return ast.Await(
+        value=ast.Call(
+            func=ast.Attribute(
+                value=ast.Name(id="asyncio", ctx=ast.Load()),
+                attr="sleep",
+                ctx=ast.Load(),
+            ),
+            args=node.args,
+            keywords=node.keywords,
+        )
+    )
+```
+
+```py
+_insert_import_statement(code_block_ast, ["asyncio"])
+```
+
 ---
 
 # Case3: `def fn(): ...; fn()` -> `async def fn(): ...; await fn()`
+
+---
+
+# Name resolution
 
 ---
 

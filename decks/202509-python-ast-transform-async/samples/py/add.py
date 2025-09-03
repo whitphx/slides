@@ -1,2 +1,7 @@
 print("2 + 3 =", 2 + 3)
-print("20 + 22 =", 20 + 22)
+
+
+def fn(a, b):
+    return a + b
+
+print("2 + 3 =", fn(2, 3))

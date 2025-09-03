@@ -59,6 +59,45 @@ Software Artisan / Indie Dev / OSS Enthusiast
 layout: section
 ---
 
+<h1>AST 101</h1>
+
+---
+
+# What is an AST?
+
+- **AST** stands for **Abstract Syntax Tree**
+- It is a tree representation of the structure of source code
+
+<div flex="~ col" gap-4 h-90 v-click="1">
+
+```py {*}
+x = 1 + 2
+```
+
+<div grid="~ cols-2" gap-4 grow v-click="2">
+
+``` {*|1-2|3-9|4-5|6-9}{at: 3}
+Module(
+    body=[
+        Assign(
+            targets=[
+                Name(id='x', ctx=Store())],
+            value=BinOp(
+                left=Constant(value=1),
+                op=Add(),
+                right=Constant(value=2)))])
+```
+
+<SlidevAnipres id="ast-sample-add-assignment" at="2" />
+
+</div>
+
+</div>
+
+---
+layout: section
+---
+
 <h1>
 Background
 
@@ -350,7 +389,7 @@ Replace `+` with `*` at runtime
 ```shell
 ❯ python add.py
 2 + 3 = 5
-20 + 22 = 42
+2 + 3 = 5
 ```
 
 `run_noop.py`
@@ -359,7 +398,7 @@ Replace `+` with `*` at runtime
 ```shell
 ❯ ./run_noop.py add.py
 2 + 3 = 5
-20 + 22 = 42
+2 + 3 = 5
 ```
 
 `run_add_as_mul.py`
@@ -368,7 +407,7 @@ Replace `+` with `*` at runtime
 ```shell
 ❯ ./run_add_as_mul.py add.py
 2 + 3 = 6
-20 + 22 = 440
+2 + 3 = 6
 ```
 
 ---

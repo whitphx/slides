@@ -96,6 +96,10 @@ Module(
 
 ---
 
+# `ast` module
+
+---
+
 # AST transformation
 
 <div grid="~ cols-3" gap-4 mt-16>
@@ -112,7 +116,7 @@ print(x)
 ```
 </Modal>
 
-<Modal>
+<Modal v-click="1">
   <template #title>
     <span data-id="modal-ast">
       AST
@@ -121,7 +125,7 @@ print(x)
 
 <div>
 
-````md magic-move
+````md magic-move {at: 4}
 
 ```
 ...
@@ -147,14 +151,14 @@ BinOp(
 
 </Modal>
 
-<Modal>
+<Modal v-click="2">
   <template #title>
     <span data-id="modal-bytecode">
     Byte code
     </span>
   </template>
 
-````md magic-move {'data-id': 'codeblock-bytecode'}
+````md magic-move {'data-id': 'codeblock-bytecode', at: 5}
 
 ```
 ...
@@ -180,21 +184,21 @@ BinOp(
 
 </div>
 
-<FancyArrow from="[data-id=modal-python-code] @ right" to="[data-id=modal-ast] @ left" arc="0.6">
+<FancyArrow from="[data-id=modal-python-code] @ right" to="[data-id=modal-ast] @ left" arc="0.6" v-click="1">
 
 `ast.parse(code)`
 
 </FancyArrow>
 
-<FancyArrow from="[data-id=modal-ast] @ right" to="[data-id=modal-bytecode] @ left" arc="0.35">
+<FancyArrow from="[data-id=modal-ast] @ right" to="[data-id=modal-bytecode] @ left" arc="0.35" v-click="2">
 
 `compile(tree)`
 
 </FancyArrow>
 
-<div mt-20>
+<div mt-20 v-click="3">
 
-````md magic-move {'data-id': 'ast-transform-sample-result'}
+````md magic-move {'data-id': 'ast-transform-sample-result', at: 6}
 ```
 3
 ```
@@ -207,11 +211,114 @@ BinOp(
 
 </div>
 
-<FancyArrow from="[data-id=codeblock-bytecode] @ bottom" to="[data-id=ast-transform-sample-result] @ top">
+<FancyArrow from="[data-id=codeblock-bytecode] @ bottom" to="[data-id=ast-transform-sample-result] @ top" v-click="3">
 
 `exec(bytecode)`
 
 </FancyArrow>
+
+---
+
+# AST transformation in action
+
+Replace `+` with `*` at runtime
+
+<div grid="~ cols-2" gap-4>
+
+<div>
+
+`add.py`
+
+<<< @/samples/py/add.py py {*}
+
+```shell
+❯ python add.py
+2 + 5 = 7
+2 + 5 = 7
+```
+
+</div>
+
+<div v-click="1">
+
+<p>
+<code transition duration-500>
+<template v-if="$clicks<2">
+run_noop.py
+</template>
+<template v-else>
+run_add_as_mul.py
+</template>
+</code>
+</p>
+
+````md magic-move {at: 2}
+
+<<< @/samples/py/run_noop.py py
+
+```py {*|10}
+#!/usr/bin/env python3
+import sys
+import ast
+
+with open(sys.argv[1]) as f:
+    code = f.read()
+
+tree = ast.parse(code)
+
+transformed_tree = transform_tree(tree)
+
+bytecode = compile(transformed_tree, filename="<ast>", mode="exec")
+
+exec(bytecode)
+```
+
+````
+
+````md magic-move {at: 2}
+
+```shell
+❯ ./run_noop.py add.py
+2 + 5 = 7
+2 + 5 = 7
+```
+
+```shell
+❯ ./run_add_as_mul.py add.py
+2 + 5 = 10
+2 + 5 = 10
+```
+
+````
+
+</div>
+
+</div>
+
+---
+
+# `ast.NodeTransformer`
+
+```py
+import ast
+
+
+class AddToMulTransformer(ast.NodeTransformer):
+    def visit_BinOp(self, node):
+        self.generic_visit(node)
+        if isinstance(node.op, ast.Add):
+            node.op = ast.Mult()
+        return node
+
+
+def transform_tree(tree):
+    transformer = AddToMulTransformer()
+    return transformer.visit(tree)
+```
+
+---
+
+# `ast.NodeVisitor`
 
 ---
 layout: section
@@ -495,43 +602,6 @@ to the rescue
 ---
 
 # `ast` module
-
----
-
-# Example: AST Transformation
-Replace `+` with `*` at runtime
-
-`add.py`
-
-<<< @/samples/py/add.py py {*}
-
-```shell
-❯ python add.py
-2 + 3 = 5
-2 + 3 = 5
-```
-
-`run_noop.py`
-<<< @/samples/py/run_noop.py
-
-```shell
-❯ ./run_noop.py add.py
-2 + 3 = 5
-2 + 3 = 5
-```
-
-`run_add_as_mul.py`
-<<< @/samples/py/run_add_as_mul.py py {*}
-
-```shell
-❯ ./run_add_as_mul.py add.py
-2 + 3 = 6
-2 + 3 = 6
-```
-
----
-
-# `ast.NodeVisitor` and `ast.NodeTransformer`
 
 ---
 

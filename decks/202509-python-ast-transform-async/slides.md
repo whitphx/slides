@@ -299,7 +299,7 @@ exec(bytecode)
 
 # `ast.NodeTransformer`
 
-```py
+```py {12-14|1-9|*}
 import ast
 
 
@@ -319,6 +319,12 @@ def transform_tree(tree):
 ---
 
 # `ast.NodeVisitor`
+
+---
+
+# Metaprogramming!
+
+- Don't shoot yourself in the foot.
 
 ---
 layout: section
@@ -489,7 +495,6 @@ st.write("Hello,", name or "world")
 # The problem: interoperability
 
 
-
 ---
 
 # Example 1: `asyncio.run()`
@@ -590,14 +595,6 @@ layout: section
 AST transformation<br>
 to the rescue
 </h1>
-
----
-
-# Python code execution flow
-
----
-
-# Metaprogramming!
 
 ---
 

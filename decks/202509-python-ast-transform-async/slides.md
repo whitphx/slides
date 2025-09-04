@@ -577,6 +577,8 @@ https://pyodide.org/en/stable/usage/wasm-constraints.html
 
 <div>
 
+## Original
+
 ```py {*|6}{at: 3, 'data-id': 'asyncio-run-orig'}
 import asyncio
 
@@ -603,6 +605,8 @@ RuntimeError: asyncio.run() cannot be called from a running event loop
 <div>
 
 <div v-click>
+
+## Fixed
 
 ```py {*|6}{at: 3, 'data-id': 'asyncio-run-await'}
 import asyncio

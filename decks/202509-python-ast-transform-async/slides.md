@@ -98,6 +98,49 @@ Module(
 
 # `ast` module
 
+```py {*}{'data-id': 'ast-module-example'}
+>>> import ast
+>>> tree = ast.parse("x = 1 + 2")
+>>> print(ast.dump(tree, indent=4))
+Module(
+    body=[
+        Assign(
+            targets=[
+                Name(id='x', ctx=Store())],
+            value=BinOp(
+                left=Constant(value=1),
+                op=Add(),
+                right=Constant(value=2)))])
+```
+
+<div>
+
+<div v-click>
+<div data-id="ast-parse-desc" absolute top-10 right-10 w="50%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+
+`ast.parse(code)` returns an AST object, `tree`, that is of type `ast.Module`.
+
+</div>
+<FancyArrow from="[data-id=ast-parse-desc] @ left" to="[data-id=ast-module-example] .line:nth-child(2) @ top" arc="-0.2" />
+</div>
+
+<div v-click>
+<span data-id="ast-module-node-classes" absolute top-50 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+
+`ast` module has node classes such as `ast.Module`, `ast.Assign`, `ast.Name`, `ast.Constant`, `ast.BinOp`, and `ast.Add`.
+
+</span>
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(4) @ right" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(6) @ right" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(8) @ top" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(9) @ right" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(10) @ (70%,0)" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(11) @ (90%,0)" arc="-0.2" />
+<FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(12) @ (70%,0)" arc="-0.2" />
+</div>
+
+</div>
+
 ---
 
 # AST transformation

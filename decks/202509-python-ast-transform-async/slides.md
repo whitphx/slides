@@ -1398,6 +1398,10 @@ https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite
 
 # Libraries
 
+- `astroid` https://github.com/pylint-dev/astroid
+  - AST analysis library **pylint** is based on.
+  - Name resolution inference capability.
+
 ---
 
 # Summary

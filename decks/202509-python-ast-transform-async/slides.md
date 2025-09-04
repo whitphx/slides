@@ -1143,6 +1143,45 @@ This name `wait` is **resolved** to the one in the **nearest enclosing scope**.
 
 ---
 
+# Add name binding tracker and resolver
+
+<div grid="~ cols-2" gap-4>
+
+```py
+class NameBindingTracker(ast.NodeVisitor):
+    def visit(self, node):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            # Push a new code block
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            # Bind the name. Use `node.names[].alias` if exists.
+        if isinstance(node, ast.Assign):
+            # Bind the name
+        if isinstance(node, ast.Delete):
+            # Unbind the name
+        if isinstance(node, (
+            ast.AugAssign, ast.AnnAssign,
+            ast.For, ast.AsyncFor,
+            ast.NamedExpr,
+        )):
+            # Bind the name
+
+        self.generic_visit(node)
+```
+
+```py
+tracker = NameBindingTracker()
+
+tracker.visit(tree)
+
+bound_object = (
+    tracker.resolve(code_block, name)
+)
+```
+
+</div>
+
+---
+
 # Inside control flows
 
 ```py

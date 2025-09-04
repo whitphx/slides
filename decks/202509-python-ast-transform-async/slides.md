@@ -682,7 +682,11 @@ await asyncio.sleep(1)
 
 ---
 
-# Motivation: we don't want to rewrite the code
+# Motivation
+
+- We don't want to rewrite the code.
+- Once you write Python code for Streamlit (Python),<br>
+  it should work on Stlite (Pyodide).
 
 ---
 layout: section
@@ -727,9 +731,19 @@ else:
 
 ---
 
-# Case 1: `asyncio.run(coro())` -> `await coro()`
+# Case 1: `asyncio.run(coro())` → `await coro()`
 
+<div grid="~ cols-2" gap-4>
+
+```py
+asyncio.run(coro())
 ```
+
+```py
+await coro()
+```
+
+``` {*|7-10}{at:1, 'data-id': 'asyncio-run-ast-orig'}
 Call(
     func=Attribute(
         value=Name(id='asyncio', ctx=Load()),
@@ -742,13 +756,21 @@ Call(
                 Name(id='arg', ctx=Load())])])
 ```
 
-```
+``` {*|2-5}{at:1, 'data-id': 'asyncio-run-ast-fixed'}
 Await(
     value=Call(
         func=Name(id='coro', ctx=Load()),
         args=[
             Name(id='arg', ctx=Load())]))
 ```
+
+</div>
+
+<FancyArrow
+  v-click="1"
+  from="[data-id=asyncio-run-ast-orig] .line:nth-child(7) @ right"
+  to="[data-id=asyncio-run-ast-fixed] .line:nth-child(2) @ (60%,50%)"
+/>
 
 ```py
 def transform_asyncio_run(node):

@@ -1,5 +1,6 @@
 import ast
 
+
 class AsyncioRunTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
         if (
@@ -12,6 +13,7 @@ class AsyncioRunTransformer(ast.NodeTransformer):
                 value=node.args[0],
             )
 
+        return node
 
 tree = ast.parse("asyncio.run(main())")
 

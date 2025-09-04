@@ -1,6 +1,7 @@
 import ast
 
-class AsyncioRunTransformer(ast.NodeTransformer):
+
+class PyodideTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
         if (
             isinstance(node.func, ast.Attribute) and
@@ -16,7 +17,7 @@ class AsyncioRunTransformer(ast.NodeTransformer):
 
 
 def patch(tree):
-    transformer = AsyncioRunTransformer()
+    transformer = PyodideTransformer()
     new_tree = transformer.visit(tree)
     new_tree = ast.fix_missing_locations(new_tree)
     return new_tree

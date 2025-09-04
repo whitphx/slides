@@ -9,7 +9,9 @@ const pyodide = await loadPyodide();
 pyodide.FS.writeFile("codemod.py", codemodPyFile);
 pyodide.FS.writeFile("script_runner.py", scriptRunnerPyFile);
 
+//#region runScript
 const runScript = pyodide.pyimport("script_runner.run_script");
+
 await runScript(`
 import asyncio
 
@@ -18,5 +20,5 @@ async def coro():
 
 print("Hello World")
 asyncio.run(coro())
-#await coro()
 `);
+//#endregion

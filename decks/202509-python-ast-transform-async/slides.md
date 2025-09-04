@@ -883,7 +883,7 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 
 ---
 
-# Put them together...
+# Put them together
 
 <div grid="~ cols-2" gap-4>
 
@@ -893,24 +893,40 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 
 <<< @/samples/py/codemod.py#patch py
 
+`script_runner.py`
+
+<<< @/samples/py/script_runner.py#run_script py
+
 </div>
 
 <div>
 
-`script_runner.py`
+`run.js`
 
-<<< @/samples/py/script_runner.py py
+<<< @/samples/js/src/script-runner-demo.js#runScript js {*}{'data-id': 'script-runner-demo-js'}
 
 </div>
 
+</div>
+
+<div v-click>
+<div data-id="script-runner-demo-js-desc" absolute top-10 right-10 bg-white p-4 rounded border="~ gray rounded-lg">
+
+`await`-ed at the JavaScript level <br>
+that makes the top-level `await` in Python work.
+
+</div>
+<FancyArrow
+  from="[data-id=script-runner-demo-js-desc] @ left"
+  to="[data-id=script-runner-demo-js] .line:nth-child(3) @ left"
+  arc="-0.6"
+/>
 </div>
 
 ---
-
+layout: fact
+---
 # It works!
-
-<!-- Script runner works -->
-<!-- Explain why top-level await works -->
 
 ---
 layout: statement

@@ -278,11 +278,9 @@ Program behavior is changed<br>without modifying the source code.
 
 # AST transformation in action
 
-Replace `+` with `*` at runtime
+<div flex="~ row" w="100%">
 
-<div grid="~ cols-2" gap-4>
-
-<div>
+<div grow>
 
 <div>
 
@@ -304,9 +302,10 @@ Replace `+` with `*` at runtime
 
 </div>
 
-<div v-click="2">
+<div v-click="2" w="60%" ml-4>
 
 <p>
+Custom Python runner:
 <code transition duration-500>
 <template v-if="$clicks<3">
 run_noop.py

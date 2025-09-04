@@ -168,7 +168,7 @@ print(x)
 
 <div relative overflow-hidden>
 
-````md magic-move {at: 4}
+````md magic-move {at: 5, 'data-id': 'ast-mod-shiki-move'}
 
 ```
 ...
@@ -201,7 +201,7 @@ BinOp(
     </span>
   </template>
 
-````md magic-move {'data-id': 'codeblock-bytecode', at: 5}
+````md magic-move {'data-id': 'codeblock-bytecode', at: 6}
 
 ```
 ...
@@ -241,7 +241,7 @@ STORE_NAME    1 (x)
 
 <div mt-20 v-click="3">
 
-````md magic-move {'data-id': 'ast-transform-sample-result', at: 6}
+````md magic-move {'data-id': 'ast-transform-sample-result', at: 7}
 ```
 3
 ```
@@ -259,6 +259,20 @@ STORE_NAME    1 (x)
 `exec(bytecode)`
 
 </FancyArrow>
+
+<div v-click="4">
+<span data-id="transform-node-desc" absolute top-90 left-30>
+Transform this node in the AST...
+</span>
+<FancyArrow from="[data-id=transform-node-desc]" to="[data-id=ast-mod-shiki-move] @ (20%,55%)" color="red" arc="0.3" />
+</div>
+
+<div v-click="8">
+<span data-id="result-change-desc" absolute top-110 left-40>
+Program behavior is changed<br>without modifying the source code.
+</span>
+<FancyArrow from="[data-id=result-change-desc] @ left" to="[data-id=ast-transform-sample-result] @ (3%,100%)" color="red" arc="0.3" />
+</div>
 
 ---
 

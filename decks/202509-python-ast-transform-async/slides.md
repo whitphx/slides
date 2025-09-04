@@ -116,7 +116,7 @@ Module(
 <div>
 
 <div v-click>
-<div data-id="ast-parse-desc" absolute top-10 right-10 w="50%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+<div data-id="ast-parse-desc" absolute top-10 right-10 w="50%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast.parse(code)` returns an AST object that is of type `ast.Module`.
 
@@ -125,7 +125,7 @@ Module(
 </div>
 
 <div v-click>
-<span data-id="ast-module-node-classes" absolute top-50 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+<span data-id="ast-module-node-classes" absolute top-50 right-10 w="40%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast` module has node classes such as `ast.Module`, `ast.Assign`, `ast.Name`, `ast.Constant`, `ast.BinOp`, and `ast.Add`.
 
@@ -388,7 +388,7 @@ def transform_tree(tree):
 ```
 
 <div v-click>
-<div data-id="node-transformer-desc" absolute top-15 right-10 w="50%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+<div data-id="node-transformer-desc" absolute top-15 right-10 w="50%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast.NodeTransformer` walks an AST and modifies its nodes.
 
@@ -397,7 +397,7 @@ def transform_tree(tree):
 </div>
 
 <div v-click>
-<div data-id="visit-callback-desc" absolute top-55 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+<div data-id="visit-callback-desc" absolute top-55 right-10 w="40%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 It allows you to modify nodes via `visit_*` callbacks.
 
@@ -406,7 +406,7 @@ It allows you to modify nodes via `visit_*` callbacks.
 </div>
 
 <div v-click>
-<div data-id="transformer-visit-desc" absolute top-90 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+<div data-id="transformer-visit-desc" absolute top-90 right-10 w="40%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `.visit()` traverses the AST and applies the transformation.
 
@@ -884,7 +884,7 @@ Await(
 </div>
 
 <div v-click>
-<div data-id="script-runner-demo-js-desc" absolute top-10 right-10 bg-white p-4 rounded border="~ gray rounded-lg">
+<div data-id="script-runner-demo-js-desc" absolute top-10 right-10 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg">
 
 `await`-ed at the JavaScript level <br>
 that makes the top-level `await` in Python work.

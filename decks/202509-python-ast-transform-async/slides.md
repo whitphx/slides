@@ -931,25 +931,30 @@ else:
 </div>
 
 ---
+
+# It works!
+
+<!-- Script runner works -->
+<!-- Explain why top-level await works -->
+
+---
+layout: statement
+---
+
+# Is that all...?
+
+---
 layout: section
 ---
 
 <h1>
-More cases
+More cases to consider:
 </h1>
 
 ---
 
-# Inside control flows
+# `import` and `from import`
 
-```py
-if cond:
-  time.sleep(1)
-```
-
----
-
-# Import types
 ```py
 import time
 
@@ -961,6 +966,10 @@ from time import sleep
 
 sleep(1)
 ```
+
+---
+
+# Aliased import
 
 ```py
 import time as t
@@ -976,7 +985,7 @@ wait(1)
 
 ---
 
-# Aliased
+# Assignment
 
 ```py
 from time import sleep
@@ -984,6 +993,161 @@ from time import sleep
 wait = sleep
 
 wait(1)
+```
+
+---
+layout: section
+---
+
+# Name resolution
+
+---
+
+# Name resolution
+
+---
+
+# Name resolution in Python
+
+<div>
+
+[Python documentation, 4. Execution model (https://docs.python.org/3/reference/executionmodel.html)](https://docs.python.org/3/reference/executionmodel.html)
+
+</div>
+
+> A Python program is constructed from code blocks. ... \
+> The following are blocks: a module, a function body, and a class definition. ...
+>
+> Names refer to objects. Names are introduced by name binding operations. ...
+>
+> **Each assignment or import statement occurs within a block** defined by a class or function definition or at the module level (the top-level code block). \
+> If a name is bound in a block, it is a local variable of that block, unless declared as nonlocal or global. If a name is bound at the module level, it is a global variable. (The variables of the module code block are local and global.) If a variable is used in a code block but not defined there, it is a free variable. \
+> ...
+
+---
+
+# Name resolution in Python
+
+<div w="80" relative>
+
+<<< @/samples/py/code_block_example.py py {*}{'data-id': 'code-block-example'}
+
+<div absolute inset-0 border="~ 5 red rounded-md" data-id="module-code-block-frame"></div>
+
+<div absolute top-40 bottom-20 left-1 right-3 border="~ 5 green rounded-md" data-id="function-code-block-frame"></div>
+
+</div>
+
+<div v-click>
+<div absolute top-10 left-140 data-id="module-code-block-desc">
+  A module is a code block.
+</div>
+<FancyArrow
+  from="[data-id=module-code-block-desc] @ left"
+  to="[data-id=module-code-block-frame] @ (100%,10%)"
+  color="red"
+  arc="-0.2"
+/>
+</div>
+
+<div v-click>
+<div absolute top-20 left-140 data-id="function-code-block-desc">
+  A function is a code block.<br>
+  A class is also a code block.
+</div>
+<FancyArrow
+  from="[data-id=function-code-block-desc] @ left"
+  to="[data-id=function-code-block-frame] @ (100%,10%)"
+  color="green"
+  arc="-0.2"
+/>
+</div>
+
+<div absolute top-40 left-120>
+
+<div v-click>
+<div data-id="asyncio-sleep-import-desc">
+
+`asyncio.sleep` is **bound** to a name __`time` in the module code block__,
+
+</div>
+<FancyArrow
+  from="[data-id=asyncio-sleep-import-desc] @ left"
+  to="[data-id=code-block-example] .line:nth-child(2) @ right"
+  color="red"
+  arc="-0.2"
+/>
+</div>
+
+<div v-click>
+<div data-id="asyncio-sleep-assign-desc">
+
+then **bound** to a name __`wait` in the module code block__.
+
+</div>
+<FancyArrow
+  from="[data-id=asyncio-sleep-assign-desc] @ left"
+  to="[data-id=code-block-example] .line:nth-child(4) @ right"
+  color="red"
+  arc="-0.2"
+/>
+</div>
+
+</div>
+
+<div absolute top-75 left-120>
+
+<div v-click>
+<div data-id="time-sleep-import-desc">
+
+`time.sleep` is **bound** to a name __`time` in the function code block__,
+
+</div>
+<FancyArrow
+  from="[data-id=time-sleep-import-desc] @ left"
+  to="[data-id=code-block-example] .line:nth-child(8) @ right"
+  color="green"
+  arc="-0.2"
+/>
+</div>
+
+<div v-click>
+<div data-id="time-sleep-assign-desc">
+
+then **bound** to a name __`wait` in the function code block__.
+
+</div>
+<FancyArrow
+  from="[data-id=time-sleep-assign-desc] @ left"
+  to="[data-id=code-block-example] .line:nth-child(10) @ right"
+  color="green"
+  arc="-0.2"
+/>
+</div>
+
+<div v-click>
+<div data-id="time-sleep-resolve-desc">
+
+This name `wait` is **resolved** to the one in the **nearest enclosing scope**.
+
+</div>
+<FancyArrow
+  from="[data-id=time-sleep-resolve-desc] @ left"
+  to="[data-id=code-block-example] .line:nth-child(12) @ right"
+  color="blue"
+  arc="-0.2"
+/>
+</div>
+
+</div>
+
+---
+
+# Inside control flows
+
+```py
+if cond:
+  time.sleep(1)
 ```
 
 ---
@@ -1029,10 +1193,6 @@ import asyncio
 async def sleep(delay):
     await asyncio.sleep(delay)
 ```
-
----
-
-# Name resolution
 
 ---
 

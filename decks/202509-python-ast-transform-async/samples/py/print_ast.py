@@ -23,3 +23,5 @@ print(x)
 dis.dis(bytecode)
 
 print(eval(bytecode))
+
+print(ast.dump(ast.parse("import time as t"), indent=4))

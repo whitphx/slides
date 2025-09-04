@@ -1007,6 +1007,23 @@ layout: section
 
 # Name resolution
 
+<div>
+
+To solve such problems,
+we need to know what each occurrence of a name refers to.
+
+e.g. What is this `sleep`? Is it `time.sleep` or `asyncio.sleep`?
+
+</div>
+
+<div v-click>
+It's done by Python at runtime.
+</div>
+
+<div v-click>
+However, in this case, we need to perform name resolution at the code transformation stage.
+</div>
+
 ---
 
 # Name resolution in Python
@@ -1034,13 +1051,13 @@ layout: section
 
 <<< @/samples/py/code_block_example.py py {*}{'data-id': 'code-block-example'}
 
-<div absolute inset-0 border="~ 5 red rounded-md" data-id="module-code-block-frame"></div>
+<div absolute inset-0 border="~ 5 red rounded-md" data-id="module-code-block-frame" v-click="1"></div>
 
-<div absolute top-40 bottom-20 left-1 right-3 border="~ 5 green rounded-md" data-id="function-code-block-frame"></div>
+<div absolute top-40 bottom-20 left-1 right-3 border="~ 5 green rounded-md" data-id="function-code-block-frame" v-click="2"></div>
 
 </div>
 
-<div v-click>
+<div v-click="1">
 <div absolute top-10 left-140 data-id="module-code-block-desc">
   A module is a code block.
 </div>
@@ -1052,7 +1069,7 @@ layout: section
 />
 </div>
 
-<div v-click>
+<div v-click="2">
 <div absolute top-20 left-140 data-id="function-code-block-desc">
   A function is a code block.<br>
   A class is also a code block.
@@ -1067,10 +1084,10 @@ layout: section
 
 <div absolute top-40 left-120>
 
-<div v-click>
+<div v-click="3">
 <div data-id="asyncio-sleep-import-desc">
 
-`asyncio.sleep` is **bound** to a name __`time` in the module code block__,
+`asyncio.sleep` is **bound** to a name <br>__`time` in the module code block__,
 
 </div>
 <FancyArrow
@@ -1081,10 +1098,10 @@ layout: section
 />
 </div>
 
-<div v-click>
+<div v-click="4">
 <div data-id="asyncio-sleep-assign-desc">
 
-then **bound** to a name __`wait` in the module code block__.
+then **bound** to a name <br>__`wait` in the module code block__.
 
 </div>
 <FancyArrow
@@ -1099,10 +1116,10 @@ then **bound** to a name __`wait` in the module code block__.
 
 <div absolute top-75 left-120>
 
-<div v-click>
+<div v-click="5">
 <div data-id="time-sleep-import-desc">
 
-`time.sleep` is **bound** to a name __`time` in the function code block__,
+`time.sleep` is **bound** to a name <br>__`time` in the function code block__,
 
 </div>
 <FancyArrow
@@ -1113,10 +1130,10 @@ then **bound** to a name __`wait` in the module code block__.
 />
 </div>
 
-<div v-click>
+<div v-click="6">
 <div data-id="time-sleep-assign-desc">
 
-then **bound** to a name __`wait` in the function code block__.
+then **bound** to a name <br>__`wait` in the function code block__.
 
 </div>
 <FancyArrow
@@ -1127,10 +1144,11 @@ then **bound** to a name __`wait` in the function code block__.
 />
 </div>
 
-<div v-click>
+<div v-click="7">
 <div data-id="time-sleep-resolve-desc">
 
-This name `wait` is **resolved** to the one in the **nearest enclosing scope**.
+This name `wait` is **resolved** to the one in the **nearest enclosing scope**
+<span v-click="8"> that is **bound** to `time.sleep`.</span>
 
 </div>
 <FancyArrow
@@ -1363,4 +1381,41 @@ async def sleep(delay):
 
 ---
 
-# Test cases
+# To what extent can we do?
+
+<v-clicks>
+
+- AST analysis/transformation can't cover 100% cases.
+- Dynamic behavior is hard to analyze.
+- We need to determine the lines we want to support.
+
+</v-clicks>
+
+---
+
+# Actual implementation
+
+<div>
+
+https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/codemod.py
+
+https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib_tests/codemod_test.py
+
+</div>
+
+---
+
+# Libraries
+
+---
+
+# Summary
+
+AST-based approach:
+- can achieve what dynamic approaches can't.
+  - e.g. syntax-level code modification
+- has limitations.
+  - e.g. can't analyze dynamic behavior
+
+I used this approach in the real-world project "Stlite"
+to run Python code on Pyodide without rewriting the input source code.

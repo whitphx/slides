@@ -373,7 +373,7 @@ exec(bytecode)
 
 # `ast.NodeTransformer`
 
-```py {12-14|1-9|*}
+```py {12-14|1-9|*}{'data-id': 'node-transformer-sample'}
 import ast
 
 
@@ -390,15 +390,55 @@ def transform_tree(tree):
     return transformer.visit(tree)
 ```
 
+<div v-click>
+<div data-id="node-transformer-desc" absolute top-15 right-10 w="50%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+
+`ast.NodeTransformer` walks an AST and modifies its nodes.
+
+</div>
+<FancyArrow from="[data-id=node-transformer-desc] @ bottom" to="[data-id=node-transformer-sample] .line:nth-child(4) @ right" arc="0.2" />
+</div>
+
+<div v-click>
+<div data-id="visit-callback-desc" absolute top-55 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+
+It allows you to modify nodes via `visit_*` callbacks.
+
+</div>
+<FancyArrow from="[data-id=visit-callback-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(5) @ right" arc="-0.2" />
+</div>
+
+<div v-click>
+<div data-id="transformer-visit-desc" absolute top-90 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
+
+`.visit()` traverses the AST and applies the transformation.
+
+</div>
+<FancyArrow from="[data-id=transformer-visit-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(14) @ right" arc="0.2" />
+</div>
+
 ---
 
 # `ast.NodeVisitor`
 
+<div>
+
+If you just need to analyze the AST without modifying it, you should use `ast.NodeVisitor`.
+
+</div>
+
 ---
 
-# Metaprogramming!
+# Applications
 
-- Don't shoot yourself in the foot.
+<v-clicks>
+
+- Code analysis
+  - Linter
+- Meta programming!
+  - Don't shoot yourself in the foot.
+
+</v-clicks>
 
 ---
 layout: section

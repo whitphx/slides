@@ -118,7 +118,7 @@ Module(
 <div v-click>
 <div data-id="ast-parse-desc" absolute top-10 right-10 w="50%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
 
-`ast.parse(code)` returns an AST object, `tree`, that is of type `ast.Module`.
+`ast.parse(code)` returns an AST object that is of type `ast.Module`.
 
 </div>
 <FancyArrow from="[data-id=ast-parse-desc] @ left" to="[data-id=ast-module-example] .line:nth-child(2) @ top" arc="-0.2" />
@@ -128,6 +128,8 @@ Module(
 <span data-id="ast-module-node-classes" absolute top-50 right-10 w="40%" bg-white p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast` module has node classes such as `ast.Module`, `ast.Assign`, `ast.Name`, `ast.Constant`, `ast.BinOp`, and `ast.Add`.
+
+They inherit from the `ast.AST` base class.
 
 </span>
 <FancyArrow from="[data-id=ast-module-node-classes] @ left" to="[data-id=ast-module-example] .line:nth-child(4) @ right" arc="-0.2" />
@@ -269,7 +271,7 @@ Transform this node in the AST...
 
 <div v-click="8">
 <span data-id="result-change-desc" absolute top-110 left-40>
-Program behavior is changed<br>without modifying the source code.
+Program is modified<br>without modifying the source code.
 </span>
 <FancyArrow from="[data-id=result-change-desc] @ left" to="[data-id=ast-transform-sample-result] @ (3%,100%)" color="red" arc="0.3" />
 </div>
@@ -307,7 +309,7 @@ Program behavior is changed<br>without modifying the source code.
 <p>
 Custom Python runner:
 <code transition duration-500>
-<template v-if="$clicks<3">
+<template v-if="$clicks<=3">
 run_noop.py
 </template>
 <template v-else>
@@ -318,7 +320,7 @@ run_add_as_mul.py
 
 <div overflow-hidden>
 
-````md magic-move {at: 3}
+````md magic-move {at: 4}
 
 <<< @/samples/py/run_noop.py py
 
@@ -343,9 +345,9 @@ exec(bytecode)
 
 </div>
 
-<div mt-2>
+<div mt-2 v-click="3">
 
-````md magic-move {at: 3}
+````md magic-move {at: 4}
 
 ```shell
 ❯ ./run_noop.py add.py
@@ -843,6 +845,49 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 ---
 
 # Case 4: `st.navigation().run()` -> `await (st.navigation()).run()`
+
+---
+
+# Put them together...
+
+<div grid="~ cols-2" gap-4>
+
+<div>
+
+`codemod.py`
+
+```py
+def patch(code, script_path):
+    tree = ast.parse(code, script_path, "exec")
+    transformed_tree = transform_tree(tree)
+    return transformed_tree
+```
+
+</div>
+
+<div>
+
+`script_runner.py`
+```py
+with open(script_path) as f:
+    filebody = f.read()
+
+filebody = codemod.patch(filebody, script_path)
+
+bytecode = compile(filebody, script_path,
+    mode="exec",
+    flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT,
+)
+
+if bytecode.co_flags & CO_COROUTINE:
+    await eval(bytecode, module.__dict__)
+else:
+    exec(bytecode, module.__dict__)
+```
+
+</div>
+
+</div>
 
 ---
 layout: section

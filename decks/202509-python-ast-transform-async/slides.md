@@ -839,6 +839,8 @@ class AsyncioRunTransformer(ast.NodeTransformer):
             return ast.Await(
                 value=node.args[0],
             )
+
+        return node
 ```
 
 </div>
@@ -1324,6 +1326,8 @@ class AsyncioRunTransformer(ast.NodeTransformer):
             return ast.Await(
                 value=node.args[0],
             )
+
+        return node
 ```
 
 </div>

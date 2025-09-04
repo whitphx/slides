@@ -381,12 +381,6 @@ Python in JavaScript
 <div absolute right-10 top-90 text-4xl data-id="desc3" v-click="3">Pass the Python code as a string literal</div>
 <FancyArrow from="[data-id=desc3] @ topleft" to="[data-id=pyodide-example-js] .line:nth-child(6) @ right" arc="-0.1" v-click="3" />
 
-<style>
-* {
-  --slidev-code-font-size: 18px;
-}
-</style>
-
 ---
 
 # Python in JavaScript = Python on browsers/NodeJS
@@ -403,12 +397,6 @@ undefined
 Hello from Python
 undefined
 ```
-
-<style>
-* {
-  --slidev-code-font-size: 18px;
-}
-</style>
 
 ---
 
@@ -494,6 +482,20 @@ st.write("Hello,", name or "world")
 
 # The problem: interoperability
 
+<div>
+
+Pyodide executes Python code in WebAssembly, which has a different nature.
+
+- Single-threaded
+- Browser's event loop
+
+-> Some Python features do not work as expected.
+
+https://pyodide.org/en/stable/usage/wasm-constraints.html
+
+-> We will focus on async-related features.
+
+</div>
 
 ---
 
@@ -596,6 +598,8 @@ AST transformation<br>
 to the rescue
 </h1>
 
+---
+hide: true
 ---
 
 # Script Runner

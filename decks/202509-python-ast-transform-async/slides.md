@@ -685,46 +685,26 @@ await fn()
 
 <div>
 
-```py
-import asyncio
+```py {*|1|3}{at:1}
 import time
 
-async def async_timer():
-    print("Async time start", time.time())
-    await asyncio.sleep(1)
-    print("Async time end", time.time())
-
-
-print("Script start", time.time())
-# asyncio.run(async_timer())
-asyncio.create_task(async_timer())
 time.sleep(1)
-```
-
-### Expected
-
-```
-Script start 1756823376.8114681
-Async time start 1756823376.811596
-Async time end 1756823377.812911
-```
-
-### Actual
-```
-Script start 1756822802.754
-Async time start 1756822803.755
-Async time end 1756822804.757
 ```
 
 </div>
 
-```py
+```py {*|1|3}{at:1}
 import asyncio
 
 await asyncio.sleep(1)
 ```
 
 </div>
+
+<footer text-sm absolute bottom-20>
+Disclaimer:<br>
+Pyodide now supports `time.sleep()` in most cases.
+</footer>
 
 ---
 
@@ -779,9 +759,7 @@ else:
 
 # Case 1: `asyncio.run(coro())` → `await coro()`
 
-<div :class="$clicks >= 2 ? 'translate-y--16' : ''" duration-100>
-
-<div grid="~ cols-2" gap-4 v-click.hide="2">
+<div grid="~ cols-2" gap-4>
 
 ```py
 asyncio.run(coro())
@@ -825,17 +803,21 @@ Await(
   to="[data-id=asyncio-run-ast-fixed] .line:nth-child(2) @ (60%,50%)"
 />
 
-<div v-click="2">
+---
+
+# Case 1: `asyncio.run(coro())` → `await coro()`
+
+<div>
 
 <<< @/samples/py/transform_asyncio_run.py#transformer
-
-</div>
 
 </div>
 
 ---
 
 # Case 2: `time.sleep()` → `asyncio.sleep()`
+
+<div grid="~ cols-2" gap-4>
 
 ```
 Call(
@@ -858,28 +840,20 @@ Await(
             Name(id='arg', ctx=Load())]))
 ```
 
-```py
-def transform_time_sleep(node):
-    return ast.Await(
-        value=ast.Call(
-            func=ast.Attribute(
-                value=ast.Name(id="asyncio", ctx=ast.Load()),
-                attr="sleep",
-                ctx=ast.Load(),
-            ),
-            args=node.args,
-            keywords=node.keywords,
-        )
-    )
-```
-
-```py
-_insert_import_statement(code_block_ast, ["asyncio"])
-```
+</div>
 
 ---
 
-# Case 3: `st.navigation().run()` -> `await (st.navigation()).run()`
+# Case 2: `time.sleep()` → `asyncio.sleep()`
+
+<<< @/samples/py/transform_time_sleep.py#transformer py {*}{'max-height': '300px'}
+
+
+<div mt-4>
+
+<<< @/samples/py/transform_time_sleep.py#apply py
+
+</div>
 
 ---
 

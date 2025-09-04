@@ -2,6 +2,7 @@ import ast
 import dis
 
 print(ast.dump(ast.parse("x = 1 + 2"), indent=4))
+print(ast.dump(ast.parse("x = 2 + 3 + 4"), indent=4))
 
 print(ast.dump(ast.parse("""
 def foo(x, y):

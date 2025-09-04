@@ -296,8 +296,7 @@ Program is modified<br>without modifying the source code.
 
 ```shell
 ❯ python add.py
-2 + 5 = 7
-2 + 5 = 7
+9
 ```
 
 </div>
@@ -351,14 +350,12 @@ exec(bytecode)
 
 ```shell
 ❯ ./run_noop.py add.py
-2 + 5 = 7
-2 + 5 = 7
+9
 ```
 
 ```shell
 ❯ ./run_add_as_mul.py add.py
-2 + 5 = 10
-2 + 5 = 10
+24
 ```
 
 ````
@@ -422,6 +419,8 @@ It allows you to modify nodes via `visit_*` callbacks.
 # `ast.NodeVisitor`
 
 <div>
+
+Side note:
 
 If you just need to analyze the AST without modifying it, you should use `ast.NodeVisitor`.
 
@@ -663,7 +662,8 @@ await fn()
 
 <div v-click="4">
 
-- Top-level `await`
+- `asyncio.run()` can't be used on Pyodide
+- Use top-level `await` instead
 
 </div>
 
@@ -824,10 +824,11 @@ Await(
 <div v-click="2">
 
 ```py
-def transform_asyncio_run(node):
-    return ast.Await(
-        value=node.args[0],
-    )
+class AsyncioRunTransformer(ast.NodeTransformer):
+    def visit_Call(self, node):
+        return ast.Await(
+            value=node.args[0],
+        )
 ```
 
 </div>

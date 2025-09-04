@@ -166,7 +166,7 @@ print(x)
     </span>
   </template>
 
-<div>
+<div relative overflow-hidden>
 
 ````md magic-move {at: 4}
 
@@ -205,19 +205,19 @@ BinOp(
 
 ```
 ...
-  3   LOAD_NAME     0 (a)
-      LOAD_CONST    1 (2)
-      BINARY_OP     0 (+)
-      STORE_NAME    1 (x)
+LOAD_NAME     0 (a)
+LOAD_CONST    1 (2)
+BINARY_OP     0 (+)
+STORE_NAME    1 (x)
 ...
 ```
 
 ```
 ...
-  3   LOAD_NAME     0 (a)
-      LOAD_CONST    1 (2)
-      BINARY_OP     5 (*)
-      STORE_NAME    1 (x)
+LOAD_NAME     0 (a)
+LOAD_CONST    1 (2)
+BINARY_OP     5 (*)
+STORE_NAME    1 (x)
 ...
 ```
 

@@ -826,9 +826,15 @@ Await(
 ```py
 class AsyncioRunTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
-        return ast.Await(
-            value=node.args[0],
-        )
+        if (
+            isinstance(node.func, ast.Attribute) and
+            isinstance(node.func.value, ast.Name) and
+            node.func.value.id == "asyncio" and
+            node.func.attr == "run"
+        ):
+            return ast.Await(
+                value=node.args[0],
+            )
 ```
 
 </div>
@@ -878,10 +884,6 @@ def transform_time_sleep(node):
 ```py
 _insert_import_statement(code_block_ast, ["asyncio"])
 ```
-
----
-
-# Case 3: `def fn(): ...; fn()` -> `async def fn(): ...; await fn()`
 
 ---
 
@@ -1189,43 +1191,152 @@ bound_object = (
 </div>
 
 ---
+layout: section
+---
 
-# Inside control flows
-
-```py
-if cond:
-  time.sleep(1)
-```
+# More cases, still...
 
 ---
 
-# Conditionally aliased
+# Chain reaction
+
+<div grid="~ cols-2" gap-4>
+
+<div>
+
+````md magic-move {at:1}
+
+```py {*|9|9|9}
+import asyncio
+
+
+async def coro():
+    ...
+
+
+def foo():
+    asyncio.run(coro())
+
+
+foo()
+```
+````
+
+</div>
+
+````md magic-move {at:1}
+
+```py {*|9}
+import asyncio
+
+
+async def coro():
+    ...
+
+
+def foo():
+    await coro()
+
+
+foo()
+```
+
+```py {8-9}
+import asyncio
+
+
+async def coro():
+    ...
+
+
+async def foo():
+    await coro()
+
+
+foo()
+```
+
+```py {8-12}
+import asyncio
+
+
+async def coro():
+    ...
+
+
+async def foo():
+    await coro()
+
+
+await foo()
+```
+
+````
+
+</div>
+
+---
+
+# Add a call graph tracker
+
+<div grid="~ cols-2" gap-4>
+
+```py
+class CallGraphTracker(ast.NodeVisitor):
+    def visit_Call(self, node):
+        caller = self.current_code_block
+        callee = node.func
+        self.call_graph.push(caller, callee)
+```
+
+```py
+class AsyncioRunTransformer(ast.NodeTransformer):
+    def visit_Call(self, node):
+        if (
+            isinstance(node.func, ast.Attribute) and
+            isinstance(node.func.value, ast.Name) and
+            node.func.value.id == "asyncio" and
+            node.func.attr == "run"
+        ):
+            self.make_fn_async_recursively(call_graph)
+            return ast.Await(
+                value=node.args[0],
+            )
+```
+
+</div>
+
+---
+layout: section
+---
+
+# Still, it's not perfect...
+
+---
+
+# Conditional binding
 
 ```py
 import time
 import asyncio
 
-wait = time.sleep if cond else asyncio.sleep
+if cond:
+    wait = time.sleep
+else:
+    wait = asyncio.sleep
 
-wait(1)
+wait(1)  # What is this?
 ```
 
 ---
 
-# Import in scope
+# Package overridden
 
-```py
-from asyncio import sleep
+<div grid="~ cols-2" gap-4>
 
-def foo():
-    from time import sleep
+<div>
 
-    sleep(1)
-```
-
----
-
-# Overridden package
+Looks good...
 
 ```py
 import time
@@ -1233,13 +1344,22 @@ import time
 time.sleep(1)
 ```
 
+</div>
+
+<div v-click>
+
 `time.py`
+
 ```py
 import asyncio
 
 async def sleep(delay):
     await asyncio.sleep(delay)
 ```
+
+</div>
+
+</div>
 
 ---
 

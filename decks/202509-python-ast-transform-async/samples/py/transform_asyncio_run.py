@@ -2,9 +2,15 @@ import ast
 
 class AsyncioRunTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
-        return ast.Await(
-            value=node.args[0],
-        )
+        if (
+            isinstance(node.func, ast.Attribute) and
+            isinstance(node.func.value, ast.Name) and
+            node.func.value.id == "asyncio" and
+            node.func.attr == "run"
+        ):
+            return ast.Await(
+                value=node.args[0],
+            )
 
 
 tree = ast.parse("asyncio.run(main())")

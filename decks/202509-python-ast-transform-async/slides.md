@@ -733,7 +733,9 @@ else:
 
 # Case 1: `asyncio.run(coro())` → `await coro()`
 
-<div grid="~ cols-2" gap-4>
+<div :class="$clicks >= 2 ? 'translate-y--16' : ''" duration-100>
+
+<div grid="~ cols-2" gap-4 v-click.hide="2">
 
 ```py
 asyncio.run(coro())
@@ -742,6 +744,10 @@ asyncio.run(coro())
 ```py
 await coro()
 ```
+
+</div>
+
+<div grid="~ cols-2" gap-4>
 
 ``` {*|7-10}{at:1, 'data-id': 'asyncio-run-ast-orig'}
 Call(
@@ -768,9 +774,12 @@ Await(
 
 <FancyArrow
   v-click="1"
+  v-click.hide="2"
   from="[data-id=asyncio-run-ast-orig] .line:nth-child(7) @ right"
   to="[data-id=asyncio-run-ast-fixed] .line:nth-child(2) @ (60%,50%)"
 />
+
+<div v-click="2">
 
 ```py
 def transform_asyncio_run(node):
@@ -778,6 +787,10 @@ def transform_asyncio_run(node):
         value=node.args[0],
     )
 ```
+
+</div>
+
+</div>
 
 ---
 

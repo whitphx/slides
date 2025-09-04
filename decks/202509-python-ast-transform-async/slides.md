@@ -284,9 +284,15 @@ Replace `+` with `*` at runtime
 
 <div>
 
+<div>
+
 `add.py`
 
 <<< @/samples/py/add.py py {*}
+
+</div>
+
+<div v-click="1" mt-2>
 
 ```shell
 ❯ python add.py
@@ -296,11 +302,13 @@ Replace `+` with `*` at runtime
 
 </div>
 
-<div v-click="1">
+</div>
+
+<div v-click="2">
 
 <p>
 <code transition duration-500>
-<template v-if="$clicks<2">
+<template v-if="$clicks<3">
 run_noop.py
 </template>
 <template v-else>
@@ -309,7 +317,9 @@ run_add_as_mul.py
 </code>
 </p>
 
-````md magic-move {at: 2}
+<div overflow-hidden>
+
+````md magic-move {at: 3}
 
 <<< @/samples/py/run_noop.py py
 
@@ -332,7 +342,11 @@ exec(bytecode)
 
 ````
 
-````md magic-move {at: 2}
+</div>
+
+<div mt-2>
+
+````md magic-move {at: 3}
 
 ```shell
 ❯ ./run_noop.py add.py
@@ -347,6 +361,8 @@ exec(bytecode)
 ```
 
 ````
+
+</div>
 
 </div>
 

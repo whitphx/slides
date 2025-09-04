@@ -1147,26 +1147,32 @@ This name `wait` is **resolved** to the one in the **nearest enclosing scope**.
 
 <div grid="~ cols-2" gap-4>
 
+<div>
+
 ```py
 class NameBindingTracker(ast.NodeVisitor):
     def visit(self, node):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             # Push a new code block
         if isinstance(node, (ast.Import, ast.ImportFrom)):
-            # Bind the name. Use `node.names[].alias` if exists.
+            # Bind the name.
+            # Use `node.names[].alias` if exists.
+            # Take care of "from ... import *".
         if isinstance(node, ast.Assign):
             # Bind the name
         if isinstance(node, ast.Delete):
             # Unbind the name
         if isinstance(node, (
-            ast.AugAssign, ast.AnnAssign,
-            ast.For, ast.AsyncFor,
-            ast.NamedExpr,
+            ast.For, ast.AsyncFor, ast.NamedExpr, ast.AugAssign, ast.AnnAssign,
         )):
             # Bind the name
 
         self.generic_visit(node)
 ```
+
+</div>
+
+<div v-click>
 
 ```py
 tracker = NameBindingTracker()
@@ -1177,6 +1183,8 @@ bound_object = (
     tracker.resolve(code_block, name)
 )
 ```
+
+</div>
 
 </div>
 

@@ -522,8 +522,9 @@ Streamlit for Pyodide: Stlite
 
 [`streamlit/streamlit`](https://github.com/streamlit/streamlit)
 
-<img src="/streamlit-logo-primary-colormark-darktext.svg" alt="Streamlit logo">
+<img src="/streamlit-logo-primary-colormark-darktext.svg" alt="Streamlit logo" max-h-30>
 
+- Runs on **Python**
 
 ```py
 import streamlit as st
@@ -541,9 +542,11 @@ st.write("Hello World")
 
 [`whitphx/stlite`](https://github.com/whitphx/stlite)
 
-<img src="/stlite.svg" alt="Stlite logo">
+<img src="/stlite.svg" alt="Stlite logo" max-h-30>
 
-```html
+- Runs on **Pyodide**
+
+```html {*}{maxHeight: '200px'}
 <!doctype html>
 <html>
   <head>
@@ -551,20 +554,21 @@ st.write("Hello World")
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
     />
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"
-    ></script>
   </head>
   <body>
-    <streamlit-app>
-      <app-file name="app.py" entrypoint>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.83.0/build/stlite.js";
+      mount(
+        `
 import streamlit as st
 
 name = st.text_input('Your name')
 st.write("Hello,", name or "world")
-      </app-file>
-    </streamlit-app>
+`,
+        document.getElementById("root"),
+      );
+    </script>
+    <div id="root"></div>
   </body>
 </html>
 ```
@@ -843,7 +847,7 @@ class AsyncioRunTransformer(ast.NodeTransformer):
 
 ---
 
-# Case 2: `time.sleep()` -> `asyncio.sleep()`
+# Case 2: `time.sleep()` → `asyncio.sleep()`
 
 ```
 Call(
@@ -887,7 +891,7 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 
 ---
 
-# Case 4: `st.navigation().run()` -> `await (st.navigation()).run()`
+# Case 3: `st.navigation().run()` -> `await (st.navigation()).run()`
 
 ---
 

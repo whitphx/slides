@@ -505,7 +505,7 @@ https://pyodide.org/en/stable/usage/wasm-constraints.html
 
 <div>
 
-```py
+```py {*|6}{at: 3, 'data-id': 'asyncio-run-orig'}
 import asyncio
 
 async def fn():
@@ -513,6 +513,8 @@ async def fn():
 
 asyncio.run(fn())
 ```
+
+<div v-click>
 
 ```
 Traceback (most recent call last):
@@ -524,8 +526,13 @@ RuntimeError: asyncio.run() cannot be called from a running event loop
 
 </div>
 
+</div>
 
-```py
+<div>
+
+<div v-click>
+
+```py {*|6}{at: 3, 'data-id': 'asyncio-run-await'}
 import asyncio
 
 async def fn():
@@ -535,6 +542,18 @@ await fn()
 ```
 
 </div>
+
+<div v-click="4">
+
+- Top-level `await`
+
+</div>
+
+</div>
+
+</div>
+
+<FancyArrow from="[data-id=asyncio-run-orig] .line:nth-child(6) @ topright" to="[data-id=asyncio-run-await] .line:nth-child(6) @ topleft" arc="0.2" v-click="3" color="blue" />
 
 ---
 

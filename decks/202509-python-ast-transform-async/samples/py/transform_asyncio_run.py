@@ -1,6 +1,6 @@
 import ast
 
-
+#region transformer
 class AsyncioRunTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
         if (
@@ -14,6 +14,7 @@ class AsyncioRunTransformer(ast.NodeTransformer):
             )
 
         return node
+#endregion
 
 tree = ast.parse("asyncio.run(main())")
 

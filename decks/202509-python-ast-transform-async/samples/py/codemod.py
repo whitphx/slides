@@ -16,8 +16,10 @@ class PyodideTransformer(ast.NodeTransformer):
         return node
 
 
+#region patch
 def patch(tree):
     transformer = PyodideTransformer()
     new_tree = transformer.visit(tree)
     new_tree = ast.fix_missing_locations(new_tree)
     return new_tree
+#endregion

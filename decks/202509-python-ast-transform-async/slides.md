@@ -827,21 +827,7 @@ Await(
 
 <div v-click="2">
 
-```py
-class AsyncioRunTransformer(ast.NodeTransformer):
-    def visit_Call(self, node):
-        if (
-            isinstance(node.func, ast.Attribute) and
-            isinstance(node.func.value, ast.Name) and
-            node.func.value.id == "asyncio" and
-            node.func.attr == "run"
-        ):
-            return ast.Await(
-                value=node.args[0],
-            )
-
-        return node
-```
+<<< @/samples/py/transform_asyncio_run.py#transformer
 
 </div>
 
@@ -905,34 +891,15 @@ _insert_import_statement(code_block_ast, ["asyncio"])
 
 `codemod.py`
 
-```py
-def patch(code, script_path):
-    tree = ast.parse(code, script_path, "exec")
-    transformed_tree = transform_tree(tree)
-    return transformed_tree
-```
+<<< @/samples/py/codemod.py#patch py
 
 </div>
 
 <div>
 
 `script_runner.py`
-```py
-with open(script_path) as f:
-    filebody = f.read()
 
-filebody = codemod.patch(filebody, script_path)
-
-bytecode = compile(filebody, script_path,
-    mode="exec",
-    flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT,
-)
-
-if bytecode.co_flags & CO_COROUTINE:
-    await eval(bytecode, module.__dict__)
-else:
-    exec(bytecode, module.__dict__)
-```
+<<< @/samples/py/script_runner.py py
 
 </div>
 

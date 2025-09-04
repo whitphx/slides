@@ -1406,11 +1406,17 @@ https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite
 
 # Summary
 
+<div>
+
 AST-based approach:
 - can achieve what dynamic approaches can't.
   - e.g. syntax-level code modification
 - has limitations.
   - e.g. can't analyze dynamic behavior
 
-I used this approach in the real-world project "Stlite"
+AST-based approach is used in the real-world project "Stlite"
 to run Python code on Pyodide without rewriting the input source code.
+
+It resolves the incompatibility ...to some extent!
+
+</div>

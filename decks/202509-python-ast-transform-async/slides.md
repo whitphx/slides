@@ -98,7 +98,7 @@ Module(
 
 # `ast` module
 
-```py {*}{'data-id': 'ast-module-example'}
+```py {*|1|1-2|1-3|*}{'data-id': 'ast-module-example', at: 1}
 >>> import ast
 >>> tree = ast.parse("x = 1 + 2")
 >>> print(ast.dump(tree, indent=4))
@@ -115,7 +115,7 @@ Module(
 
 <div>
 
-<div v-click>
+<div v-click="2">
 <div data-id="ast-parse-desc" absolute top-10 right-10 w="50%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast.parse(code)` returns an AST object that is of type `ast.Module`.
@@ -124,7 +124,7 @@ Module(
 <FancyArrow from="[data-id=ast-parse-desc] @ left" to="[data-id=ast-module-example] .line:nth-child(2) @ top" arc="-0.2" />
 </div>
 
-<div v-click>
+<div v-click="5">
 <span data-id="ast-module-node-classes" absolute top-50 right-10 w="40%" bg-white dark:bg-black p-4 rounded border="~ gray/50 rounded-lg">
 
 `ast` module has node classes such as `ast.Module`, `ast.Assign`, `ast.Name`, `ast.Constant`, `ast.BinOp`, and `ast.Add`.
@@ -280,6 +280,15 @@ Program is modified<br>without modifying the source code.
 
 # AST transformation in action
 
+<style>
+* {
+  --slidev-code-font-size: 22px;
+}
+:global(.shiki-magic-move-item) {
+  line-height: 1.0;
+}
+</style>
+
 <div flex="~ row" w="100%">
 
 <div grow>
@@ -370,9 +379,15 @@ exec(bytecode)
 
 # `ast.NodeTransformer`
 
+<style>
+* {
+  --slidev-code-font-size: 23px;
+}
+</style>
+
+
 ```py {12-14|1-9|*}{'data-id': 'node-transformer-sample'}
 import ast
-
 
 class AddToMulTransformer(ast.NodeTransformer):
     def visit_BinOp(self, node):
@@ -380,7 +395,6 @@ class AddToMulTransformer(ast.NodeTransformer):
         if isinstance(node.op, ast.Add):
             node.op = ast.Mult()
         return node
-
 
 def transform_tree(tree):
     transformer = AddToMulTransformer()
@@ -393,7 +407,7 @@ def transform_tree(tree):
 `ast.NodeTransformer` walks an AST and modifies its nodes.
 
 </div>
-<FancyArrow from="[data-id=node-transformer-desc] @ bottom" to="[data-id=node-transformer-sample] .line:nth-child(4) @ right" arc="0.2" />
+<FancyArrow from="[data-id=node-transformer-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(3) @ (60%,0)" arc="-0.2" />
 </div>
 
 <div v-click>
@@ -402,7 +416,7 @@ def transform_tree(tree):
 It allows you to modify nodes via `visit_*` callbacks.
 
 </div>
-<FancyArrow from="[data-id=visit-callback-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(5) @ right" arc="-0.2" />
+<FancyArrow from="[data-id=visit-callback-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(4) @ right" arc="-0.2" />
 </div>
 
 <div v-click>
@@ -411,7 +425,7 @@ It allows you to modify nodes via `visit_*` callbacks.
 `.visit()` traverses the AST and applies the transformation.
 
 </div>
-<FancyArrow from="[data-id=transformer-visit-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(14) @ right" arc="0.2" />
+<FancyArrow from="[data-id=transformer-visit-desc] @ left" to="[data-id=node-transformer-sample] .line:nth-child(12) @ (80%,0)" arc="-0.2" />
 </div>
 
 ---
@@ -420,9 +434,7 @@ It allows you to modify nodes via `visit_*` callbacks.
 
 <div>
 
-Side note:
-
-If you just need to analyze the AST without modifying it, you should use `ast.NodeVisitor`.
+Use `ast.NodeVisitor` if you just need to analyze the AST without modifying it.
 
 </div>
 
@@ -444,7 +456,7 @@ layout: section
 ---
 
 <h1>
-Background
+My problem
 
 <div text-4xl>
 Incompatibility between Python and Pyodide
@@ -626,6 +638,8 @@ https://pyodide.org/en/stable/usage/wasm-constraints.html
 
 ## Original
 
+<div :style="{'--slidev-code-font-size': '24px'}">
+
 ```py {*|6}{at: 3, 'data-id': 'asyncio-run-orig'}
 import asyncio
 
@@ -635,7 +649,9 @@ async def fn():
 asyncio.run(fn())
 ```
 
-<div v-click>
+</div>
+
+<div v-click mt-4 :style="{'--slidev-code-font-size': '18px'}">
 
 ```
 Traceback (most recent call last):
@@ -655,6 +671,8 @@ RuntimeError: asyncio.run() cannot be called from a running event loop
 
 ## Fixed
 
+<div :style="{'--slidev-code-font-size': '24px'}">
+
 ```py {*|6}{at: 3, 'data-id': 'asyncio-run-await'}
 import asyncio
 
@@ -663,6 +681,8 @@ async def fn():
 
 await fn()
 ```
+
+</div>
 
 </div>
 
@@ -683,6 +703,12 @@ await fn()
 
 # Case 2: `time.sleep()`
 
+<style>
+* {
+  --slidev-code-font-size: 28px;
+}
+</style>
+
 <div grid="~ cols-2" gap-4>
 
 ```py {*|1|3}{at:1}
@@ -699,7 +725,7 @@ await asyncio.sleep(1)
 
 </div>
 
-<footer text-sm absolute bottom-20>
+<footer text-sm absolute bottom-20 v-click="3">
 Disclaimer:<br>
 Pyodide now supports `time.sleep()` in most cases.
 </footer>
@@ -796,7 +822,6 @@ Await(
 
 <FancyArrow
   v-click="1"
-  v-click.hide="2"
   from="[data-id=asyncio-run-ast-orig] .line:nth-child(7) @ right"
   to="[data-id=asyncio-run-ast-fixed] .line:nth-child(2) @ (60%,50%)"
 />

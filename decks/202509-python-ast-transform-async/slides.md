@@ -1075,12 +1075,13 @@ However, in this case, we need to perform name resolution at the code transforma
 </div>
 
 ---
-
+hide: true
+---
 # Name resolution in Python
 
 <div>
 
-[Python documentation, 4. Execution model (https://docs.python.org/3/reference/executionmodel.html)](https://docs.python.org/3/reference/executionmodel.html)
+See [Python documentation, 4. Execution model (https://docs.python.org/3/reference/executionmodel.html)](https://docs.python.org/3/reference/executionmodel.html) ...
 
 </div>
 
@@ -1092,6 +1093,15 @@ However, in this case, we need to perform name resolution at the code transforma
 > **Each assignment or import statement occurs within a block** defined by a class or function definition or at the module level (the top-level code block). \
 > If a name is bound in a block, it is a local variable of that block, unless declared as nonlocal or global. If a name is bound at the module level, it is a global variable. (The variables of the module code block are local and global.) If a variable is used in a code block but not defined there, it is a free variable. \
 > ...
+
+---
+
+# Name resolution in Python
+
+<div>
+
+See https://docs.python.org/3/reference/executionmodel.html ...
+</div>
 
 ---
 
@@ -1137,7 +1147,7 @@ However, in this case, we need to perform name resolution at the code transforma
 <div v-click="3">
 <div data-id="asyncio-sleep-import-desc">
 
-`asyncio.sleep` is **bound** to a name <br>__`time` in the module code block__,
+`asyncio.sleep` is **bound** to a name <br>__`sleep` in the module code block__,
 
 </div>
 <FancyArrow
@@ -1169,7 +1179,7 @@ then **bound** to a name <br>__`wait` in the module code block__.
 <div v-click="5">
 <div data-id="time-sleep-import-desc">
 
-`time.sleep` is **bound** to a name <br>__`time` in the function code block__,
+`time.sleep` is **bound** to a name <br>__`sleep` in the function code block__,
 
 </div>
 <FancyArrow

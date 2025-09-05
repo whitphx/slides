@@ -886,11 +886,7 @@ Await(
 
 <div>
 
-`codemod.py`
-
 <<< @/samples/py/codemod.py#patch py
-
-`script_runner.py`
 
 <<< @/samples/py/script_runner.py#run_script py
 
@@ -960,7 +956,7 @@ layout: statement
 
 ---
 
-# `import` and `from import`
+# `from import`
 
 <style>
 * {
@@ -969,12 +965,6 @@ layout: statement
 </style>
 
 <div flex="~ col" gap-4 mt-8>
-
-```py
-import time
-
-time.sleep(1)
-```
 
 ```py
 from time import sleep
@@ -1023,9 +1013,9 @@ wait(1)
 <div flex="~ col" gap-4 mt-8>
 
 ```py
-from time import sleep
+import time
 
-wait = sleep
+wait = time.sleep
 
 wait(1)
 ```

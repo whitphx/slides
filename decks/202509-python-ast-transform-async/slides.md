@@ -933,9 +933,30 @@ that makes the top-level `await` in Python work.
 </div>
 
 ---
-layout: fact
+layout: intro
 ---
-# It works!
+
+<h1 text-4xl text-center>
+It works!
+</h1>
+
+<style>
+* {
+  --slidev-code-font-size: 24px;
+}
+</style>
+
+```js
+await runScript(`
+import asyncio
+
+async def coro():
+    print("Hello World")
+    return 42
+
+asyncio.run(coro())
+`);
+```
 
 ---
 layout: statement
@@ -955,6 +976,14 @@ More cases to consider:
 
 # `import` and `from import`
 
+<style>
+* {
+  --slidev-code-font-size: 32px;
+}
+</style>
+
+<div flex="~ col" gap-4 mt-8>
+
 ```py
 import time
 
@@ -967,9 +996,19 @@ from time import sleep
 sleep(1)
 ```
 
+</div>
+
 ---
 
 # Aliased import
+
+<style>
+* {
+  --slidev-code-font-size: 32px;
+}
+</style>
+
+<div flex="~ col" gap-4 mt-8>
 
 ```py
 import time as t
@@ -983,9 +1022,19 @@ from time import sleep as wait
 wait(1)
 ```
 
+</div>
+
 ---
 
 # Assignment
+
+<style>
+* {
+  --slidev-code-font-size: 32px;
+}
+</style>
+
+<div flex="~ col" gap-4 mt-8>
 
 ```py
 from time import sleep
@@ -994,6 +1043,8 @@ wait = sleep
 
 wait(1)
 ```
+
+</div>
 
 ---
 layout: section
@@ -1005,14 +1056,14 @@ layout: section
 
 # Name resolution
 
-<div>
+<div flex="~ col" gap-6 text-4xl>
 
+<div>
 To solve such problems,
 we need to know what each occurrence of a name refers to.
+</div>
 
 e.g. What is this `sleep`? Is it `time.sleep` or `asyncio.sleep`?
-
-</div>
 
 <div v-click>
 It's done by Python at runtime.
@@ -1020,6 +1071,8 @@ It's done by Python at runtime.
 
 <div v-click>
 However, in this case, we need to perform name resolution at the code transformation stage.
+</div>
+
 </div>
 
 ---

@@ -16,9 +16,9 @@ await runScript(`
 import asyncio
 
 async def coro():
+    print("Hello World")
     return 42
 
-print("Hello World")
 asyncio.run(coro())
 `);
 //#endregion

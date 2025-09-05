@@ -32,12 +32,19 @@ class PyodideTransformer(ast.NodeTransformer):
 
         return node
 
+    def visit_Module(self, node):
+        self.generic_visit(node)
+        node.body.insert(
+            0,
+            ast.Import(names=[ast.alias(name="asyncio", asname=None)])
+        )
+        return node
+
 
 #region patch
 def patch(tree):
     transformer = PyodideTransformer()
     new_tree = transformer.visit(tree)
-    tree.body.insert(0, ast.Import(names=[ast.alias(name="asyncio", asname=None)]))
     new_tree = ast.fix_missing_locations(new_tree)
     return new_tree
 #endregion

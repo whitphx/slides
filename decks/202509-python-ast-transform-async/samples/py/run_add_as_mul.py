@@ -16,12 +16,12 @@ class AddToMulTransformer(ast.NodeTransformer):
         return node
 
 
-def transform_tree(tree):
+def add_as_mul(tree):
     transformer = AddToMulTransformer()
     return transformer.visit(tree)
 
 
-transformed_tree = transform_tree(tree)
+transformed_tree = add_as_mul(tree)
 
 bytecode = compile(transformed_tree, filename="<ast>", mode="exec")
 

@@ -1269,6 +1269,12 @@ layout: section
 
 # Chain reaction
 
+<style>
+* {
+  --slidev-code-font-size: 24px;
+}
+</style>
+
 <div grid="~ cols-2" gap-4>
 
 <div>
@@ -1387,6 +1393,12 @@ layout: section
 
 # Conditional binding
 
+<style>
+* {
+  --slidev-code-font-size: 24px;
+}
+</style>
+
 ```py
 import time
 import asyncio
@@ -1402,6 +1414,12 @@ wait(1)  # What is this?
 ---
 
 # Package overridden
+
+<style>
+* {
+  --slidev-code-font-size: 24px;
+}
+</style>
 
 <div grid="~ cols-2" gap-4>
 
@@ -1436,9 +1454,10 @@ async def sleep(delay):
 
 # To what extent can we do?
 
-<v-clicks>
+<v-clicks text-3xl>
 
-- AST analysis/transformation can't cover 100% cases.
+- AST analysis/transformation can't cover 100% cases... \
+  in practice.
 - Dynamic behavior is hard to analyze.
 - We need to determine the lines we want to support.
 
@@ -1471,14 +1490,22 @@ https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite
 <div>
 
 AST-based approach:
+
+<v-clicks>
+
 - can achieve what dynamic approaches can't.
   - e.g. syntax-level code modification
 - has limitations.
   - e.g. can't analyze dynamic behavior
+
+</v-clicks>
+
+<v-clicks>
 
 AST-based approach is used in the real-world project "Stlite"
 to run Python code on Pyodide without rewriting the input source code.
 
 It resolves the incompatibility ...to some extent!
 
+</v-clicks>
 </div>

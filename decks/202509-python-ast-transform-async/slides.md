@@ -292,17 +292,7 @@ Program is modified<br>without modifying the source code.
 
 <div v-click="2" w="60%" ml-4>
 
-<p>
-Custom Python runner:
-<code transition duration-500>
-<template v-if="$clicks<=3">
-run_noop.py
-</template>
-<template v-else>
-run_add_as_mul.py
-</template>
-</code>
-</p>
+Custom Python runner: `run_python.py`
 
 <div overflow-hidden>
 
@@ -336,12 +326,12 @@ exec(bytecode)
 ````md magic-move {at: 4, 'data-id': 'ast-mod-runner-sample'}
 
 ```shell
-❯ ./run_noop.py add.py
+❯ ./run_python.py add.py
 9
 ```
 
 ```shell
-❯ ./run_add_as_mul.py add.py
+❯ ./run_python.py add.py
 24
 ```
 
@@ -375,7 +365,7 @@ Program is modified<br>without modifying<br>the source code.
 </style>
 
 
-```py {10-12|1-9|*}{'data-id': 'node-transformer-sample'}
+```py {*|1-9|10-12|*}{'data-id': 'node-transformer-sample'}
 import ast
 
 class AddToMulTransformer(ast.NodeTransformer):
@@ -426,6 +416,14 @@ It allows you to modify nodes via `visit_*` callbacks.
 Use `ast.NodeVisitor` if you just need to analyze the AST without modifying it.
 
 </div>
+
+<style>
+* {
+  --slidev-code-font-size: 24px;
+}
+</style>
+
+<<< @/samples/py/visitor_demo.py#visitor py
 
 ---
 

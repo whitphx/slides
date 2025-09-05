@@ -980,20 +980,7 @@ layout: statement
 
 # The target names are hard-coded
 
-<<< @/samples/py/transform_time_sleep.py#transformer py {'data-id': 'hard'}
-
-<FancyArrow
-  from="h1 @ (80%,100%)"
-  to=""
-/>
-
----
-layout: section
----
-
-<h1>
-More cases to consider:
-</h1>
+<<< @/samples/py/transform_time_sleep.py#transformer py {*|3-8}
 
 ---
 
@@ -1068,6 +1055,29 @@ wait(1)
 ```
 
 </div>
+
+---
+
+# `import` is inserted at the top-level only
+
+<<< @/samples/py/transform_time_sleep.py#transformer py {*|23-29}{'max-height': '460px'}
+
+---
+
+# `import` inside a function
+
+<style>
+* {
+  --slidev-code-font-size: 32px;
+}
+</style>
+
+```py
+def foo():
+    from time import sleep
+
+    sleep(1)
+```
 
 ---
 layout: section

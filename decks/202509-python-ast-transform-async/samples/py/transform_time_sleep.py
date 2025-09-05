@@ -22,6 +22,14 @@ class TimeSleepTransformer(ast.NodeTransformer):
             )
 
         return node
+
+    def visit_Module(self, node):
+        self.generic_visit(node)
+        node.body.insert(
+            0,
+            ast.Import(names=[ast.alias(name="asyncio", asname=None)])
+        )
+        return node
 #endregion
 
 tree = ast.parse("""
@@ -29,12 +37,9 @@ import time
 time.sleep(1)
 """)
 
-#region apply
 transformer = TimeSleepTransformer()
 new_tree = transformer.visit(tree)
-new_tree.body.insert(0, ast.Import(names=[ast.alias(name="asyncio", asname=None)]))
 #endregion
-
 assert ast.dump(new_tree) == ast.dump(ast.parse("""
 import asyncio
 import time

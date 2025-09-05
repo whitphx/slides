@@ -332,7 +332,7 @@ run_add_as_mul.py
 
 <<< @/samples/py/run_noop.py py
 
-```py {*|10}
+```py {*|8-14|8|10|12|14|*|10}
 #!/usr/bin/env python3
 import sys
 import ast
@@ -342,9 +342,9 @@ with open(sys.argv[1]) as f:
 
 tree = ast.parse(code)
 
-transformed_tree = transform_tree(tree)
+new_tree = transform_tree(tree)
 
-bytecode = compile(transformed_tree, filename="<ast>", mode="exec")
+bytecode = compile(new_tree, filename="<ast>", mode="exec")
 
 exec(bytecode)
 ```
@@ -355,7 +355,7 @@ exec(bytecode)
 
 <div mt-2 v-click="3">
 
-````md magic-move {at: 4}
+````md magic-move {at: 4, 'data-id': 'ast-mod-runner-sample'}
 
 ```shell
 ❯ ./run_noop.py add.py
@@ -375,6 +375,17 @@ exec(bytecode)
 
 </div>
 
+<div v-click="10">
+<div data-id="ast-mod-runner-desc" absolute left-20 bottom-10>
+Program is modified<br>without modifying<br>the source code.
+</div>
+<FancyArrow
+  from="[data-id=ast-mod-runner-desc] @ right"
+  to="[data-id=ast-mod-runner-sample] @ (0%,70%)"
+  arc="-0.2"
+/>
+</div>
+
 ---
 
 # `ast.NodeTransformer`
@@ -386,7 +397,7 @@ exec(bytecode)
 </style>
 
 
-```py {12-14|1-9|*}{'data-id': 'node-transformer-sample'}
+```py {10-12|1-9|*}{'data-id': 'node-transformer-sample'}
 import ast
 
 class AddToMulTransformer(ast.NodeTransformer):
@@ -446,8 +457,10 @@ Use `ast.NodeVisitor` if you just need to analyze the AST without modifying it.
 
 - Code analysis
   - Linter
+  - `ast.NodeVisitor`
 - Meta programming!
   - Don't shoot yourself in the foot.
+  - `ast.NodeTransformer`
 
 </v-clicks>
 
@@ -711,13 +724,13 @@ await fn()
 
 <div grid="~ cols-2" gap-4>
 
-```py {*|1|3}{at:1}
+```py
 import time
 
 time.sleep(1)
 ```
 
-```py {*|1|3}{at:1}
+```py
 import asyncio
 
 await asyncio.sleep(1)
@@ -725,18 +738,24 @@ await asyncio.sleep(1)
 
 </div>
 
-<footer text-sm absolute bottom-20 v-click="3">
+<footer text-sm absolute bottom-20 v-click>
+
 Disclaimer:<br>
 Pyodide now supports `time.sleep()` in most cases.
+
 </footer>
 
 ---
 
 # Motivation
 
+<div text-4xl>
+
 - We don't want to rewrite the code.
-- Once you write Python code for Streamlit (Python),<br>
-  it should work on Stlite (Pyodide).
+- Once you write code for Python,<br>
+  it should work on Pyodide.
+
+</div>
 
 ---
 layout: section
@@ -881,14 +900,7 @@ Await(
 
 # Case 2: `time.sleep()` → `asyncio.sleep()`
 
-<<< @/samples/py/transform_time_sleep.py#transformer py {*}{'max-height': '300px'}
-
-
-<div mt-4>
-
-<<< @/samples/py/transform_time_sleep.py#apply py
-
-</div>
+<<< @/samples/py/transform_time_sleep.py#transformer py {*|2|3-8|9-19|21|23-29}{'max-height': '460px'}
 
 ---
 
@@ -963,6 +975,17 @@ layout: statement
 ---
 
 # Is that all...?
+
+---
+
+# The target names are hard-coded
+
+<<< @/samples/py/transform_time_sleep.py#transformer py {'data-id': 'hard'}
+
+<FancyArrow
+  from="h1 @ (80%,100%)"
+  to=""
+/>
 
 ---
 layout: section

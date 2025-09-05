@@ -600,18 +600,20 @@ st.write("Hello,", name or "world")
 # The problem: interoperability
 
 <div>
+<v-clicks>
 
 Pyodide executes Python code in WebAssembly, which has a different nature.
 
 - Single-threaded
 - Browser's event loop
 
--> Some Python features do not work as expected.
+→ Some Python features do not work as expected.
 
 https://pyodide.org/en/stable/usage/wasm-constraints.html
 
--> We will focus on async-related features.
+→ We will focus on async-related features.
 
+</v-clicks>
 </div>
 
 ---

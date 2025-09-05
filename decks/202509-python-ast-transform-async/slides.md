@@ -618,7 +618,7 @@ https://pyodide.org/en/stable/usage/wasm-constraints.html
 
 ---
 
-# Example 1: `asyncio.run()`
+# Case 1: `asyncio.run()`
 
 <div grid="~ cols-2" gap-4>
 
@@ -681,19 +681,15 @@ await fn()
 
 ---
 
-# Example 2: `time.sleep()`
+# Case 2: `time.sleep()`
 
 <div grid="~ cols-2" gap-4>
-
-<div>
 
 ```py {*|1|3}{at:1}
 import time
 
 time.sleep(1)
 ```
-
-</div>
 
 ```py {*|1|3}{at:1}
 import asyncio
@@ -820,6 +816,18 @@ Await(
 # Case 2: `time.sleep()` → `asyncio.sleep()`
 
 <div grid="~ cols-2" gap-4>
+
+```py
+import time
+
+time.sleep(1)
+```
+
+```py
+import asyncio
+
+await asyncio.sleep(1)
+```
 
 ```
 Call(

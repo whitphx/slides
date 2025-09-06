@@ -1030,7 +1030,7 @@ wait(1)
 
 # `import` is inserted at the top-level only
 
-<<< @/samples/py/transform_time_sleep.py#transformer py {*|23-29}{'max-height': '460px'}
+<<< @/samples/py/transform_time_sleep.py#transformer py {*|23-29}{'max-height': '450px'}
 
 ---
 

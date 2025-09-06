@@ -469,8 +469,6 @@ https://pyodide.org/
 
 </div>
 
-> Pyodide is a Python distribution for the browser and Node.js based on WebAssembly.
-
 ---
 
 # How Python code is run on Pyodide
@@ -499,6 +497,8 @@ Python in JavaScript
 <div absolute right-10 top-90 text-4xl data-id="desc3" v-click="3">Pass the Python code as a string literal</div>
 <FancyArrow from="[data-id=desc3] @ topleft" to="[data-id=pyodide-example-js] .line:nth-child(6) @ right" arc="-0.1" v-click="3" />
 
+---
+hide: true
 ---
 
 # Python in JavaScript = Python on browsers/NodeJS
@@ -880,7 +880,7 @@ Await(
 
 # Case 2: `time.sleep()` → `asyncio.sleep()`
 
-<<< @/samples/py/transform_time_sleep.py#transformer py {*|2|3-8|9-19|21|23-29}{'max-height': '460px'}
+<<< @/samples/py/transform_time_sleep.py#transformer py {*|2|3-8|9-19|21|23-29}{'max-height': '450px'}
 
 ---
 

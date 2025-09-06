@@ -314,7 +314,7 @@ with open(sys.argv[1]) as f:
 
 tree = ast.parse(code)
 
-new_tree = add_as_mul(tree)
+new_tree = add_to_mul(tree)
 
 bytecode = compile(new_tree, filename="<ast>", mode="exec")
 
@@ -379,7 +379,7 @@ class AddToMulTransformer(ast.NodeTransformer):
             node.op = ast.Mult()
         return node
 
-def add_as_mul(tree):
+def add_to_mul(tree):
     transformer = AddToMulTransformer()
     return transformer.visit(tree)
 ```

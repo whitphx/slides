@@ -52,9 +52,11 @@ layout: section
 x = 1 + 2
 ```
 
-<div grid="~ cols-2" gap-4 grow v-click="2">
+<div grid="~ cols-2" gap-4 grow>
 
-``` {*|1-2|3-9|4-5|6-9|6-9|*}{at: 3}
+<div v-click="2">
+
+``` {*|*|1-2|3-9|4-5|6-9|6-9|*}{at: 3}
 Module(
     body=[
         Assign(
@@ -66,7 +68,9 @@ Module(
                 right=Constant(value=2)))])
 ```
 
-<SlidevAnipres id="ast-sample-add-assignment" at="2" />
+</div>
+
+<SlidevAnipres id="ast-sample-add-assignment" at="3" v-click="3" />
 
 </div>
 

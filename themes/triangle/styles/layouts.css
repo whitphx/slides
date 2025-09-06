@@ -1,5 +1,6 @@
 :root {
   --slidev-theme-primary: #5d8392;
+  --slidev-code-font-size: 18px;
 }
 
 .slidev-layout {
@@ -55,6 +56,10 @@
 
   li {
     list-style-type: circle;
+  }
+
+  a:has(img:only-child) {
+    border-style: none;
   }
 }
 

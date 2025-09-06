@@ -958,6 +958,12 @@ layout: statement
 
 <<< @/samples/py/transform_time_sleep.py#transformer py {*|3-8}
 
+<div absolute top-60 right-20 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg" v-click>
+
+Matches `time.sleep` only
+
+</div>
+
 ---
 
 # `from import`
@@ -975,6 +981,12 @@ from time import sleep
 
 sleep(1)
 ```
+
+</div>
+
+<div absolute top-50 left-80 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg" v-click>
+
+It's not `time.sleep`
 
 </div>
 
@@ -1004,6 +1016,18 @@ wait(1)
 
 </div>
 
+<div absolute top-50 left-80 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg" v-click>
+
+It's not `time.sleep`
+
+</div>
+
+<div absolute top-96 left-70 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg" v-click>
+
+It's not `time.sleep`
+
+</div>
+
 ---
 
 # Assignment
@@ -1023,6 +1047,12 @@ wait = time.sleep
 
 wait(1)
 ```
+
+</div>
+
+<div absolute top-74 left-80 bg-white dark:bg-black p-4 rounded border="~ gray rounded-lg" v-click>
+
+It's not `time.sleep`
 
 </div>
 

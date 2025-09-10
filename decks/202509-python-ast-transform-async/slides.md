@@ -34,6 +34,17 @@ Yuichiro Tachibana<br>
 </div>
 
 ---
+
+# Outline
+
+<div text-4xl>
+
+1. AST basics
+2. My case of using AST
+
+</div>
+
+---
 layout: section
 ---
 

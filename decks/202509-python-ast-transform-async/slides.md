@@ -12,6 +12,7 @@ transition: fade-out
 addons:
   - anipres
   - fancy-arrow
+  - window-mockup
 ---
 
 <h1 text-6xl leading-18>
@@ -538,7 +539,7 @@ Streamlit for Pyodide: Stlite
 
 [`streamlit/streamlit`](https://github.com/streamlit/streamlit)
 
-<img src="/streamlit-logo-primary-colormark-darktext.svg" alt="Streamlit logo" max-h-30>
+<img src="/streamlit-logo-primary-colormark-darktext.svg" alt="Streamlit logo" max-h-10>
 
 - Runs on **Python**
 
@@ -548,9 +549,11 @@ import streamlit as st
 st.write("Hello World")
 ```
 
-```shell
+<div mt-4>
+```shell window
 ❯ streamlit run app.py
 ```
+</div>
 
 </div>
 
@@ -558,7 +561,7 @@ st.write("Hello World")
 
 [`whitphx/stlite`](https://github.com/whitphx/stlite)
 
-<img src="/stlite.svg" alt="Stlite logo" max-h-30>
+<img src="/stlite.svg" alt="Stlite logo" max-h-10>
 
 - Runs on **Pyodide**
 

@@ -28,14 +28,12 @@ OSS, community, and reward
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
 
-<div class="portfolio" w-130 mt-6>
+<div class="portfolio" w-130 mt-6 v-click="1">
 
 - <span class="heading">Created</span>: <span class="item"><img src="/public/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/public/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/public/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
 - <span class="heading">Contributed to</span>: <span class="item"><img src="/public/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/public/portfolio/gradio.svg">Gradio</span>
-- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item" v-mark.red="+1">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>
+- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item" v-mark.highlight.orange="2">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>
 - <span class="heading">Job</span>: <span class="item">ML Developer Advocate at Hugging Face 🤗</span>
-
-</div>
 
 <div absolute top-48 right-0>
 <a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
@@ -43,7 +41,9 @@ Software Artisan / Indie Dev / OSS Enthusiast
 </a>
 </div>
 
-<div mt-10 w-min flex="~ gap-1" items-center justify-center>
+</div>
+
+<div mt-10 w-min flex="~ gap-1" items-center justify-center v-click="3">
   <div i-ri-user-3-line op50 ma text-2xl />
   <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
   <div i-ri-github-line op50 ma text-2xl ml4/>

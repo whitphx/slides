@@ -30,14 +30,14 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <div class="portfolio" w-130 mt-6 v-click="1">
 
-- <span class="heading">Created</span>: <span class="item"><img src="/public/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/public/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/public/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
-- <span class="heading">Contributed to</span>: <span class="item"><img src="/public/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/public/portfolio/gradio.svg">Gradio</span>
+- <span class="heading">Created</span>: <span class="item"><img src="/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
+- <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
 - <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item" v-mark.highlight.orange="2">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>
 - <span class="heading">Job</span>: <span class="item">ML Developer Advocate at Hugging Face 🤗</span>
 
 <div absolute top-48 right-0>
 <a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
-<img src="/public/github_whitphx.png" alt="GitHub @whitphx" w="400px">
+<img src="/github_whitphx.png" alt="GitHub @whitphx" w="400px">
 </a>
 </div>
 
@@ -118,7 +118,7 @@ that anyone can inspect, modify, and enhance.
 
 <div grid="~ cols-2" gap-6 h-120>
 <div max-h-full min-h-full>
-<img src="/public/the_world_is_built_on_oss.png" >
+<img src="/the_world_is_built_on_oss.png" >
 </div>
 
 <div max-h-full min-h-full v-click>
@@ -190,7 +190,7 @@ layout: section
 
 <div v-click mt-4 relative>
 <a href="https://github.com/whitphx/fuel-kana/blob/master/classes/kana.php" target="_blank" rel="noopener noreferrer">
-<img src="/public/github_fuel-kana.png" alt="Screenshot of GitHub repository fuel-kana" w="95%" mx-auto>
+<img src="/github_fuel-kana.png" alt="Screenshot of GitHub repository fuel-kana" w="95%" mx-auto>
 </a>
 </div>
 
@@ -207,7 +207,7 @@ layout: section
 
 <div v-click mt-4 relative>
 <a href="https://github.com/whitphx/lear-gist-python/tree/master" target="_blank" rel="noopener noreferrer">
-<img src="/public/github_lear-gist-python.png" alt="Screenshot of GitHub repository lear-gist-python" w="95%" mx-auto>
+<img src="/github_lear-gist-python.png" alt="Screenshot of GitHub repository lear-gist-python" w="95%" mx-auto>
 </a>
 </div>
 
@@ -228,7 +228,7 @@ no matter how small it is 👍
 
 Fix translation (en: "origin", ja: "元" -> "オリジン")
 
-[![](/public/github_mdn_translated-content_0.png)](https://github.com/mdn/translated-content/pull/16463)
+[![](/github_mdn_translated-content_0.png)](https://github.com/mdn/translated-content/pull/16463)
 
 </div>
 
@@ -240,7 +240,7 @@ Fix translation (en: "origin", ja: "元" -> "オリジン")
 
 Fix invalid syntax.
 
-[![](/public/github_mdn_translated-content_1.png)](https://github.com/mdn/translated-content/pull/15801)
+[![](/github_mdn_translated-content_1.png)](https://github.com/mdn/translated-content/pull/15801)
 
 </div>
 
@@ -252,7 +252,7 @@ Fix invalid syntax.
 
 `+2` → `+1`
 
-[![](/public/github_keras-team_keras-docs-ja.png)](https://github.com/keras-team/keras-docs-ja/pull/79/files)
+[![](/github_keras-team_keras-docs-ja.png)](https://github.com/keras-team/keras-docs-ja/pull/79/files)
 
 </div>
 
@@ -264,7 +264,7 @@ Fix invalid syntax.
 
 Removed `to`.
 
-[![](/public/github_facelessuser_pymdown-extensions.png)](https://github.com/facelessuser/pymdown-extensions/pull/2762/files)
+[![](/github_facelessuser_pymdown-extensions.png)](https://github.com/facelessuser/pymdown-extensions/pull/2762/files)
 
 </div>
 
@@ -284,7 +284,7 @@ I found it in Shinkansen heading to PyCon JP 2025 when I was developing a docs p
 
 https://github.com/docker/compose/issues/6508
 
-![My bug report to `docker/compose`](/public/docker_compose_issue_6508.png)
+![My bug report to `docker/compose`](/docker_compose_issue_6508.png)
 
 </div>
 
@@ -292,7 +292,7 @@ https://github.com/docker/compose/issues/6508
 
 https://github.com/docker/compose/pull/6509
 
-![My fix PR to `docker/compose`](/public/github_docker_compose_pr_6509.png)
+![My fix PR to `docker/compose`](/github_docker_compose_pr_6509.png)
 
 </div>
 
@@ -356,11 +356,11 @@ Streamlit-WebRTC: `whitphx/streamlit-webrtc`
 <div grid="~ cols-2" gap-4>
 
 <a href="https://github.com/streamlit/streamlit/issues?q=is:issue%20author:whitphx">
-<img src="/public/streamlit_issues.png" alt="">
+<img src="/streamlit_issues.png" alt="">
 </a>
 
 <a href="https://github.com/streamlit/streamlit/pulls?q=is:pr+author:whitphx+">
-<img src="/public/streamlit_prs.png" alt="">
+<img src="/streamlit_prs.png" alt="">
 </a>
 
 </div>
@@ -381,7 +381,7 @@ It's just an extension of your daily work.
 ...but there are some unique technical and social aspects 😉
 
 <a href="https://luma.com/4n9wk979" target="_blank" rel="noopener noreferrer" block mt-8  w="70%" mx-auto>
-<img src="/public/oss101.png" alt="">
+<img src="/oss101.png" alt="">
 </a>
 
 </div>
@@ -400,13 +400,13 @@ Awesome Emacs Keymap: [`whitphx/vscode-emacs-mcx`](https://github.com/whitphx/vs
 
 <div v-click>
 
-[![](/public/awesome-emacs-keymap.png)](https://marketplace.visualstudio.com/items?itemName=tuttieee.emacs-mcx)
+[![](/awesome-emacs-keymap.png)](https://marketplace.visualstudio.com/items?itemName=tuttieee.emacs-mcx)
 
 </div>
 
 ---
 
-<img src="/public/sebastian_solve_a_problem.png" w="85%" mx-auto>
+<img src="/sebastian_solve_a_problem.png" w="85%" mx-auto>
 
 [Keynote: Behind the scenes of FastAPI and friends for developers and builders — Sebastián Ramírez, EuroPython 2025](https://www.youtube.com/watch?v=mwvmfl8nN_U)
 
@@ -422,7 +422,7 @@ Stlite: [`whitphx/stlite`](https://github.com/whitphx/stlite)
 
 </div>
 
-<img src="/public/stlite.svg" alt="Stlite logo" h-50 mx-auto my-8>
+<img src="/stlite.svg" alt="Stlite logo" h-50 mx-auto my-8>
 
 ---
 
@@ -440,7 +440,7 @@ in PyCon US and EuroPython sprints.
 
 <div>
 <a href="https://github.com/python/cpython/pull/134275">
-<img src="/public/github_cpython_sprint.png" alt="CPython sprint" w-200>
+<img src="/github_cpython_sprint.png" alt="CPython sprint" w-200>
 </a>
 </div>
 
@@ -509,14 +509,14 @@ Events are visible expression of a community.
 - and more...
 
 <div grid="~ cols-2 rows-2" absolute right-0 top-0 w="50%">
-<img src="/public/community/pycontw_talk.jpg" >
-<img src="/public/community/pycontw_photobooth.jpg" >
-<img src="/public/community/europython_speaker_dinner.jpg" >
-<img src="/public/community/europython_sprint.jpg" >
-<img src="/public/community/feday.jpeg" >
-<img src="/public/community/snowflake_streamlit.jpeg" >
-<img src="/public/community/snowflake_party.jpg" >
-<img src="/public/community/pyconjp_sebastian.jpg" >
+<img src="/community/pycontw_talk.jpg" >
+<img src="/community/pycontw_photobooth.jpg" >
+<img src="/community/europython_speaker_dinner.jpg" >
+<img src="/community/europython_sprint.jpg" >
+<img src="/community/feday.jpeg" >
+<img src="/community/snowflake_streamlit.jpeg" >
+<img src="/community/snowflake_party.jpg" >
+<img src="/community/pyconjp_sebastian.jpg" >
 </div>
 
 </div>

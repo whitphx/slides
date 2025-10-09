@@ -111,6 +111,7 @@ that anyone can inspect, modify, and enhance.
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-29 translate-y-33'" v-after >community</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-165 translate-y-15'" v-after >career</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-96 translate-y-27'" v-after >contributions</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-62 translate-y-31'" v-click >democratic</span>
 </div>
 
 ---

@@ -103,15 +103,15 @@ that anyone can inspect, modify, and enhance.
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-135 translate-y-22'" v-after >copyleft</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-44 translate-y-12'" v-after >standards</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-154 translate-y-34'" v-after >transparency</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-67 translate-y-18'" v-after >collaboration</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-67 translate-y-18'" v-after v-mark.orange="5">collaboration</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-112 translate-y-8'" v-after >sharing</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-18 translate-y-24'" v-after >freedom</span>
 <span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-97 translate-y-39'" v-after >innovation</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-30 translate-y-3'" v-after >learning</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-29 translate-y-33'" v-after >community</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-165 translate-y-15'" v-after >career</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-96 translate-y-27'" v-after >contributions</span>
-<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-62 translate-y-31'" v-click >democratic</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-30 translate-y-3'" v-after v-mark.orange="5">learning</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-29 translate-y-33'" v-after v-mark.orange="4">community</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-165 translate-y-15'" v-after v-mark.orange="5">career</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-96 translate-y-27'" v-after v-mark.orange="4">contributions</span>
+<span inline-block absolute left-0 top-0 transition duration-500 :class="$clicks<=2 ? 'opacity-0' : 'translate-x-62 translate-y-31'" v-after >democratic</span>
 </div>
 
 ---
@@ -206,7 +206,7 @@ layout: section
 </v-clicks>
 
 <div v-click mt-4 relative>
-<a href="https://github.com/whitphx/lear-gist-python/blob/master/gist.py" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/whitphx/lear-gist-python/tree/master" target="_blank" rel="noopener noreferrer">
 <img src="/public/github_lear-gist-python.png" alt="Screenshot of GitHub repository lear-gist-python" w="95%" mx-auto>
 </a>
 </div>
@@ -222,7 +222,7 @@ no matter how small it is 👍
 
 ---
 
-# Small fixes in [`mdn/translated-content`](github.com/mdn/translated-content/pulls?q=is:pr+author:whitphx)
+# Small fixes in [`mdn/translated-content`](https://github.com/mdn/translated-content/pulls?q=is:pr+author:whitphx)
 
 <div>
 
@@ -347,12 +347,34 @@ Streamlit-WebRTC: `whitphx/streamlit-webrtc`
 
 ---
 
+# When you find bugs or feature requests
+
+<div>
+
+`streamlit/streamlit`
+
+<div grid="~ cols-2" gap-4>
+
+<a href="https://github.com/streamlit/streamlit/issues?q=is:issue%20author:whitphx">
+<img src="/public/streamlit_issues.png" alt="">
+</a>
+
+<a href="https://github.com/streamlit/streamlit/pulls?q=is:pr+author:whitphx+">
+<img src="/public/streamlit_prs.png" alt="">
+</a>
+
+</div>
+
+</div>
+
+---
+
 # OSS contribution is not special
 
 It's just an extension of your daily work.
 
 - You write code and docs to solve your problems.
-- You share it on GitHub or other platforms.
+- You share it on GitHub for collaboration with others.
 
 <div v-click>
 
@@ -404,33 +426,11 @@ Stlite: [`whitphx/stlite`](https://github.com/whitphx/stlite)
 
 ---
 
-# When you find bugs or feature requests
-
-<div>
-
-`streamlit/streamlit`
-
-<div grid="~ cols-2" gap-4>
-
-<a href="https://github.com/streamlit/streamlit/issues?q=is:issue%20author:whitphx">
-<img src="/public/streamlit_issues.png" alt="">
-</a>
-
-<a href="https://github.com/streamlit/streamlit/pulls?q=is:pr+author:whitphx+">
-<img src="/public/streamlit_prs.png" alt="">
-</a>
-
-</div>
-
-</div>
-
----
-
 # Contribution itself can be the purpose
 
 <div>
 
-`python/cpython`
+[`python/cpython`](https://github.com/python/cpython)
 
 in PyCon US and EuroPython sprints.
 
@@ -504,7 +504,7 @@ Events are visible expression of a community.
 
 - Python community
 - Streamlit Creators channel
-- Snowflame community
+- Snowflake community
 - Hugging Face community
 - and more...
 
@@ -580,8 +580,8 @@ layout: statement
 
 - 🖋️ My everyday tool for productivity
 - ❤️ Positive feedback and stars from users
-- 👛 Tips from users
-- ⚒️ Contribution opportunities in VS Code
+- 👛 [Tips from users](https://buymeacoffee.com/whitphx)
+- ⚒️ Contribution opportunities to VS Code
 
 </v-clicks>
 
@@ -638,7 +638,7 @@ layout: statement
 
 - OSS developed, maintained, tested, and used by many people \
   **is better than** code only owned by you.
-- Secret code doesn't have to be the core of your business... in many cases.
+- General procedures don't have to be the core of your business... in many cases.
 - If you don't make it open, others may make it open in near future.
 
 </v-clicks>

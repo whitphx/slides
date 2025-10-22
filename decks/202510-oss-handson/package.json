@@ -1,0 +1,13 @@
+{
+  "name": "202510-oss-handson",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.2.4"
+  }
+}

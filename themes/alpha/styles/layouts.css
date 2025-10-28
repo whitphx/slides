@@ -54,7 +54,7 @@
     @apply font-600;
   }
 
-  li {
+  ul li {
     list-style-type: circle;
   }
 

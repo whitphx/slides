@@ -11,6 +11,7 @@ defaults:
 transition: fade-out
 addons:
   - anipres
+  - "@katzumi/slidev-addon-qrcode"
 ---
 
 <h1>
@@ -85,26 +86,63 @@ layout: section
 
 ---
 
-# Set up for hands-on
+# Preparation for hands-on
 
-- The target repository: TODO
+Set up https://github.com/whitphx-dev/meowcli-20251029
 
-## If you have local development environment
-Python setup is preferred.
+<div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg>
+<QRCode
+  value="https://github.com/whitphx-dev/meowcli-20251029"
+  :width="180"
+  :height="180"
+  color="36709E"
+/>
+</div>
 
-- Clone the repository
-- Install `uv` (https://docs.astral.sh/uv/getting-started/installation/)
+<div grid="~ cols-2" gap-4>
 
-## If you don't have local development environment
-- Go to the repository
-- Launch Codespaces
+<Modal>
+  <template #title>
+
+## Local
+
+  </template>
+
+### Prerequisites
+
+- **Git**
+- **Your favorite editor**
+
+### Steps
+
+1. Install `uv` ([docs](https://docs.astral.sh/uv/getting-started/installation/))
+2. Clone the repository: `git clone https://github.com/whitphx-dev/meowcli-20251029.git`
+3. Set up: `uv sync`
+4. Test it works: `uv run python -m meow`
+
+</Modal>
+
+<Modal>
+  <template #title>
+
+## Cloud
+
+  </template>
+
+1. Go to [the repo page](https://github.com/whitphx-dev/meowcli-20251029)
+2. Launch Codespaces
+  <img src="/codespaces_button.png" alt="GitHub Codespaces button" w="300px">
+3. Test it works: `uv run python -m meow`
+
+</Modal>
+
+</div>
 
 ---
 layout: section
 ---
 
 # What's OSS?
-
 
 ---
 layout: section
@@ -145,9 +183,59 @@ layout: section
 layout: section
 ---
 
+# Issues
+
+---
+
+# GitHub Issues
+
+- Bug report
+- Feature request
+- Documentation improvement
+- Question / Discussion
+- Others...
+
+---
+
+# nit: discussions?
+
+---
+
+# Write a good issue
+
+## General advice
+- Be gentle
+- Imagine you are writing for a friend
+
+⛔ Don't:
+- "This is broken!"
+- "Please fix this ASAP!"
+
+## Guidelines
+
+Writing a good issue requires (a bit of) skills.
+
+---
+
+# Hands-on: create an issue
+
+---
+
+# Advanced: create an issue to an actual OSS project if you have something to report
+
+---
+layout: section
+---
+
+# Code contributions
+
+---
+
 # What differs from closed source projects?
 
+<small>
 Disclaimer: We will only talk about GitHub-hosted projects in this session since I believe that you will use it in almost all cases, especially in the beginning, while there are many OSS projects that are managed in different ways.
+</small>
 
 ---
 
@@ -162,26 +250,58 @@ Disclaimer: We will only talk about GitHub-hosted projects in this session since
 <SlidevAnipres id="open-source-project" />
 
 ---
-layout: section
+
+# You have to **fork** the repository first
+
+<v-clicks>
+
+- Forking creates your own copy of the repository under your GitHub account
+- You can make changes freely in your forked repository
+- You create a **pull request** to propose your changes to the original repository
+
+</v-clicks>
+
 ---
 
-# Hands-on
+# You need to set `git remote` on your local clone
 
----
 
-# Hands-on: create an issue
 
 ---
 
 # Hands-on: create a pull request
 
-`close` keywords:
-https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword
+Assuming that you already have cloned the repo.
+
+1. On GitHub: Fork the repository
+2. On local: Configure `git remote` to point to your fork
+3. Create a new branch
+4. Make changes
+5. Commit and push
+6. On GitHub: Create a pull request
 
 ---
 
-- Semantic Commit Messages
-    - Tools
+# Tips:
+
+Some OSS projects have their own contribution guidelines/conventions that may include:
+
+- [Linking issues with keywords such as `close`](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
+- Work-in-progress PRs: [draft state](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request) / prefixing title with `WIP:`
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) / [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)
+
+---
+
+# When the upstream is updated?
+
+You need to fetch the latest changes from the original repository and merge/rebase them into your local repository/forked repository.
+
+---
+
+
+
+---
+
 - AI support
 
 ---

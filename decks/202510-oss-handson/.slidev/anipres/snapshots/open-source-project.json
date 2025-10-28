@@ -278,7 +278,7 @@
           "frame": {
             "id": "shape:UEviHuvS72IMbF5Yh22Mt",
             "type": "cue",
-            "globalIndex": 12,
+            "globalIndex": 13,
             "trackId": "track-1761644222159-glD2W7BgpSJ9VXO_tRzAF",
             "action": {
               "type": "shapeAnimation"
@@ -509,7 +509,7 @@
           "frame": {
             "id": "shape:UuBa8IZ-HUFALl3Eb464j",
             "type": "cue",
-            "globalIndex": 13,
+            "globalIndex": 14,
             "trackId": "track-1761644255432-h8N0_H6janSxGUUiCyI8s",
             "action": {
               "type": "shapeAnimation"
@@ -645,7 +645,7 @@
       },
       "shape:KeQec9yuWKU0K59XEusPB": {
         "x": 173.50063210334463,
-        "y": 797.2283059808491,
+        "y": 797.2129476464985,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -756,6 +756,61 @@
         "index": "a1",
         "typeName": "shape"
       },
+      "shape:j6TEK-V-V9H44BhVXjde3": {
+        "x": 924.4584586300089,
+        "y": 892.9061525088649,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {
+          "frame": {
+            "id": "shape:j6TEK-V-V9H44BhVXjde3",
+            "type": "cue",
+            "globalIndex": 11,
+            "trackId": "track-1761657783187-IAZWGNlY9wIT14dCDpeDP",
+            "action": {
+              "type": "shapeAnimation"
+            }
+          },
+          "hiddenDuringAnimation": false
+        },
+        "id": "shape:j6TEK-V-V9H44BhVXjde3",
+        "type": "text",
+        "props": {
+          "color": "black",
+          "size": "m",
+          "w": 1008.7691650390625,
+          "font": "draw",
+          "textAlign": "start",
+          "autoSize": true,
+          "scale": 1.4810847383397336,
+          "richText": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "dir": "auto"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "code"
+                      }
+                    ],
+                    "text": "git remote add <alias> https://github.com/your-account/awesome-oss.git"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "parentId": "page:page",
+        "index": "b0bAAA",
+        "typeName": "shape"
+      },
       "shape:8cutmwetoxjj3QIXCR7Xh": {
         "x": 1296.783224451297,
         "y": 538.4450516673878,
@@ -766,7 +821,7 @@
           "frame": {
             "id": "shape:8cutmwetoxjj3QIXCR7Xh",
             "type": "cue",
-            "globalIndex": 12,
+            "globalIndex": 13,
             "trackId": "track-1761644224677-83j5H18sQZKJDj7VtptYf",
             "action": {
               "type": "shapeAnimation"
@@ -1178,7 +1233,7 @@
       },
       "shape:CjyS_QkGVWoWk754RXqiD": {
         "x": -266.67277692865446,
-        "y": 731.8613061341998,
+        "y": 731.8327672380206,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -1581,7 +1636,7 @@
           "frame": {
             "id": "shape:NEjPtD7EnzgnG2C7jUMWi",
             "type": "cue",
-            "globalIndex": 13,
+            "globalIndex": 14,
             "trackId": "track-1761644245513-6RrXyrAGRnqb9En0Ga256",
             "action": {
               "type": "shapeAnimation"
@@ -2212,7 +2267,7 @@
       },
       "shape:JZ6LcI_Wqqpc9V4-mgHm8": {
         "x": -12.860812922288233,
-        "y": -841.413922712346,
+        "y": -841.4420831352436,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -2440,6 +2495,45 @@
           "isAnimated": false
         },
         "meta": {}
+      },
+      "shape:oC3gYUtiPI7jK-7ox-frN": {
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {},
+        "id": "shape:oC3gYUtiPI7jK-7ox-frN",
+        "type": "text",
+        "props": {
+          "color": "black",
+          "size": "m",
+          "w": 24.88888931274414,
+          "font": "draw",
+          "textAlign": "start",
+          "autoSize": true,
+          "scale": 3.190555903370296,
+          "richText": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "dir": "auto"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "👨🏻‍💻"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "parentId": "shape:yAphZiBXwHj_zb6tUVbw9",
+        "index": "a1",
+        "typeName": "shape"
       },
       "asset:-769225641": {
         "id": "asset:-769225641",
@@ -2847,6 +2941,57 @@
         },
         "typeName": "binding"
       },
+      "shape:Kns2CgQT7cNVYQuSqWv5I": {
+        "x": 79.4093927251057,
+        "y": 19.265928902680223,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {},
+        "id": "shape:Kns2CgQT7cNVYQuSqWv5I",
+        "type": "text",
+        "props": {
+          "color": "black",
+          "size": "m",
+          "w": 169.6632080078125,
+          "font": "draw",
+          "textAlign": "start",
+          "autoSize": true,
+          "scale": 1,
+          "richText": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "dir": "auto"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Org's member"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "dir": "auto"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "can merge it"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "parentId": "shape:yAphZiBXwHj_zb6tUVbw9",
+        "index": "a26Sv",
+        "typeName": "shape"
+      },
       "binding:xU1XI0ySBDlAqHmBprxXW": {
         "meta": {},
         "id": "binding:xU1XI0ySBDlAqHmBprxXW",
@@ -2967,6 +3112,31 @@
         },
         "typeName": "binding"
       },
+      "shape:yAphZiBXwHj_zb6tUVbw9": {
+        "x": 312.2356017225042,
+        "y": 420.2008632329877,
+        "rotation": 0,
+        "isLocked": false,
+        "opacity": 1,
+        "meta": {
+          "frame": {
+            "id": "shape:yAphZiBXwHj_zb6tUVbw9",
+            "type": "cue",
+            "globalIndex": 15,
+            "trackId": "track-1761655755010-khhzLIaAa4YUJsVzz5Z9Z",
+            "action": {
+              "type": "shapeAnimation"
+            }
+          },
+          "hiddenDuringAnimation": false
+        },
+        "id": "shape:yAphZiBXwHj_zb6tUVbw9",
+        "type": "group",
+        "parentId": "page:page",
+        "index": "b0aAex",
+        "props": {},
+        "typeName": "shape"
+      },
       "shape:RjONIwiC3_mKXGZAzK4j8": {
         "x": 304.7333646257254,
         "y": 367.81847794977875,
@@ -2977,7 +3147,7 @@
           "frame": {
             "id": "shape:RjONIwiC3_mKXGZAzK4j8",
             "type": "cue",
-            "globalIndex": 14,
+            "globalIndex": 15,
             "trackId": "track-1761644270091-HJCE0YPzpn9OYbLyd9asj",
             "action": {
               "type": "shapeAnimation"
@@ -3349,7 +3519,7 @@
           "frame": {
             "id": "shape:q25i6peYpV2Dm4kiiJoip",
             "type": "cue",
-            "globalIndex": 11,
+            "globalIndex": 12,
             "trackId": "track-1761644215561-8IVJkOl_pNES5mcA-pOq5",
             "action": {
               "type": "shapeAnimation"
@@ -3694,7 +3864,7 @@
       },
       "shape:hjUVztBAfE1zwlrj9Jpk5": {
         "x": 203.73453657901644,
-        "y": -0.024237506103531814,
+        "y": -0.052554179382347854,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,

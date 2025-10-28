@@ -159,6 +159,7 @@ Disclaimer: We will only talk about GitHub-hosted projects in this session since
 
 # Open source projects
 
+<SlidevAnipres id="open-source-project" />
 
 ---
 layout: section
@@ -173,3 +174,14 @@ layout: section
 ---
 
 # Hands-on: create a pull request
+
+`close` keywords:
+https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword
+
+---
+
+- Semantic Commit Messages
+    - Tools
+- AI support
+
+---

@@ -263,9 +263,28 @@ Disclaimer: We will only talk about GitHub-hosted projects in this session since
 
 ---
 
-# You need to set `git remote` on your local clone
+# `git remote`?
+
+<div grid="~ cols-2" gap-4>
+
+```bash {1|1|1|2|3-5|3-5|3-5|3-5|3-5|6|6|7-11}
+$ git clone https://github.com/whitphx-dev/meowcli-20251029.git
+$ cd meowcli-20251029/
+$ git remote -v
+origin  https://github.com/whitphx-dev/meowcli-20251029.git (fetch)
+origin  https://github.com/whitphx-dev/meowcli-20251029.git (push)
+$ git remote add my-fork https://github.com/whitphx/meowcli-20251029.git
+$ git remote -v
+my-fork https://github.com/whitphx/meowcli-20251029.git (fetch)
+my-fork https://github.com/whitphx/meowcli-20251029.git (push)
+origin  https://github.com/whitphx-dev/meowcli-20251029.git (fetch)
+origin  https://github.com/whitphx-dev/meowcli-20251029.git (push)
+```
 
 
+<SlidevAnipres id="git-remote" at="0" />
+
+</div>
 
 ---
 
@@ -295,13 +314,5 @@ Some OSS projects have their own contribution guidelines/conventions that may in
 # When the upstream is updated?
 
 You need to fetch the latest changes from the original repository and merge/rebase them into your local repository/forked repository.
-
----
-
-
-
----
-
-- AI support
 
 ---

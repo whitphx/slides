@@ -9,6 +9,8 @@ themeConfig:
 defaults:
   transition: slide-left
 transition: fade-out
+addons:
+  - anipres
 ---
 
 <h1>
@@ -74,3 +76,100 @@ Software Artisan / Indie Dev / OSS Enthusiast
     }
   }
 </style>
+
+---
+layout: section
+---
+
+# Announcement
+
+---
+
+# Set up for hands-on
+
+- The target repository: TODO
+
+## If you have local development environment
+Python setup is preferred.
+
+- Clone the repository
+- Install `uv` (https://docs.astral.sh/uv/getting-started/installation/)
+
+## If you don't have local development environment
+- Go to the repository
+- Launch Codespaces
+
+---
+layout: section
+---
+
+# What's OSS?
+
+
+---
+layout: section
+---
+
+# Why OSS?
+
+👉 [You share, you gain: OSS, community, and reward](https://slides.whitphx.info/202510-oss-community-reward/)
+
+---
+
+# Even if your main job is not OSS?
+
+- Your project may be using OSS libraries
+- And you may encounter bugs/missing features/incorrect documentation
+- Then you fix them
+- It's better to merge **your** fixes back to the original project!
+
+---
+
+# Why?
+
+If you keep the fixes only in your place,
+- You have to maintain the fixes forever by yourself
+  - Huge burden when you update the library!
+- You lose chances to get feedback/improvements from others, e.g. the original developers
+  - e.g. better implementations, alternative solutions
+- Someone else may have the same issues
+  - Good programmers don't like making duplicates 😎
+
+---
+layout: section
+---
+
+# Practical scenarios
+
+---
+layout: section
+---
+
+# What differs from closed source projects?
+
+Disclaimer: We will only talk about GitHub-hosted projects in this session since I believe that you will use it in almost all cases, especially in the beginning, while there are many OSS projects that are managed in different ways.
+
+---
+
+# Closed source projects
+
+<SlidevAnipres id="closed-source-project" />
+
+---
+
+# Open source projects
+
+
+---
+layout: section
+---
+
+# Hands-on
+
+---
+
+# Hands-on: create an issue
+
+---
+
+# Hands-on: create a pull request

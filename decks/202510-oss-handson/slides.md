@@ -219,6 +219,17 @@ Writing a good issue requires (a bit of) skills.
 
 # Hands-on: create an issue
 
+1. Go to the [repository page](https://github.com/whitphx-dev/meowcli-20251029) and open the "Issues" tab
+   <img src="/github_issue_tab.png" alt="GitHub Repo Page" w="400px">
+2. Click the "New issue" button
+   <img src="/github_new_issue_button.png" alt="GitHub New Issue button" w="400px">
+3. Select an issue template if available
+   - For this hands-on, you can select any template
+4. Fill in the title and description following the template and general advice
+   - For your first trial, you can just write "hello"
+   - For better practice, you can try to find a typo/bug/missing feature in the repository and report it
+5. Click the "Create" button to submit your issue
+
 ---
 
 # Advanced: create an issue to an actual OSS project if you have something to report
@@ -451,6 +462,9 @@ Some OSS projects have their own contribution guidelines/conventions that may in
 You need to fetch the latest changes from the original repository and merge/rebase them into your local repository/forked repository.
 
 ---
+
+# Advanced hands-on
+Contribute to an actual OSS project that you use and found something to improve!
 
 ---
 # License and Contributor License Agreement (CLA)

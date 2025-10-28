@@ -115,10 +115,10 @@ Set up https://github.com/whitphx-dev/meowcli-20251029
 
 ### Steps
 
-1. Install `uv` ([docs](https://docs.astral.sh/uv/getting-started/installation/))
+1. (Optional) Install `uv` ([docs](https://docs.astral.sh/uv/getting-started/installation/))
 2. Clone the repository: `git clone https://github.com/whitphx-dev/meowcli-20251029.git`
-3. Set up: `uv sync`
-4. Test it works: `uv run python -m meow`
+3. Set up: `uv sync` (if you installed `uv`)
+4. Test it works: `uv run python -m meow` (if you installed `uv`)
 
 </Modal>
 

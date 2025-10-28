@@ -174,10 +174,34 @@ If you keep the fixes only in your place,
   - Good programmers don't like making duplicates 😎
 
 ---
-layout: section
----
 
 # Practical scenarios
+
+- You found a bug in an OSS library you are using
+- You found a missing feature that you need
+- You found a typo or unclear part in the documentation
+- You have an idea to improve the library
+
+---
+
+# My examples
+
+---
+
+# Ways to contribute
+
+<v-clicks>
+
+- 🖥️ <span v-mark.orange="8">Writing code</span>
+- 📝 <span v-mark.orange="8">Writing docs</span>
+  - 🌐 Translation
+- 🐛 <span v-mark.orange="8">Reporting issues (bugs, feature requests, etc.)</span>
+- 🤝 Helping others (answering questions, mentoring, etc.)
+- 📚 Writing articles or tutorials
+- 💰 Financial support (donations, sponsorships, etc.)
+- 📢 Sharing on social media
+
+</v-clicks>
 
 ---
 layout: section
@@ -188,6 +212,8 @@ layout: section
 ---
 
 # GitHub Issues
+
+A way to contact the maintainers and discuss about something related to the project.
 
 - Bug report
 - Feature request

@@ -113,13 +113,13 @@ importers:
         version: 52.0.0(@babel/parser@7.28.4)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.21)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
         specifier: ^0.5.2
-        version: 0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3))
+        version: 0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1))(vue@3.5.13(typescript@5.9.3))
       slidev-addon-fancy-arrow:
         specifier: ^0.8.0
-        version: 0.8.0(typescript@5.8.3)
+        version: 0.8.0(typescript@5.9.3)
       vue:
         specifier: ^3.5.13
-        version: 3.5.13(typescript@5.8.3)
+        version: 3.5.13(typescript@5.9.3)
 
   decks/202507-python-serverless-web-apps:
     dependencies:
@@ -146,13 +146,13 @@ importers:
         version: 52.0.0(@babel/parser@7.28.4)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.21)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
         specifier: ^0.5.2
-        version: 0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1))(vue@3.5.17(typescript@5.9.3))
+        version: 0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       slidev-addon-fancy-arrow:
         specifier: ^0.8.0
-        version: 0.8.0(typescript@5.9.3)
+        version: 0.8.0(typescript@5.8.3)
       vue:
         specifier: ^3.5.13
-        version: 3.5.17(typescript@5.9.3)
+        version: 3.5.17(typescript@5.8.3)
 
   decks/202509-python-ast-transform-async:
     dependencies:
@@ -180,15 +180,15 @@ importers:
 
   decks/202510-oss-handson:
     dependencies:
-      '@katzumi/slidev-addon-qrcode':
-        specifier: ^0.0.17
-        version: 0.0.17
       '@slidev/cli':
         specifier: ^52.2.4
         version: 52.2.4(@babel/parser@7.28.4)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.21)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-anipres:
         specifier: ^0.6.4
         version: 0.6.4(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.5.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.3))
+      slidev-addon-qrcode:
+        specifier: ^1.0.2
+        version: 1.0.2
 
   decks/anipres-and-slidev:
     dependencies:
@@ -1215,10 +1215,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.29':
     resolution: {integrity: sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ==}
-
-  '@katzumi/slidev-addon-qrcode@0.0.17':
-    resolution: {integrity: sha512-H2XFqwMJyafqA4B9VZsqx7jpuoTfu6Mo6X/r8Okk1H+OMZcIt0iTsWdQaGhRsuaRQPtv+zmQtiY1V3WLlcd7Ug==}
-    engines: {node: '>=18.0.0', slidev: '>=0.48.7'}
 
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
@@ -5776,6 +5772,10 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  qr-code-styling@1.9.2:
+    resolution: {integrity: sha512-RgJaZJ1/RrXJ6N0j7a+pdw3zMBmzZU4VN2dtAZf8ZggCfRB5stEQ3IoDNGaNhYY3nnZKYlYSLl5YkfWN5dPutg==}
+    engines: {node: '>=18.18.0'}
+
   qrcode-generator@1.5.2:
     resolution: {integrity: sha512-pItrW0Z9HnDBnFmgiNrY1uxRdri32Uh9EjNYLPVC2zZ3ZRIIEqBoDgm4DkvDwNNDHTK7FNkmr8zAa77BYc9xNw==}
 
@@ -6169,6 +6169,10 @@ packages:
   slidev-addon-fancy-arrow@0.8.0:
     resolution: {integrity: sha512-o5OppRwO+MQltcXIWXKENYd3a4XKDJrhddJ/MKmTVY7s8t+bwsOHD7hwOdIxhNzF+LxnO+Jhzwqj5Nb8O96t+g==}
 
+  slidev-addon-qrcode@1.0.2:
+    resolution: {integrity: sha512-vYjfu8KHnOaiijWaQFc5LaaglDIISGZ5Bx4m0RbmDlPiIZDseEoJX6O3Lxh4LaaCdo5JpMK/3o6CcNZtcTqpLg==}
+    engines: {slidev: '>=0.32.1'}
+
   slidev-addon-window-mockup@0.3.0:
     resolution: {integrity: sha512-oS83NBwXbX+tUtZOlbIxXb9kTNSSvR6mJOi1eRNV6DYUVPROPrpqahHeDgaYKhiBGpgRkhuq824qmT8Esov98A==}
 
@@ -6244,9 +6248,6 @@ packages:
 
   style-value-types@5.1.2:
     resolution: {integrity: sha512-Vs9fNreYF9j6W2VvuDTP7kepALi7sk0xtk2Tu8Yxi9UoajJdEVpNpCov0HsLTqXvNGKX+Uv09pkozVITi1jf3Q==}
-
-  styled-qr-code@1.0.0:
-    resolution: {integrity: sha512-Tye/Omr8VYUUUCiBE+GNMeJ1Tt0cIsDkLXnQGG6/Xxegyd1021wQKFAFvx/hjaTUrfwpmukWTZfXs3uc/XXN0g==}
 
   stylis@4.3.6:
     resolution: {integrity: sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==}
@@ -8490,10 +8491,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@katzumi/slidev-addon-qrcode@0.0.17':
-    dependencies:
-      styled-qr-code: 1.0.0
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
@@ -12811,13 +12808,6 @@ snapshots:
       '@vueuse/shared': 13.5.0(vue@3.5.13(typescript@5.8.2))
       vue: 3.5.13(typescript@5.8.2)
 
-  '@vueuse/core@13.5.0(vue@3.5.13(typescript@5.8.3))':
-    dependencies:
-      '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 13.5.0
-      '@vueuse/shared': 13.5.0(vue@3.5.13(typescript@5.8.3))
-      vue: 3.5.13(typescript@5.8.3)
-
   '@vueuse/core@13.5.0(vue@3.5.13(typescript@5.9.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.21
@@ -12947,10 +12937,6 @@ snapshots:
   '@vueuse/shared@13.5.0(vue@3.5.13(typescript@5.8.2))':
     dependencies:
       vue: 3.5.13(typescript@5.8.2)
-
-  '@vueuse/shared@13.5.0(vue@3.5.13(typescript@5.8.3))':
-    dependencies:
-      vue: 3.5.13(typescript@5.8.3)
 
   '@vueuse/shared@13.5.0(vue@3.5.13(typescript@5.9.3))':
     dependencies:
@@ -16048,6 +16034,10 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  qr-code-styling@1.9.2:
+    dependencies:
+      qrcode-generator: 1.5.2
+
   qrcode-generator@1.5.2: {}
 
   quansync@0.2.10: {}
@@ -16685,10 +16675,10 @@ snapshots:
       - encoding
       - react
 
-  slidev-addon-anipres@0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.13(typescript@5.8.3)):
+  slidev-addon-anipres@0.5.2(@slidev/client@52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)))(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3)):
     dependencies:
       '@slidev/client': 52.2.4(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.21)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0))
-      '@vueuse/core': 13.5.0(vue@3.5.13(typescript@5.8.3))
+      '@vueuse/core': 13.5.0(vue@3.5.17(typescript@5.8.3))
       anipres: 0.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tldraw@3.11.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       react-dom: 18.3.1(react@18.3.1)
       regexp.escape: 2.0.1
@@ -16696,7 +16686,7 @@ snapshots:
       veaury: 2.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vite: 7.1.9(@types/node@22.16.2)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.0)
       vite-plugin-font: 5.1.1
-      vue: 3.5.13(typescript@5.8.3)
+      vue: 3.5.17(typescript@5.8.3)
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
@@ -16796,6 +16786,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  slidev-addon-qrcode@1.0.2:
+    dependencies:
+      qr-code-styling: 1.9.2
+
   slidev-addon-window-mockup@0.3.0(typescript@5.8.3):
     dependencies:
       vue: 3.5.21(typescript@5.8.3)
@@ -16886,10 +16880,6 @@ snapshots:
     dependencies:
       hey-listen: 1.0.8
       tslib: 2.4.0
-
-  styled-qr-code@1.0.0:
-    dependencies:
-      qrcode-generator: 1.5.2
 
   stylis@4.3.6: {}
 

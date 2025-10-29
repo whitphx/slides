@@ -11,7 +11,7 @@ defaults:
 transition: fade-out
 addons:
   - anipres
-  - "@katzumi/slidev-addon-qrcode"
+  - slidev-addon-qrcode
 ---
 
 <h1>
@@ -20,6 +20,16 @@ Open Source 101<br>
 Practice your first<br>OSS contributions
 </small>
 </h1>
+
+<div absolute bottom-4 right-4 z-10 bg-white shadow-lg rounded-lg>
+<QRCode
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
+/>
+</div>
 
 ---
 
@@ -82,6 +92,21 @@ Software Artisan / Indie Dev / OSS Enthusiast
 layout: section
 ---
 
+# Contents
+
+---
+
+# Contents
+
+- Talk: what and why OSS
+- Hands-on: create an issue to an OSS project
+- Hands-on: create a pull request to an OSS project
+- Q&A
+
+---
+layout: section
+---
+
 # Announcement
 
 ---
@@ -90,30 +115,32 @@ layout: section
 
 Set up https://github.com/whitphx-dev/meowcli-20251029
 
-<div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg>
+<div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg p-4>
+<div text-sm text-center>
+This slide deck 👇
+</div>
 <QRCode
-  value="https://github.com/whitphx-dev/meowcli-20251029"
-  :width="180"
-  :height="180"
-  color="36709E"
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
 />
 </div>
 
-<div grid="~ cols-2" gap-4>
+<div grid="~ cols-2" gap-4 mt-10>
 
-<Modal>
+<Modal text-sm>
   <template #title>
-
-## Local
-
+    <h3 text-md>Local</h3>
   </template>
 
-### Prerequisites
+<h4>Prerequisites</h4>
 
 - **Git**
 - **Your favorite editor**
 
-### Steps
+<h4>Steps</h4>
 
 1. (Optional) Install `uv` ([docs](https://docs.astral.sh/uv/getting-started/installation/))
 2. Clone the repository: `git clone https://github.com/whitphx-dev/meowcli-20251029.git`
@@ -122,10 +149,10 @@ Set up https://github.com/whitphx-dev/meowcli-20251029
 
 </Modal>
 
-<Modal>
+<Modal text-sm>
   <template #title>
 
-## Cloud
+<h3>Cloud</h3>
 
   </template>
 
@@ -148,24 +175,86 @@ layout: section
 layout: section
 ---
 
+<h1>
+<span inline-block transition duration-500 :class="$clicks === 0 ? 'translate-x-80 translate-y-40' : $clicks === 1 ? 'translate-y-40' : ''">OSS</span>
+<span v-click inline-block transition duration-500 :class="$clicks <= 1 ? 'translate-y-40' : ''">: Open Source Software</span>
+</h1>
+
+<blockquote v-click transition duration-500>
+
+<div text-md p-2>
+
+Open source software is software with source code<br>
+that anyone can inspect, modify, and enhance.
+
+<small>
+<i>https://opensource.com/resources/what-open-source</i>
+</small>
+
+</div>
+</blockquote>
+
+<v-clicks>
+
+You can use it for free (under some conditions)
+
+You can modify it; debug, new features, etc.
+
+Your modifications can be merged back to the original project
+
+Give-and-take ecosystem
+
+</v-clicks>
+
+---
+
+<div grid="~ cols-2" gap-6 h-120>
+<div max-h-full min-h-full>
+<img src="/the_world_is_built_on_oss.png" >
+</div>
+
+<div max-h-full min-h-full v-click>
+<img src="https://www.explainxkcd.com/wiki/images/d/d7/dependency.png" block h="100%" mx-auto>
+</div>
+
+</div>
+
+---
+layout: section
+---
+
 # Why OSS?
 
-👉 [You share, you gain: OSS, community, and reward](https://slides.whitphx.info/202510-oss-community-reward/)
+<v-click>
+
+👉 [You share, you gain: OSS, community, and reward (`whitphx.info`)](https://slides.whitphx.info/202510-oss-community-reward/)
+
+</v-click>
 
 ---
 
 # Even if your main job is not OSS?
+
+<v-clicks>
 
 - Your project may be using OSS libraries
 - And you may encounter bugs/missing features/incorrect documentation
 - Then you fix them
 - It's better to merge **your** fixes back to the original project!
 
+</v-clicks>
+
 ---
 
 # Why?
+Why not?
 
+<v-click>
 If you keep the fixes only in your place,
+</v-click>
+
+<v-clicks mt-4>
+
 - You have to maintain the fixes forever by yourself
   - Huge burden when you update the library!
 - You lose chances to get feedback/improvements from others, e.g. the original developers
@@ -173,18 +262,92 @@ If you keep the fixes only in your place,
 - Someone else may have the same issues
   - Good programmers don't like making duplicates 😎
 
+</v-clicks>
+
 ---
 
 # Practical scenarios
+
+<v-clicks>
 
 - You found a bug in an OSS library you are using
 - You found a missing feature that you need
 - You found a typo or unclear part in the documentation
 - You have an idea to improve the library
 
+</v-clicks>
+
 ---
 
 # My examples
+
+<div grid="~ cols-2" gap-4>
+
+<Modal>
+  <template #title>
+    <div text-lg>Fix translation</div>
+  </template>
+
+<div text-sm>
+
+`mdn/translated-content`: [(link)](https://github.com/mdn/translated-content/pulls?q=is:pr+author:whitphx)
+
+`keras-team/keras-docs-ja`: [(link)](https://github.com/keras-team/keras-docs-ja/pulls?q=is:pr+author:whitphx)
+
+</div>
+
+</Modal>
+
+<Modal text-sm>
+  <template #title>
+    <h3 text-base>Fix typo</h3>
+  </template>
+
+`microsoft/vscode-docs`: [#4781](https://github.com/microsoft/vscode-docs/pull/4781)
+
+`facelessuser/pymdown-extensions`: [#2762](https://github.com/facelessuser/pymdown-extensions/pull/2762)
+
+</Modal>
+
+<Modal text-sm>
+  <template #title>
+    <h3 text-md>Report/Fix bug</h3>
+  </template>
+
+`docker/compose`: [#6508](https://github.com/docker/compose/issues/6508), [#6509](https://github.com/docker/compose/pull/6509)
+
+`VSCodeVim/Vim`: [#9715](https://github.com/VSCodeVim/Vim/pull/9715)
+
+`aiortc/aiortc`: [#1271](https://github.com/aiortc/aiortc/pull/1271), [#1270](https://github.com/aiortc/aiortc/pull/1270)
+
+</Modal>
+
+<Modal text-sm>
+  <template #title>
+    <h3 text-md>Request/propose new features</h3>
+  </template>
+
+`streamlit/streamlit`: [#11793](https://github.com/streamlit/streamlit/pull/11793), [#11821](https://github.com/streamlit/streamlit/pull/11821)
+
+`slidevjs/slidev`: [#2311](https://github.com/slidevjs/slidev/pull/2311), [#2317](https://github.com/slidevjs/slidev/pull/2317)
+
+`aiortc/aioice`: [#84](https://github.com/aiortc/aioice/pull/84)
+
+</Modal>
+
+</div>
+
+<footer text-sm>
+
+https://github.com/search?q=author%3Awhitphx+-org%3Awhitphx+-org%3Awhitphx-dev&type=pullrequests&s=created&o=desc
+
+</footer>
+
+<style>
+  .slidev-layout p {
+    font-size: 1.0rem;
+  }
+</style>
 
 ---
 
@@ -223,38 +386,55 @@ A way to contact the maintainers and discuss about something related to the proj
 
 ---
 
-# nit: discussions?
-
----
-
 # Write a good issue
 
 ## General advice
 - Be gentle
 - Imagine you are writing for a friend
 
-⛔ Don't:
-- "This is broken!"
-- "Please fix this ASAP!"
+⛔ Don't: "This is broken!", "Please fix this ASAP!"
 
 ## Guidelines
 
-Writing a good issue requires (a bit of) skills.
+- [How do I ask a good question?](https://stackoverflow.com/help/how-to-ask)
+- [Best Practices for Writing Effective GitHub Issues](https://github.com/orgs/community/discussions/147722)
+- [How to Write a Good Issue: Tips for Effective Communication in Open Source](https://dev.to/opensauced/how-to-write-a-good-issue-tips-for-effective-communication-in-open-source-5443)
+
+Writing a good issue requires (a bit of) skills?
 
 ---
 
 # Hands-on: create an issue
 
-1. Go to the [repository page](https://github.com/whitphx-dev/meowcli-20251029) and open the "Issues" tab
+<div text-base>
+
+1. Go to the [repository page (`whitphx-dev/meowcli-20251029`)](https://github.com/whitphx-dev/meowcli-20251029) and \
+   open the "Issues" tab
    <img src="/github_issue_tab.png" alt="GitHub Repo Page" w="400px">
 2. Click the "New issue" button
    <img src="/github_new_issue_button.png" alt="GitHub New Issue button" w="400px">
+   - Please make sure you are on the correct repository!
 3. Select an issue template if available
    - For this hands-on, you can select any template
 4. Fill in the title and description following the template and general advice
    - For your first trial, you can just write "hello"
    - For better practice, you can try to find a typo/bug/missing feature in the repository and report it
 5. Click the "Create" button to submit your issue
+
+</div>
+
+<div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg p-4>
+<div text-sm text-center>
+This slide deck 👇
+</div>
+<QRCode
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
+/>
+</div>
 
 ---
 
@@ -392,6 +572,19 @@ upstream  https://github.com/whitphx-dev/meowcli-20251029.git (push)
 
 </v-clicks>
 
+<div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg p-4>
+<div text-sm text-center>
+This slide deck 👇
+</div>
+<QRCode
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
+/>
+</div>
+
 ---
 
 # 1. Clone the repository
@@ -411,6 +604,8 @@ $ cd meowcli-20251029/
 
 # 2. On GitHub: Fork the repository
 
+<div text-sm>
+
 1. Go to https://github.com/whitphx-dev/meowcli-20251029
 2. Click the "Fork" button at the top-right corner
    <img src="/github_fork_button.png" alt="GitHub Fork button" w="400px">
@@ -420,9 +615,13 @@ $ cd meowcli-20251029/
    <img src="/github_fork_config.png" alt="GitHub Create Fork" w="400px">
 4. You are redirected to your forked repository page
 
+</div>
+
 ---
 
 # 3: On local: `git remote add`
+
+<Transform :scale="0.8">
 
 1. Get the Git URL of your forked repository from the "Code" button
    <img src="/github_forked_repo_url.png" alt="GitHub Forked Repo URL" w="400px">
@@ -431,11 +630,19 @@ $ cd meowcli-20251029/
    git remote add my-fork <your-forked-repo-url>
    ```
 
-## If you cloned your forked repository
+<div mt-4>
+
+### If you cloned your forked repository
+
 Get the Git URL of the [**original** repository](https://github.com/whitphx-dev/meowcli-20251029), and add it as a remote named `upstream`
+
 ```bash
 git remote add upstream https://github.com/whitphx-dev/meowcli-20251029.git
 ```
+
+</div>
+
+</Transform>
 
 ---
 
@@ -477,6 +684,9 @@ $ git push origin <your-branch-name>
 ---
 
 # 7: On GitHub: Create a pull request
+
+<div text-sm>
+
 1. Go to your forked repository page or the original repository page on GitHub.
 2. You will see a notification to create a pull request for the branch you just pushed. Click the "Compare & pull request" button.
    <img src="/github_pr_notification.png" alt="GitHub Create Pull Request button" w="400px">
@@ -485,6 +695,8 @@ $ git push origin <your-branch-name>
     - The description may be generated from a template and contain important information instructed by the maintainers.
 4. Click the "Create pull request" button to submit your pull request.
    <img src="/github_pr_submit.png" alt="GitHub Create Pull Request button" w="400px">
+
+</div>
 
 ---
 
@@ -535,4 +747,30 @@ feel free to ask me anytime!
 </div>
 
 ---
+
 # License and Contributor License Agreement (CLA)
+
+<v-clicks>
+
+- Legally, "OSS" means "software licensed under an OSS license"
+    - MIT, BSD-2, BSD-3, Apache 2.0, GPL, LGPL, AGPL, etc.
+- OSS licenses are to **keep copyright to the authors** while allowing users to use, modify, and distribute the software under certain conditions.
+- What about the copyright of your contributions?
+  - Usually, the copyright of your contributions remains to you while allowing the project to use them under the same license as the project.
+  - Some projects require you to sign a CLA to contribute to clarify the copyright and licensing terms.
+
+</v-clicks>
+
+<footer>
+
+**IANAL:** This is a general overview and rough explanation. For specific and precise legal advice, please consult a legal professional.
+
+</footer>
+
+---
+
+# Summary
+
+- OSS is everywhere
+- You can contribute in various ways
+- OSS contributions may help your daily work, even if your main job is not OSS

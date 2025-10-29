@@ -94,6 +94,16 @@ layout: section
 
 # Contents
 
+<div absolute bottom-4 right-4 z-10 bg-white shadow-lg rounded-lg>
+<QRCode
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
+/>
+</div>
+
 ---
 
 # Contents
@@ -102,6 +112,16 @@ layout: section
 - Hands-on: create an issue to an OSS project
 - Hands-on: create a pull request to an OSS project
 - Q&A
+
+<div absolute bottom-4 right-4 z-10 bg-white shadow-lg rounded-lg>
+<QRCode
+    :width="180"
+    :height="180"
+    type="svg"
+    data="https://slides.whitphx.info/202510-oss-handson/"
+    :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }"
+/>
+</div>
 
 ---
 layout: section
@@ -117,7 +137,7 @@ Set up https://github.com/whitphx-dev/meowcli-20251029
 
 <div absolute top-4 right-4 z-10 bg-white shadow-lg rounded-lg p-4>
 <div text-sm text-center>
-This slide deck 👇
+Access via this slide deck 👇
 </div>
 <QRCode
     :width="180"
@@ -275,6 +295,8 @@ If you keep the fixes only in your place,
 - You found a typo or unclear part in the documentation
 - You have an idea to improve the library
 
+- 👉 Contribute!
+
 </v-clicks>
 
 ---
@@ -388,11 +410,17 @@ A way to contact the maintainers and discuss about something related to the proj
 
 # Write a good issue
 
+<v-click>
+
 ## General advice
 - Be gentle
 - Imagine you are writing for a friend
 
 ⛔ Don't: "This is broken!", "Please fix this ASAP!"
+
+</v-click>
+
+<v-click>
 
 ## Guidelines
 
@@ -401,6 +429,8 @@ A way to contact the maintainers and discuss about something related to the proj
 - [How to Write a Good Issue: Tips for Effective Communication in Open Source](https://dev.to/opensauced/how-to-write-a-good-issue-tips-for-effective-communication-in-open-source-5443)
 
 Writing a good issue requires (a bit of) skills?
+
+</v-click>
 
 ---
 

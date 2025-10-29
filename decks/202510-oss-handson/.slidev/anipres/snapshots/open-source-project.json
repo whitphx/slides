@@ -564,7 +564,18 @@
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
-        "meta": {},
+        "meta": {
+          "frame": {
+            "id": "shape:34Huzvu6FncvwMf32ojle",
+            "type": "cue",
+            "globalIndex": 3,
+            "trackId": "track-1761725515599--IAR4yDKObPLUqjWkLNKF",
+            "action": {
+              "type": "shapeAnimation"
+            }
+          },
+          "hiddenDuringAnimation": false
+        },
         "id": "shape:34Huzvu6FncvwMf32ojle",
         "type": "text",
         "props": {
@@ -645,7 +656,7 @@
       },
       "shape:KeQec9yuWKU0K59XEusPB": {
         "x": 173.50063210334463,
-        "y": 797.2129476464985,
+        "y": 797.2113278547047,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -1035,7 +1046,17 @@
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
-        "meta": {},
+        "meta": {
+          "frame": {
+            "id": "shape:4aEQ0TefFMKf7b7VZMFvn",
+            "type": "cue",
+            "globalIndex": 4,
+            "trackId": "track-1761725539672-gbPEMRCfIa6KimYRiD_9B",
+            "action": {
+              "type": "shapeAnimation"
+            }
+          }
+        },
         "id": "shape:4aEQ0TefFMKf7b7VZMFvn",
         "type": "text",
         "props": {
@@ -1233,7 +1254,7 @@
       },
       "shape:CjyS_QkGVWoWk754RXqiD": {
         "x": -266.67277692865446,
-        "y": 731.8327672380206,
+        "y": 731.8294998765704,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -2267,7 +2288,7 @@
       },
       "shape:JZ6LcI_Wqqpc9V4-mgHm8": {
         "x": -12.860812922288233,
-        "y": -841.4420831352436,
+        "y": -841.4450531873905,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -2943,7 +2964,7 @@
       },
       "shape:Kns2CgQT7cNVYQuSqWv5I": {
         "x": 79.4093927251057,
-        "y": 19.265928902680223,
+        "y": 19.26268931909258,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,
@@ -3864,7 +3885,7 @@
       },
       "shape:hjUVztBAfE1zwlrj9Jpk5": {
         "x": 203.73453657901644,
-        "y": -0.052554179382347854,
+        "y": -0.05579376296999072,
         "rotation": 0,
         "isLocked": false,
         "opacity": 1,

@@ -1,6 +1,6 @@
 ---
 theme: ../../themes/triangle
-title: "You share, you gain: OSS, community, and reward"
+title: "Open Source 101: Practice your first OSS contributions"
 drawings:
   persist: false
 mdc: true

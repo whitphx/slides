@@ -568,7 +568,7 @@ origin  https://github.com/whitphx-dev/meowcli-20251029.git (push)
 
 <div grid="~ cols-2" gap-4>
 
-```bash {1|1|1|2|3-5|3-5|3-5|3-5|3-5|6|6|7-11|7-11}
+```bash {1|1|2|3-5|3-5|3-5|3-5|6|6|7-11|7-11}
 $ git clone https://github.com/whitphx/meowcli-20251029.git
 $ cd meowcli-20251029/
 $ git remote -v

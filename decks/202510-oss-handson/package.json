@@ -8,8 +8,8 @@
     "export": "slidev export"
   },
   "dependencies": {
-    "@slidev/cli": "^52.2.4",
-    "slidev-addon-anipres": "^0.7.1",
+    "@slidev/cli": "^52.8.0",
+    "slidev-addon-anipres": "^0.8.0",
     "slidev-addon-qrcode": "^1.0.2"
   }
 }

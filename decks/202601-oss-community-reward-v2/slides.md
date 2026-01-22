@@ -32,7 +32,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 - <span class="heading">Created</span>: <span class="item"><img src="/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
 - <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
-- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item" v-mark.highlight.orange="2">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>
+- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>, <span class="item" v-mark.highlight.orange="2">🐍SciPyData2026</span>
 - <span class="heading">Job</span>: <span class="item">ML Developer Advocate at Hugging Face 🤗</span>
 
 <div absolute top-48 right-0>
@@ -43,7 +43,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </div>
 
-<div mt-10 w-min flex="~ gap-1" items-center justify-center v-click="3">
+<div absolute left-12 bottom-6 w-min flex="~ gap-1" items-center justify-center v-click="3">
   <div i-ri-user-3-line op50 ma text-2xl />
   <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
   <div i-ri-github-line op50 ma text-2xl ml4/>
@@ -209,6 +209,10 @@ layout: section
 <a href="https://github.com/whitphx/lear-gist-python/tree/master" target="_blank" rel="noopener noreferrer">
 <img src="/github_lear-gist-python.png" alt="Screenshot of GitHub repository lear-gist-python" w="95%" mx-auto>
 </a>
+</div>
+
+<div absolute right-0 bottom-0>
+<img src="/raspi-camera.JPG" alt="Raspberry Pi Camera Module v1" w-100 mt-4 v-click>
 </div>
 
 ---
@@ -380,9 +384,15 @@ It's just an extension of your daily work.
 
 ...but there are some unique technical and social aspects 😉
 
-<a href="https://luma.com/4n9wk979" target="_blank" rel="noopener noreferrer" block mt-8  w="70%" mx-auto>
+<div text-center>
+
+<a href="https://luma.com/4n9wk979" target="_blank" rel="noopener noreferrer" block mt-8  w="50%" mx-auto>
 <img src="/oss101.png" alt="">
 </a>
+
+https://slides.whitphx.info/202510-oss-handson/
+
+</div>
 
 </div>
 

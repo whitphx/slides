@@ -9,6 +9,8 @@ themeConfig:
 defaults:
   transition: slide-left
 transition: fade-out
+addons:
+  - slidev-addon-anipres
 ---
 
 <h1>
@@ -179,6 +181,25 @@ layout: section
 
 ---
 
+# Social posts
+
+<div grid="~ cols-2" gap-4>
+
+
+</div>
+
+---
+
+# Writing articles
+
+---
+layout: section
+---
+
+### Code contributions...
+
+---
+
 # [`whitphx/fuel-kana`](https://github.com/whitphx/fuel-kana), 2015
 
 <v-clicks>
@@ -188,9 +209,10 @@ layout: section
 
 </v-clicks>
 
-<div v-click mt-4 relative>
+<div mt-4 relative>
 <a href="https://github.com/whitphx/fuel-kana/blob/master/classes/kana.php" target="_blank" rel="noopener noreferrer">
-<img src="/github_fuel-kana.png" alt="Screenshot of GitHub repository fuel-kana" w="95%" mx-auto>
+<img absolute top-0 left-0 src="/github_fuel-kana.png" alt="Screenshot of GitHub repository fuel-kana" w="95%" mx-auto v-click>
+<img absolute top-0 left-0 src="/github_fuel-kana_top.png" alt="Screenshot of GitHub repository fuel-kana" w="95%" mx-auto v-click>
 </a>
 </div>
 
@@ -214,6 +236,12 @@ layout: section
 <div absolute right-0 bottom-0>
 <img src="/raspi-camera.JPG" alt="Raspberry Pi Camera Module v1" w-100 mt-4 v-click>
 </div>
+
+---
+
+<img src="/qiita_gist-feature.png" w="80%" mx-auto>
+
+https://qiita.com/whitphx/items/f55c7e2613862ce123ae
 
 ---
 layout: statement
@@ -333,6 +361,16 @@ before tweeting complaining about it!
 
 </div>
 
+<div mt-6 relative>
+
+<img src="/mock_bad_tweet.png" w="60%" mx-auto v-click>
+
+<div absolute inset-0 flex items-center justify-center v-click>
+<span text-6xl>🙅</span>
+</div>
+
+</div>
+
 ---
 
 # Tools for my team
@@ -377,8 +415,12 @@ Streamlit-WebRTC: `whitphx/streamlit-webrtc`
 
 It's just an extension of your daily work.
 
+<v-clicks>
+
 - You write code and docs to solve your problems.
 - You share it on GitHub for collaboration with others.
+
+</v-clicks>
 
 <div v-click>
 
@@ -502,7 +544,8 @@ If you have done something for an OSS project, you are part of the OSS community
 
 Events are visible expression of a community.
 - PyCon
-- Tokyo Python Meetup!
+- Tokyo Python Meetup
+- SciPyData!
 
 </v-click>
 
@@ -602,7 +645,7 @@ layout: statement
 <v-clicks depth="2">
 
 - 💬 Talk opportunities at PyCons
-- ❤️ Positive feedback and stars from users
+- ❤️ Positive feedback, real-world use cases, and stars from users
 - 💪 Learning opportunities
   - ⚡ Tech: WebRTC knowledge
   - 💼 Business: Consulting jobs
@@ -621,7 +664,7 @@ layout: statement
 
 - 💡 Inspired by JupyterLite → Opportunities to learn its internals
 - 🧑‍💻 Contribution opportunities to the OSS you use `pyodide`
-- 👛 Sponsorship: Databutton, Streamlit, Hal9, RAKUDEJI
+- 👛 Sponsorship: Databutton, Streamlit, Hal9, RAKUDEJI, and TestMu AI
 - 🧑‍🤝‍🧑 Friends at sponsor companies
 - 🤝 Collaboration opportunities with the Streamlit core team
 - 💼 Job opportunities at companies using Streamlit/Stlite
@@ -649,9 +692,54 @@ layout: statement
 - OSS developed, maintained, tested, and used by many people \
   **is better than** code only owned by you.
 - General procedures don't have to be the core of your business... in many cases.
-- If you don't make it open, others may make it open in near future.
+- If you don't make it open, someone will make something similar open in the near future.
 
 </v-clicks>
+
+---
+
+# Scenario:
+
+---
+
+# OSS incubates collaboration
+
+
+1. <v-click>You share something as OSS.</v-click>
+2. <v-click>Someone uses it for their purpose.</v-click>
+3. <v-click>They may contribute back.</v-click>
+
+<v-clicks at="10">
+
+* Using OSS is **beneficial for users**.
+* Contributing back is **beneficial for users**.
+  * Able to solve their problems faster.
+  * Maintaining the fork is costly.
+* Using **mature** OSS is **more beneficial for users**.
+* Your OSS grows.
+
+</v-clicks>
+
+<div absolute right-0 top-20 w-100 h-80>
+
+<SlidevAnipres id="oss-benefit-cycle" v-click="1" at="2" />
+
+</div>
+
+---
+
+# My example: Awesome Emacs Keymap
+
+
+---
+
+# My example: Stlite and Cognite
+
+---
+
+# Example
+
+[オープンソース活動がフルタイムの仕事になる仕組みの話, Rui Ueyama](https://note.com/ruiu/n/n5ef32cf70074)
 
 ---
 layout: statement
@@ -665,6 +753,50 @@ layout: statement
 
 </v-clicks>
 </div>
+
+---
+layout: section
+---
+
+# Does AI affect OSS ecosystem?
+
+<v-click>
+
+# ...obviously yes, but how?
+
+</v-click>
+
+---
+
+# Example: Tailwind CSS
+
+https://github.com/tailwindlabs/tailwindcss.com/pull/2388#issuecomment-3717222957
+
+---
+
+# Programming is over?
+
+https://x.com/rough__sea/status/2013280952370573666
+
+---
+layout: statement
+---
+
+If AI can generate code/docs/tests,
+no need to share them?
+
+---
+
+OSS libraries, frameworks, tools, apps, etc are still valuable.
+
+<v-clicks>
+
+* 🛠️ Support from maintainers and community
+* 🤝 Trusted by community
+* 🌐 Ecosystem and integrations quality
+* 🧪 "Battle-tested" by many users; bugs, edge-cases, ...
+
+</v-clicks>
 
 ---
 

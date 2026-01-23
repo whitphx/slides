@@ -181,25 +181,6 @@ layout: section
 
 ---
 
-# Social posts
-
-<div grid="~ cols-2" gap-4>
-
-
-</div>
-
----
-
-# Writing articles
-
----
-layout: section
----
-
-### Code contributions...
-
----
-
 # [`whitphx/fuel-kana`](https://github.com/whitphx/fuel-kana), 2015
 
 <v-clicks>
@@ -698,10 +679,6 @@ layout: statement
 
 ---
 
-# Scenario:
-
----
-
 # OSS incubates collaboration
 
 
@@ -728,28 +705,65 @@ layout: statement
 
 ---
 
-# My example: Awesome Emacs Keymap
+# Example: Awesome Emacs Keymap
 
+<v-clicks>
+
+- Users added new features for their needs.
+- They contributed back to the main repo, [`whitphx/vscode-emacs-mcx`](https://github.com/whitphx/vscode-emacs-mcx).
+- Other extension developers required new features to collaborate with their extensions.
+
+</v-clicks>
+
+<div grid="~ cols-2" gap-4 v-click>
+
+[<img src="/github_vscode_emacs_mcx_pr_1.png" alt="">](https://github.com/whitphx/vscode-emacs-mcx/pull/215)
+
+[<img src="/github_vscode_emacs_mcx_issue1.png" alt="">](https://github.com/whitphx/vscode-emacs-mcx/issues/1127#issuecomment-997157436)
+
+</div>
 
 ---
 
-# My example: Stlite and Cognite
+# Example: Stlite and Cognite
+
+<v-clicks>
+
+- [Cognite](https://www.cognite.com/en) uses [`whitphx/stlite`](https://github.com/whitphx/stlite) on their platform.
+- They customized Stlite to fit their needs.
+- They contributed back to Stlite.
+
+</v-clicks>
+
+<div grid="~ cols-2" gap-4 v-click>
+
+[<img src="/github_discussion_stlite_cognite.png" w-full>](https://github.com/whitphx/stlite/discussions/1328)
+
+[<img src="/github_stlite_cognite_pr.png" w-full>](https://github.com/whitphx/stlite/pull/1338)
+
+</div>
 
 ---
 
-# Example
+# Reference
+
+<div>
 
 [オープンソース活動がフルタイムの仕事になる仕組みの話, Rui Ueyama](https://note.com/ruiu/n/n5ef32cf70074)
+
+explains how developers working for different companies can collaborate on the same open source project with mutual benefits.
+
+</div>
 
 ---
 layout: statement
 ---
 
-<div text-left>
+<div text-left text-3xl>
 <v-clicks>
 
-- You share something with the community through OSS.
-- You gain something from the community and OSS.
+- ➡️ You share something with the community through OSS.
+- ⬅️ You gain something from the community and OSS.
 
 </v-clicks>
 </div>
@@ -770,24 +784,33 @@ layout: section
 
 # Example: Tailwind CSS
 
-https://github.com/tailwindlabs/tailwindcss.com/pull/2388#issuecomment-3717222957
+<div grid="~ cols-2" gap-4>
+
+[<img src="/tailwind_comment.png" v-click>](https://github.com/tailwindlabs/tailwindcss.com/pull/2388#issuecomment-3717222957)
+
+[<img src="/tailwind_sponsors.png" v-click>](https://tailwindcss.com/sponsor)
+
+</div>
 
 ---
 
 # Programming is over?
 
-https://x.com/rough__sea/status/2013280952370573666
+<div mt-10>
+
+[<img src="/ryan_dahl_tweet.png" w="80%" mx-auto>](https://x.com/rough__sea/status/2013280952370573666)
+
+</div>
 
 ---
 layout: statement
 ---
 
-If AI can generate code/docs/tests,
-no need to share them?
+## If AI can generate code/docs/tests, no need to share them?
 
 ---
 
-OSS libraries, frameworks, tools, apps, etc are still valuable.
+# OSS libraries, frameworks, tools, apps, etc are still valuable.
 
 <v-clicks>
 
@@ -798,29 +821,25 @@ OSS libraries, frameworks, tools, apps, etc are still valuable.
 
 </v-clicks>
 
+<v-click>
+However, the way to contribute may change.
+</v-click>
+
 ---
 
-# ⚠️ Don't troll. Be professional.
-You can get many good things from OSS and community, so...
+<h1 relative>
+<span inline-block transition duration-500 :class="$clicks===0 ? 'translate-x-64 translate-y-36 scale-200' : ''">You share, you gain.&nbsp;</span>
+<span inline-block transition duration-500 :class="$clicks===0 ? 'translate-x--40 translate-y-64 scale-150' : ''">OSS, community, and reward.</span>
+</h1>
 
-<v-clicks>
+<v-clicks at="2">
 
-- Be respectful and kind
-- Community is made of people
-- "Can I do it to my boss/colleague/client?"
+- OSS contribution is not special. It's an extension of your daily work.
+- Share what you built no matter how small it is.
+- Through OSS contributions, you can gain community, learning opportunities, and more.
+- OSS incubates collaboration. It benefits both users and maintainers.
 
 </v-clicks>
-
----
-layout: statement
----
-
-<h1>
-You share, you gain:<br>
-<small>
-OSS, community, and reward
-</small>
-</h1>
 
 ---
 

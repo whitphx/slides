@@ -1,0 +1,14 @@
+{
+  "name": "202601-oss-community-reward-v2",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.2.4",
+    "slidev-addon-anipres": "^0.8.7"
+  }
+}

@@ -489,6 +489,21 @@ From <a href="https://gihyo.jp/article/2025/06/pycon-us-2025-03#gh3Cv4MSFz" targ
 
 ---
 
+# Many different motivations!
+
+<v-clicks>
+
+- Solve your problem
+- Solve someone's problem
+- Learn something new
+- Curiosity
+- Making contribution itself the purpose
+- ...any!
+
+</v-clicks>
+
+---
+
 # Through such OSS contributions, you can gain...
 
 <v-clicks>
@@ -615,9 +630,10 @@ layout: statement
 - 🖋️ My everyday tool for productivity
 - ❤️ Positive feedback and stars from users
 - 👛 [Tips from users](https://buymeacoffee.com/whitphx)
-- ⚒️ Contribution opportunities to VS Code
 
 </v-clicks>
+
+[![](/awesome-emacs-keymap.png)](https://marketplace.visualstudio.com/items?itemName=tuttieee.emacs-mcx)
 
 ---
 
@@ -633,9 +649,16 @@ layout: statement
     - Contracts with overseas clients
     - Income in foreign currency
     - Work in English
-- 🧑‍💻 Contribution opportunities to the OSS you use `aiortc`
 
 </v-clicks>
+
+<div absolute right-10 top-50 w-80>
+
+<SlidevVideo autoplay muted controls loop w-120 mx-auto>
+  <source src="/streamlit-webrtc-tutorial-edge-9312.mov" />
+</SlidevVideo>
+
+</div>
 
 ---
 
@@ -651,6 +674,8 @@ layout: statement
 - 💼 Job opportunities at companies using Streamlit/Stlite
 
 </v-clicks>
+
+<img src="/stlite.svg" alt="Stlite logo" h-30 mx-auto my-8>
 
 ---
 

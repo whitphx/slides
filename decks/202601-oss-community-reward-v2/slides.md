@@ -797,7 +797,7 @@ layout: statement
 layout: section
 ---
 
-# Does AI affect the OSS ecosystem?
+# Does AI affect OSS ecosystem?
 
 <v-click>
 

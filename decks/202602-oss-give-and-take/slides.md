@@ -82,7 +82,13 @@ https://scipydata.connpass.com/event/364718/
 
 <div grid="~ cols-2" gap-4>
 
-<img src="https://media.connpass.com/thumbs/56/bd/56bda31cf3806b420ced41f7f924f610.png" alt="SciPyData 2026 logo" mt-8>
+<div flex="~ col" items-center justify-center>
+
+<img src="https://media.connpass.com/thumbs/56/bd/56bda31cf3806b420ced41f7f924f610.png" alt="SciPyData 2026 logo" h-30 mt--8>
+
+<img src="https://pbs.twimg.com/media/G_aC_x8bAAEXFeD?format=jpg&name=large" alt="My presentation at SciPyData 2026" mt-8>
+
+</div>
 
 <Tweet id="2014941918049009799" />
 

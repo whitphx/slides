@@ -166,3 +166,36 @@ https://stlite.net/
 <div text-6xl mt-8 v-click>
 Share your code!
 </div>
+
+---
+
+# Programming is over?
+
+<div mt-10>
+
+[<img src="/ryan_dahl_tweet.png" w="80%" mx-auto>](https://x.com/rough__sea/status/2013280952370573666)
+
+</div>
+
+---
+layout: statement
+---
+
+## If AI can generate code/docs/tests, no need to share them?
+
+---
+
+# OSS libraries, frameworks, tools, apps, etc are still valuable.
+
+<v-clicks>
+
+* 🛠️ Support from maintainers and community
+* 🤝 Trusted by community
+* 🌐 Ecosystem and integrations quality
+* 🧪 "Battle-tested" by many users; bugs, edge-cases, ...
+
+</v-clicks>
+
+<div mt-8 v-click>
+However, the way to contribute may change.
+</div>

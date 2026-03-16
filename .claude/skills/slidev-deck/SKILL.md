@@ -80,7 +80,7 @@ defaults:
   transition: slide-left
 transition: fade-out
 addons:
-  - slidev-addon-anipres
+  - anipres
 ---
 ```
 
@@ -88,7 +88,7 @@ addons:
 - `../../themes/triangle` — the default choice for most presentations (generative triangle tessellation background)
 - `../../themes/alpha` — alternative with animated gradient background
 
-Only list addons in the frontmatter `addons:` field that are actually used in the slides. Use the addon's short name (without `slidev-addon-` prefix) in the frontmatter. For example, use `anipres` not `slidev-addon-anipres`.
+Only list addons in the frontmatter `addons:` field that are actually used in the slides. Use the short name (without `slidev-addon-` prefix) in the frontmatter — e.g., `anipres` not `slidev-addon-anipres`. The full package name with prefix is only used in `package.json` dependencies.
 
 #### Slide structure
 
@@ -233,21 +233,25 @@ For nested lists with depth control: `<v-clicks depth="2">`.
 ```
 
 The same applies to `v-mark` on any element that is inside a `v-click` container — always coordinate the click numbers.
+
+Other `v-mark` styles:
+
+```html
 <span v-mark.circle.red>circled</span>
 <span v-mark.box.orange>boxed</span>
 ```
 
 **Code highlighting with line reveals**:
 
-```
+````
 ```py {*|1-3|5-8}
 # Lines revealed progressively
 ```
-```
+````
 
 **Magic-move** — for animated code transitions:
 
-````
+`````
 ````md magic-move {at: 3}
 
 ```py
@@ -261,7 +265,7 @@ code_v2()
 ```
 
 ````
-````
+`````
 
 ### 5. Addons usage
 
@@ -363,12 +367,12 @@ Use UnoCSS utility classes directly on HTML elements (Attributify mode):
 
 **Inline code blocks** with syntax highlighting:
 
-```
+````
 ```py {*|1-3|5-8}{'data-id': 'my-code', 'max-height': '450px'}
 import ast
 # ...
 ```
-```
+````
 
 **External code imports** — when code blocks are long, externalize to files:
 

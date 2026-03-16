@@ -41,13 +41,17 @@ Create a new directory under `decks/` following the naming convention: `YYYYMM-s
     "export": "slidev export"
   },
   "dependencies": {
-    "@iconify/json": "^2.2.303",
+    "@iconify-json/ri": "^1.2.5",
     "@slidev/cli": "^52.8.0"
   }
 }
 ```
 
-`@iconify/json` is required for icon classes like `i-ri-github-line`, `i-ri-user-3-line`, etc. to work — always include it.
+**Icons**: Slidev uses [unplugin-icons](https://github.com/antfu/unplugin-icons) with [Iconify](https://iconify.design/). To use icons, install the corresponding `@iconify-json/{collection-name}` package. The author's decks primarily use Remix Icons (`i-ri-*` classes), so `@iconify-json/ri` is the standard choice. If you need icons from other collections (e.g., Material Design `i-mdi-*`, Carbon `i-carbon-*`), add the corresponding package (e.g., `@iconify-json/mdi`).
+
+Icons are used as HTML elements with UnoCSS classes: `<div i-ri-github-line />`. You can style them like any other element: `<div i-ri-github-line op50 ma text-2xl />`.
+
+Browse available icons at [Icônes](https://icones.js.org/) or [Iconify](https://icon-sets.iconify.design/).
 
 Add addons to `dependencies` only when the content requires them:
 - `"slidev-addon-anipres": "^0.8.7"` — for complex graphical animations and free-style drawing areas

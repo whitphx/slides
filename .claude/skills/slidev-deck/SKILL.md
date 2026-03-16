@@ -109,44 +109,27 @@ Talk Title Here<br>
 </h1>
 ```
 
-**Author/bio slide** — follow this established pattern:
+**Author/bio slide** — choose the appropriate level of detail based on the talk content:
+
+**Full portfolio bio** — use when the talk topic is directly supported by the author's projects and experience (e.g., talks about OSS, Streamlit, Gradio, browser-based Python). This version lists created projects, contributions, and past talks to establish credibility on the topic. Copy the full bio slide from the most recent deck that uses it (e.g., `decks/202602-oss-give-and-take/`), including the portfolio `<style>` block and `public/portfolio/` assets.
+
+**Simple bio** — use when the talk is technical and the author's identity is secondary to the content (e.g., deep-dive into AST manipulation, a specific algorithm, or a language feature). Keep it minimal:
 
 ```html
-<h1>Yuichiro Tachibana / 橘 祐一郎</h1>
+# Hi 👋
 
-@whitphx
-
-<div mt-8>
-Software Artisan / Indie Dev / OSS Enthusiast
+<div text-5xl leading-20 mt-10 ml-10>
+Yuichiro Tachibana<br>
+橘 祐一郎<br>
+<small>@whitphx</small>
 </div>
 
-<div class="portfolio" w-130 mt-6 v-click="1">
-
-- <span class="heading">Created</span>: <span class="item"><img src="/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
-- <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
-- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🇪🇺Euro, 🌏APAC, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🗾miniShizuoka</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍Tokyo Python Meetup</span>, <span class="item">▶️Streamlit Live</span>
-
-<div absolute top-48 right-0>
-<a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
-<img src="/github_whitphx.png" alt="GitHub @whitphx" w="400px">
-</a>
-</div>
-
-</div>
-
-<div absolute left-12 bottom-10 w-min flex="~ gap-1" items-center justify-center v-click="2">
-  <div i-ri-user-3-line op50 ma text-2xl />
-  <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
-  <div i-ri-github-line op50 ma text-2xl ml4/>
-  <div><a href="https://github.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
-  <div i-ri-linkedin-line op50 ma text-2xl ml4/>
-  <div><a href="https://www.linkedin.com/in/whitphx/" target="_blank" class="border-none! font-300">whitphx</a></div>
-  <div i-ri-twitter-x-line op50 ma text-2xl ml4/>
-  <div><a href="https://twitter.com/whitphx" target="_blank" class="border-none! font-300">whitphx</a></div>
+<div absolute top-50 right-40>
+<img src="https://avatars.githubusercontent.com/u/3135397?v=4" alt="whitphx" w="130px">
 </div>
 ```
 
-Include the portfolio `<style>` block from existing decks. Copy the `public/portfolio/` assets from a recent deck that has them.
+Use your judgment: if the audience benefits from knowing the author's background and project portfolio (because the talk is about those projects or that domain), use the full bio. If the talk stands on its own and the audience just needs a name, use the simple version.
 
 **Section breaks** — use Slidev layouts:
 

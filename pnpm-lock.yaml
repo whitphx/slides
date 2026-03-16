@@ -208,6 +208,21 @@ importers:
         specifier: ^0.8.7
         version: 0.8.7(@slidev/client@52.8.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@vue/compiler-sfc@3.5.24)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(vite@7.2.2(@types/node@22.16.2)(jiti@2.6.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1)))(react@18.3.1)(vite@7.2.2(@types/node@22.16.2)(jiti@2.6.1)(lightningcss@1.29.2)(tsx@4.19.2)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
 
+  decks/202603-pycon-python-release-workflow:
+    dependencies:
+      '@iconify-json/ri':
+        specifier: ^1.2.5
+        version: 1.2.10
+      '@slidev/cli':
+        specifier: ^52.8.0
+        version: 52.8.0(@babel/parser@7.28.5)(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.24)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(postcss@8.5.6)(react@18.3.1)(tsx@4.19.2)
+      slidev-addon-fancy-arrow:
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.9.3)
+      slidev-addon-window-mockup:
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.9.3)
+
   decks/anipres-and-slidev:
     dependencies:
       '@slidev/cli':
@@ -1086,6 +1101,9 @@ packages:
 
   '@iconify-json/ph@1.2.2':
     resolution: {integrity: sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw==}
+
+  '@iconify-json/ri@1.2.10':
+    resolution: {integrity: sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==}
 
   '@iconify-json/svg-spinners@1.2.2':
     resolution: {integrity: sha512-DIErwfBWWzLfmAG2oQnbUOSqZhDxlXvr8941itMCrxQoMB0Hiv8Ww6Bln/zIgxwjDvSem2dKJtap+yKKwsB/2A==}
@@ -9554,6 +9572,10 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/ph@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/ri@1.2.10':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -19427,6 +19449,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  slidev-addon-fancy-arrow@0.13.10(typescript@5.9.3):
+    dependencies:
+      roughjs: 4.6.6
+      vue: 3.5.21(typescript@5.9.3)
+    transitivePeerDependencies:
+      - typescript
+
   slidev-addon-fancy-arrow@0.8.0(typescript@5.8.3):
     dependencies:
       roughjs: 4.6.6
@@ -19448,6 +19477,12 @@ snapshots:
   slidev-addon-window-mockup@0.3.0(typescript@5.8.3):
     dependencies:
       vue: 3.5.21(typescript@5.8.3)
+    transitivePeerDependencies:
+      - typescript
+
+  slidev-addon-window-mockup@0.3.0(typescript@5.9.3):
+    dependencies:
+      vue: 3.5.21(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 

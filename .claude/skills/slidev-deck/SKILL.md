@@ -113,6 +113,8 @@ Talk Title Here<br>
 
 **Full portfolio bio** — use when the talk topic is directly supported by the author's projects and experience (e.g., talks about OSS, Streamlit, Gradio, browser-based Python). This version lists created projects, contributions, and past talks to establish credibility on the topic. Copy the full bio slide from the most recent deck that uses it (e.g., `decks/202602-oss-give-and-take/`), including the portfolio `<style>` block and `public/portfolio/` assets.
 
+**IMPORTANT: Copy all referenced assets.** When copying a bio slide (or any slide) from another deck, check every `<img src="/...">` path in the slide markup and ensure the corresponding files exist in the new deck's `public/` directory. The portfolio bio slide typically references both `public/portfolio/*.svg|png` images **and** `public/github_whitphx.png` (the GitHub profile screenshot). Missing any of these will cause a Vite build error. Always list the source deck's `public/` directory and copy all assets that are referenced by the slides you are reusing.
+
 **Simple bio** — use when the talk is technical and the author's identity is secondary to the content (e.g., deep-dive into AST manipulation, a specific algorithm, or a language feature). Keep it minimal:
 
 ```html
@@ -405,7 +407,8 @@ If you need reusable slide components, create them in a `components/` directory 
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)
-- Portfolio images are typically shared — copy from a recent deck's `public/portfolio/`
+- **Verify all image references**: After writing `slides.md`, scan every `<img src="/...">` path and confirm the file exists in the deck's `public/` directory. Missing images cause Vite build errors at dev/build time.
+- Portfolio images are typically shared — copy from a recent deck's `public/portfolio/` and also any other `public/*.png|svg` files referenced by reused slides
 - Test the deck with `pnpm dev` when possible
 - Keep slide count appropriate for the talk length (roughly 1-2 minutes per slide)
 - When content is provided in a language other than the target presentation language, translate appropriately

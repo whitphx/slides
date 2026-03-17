@@ -374,6 +374,13 @@ import ast
 ```
 ````
 
+**A line highlight spec is required for `maxHeight` to work.** If you don't need line highlights, use `{*}` (highlight all) as a placeholder. Without it, the scroll container is not created and `maxHeight` is silently ignored:
+
+```
+✅ ```yaml {*}{maxHeight:'300px'}     ← scroll works
+❌ ```yaml {maxHeight:'300px'}        ← maxHeight ignored, no scroll
+```
+
 If a code block *and* surrounding text together overflow, either reduce `maxHeight`, trim the code, or reduce margins/padding on other elements. Always consider total slide height when combining code blocks with titles, descriptions, and footer text.
 
 **External code imports** — when code blocks are long, externalize to files:

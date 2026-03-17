@@ -311,7 +311,7 @@ layout: statement
 
 # Why Changesets-style?
 
-<div grid="~ cols-2" gap-6 mt-4>
+<div grid="~ cols-2" gap-6 mt-2>
 
 <div>
 
@@ -336,8 +336,7 @@ layout: statement
 
 - Version intent is a **dedicated file** — reviewed in the PR
 - One fragment per PR, not per commit
-- Survives squash, rebase, amend
-- Easy to edit fragments **after merge** — just update the file
+- Survives squash/rebase; easy to edit **after merge**
 - Changelog is **human-written prose**
 
 </v-clicks>
@@ -346,7 +345,7 @@ layout: statement
 
 </div>
 
-<div v-click mt-6 text-center text-lg>
+<div v-click mt-4 text-center text-lg>
 
 Fragments decouple **"what changed"** from **"how it was committed"**.
 
@@ -505,22 +504,22 @@ Two-phase automation, inspired by Changesets' "Version Packages" PR:
 
 <div flex="~ col" gap-2>
 
-<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-3 bg-sky:10>
+<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-2 bg-sky:10 text-sm>
 
 **Phase 1: Changelog Preview PR** (automated)
 
 1. PR with changelog fragments merges to `main`
-2. CI runs `scriv collect` → combines fragments into CHANGELOG.md
+2. CI runs `scriv collect` → aggregates fragments into CHANGELOG.md
 3. CI calculates version via `get_bump_version_level.py`
-4. Opens a "Preview changelog" PR on a dedicated branch
+4. Opens a "Preview changelog" PR
 
 </div>
 
-<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
+<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-2 bg-emerald:10 text-sm>
 
 **Phase 2: Release** (merge the preview PR)
 
-1. Maintainer reviews changelog, merges the preview PR
+1. Maintainer reviews changelog, merges the PR
 2. CI creates a **git tag** with the calculated version
 3. Tag triggers build → test → **publish to PyPI**
 
@@ -530,7 +529,7 @@ Two-phase automation, inspired by Changesets' "Version Packages" PR:
 
 </div>
 
-<div v-click="3" mt-2 text-center text-lg>
+<div v-click="3" mt-2 text-center>
 
 Human reviews the changelog. Machine handles the rest.
 
@@ -607,7 +606,7 @@ Three workflows, each with a clear responsibility:
 
 </div>
 
-```yaml {maxHeight:'340px'}
+```yaml {*}{maxHeight:'300px'}
 # 1️⃣ test-build.yml — triggers on PRs and pushes
 on: [push, pull_request]
 # Runs tests, builds wheel, uploads artifact
@@ -628,7 +627,7 @@ on:
 # Manages changelog preview PRs and version tagging
 ```
 
-<div v-click mt-4 op80>
+<div v-click mt-2 op80>
 
 Key insight: `workflow_run` runs in the **target branch context** (main), not the PR branch — so secrets are safe.
 
@@ -648,10 +647,8 @@ The final piece: **how do users trust the package?**
 
 <v-clicks>
 
-- **Trusted Publishing** (PyPI) — no API tokens stored in repo secrets
-  - GitHub OIDC authenticates the workflow directly with PyPI
-- **Sigstore signing** — artifacts are signed with ephemeral certificates
-  - Verifiable provenance: "this wheel was built by *this* workflow in *this* repo"
+- **Trusted Publishing** (PyPI) — GitHub OIDC authenticates directly, no API tokens
+- **Sigstore signing** — ephemeral certificates, verifiable provenance
 - **GitHub Release** — signed artifacts attached for auditing
 
 </v-clicks>

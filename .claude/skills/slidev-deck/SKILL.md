@@ -41,11 +41,13 @@ Create a new directory under `decks/` following the naming convention: `YYYYMM-s
     "export": "slidev export"
   },
   "dependencies": {
-    "@iconify-json/ri": "^1.2.5",
-    "@slidev/cli": "^52.8.0"
+    "@iconify-json/ri": "^<LATEST>",
+    "@slidev/cli": "^<LATEST>"
   }
 }
 ```
+
+**Dependency versions**: Do NOT use the hardcoded versions shown above. Before writing `package.json`, look up the latest version of each dependency by checking an existing deck's `package.json` in this repo or by running `npm view <package> version`. Use caret ranges (`^`) with the latest version for each package.
 
 **Icons**: Slidev uses [unplugin-icons](https://github.com/antfu/unplugin-icons) with [Iconify](https://iconify.design/). To use icons, install the corresponding `@iconify-json/{collection-name}` package. The author's decks primarily use Remix Icons (`i-ri-*` classes), so `@iconify-json/ri` is the standard choice. If you need icons from other collections (e.g., Material Design `i-mdi-*`, Carbon `i-carbon-*`), add the corresponding package (e.g., `@iconify-json/mdi`).
 
@@ -54,10 +56,12 @@ Icons are used as HTML elements with UnoCSS classes: `<div i-ri-github-line />`.
 Browse available icons at [Icônes](https://icones.js.org/) or [Iconify](https://icon-sets.iconify.design/).
 
 Add addons to `dependencies` only when the content requires them:
-- `"slidev-addon-anipres": "^0.8.7"` — for complex graphical animations and free-style drawing areas
-- `"slidev-addon-fancy-arrow": "^0.13.10"` — for arrows pointing between elements on slides
-- `"slidev-addon-window-mockup": "^0.3.0"` — for macOS-style window frames around code/content
-- `"slidev-addon-qrcode": "^1.0.2"` — for QR codes linking to URLs
+- `"slidev-addon-anipres"` — for complex graphical animations and free-style drawing areas
+- `"slidev-addon-fancy-arrow"` — for arrows pointing between elements on slides
+- `"slidev-addon-window-mockup"` — for macOS-style window frames around code/content
+- `"slidev-addon-qrcode"` — for QR codes linking to URLs
+
+Look up the latest version for each addon the same way (check existing decks or `npm view`).
 
 After creating package.json, run `pnpm install` in the deck directory.
 

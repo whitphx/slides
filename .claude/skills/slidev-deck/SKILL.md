@@ -353,7 +353,7 @@ Use UnoCSS utility classes directly on HTML elements (Attributify mode):
 **Inline code blocks** with syntax highlighting:
 
 ````
-```py {*|1-3|5-8}{'data-id': 'my-code', 'max-height': '450px'}
+```py {*|1-3|5-8}{'data-id': 'my-code', maxHeight: '450px'}
 import ast
 # ...
 ```

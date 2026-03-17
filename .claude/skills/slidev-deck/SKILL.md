@@ -113,6 +113,8 @@ Talk Title Here<br>
 
 **Full portfolio bio** — use when the talk topic is directly supported by the author's projects and experience (e.g., talks about OSS, Streamlit, Gradio, browser-based Python). This version lists created projects, contributions, and past talks to establish credibility on the topic. Copy the full bio slide from the most recent deck that uses it (e.g., `decks/202602-oss-give-and-take/`), including the portfolio `<style>` block and `public/portfolio/` assets.
 
+**IMPORTANT: Copy all referenced assets.** When copying a bio slide (or any slide) from another deck, check every `<img src="/...">` path in the slide markup and ensure the corresponding files exist in the new deck's `public/` directory. The portfolio bio slide typically references both `public/portfolio/*.svg|png` images **and** `public/github_whitphx.png` (the GitHub profile screenshot). Missing any of these will cause a Vite build error. Always list the source deck's `public/` directory and copy all assets that are referenced by the slides you are reusing.
+
 **Simple bio** — use when the talk is technical and the author's identity is secondary to the content (e.g., deep-dive into AST manipulation, a specific algorithm, or a language feature). Keep it minimal:
 
 ```html
@@ -351,11 +353,28 @@ Use UnoCSS utility classes directly on HTML elements (Attributify mode):
 **Inline code blocks** with syntax highlighting:
 
 ````
-```py {*|1-3|5-8}{'data-id': 'my-code', 'max-height': '450px'}
+```py {*|1-3|5-8}{'data-id': 'my-code', maxHeight: '450px'}
 import ast
 # ...
 ```
 ````
+
+**Code fence meta string format**: Multiple curly-brace option blocks must be written **adjacent with no space** between them. A space between blocks can cause Slidev/Shiki to silently fail to parse the second block.
+
+```
+✅ ```yaml {*|3-5}{at:4}{maxHeight:'320px'}
+❌ ```yaml {*|3-5} {at:4}    ← space breaks parsing
+```
+
+**IMPORTANT: Prevent code block overflow.** Code blocks have no default height limit, so tall code blocks will overflow the slide viewport and get cut off at the bottom. For any code block longer than ~10 lines, always add `maxHeight` to constrain it within the slide. Use `{maxHeight:'300px'}` to `{maxHeight:'380px'}` depending on how much other content is on the slide. The `maxHeight` property goes in the curly-brace options after the line highlight spec:
+
+````
+```yaml {*|3-8}{maxHeight:'320px'}
+# long code here...
+```
+````
+
+If a code block *and* surrounding text together overflow, either reduce `maxHeight`, trim the code, or reduce margins/padding on other elements. Always consider total slide height when combining code blocks with titles, descriptions, and footer text.
 
 **External code imports** — when code blocks are long, externalize to files:
 
@@ -405,9 +424,16 @@ If you need reusable slide components, create them in a `components/` directory 
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)
-- Portfolio images are typically shared — copy from a recent deck's `public/portfolio/`
+- **Verify all image references**: After writing `slides.md`, scan every `<img src="/...">` path and confirm the file exists in the deck's `public/` directory. Missing images cause Vite build errors at dev/build time.
+- Portfolio images are typically shared — copy from a recent deck's `public/portfolio/` and also any other `public/*.png|svg` files referenced by reused slides
 - Test the deck with `pnpm dev` when possible
 - Keep slide count appropriate for the talk length (roughly 1-2 minutes per slide)
 - When content is provided in a language other than the target presentation language, translate appropriately
 - Prefer structured HTML with UnoCSS over plain markdown for non-trivial layouts
 - The author's social links and bio slide content should be kept up-to-date by referencing the most recent deck
+- **Prevent vertical overflow**: Slides have a fixed viewport height. Content that is too tall will be silently clipped — there is no scrollbar in presentation mode. Watch out for:
+  - **Code blocks**: Always add `maxHeight` (e.g., `{maxHeight:'320px'}`) for blocks longer than ~10 lines.
+  - **Stacked content**: When a slide has a title + description + code block + footer text, the total height can easily exceed the viewport. Reduce margins (`mt-2` instead of `mt-6`), padding (`p-3` instead of `p-4`), or trim content.
+  - **Bullet lists with nested items**: Deep nesting or many items can push content off-screen.
+  - **Don't shrink text to fit**: Avoid using `text-sm` or `text-xs` to cram more content into a slide — this makes text unreadable for the audience. Instead, split the content across multiple slides or reduce the amount of content.
+- **Visually verify slides**: Overflow issues can only be reliably detected by viewing the rendered slides. If a Playwright MCP browser is available, use it to navigate to each content-heavy slide (at its final click state, e.g., `http://localhost:3030/{slide}?clicks=999`) and take screenshots to check for clipping. The `/export` route shows all slides rendered at once but is less precise for overflow detection than individual slide views.

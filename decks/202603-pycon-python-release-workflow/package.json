@@ -1,0 +1,16 @@
+{
+  "name": "202603-pycon-python-release-workflow",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@iconify-json/ri": "^1.2.5",
+    "@slidev/cli": "^52.8.0",
+    "slidev-addon-fancy-arrow": "^0.13.10",
+    "slidev-addon-window-mockup": "^0.3.0"
+  }
+}

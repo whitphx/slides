@@ -593,7 +593,7 @@ The final piece: **how do users trust the package?**
 
 </div>
 
-```yaml {*|3-5} {at:4}
+```yaml {*|3-5}{at:4}
   publish-to-pypi:
     permissions:
       id-token: write  # Required for trusted publishing

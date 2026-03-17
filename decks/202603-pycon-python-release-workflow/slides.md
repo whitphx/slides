@@ -146,7 +146,7 @@ Testing across Python versions and dependency combinations:
 
 </div>
 
-```yaml {*|3-8|9-11|12-18}{maxHeight:'380px'}
+```yaml {*|3-8|9-11|12-18}{maxHeight:'300px'}
 jobs:
   test-python:
     strategy:
@@ -403,7 +403,7 @@ Mapping changelog categories → SemVer bump level (inspired by Changesets):
 
 </div>
 
-```py {*|1-9|11-18}
+```py {*|1-9|11-18}{maxHeight:'340px'}
 CATEGORY_SEMVER_MAP = {
     "Added":      "minor",   # New features
     "Changed":    "minor",   # Behavior changes
@@ -434,17 +434,13 @@ The fragments **declare intent** — the version follows automatically.
 
 # The release flow
 
-<div mt-2 text-sm>
-
 Two-phase automation, inspired by Changesets' "Version Packages" PR:
 
-</div>
-
-<div mt-4>
+<div mt-2>
 
 <div flex="~ col" gap-2>
 
-<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-4 bg-sky:10>
+<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-3 bg-sky:10>
 
 **Phase 1: Changelog Preview PR** (automated)
 
@@ -455,7 +451,7 @@ Two-phase automation, inspired by Changesets' "Version Packages" PR:
 
 </div>
 
-<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-4 bg-emerald:10>
+<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
 
 **Phase 2: Release** (merge the preview PR)
 
@@ -469,7 +465,7 @@ Two-phase automation, inspired by Changesets' "Version Packages" PR:
 
 </div>
 
-<div v-click="3" mt-4 text-center text-lg>
+<div v-click="3" mt-2 text-center text-lg>
 
 Human reviews the changelog. Machine handles the rest.
 
@@ -546,7 +542,7 @@ Three workflows, each with a clear responsibility:
 
 </div>
 
-```yaml
+```yaml {maxHeight:'340px'}
 # 1️⃣ test-build.yml — triggers on PRs and pushes
 on: [push, pull_request]
 # Runs tests, builds wheel, uploads artifact
@@ -577,13 +573,13 @@ Key insight: `workflow_run` runs in the **target branch context** (main), not th
 
 # Signing and provenance
 
-<div mt-6>
+<div mt-4>
 
 The final piece: **how do users trust the package?**
 
 </div>
 
-<div mt-4>
+<div mt-2>
 
 <v-clicks>
 
@@ -706,7 +702,7 @@ Every PR gets a deployable wheel — reviewers can test with one command:
 
 </div>
 
-```yaml {*|6-8|10-15}
+```yaml {*|6-8|10-15}{maxHeight:'320px'}
   deploy-preview-wheel:
     if: github.event.workflow_run.event == 'pull_request'
     steps:
@@ -740,49 +736,45 @@ layout: section
 
 # The full release lifecycle
 
-<div mt-2 text-sm>
-
 From code change to published package:
 
-</div>
+<div mt-4 flex="~ col" gap-3>
 
-<div mt-4 flex="~ col" gap-2 text-sm>
-
-<div v-click="1" flex="~ gap-2" items-center>
+<div v-click="1" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-sky:20 flex items-center justify-center text-sky font-bold shrink-0>1</div>
-<div>Contributor opens PR with code changes + <code>scriv</code> changelog fragment</div>
+<div>Contributor opens PR with code + <code>scriv</code> fragment</div>
 </div>
 
-<div v-click="2" flex="~ gap-2" items-center>
+<div v-click="2" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-sky:20 flex items-center justify-center text-sky font-bold shrink-0>2</div>
-<div>CI runs tests across Python versions, builds wheel, deploys <strong>preview wheel</strong></div>
+<div>CI tests, builds wheel, deploys <strong>preview wheel</strong></div>
 </div>
 
-<div v-click="3" flex="~ gap-2" items-center>
+<div v-click="3" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-sky:20 flex items-center justify-center text-sky font-bold shrink-0>3</div>
-<div>PR merges → CI opens a <strong>"Preview changelog"</strong> PR with version bump</div>
+<div>PR merges → CI opens <strong>"Preview changelog"</strong> PR</div>
 </div>
 
-<div v-click="4" flex="~ gap-2" items-center>
+<div v-click="4" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-emerald:20 flex items-center justify-center text-emerald font-bold shrink-0>4</div>
-<div>Maintainer reviews changelog, merges the preview PR</div>
+<div>Maintainer reviews changelog, merges the PR</div>
 </div>
 
-<div v-click="5" flex="~ gap-2" items-center>
+<div v-click="5" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-emerald:20 flex items-center justify-center text-emerald font-bold shrink-0>5</div>
-<div>CI creates <strong>git tag</strong> → triggers build → publishes to <strong>PyPI</strong> with Trusted Publishing</div>
+<div>CI creates <strong>git tag</strong> → publishes to <strong>PyPI</strong></div>
 </div>
 
-<div v-click="6" flex="~ gap-2" items-center>
+<div v-click="6" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-emerald:20 flex items-center justify-center text-emerald font-bold shrink-0>6</div>
-<div><strong>GitHub Release</strong> created with Sigstore-signed artifacts</div>
+<div><strong>GitHub Release</strong> with Sigstore-signed artifacts</div>
 </div>
 
 </div>
 
-<div v-click="7" mt-4 text-center text-lg>
+<div v-click="7" mt-4 text-center text-xl>
 
-One human decision (merge the changelog PR) → everything else is automated.
+One human decision → everything else is automated.
 
 </div>
 

@@ -359,6 +359,16 @@ import ast
 ```
 ````
 
+**IMPORTANT: Prevent code block overflow.** Code blocks have no default height limit, so tall code blocks will overflow the slide viewport and get cut off at the bottom. For any code block longer than ~10 lines, always add `maxHeight` to constrain it within the slide. Use `{maxHeight:'300px'}` to `{maxHeight:'380px'}` depending on how much other content is on the slide. The `maxHeight` property goes in the curly-brace options after the line highlight spec:
+
+````
+```yaml {*|3-8}{maxHeight:'320px'}
+# long code here...
+```
+````
+
+If a code block *and* surrounding text together overflow, either reduce `maxHeight`, trim the code, or reduce margins/padding on other elements. Always consider total slide height when combining code blocks with titles, descriptions, and footer text.
+
 **External code imports** — when code blocks are long, externalize to files:
 
 ```
@@ -414,3 +424,9 @@ If you need reusable slide components, create them in a `components/` directory 
 - When content is provided in a language other than the target presentation language, translate appropriately
 - Prefer structured HTML with UnoCSS over plain markdown for non-trivial layouts
 - The author's social links and bio slide content should be kept up-to-date by referencing the most recent deck
+- **Prevent vertical overflow**: Slides have a fixed viewport height. Content that is too tall will be silently clipped — there is no scrollbar in presentation mode. Watch out for:
+  - **Code blocks**: Always add `maxHeight` (e.g., `{maxHeight:'320px'}`) for blocks longer than ~10 lines.
+  - **Stacked content**: When a slide has a title + description + code block + footer text, the total height can easily exceed the viewport. Reduce margins (`mt-2` instead of `mt-6`), padding (`p-3` instead of `p-4`), or trim content.
+  - **Bullet lists with nested items**: Deep nesting or many items can push content off-screen.
+  - **Don't shrink text to fit**: Avoid using `text-sm` or `text-xs` to cram more content into a slide — this makes text unreadable for the audience. Instead, split the content across multiple slides or reduce the amount of content.
+- **Visually verify slides**: Overflow issues can only be reliably detected by viewing the rendered slides. If a Playwright MCP browser is available, use it to navigate to each content-heavy slide (at its final click state, e.g., `http://localhost:3030/{slide}?clicks=999`) and take screenshots to check for clipping. The `/export` route shows all slides rendered at once but is less precise for overflow detection than individual slide views.

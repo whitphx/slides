@@ -359,6 +359,13 @@ import ast
 ```
 ````
 
+**Code fence meta string format**: Multiple curly-brace option blocks must be written **adjacent with no space** between them. A space between blocks can cause Slidev/Shiki to silently fail to parse the second block.
+
+```
+✅ ```yaml {*|3-5}{at:4}{maxHeight:'320px'}
+❌ ```yaml {*|3-5} {at:4}    ← space breaks parsing
+```
+
 **IMPORTANT: Prevent code block overflow.** Code blocks have no default height limit, so tall code blocks will overflow the slide viewport and get cut off at the bottom. For any code block longer than ~10 lines, always add `maxHeight` to constrain it within the slide. Use `{maxHeight:'300px'}` to `{maxHeight:'380px'}` depending on how much other content is on the slide. The `maxHeight` property goes in the curly-brace options after the line highlight spec:
 
 ````

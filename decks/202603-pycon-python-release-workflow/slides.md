@@ -289,6 +289,71 @@ layout: statement
 
 ---
 
+# Existing approaches
+
+<div mt-4>
+
+<v-clicks>
+
+- **Conventional Commits** — encode intent in commit messages
+  - `feat:`, `fix:`, `BREAKING CHANGE:` → auto-generate changelog & version
+  - Tools: `semantic-release`, `commitizen`, `release-please`
+- **Changelog fragments** — each PR adds a separate file describing the change
+  - A bot aggregates fragments at release time
+  - Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
+- **Manual** — maintainer writes changelog and bumps version by hand
+
+</v-clicks>
+
+</div>
+
+---
+
+# Why Changesets-style?
+
+<div grid="~ cols-2" gap-6 mt-4>
+
+<div>
+
+**Conventional Commits**
+
+<v-clicks>
+
+- Version intent tied to **commit messages**
+- Requires discipline on every commit
+- Squash merges lose granularity
+- Changelog reads like a git log
+
+</v-clicks>
+
+</div>
+
+<div v-click="1">
+
+**Changelog fragments**
+
+<v-clicks at="5">
+
+- Version intent is a **dedicated file** — reviewed in the PR
+- One fragment per PR, not per commit
+- Survives squash, rebase, amend
+- Easy to edit fragments **after merge** — just update the file
+- Changelog is **human-written prose**
+
+</v-clicks>
+
+</div>
+
+</div>
+
+<div v-click mt-6 text-center text-lg>
+
+Fragments decouple **"what changed"** from **"how it was committed"**.
+
+</div>
+
+---
+
 # Inspiration: Changesets (JS ecosystem)
 
 <div mt-4>

@@ -237,58 +237,6 @@ Tools like `tox` / `nox` can manage this too — here we use GitHub Actions matr
 
 ---
 
-# Building distributable packages
-
-<div mt-4>
-
-Use `hatch-vcs` to derive the version from **git tags** — single source of truth:
-
-</div>
-
-<div grid="~ cols-2" gap-6 mt-4>
-
-<div>
-
-```toml
-# pyproject.toml
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "vcs"
-
-[project]
-dynamic = ["version"]
-```
-
-</div>
-
-<div v-click="1">
-
-<WindowMockup title="Terminal" dark codeblock>
-
-```shell
-$ git tag v0.64.5
-$ python -m build
-Building wheel...
-streamlit_webrtc-0.64.5-py3-none-any.whl
-```
-
-</WindowMockup>
-
-<div mt-4 op80 text-sm>
-
-No hardcoded version strings anywhere — the git tag **is** the version.
-
-</div>
-
-</div>
-
-</div>
-
----
-
 # Build artifacts in CI
 
 <div mt-6>

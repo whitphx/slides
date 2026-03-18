@@ -143,7 +143,9 @@ build → publish-to-pypi
 
 <div v-click="3" mt-4 op80>
 
-Great foundations — but a **growing OSS library** needs more.
+Both use **GitHub Actions** — we'll build on that throughout this talk.
+
+Great foundations — but a growing OSS library needs more.
 
 </div>
 

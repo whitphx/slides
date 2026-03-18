@@ -320,39 +320,122 @@ The wheel that passes tests is the **exact same wheel** that gets published.
 layout: section
 ---
 
-# 📝 Change Management
+# 📝 Changelog & Versioning
 
 <div mt-4 op70>
-Track what changed, decide the next version — without manual bookkeeping.
+Two sides of the same coin — automate them together.
 </div>
 
 ---
 layout: statement
 ---
 
-## How do you keep track of changes<br>and decide the next version number?
+## Changelog and versioning are **coupled problems**
+
+<div mt-4 op70 text-xl>
+What changed → what version comes next
+</div>
 
 ---
 
-# The problem
+# How streamlit-webrtc started
 
-<div mt-6>
+<div mt-4>
 
-<v-clicks>
+<div grid="~ cols-2" gap-6>
 
-- Writing changelogs retroactively is painful and error-prone
-- Deciding "is this a patch or minor?" at release time is hard
-- CHANGELOG.md merge conflicts when multiple PRs land
-- Manual versioning invites mistakes
+<div>
 
-</v-clicks>
+**Changelog**: manual
+
+- Edit CHANGELOG.md by hand before each release
+- Easy to forget, hard to keep consistent
 
 </div>
 
-<div v-click mt-8 text-xl>
+<div v-click="1">
 
-**Idea**: each PR carries its own changelog entry and version hint.
+**Versioning**: `bump-my-version`
+
+```toml
+# pyproject.toml
+version = "0.49.4"  # hardcoded
+```
+
+```shell
+$ make release/minor
+# bump-my-version bump minor
+#   --tag --commit
+```
+
 </div>
+
+</div>
+
+</div>
+
+<div v-click="2" mt-4 op80>
+
+Both fully **manual** — the maintainer decides everything at release time.
+
+</div>
+
+---
+
+# First improvement: `hatch-vcs`
+
+<div mt-4>
+
+Eliminate the hardcoded version string:
+
+</div>
+
+<div grid="~ cols-2" gap-6 mt-2>
+
+<div>
+
+```toml
+# Before
+[project]
+version = "0.49.4"
+
+[build-system]
+requires = ["hatchling"]
+```
+
+</div>
+
+<div v-click="1">
+
+```toml
+# After
+[project]
+dynamic = ["version"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+```
+
+</div>
+
+</div>
+
+<div v-click="2" mt-4>
+
+Version = latest **git tag** at build time. No more hardcoded strings to keep in sync.
+
+But `bump-my-version` still creates the tag — the **human still decides** the bump level.
+
+</div>
+
+---
+layout: statement
+---
+
+## Can we automate **both** changelog and versioning?
 
 ---
 
@@ -366,9 +449,8 @@ layout: statement
   - `feat:`, `fix:`, `BREAKING CHANGE:` → auto-generate changelog & version
   - Tools: `semantic-release`, `commitizen`, `release-please`
 - **Changelog fragments** — each PR adds a separate file describing the change
-  - A bot aggregates fragments at release time
+  - A bot aggregates fragments and calculates the version at release time
   - Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
-- **Manual** — maintainer writes changelog and bumps version by hand
 
 </v-clicks>
 
@@ -424,7 +506,7 @@ Fragments decouple **"what changed"** from **"how it was committed"**.
 
 <div mt-4>
 
-In the JavaScript world, [Changesets](https://github.com/changesets/changesets) solves this:
+In the JavaScript world, [Changesets](https://github.com/changesets/changesets) solves both:
 
 </div>
 
@@ -456,7 +538,7 @@ for locale-aware date formatting.
 
 <div mt-2 op70 text-sm>
 
-A changeset file — lives alongside the code change.
+One file → changelog entry **and** version bump level.
 
 </div>
 
@@ -470,7 +552,7 @@ A changeset file — lives alongside the code change.
 
 <div mt-4>
 
-[`scriv`](https://github.com/nedbat/scriv) is a changelog management tool for Python projects.
+[`scriv`](https://github.com/nedbat/scriv) manages changelog fragments for Python projects.
 
 </div>
 
@@ -526,98 +608,17 @@ Each PR gets its own fragment file — no merge conflicts!
 
 ---
 
-# But what about versioning?
+# From fragments to version numbers
 
-scriv handles **changelogs** — but who decides the **version number**?
+scriv handles changelogs — but how do we **derive the version** from them?
 
-<div grid="~ cols-2" gap-6 mt-4>
+<div mt-4>
 
-<div v-click="1">
-
-**Tag-based** (`hatch-vcs`)
-
-```toml
-[tool.hatch.version]
-source = "vcs"
-```
-
-Version = latest git tag. Simple, but someone must **manually decide** the tag name.
+The fragment categories already carry **semantic intent**:
 
 </div>
 
-<div v-click="2">
-
-**Bump tool** (`bump-my-version`)
-
-```shell
-$ bump-my-version bump minor
-# 0.64.4 → 0.65.0
-```
-
-Explicit control, but the **human** still picks the level.
-
-</div>
-
-</div>
-
-<div v-click="3" mt-4 text-center text-lg>
-
-Can we **automate** the version decision too?
-
-</div>
-
----
-
-# streamlit-webrtc's versioning journey
-
-<div mt-2>
-
-<div flex="~ col" gap-2>
-
-<div v-click="1" border="~ gray/30 rounded-lg" p-2 bg-gray:5 text-sm>
-
-**v1: Hardcoded version** + `bump-my-version`
-
-- Version string in `pyproject.toml`: `version = "0.49.4"`
-- Manual `make release/patch` or `make release/minor`
-- Had to remember to update CHANGELOG.md before release
-
-</div>
-
-<div v-click="2" border="~ sky/30 rounded-lg" p-2 bg-sky:5 text-sm>
-
-**v2: `hatch-vcs`** — version from git tags
-
-- `dynamic = ["version"]` + `source = "vcs"` — no hardcoded version
-- But still: **who tags? what version?** → manual `bump-my-version bump`
-
-</div>
-
-<div v-click="3" border="~ emerald/30 rounded-lg" p-2 bg-emerald:5 text-sm>
-
-**v3: scriv fragments** → auto-calculate version
-
-- Changelog categories **declare** the bump level (Added→minor, Fixed→patch, ...)
-- Custom script reads fragments, returns `major`/`minor`/`patch`
-- CI tags automatically — **no manual version decision**
-
-</div>
-
-</div>
-
-</div>
-
----
-
-# Automated version calculation
-
-<div mt-2>
-
-Mapping changelog categories → SemVer bump level (inspired by Changesets):
-
-</div>
-
-```py {*|1-9|11-18}{maxHeight:'340px'}
+```py {*|1-9|11-18}{maxHeight:'300px'}
 CATEGORY_SEMVER_MAP = {
     "Added":      "minor",   # New features
     "Changed":    "minor",   # Behavior changes
@@ -638,9 +639,46 @@ def get_bump_level():
     return max_level(entries)
 ```
 
-<div v-click op80 mt-2>
+<div v-click mt-2 op80>
 
-The fragments **declare intent** — the version follows automatically.
+One source of truth: fragments → changelog **and** version bump.
+
+</div>
+
+---
+
+# The full picture
+
+<div mt-2>
+
+How the pieces fit together in streamlit-webrtc today:
+
+</div>
+
+<div mt-2 flex="~ col" gap-1 text-sm>
+
+<div v-click="1" flex="~ gap-2" items-center>
+<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>1</div>
+<div><code>bump-my-version</code> creates git <strong>tag</strong> → <code>hatch-vcs</code> reads it at build time</div>
+</div>
+
+<div v-click="2" flex="~ gap-2" items-center>
+<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>2</div>
+<div><code>scriv</code> collects fragments → CHANGELOG.md</div>
+</div>
+
+<div v-click="3" flex="~ gap-2" items-center>
+<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>3</div>
+<div>Custom script reads fragment categories → tells <code>bump-my-version</code> which level</div>
+</div>
+
+</div>
+
+<div v-click="4" mt-4 border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
+
+**Before**: maintainer writes changelog by hand, picks version level, runs `make release/minor`
+
+**After**: fragments auto-generate changelog **and** determine version — CI does the rest
 
 </div>
 

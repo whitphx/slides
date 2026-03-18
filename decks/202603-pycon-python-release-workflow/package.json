@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@iconify-json/ri": "^1.2.5",
-    "@slidev/cli": "^52.8.0",
+    "@slidev/cli": "^52.14.1",
     "slidev-addon-fancy-arrow": "^0.13.10",
     "slidev-addon-window-mockup": "^0.3.0"
   }

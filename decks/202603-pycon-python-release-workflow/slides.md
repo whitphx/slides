@@ -459,6 +459,89 @@ Each PR gets its own fragment file — no merge conflicts!
 
 ---
 
+# But what about versioning?
+
+scriv handles **changelogs** — but who decides the **version number**?
+
+<div grid="~ cols-2" gap-6 mt-4>
+
+<div v-click="1">
+
+**Tag-based** (`hatch-vcs`)
+
+```toml
+[tool.hatch.version]
+source = "vcs"
+```
+
+Version = latest git tag. Simple, but someone must **manually decide** the tag name.
+
+</div>
+
+<div v-click="2">
+
+**Bump tool** (`bump-my-version`)
+
+```shell
+$ bump-my-version bump minor
+# 0.64.4 → 0.65.0
+```
+
+Explicit control, but the **human** still picks the level.
+
+</div>
+
+</div>
+
+<div v-click="3" mt-4 text-center text-lg>
+
+Can we **automate** the version decision too?
+
+</div>
+
+---
+
+# streamlit-webrtc's versioning journey
+
+<div mt-2>
+
+<div flex="~ col" gap-2>
+
+<div v-click="1" border="~ gray/30 rounded-lg" p-2 bg-gray:5 text-sm>
+
+**v1: Hardcoded version** + `bump-my-version`
+
+- Version string in `pyproject.toml`: `version = "0.49.4"`
+- Manual `make release/patch` or `make release/minor`
+- Had to remember to update CHANGELOG.md before release
+
+</div>
+
+<div v-click="2" border="~ sky/30 rounded-lg" p-2 bg-sky:5 text-sm>
+
+**v2: `hatch-vcs`** — version from git tags
+
+- `dynamic = ["version"]` + `source = "vcs"` — no hardcoded version
+- But still: **who tags? what version?** → manual `bump-my-version bump`
+
+</div>
+
+<div v-click="3" border="~ emerald/30 rounded-lg" p-2 bg-emerald:5 text-sm>
+
+**v3: scriv fragments** → auto-calculate version
+
+- Changelog categories **declare** the bump level (Added→minor, Fixed→patch, ...)
+- Custom script reads fragments, returns `major`/`minor`/`patch`
+- CI tags automatically — **no manual version decision**
+
+</div>
+
+</div>
+
+</div>
+
+---
+
 # Automated version calculation
 
 <div mt-2>

@@ -270,7 +270,7 @@ The wheel that passes tests is the **exact same wheel** that gets published.
 
 <div mt-2>
 
-A common pattern: pushing a **version tag** triggers the release pipeline.
+A common CI pattern (shown here with GitHub Actions): pushing a **version tag** triggers the release pipeline.
 
 </div>
 
@@ -768,7 +768,7 @@ layout: section
 # 🔒 Security
 
 <div mt-4 op70>
-Open source means untrusted code runs in your CI — plan for it.
+Open source means untrusted code runs in your CI — GitHub Actions has specific pitfalls.
 </div>
 
 ---
@@ -777,7 +777,7 @@ Open source means untrusted code runs in your CI — plan for it.
 
 <div mt-4>
 
-When external contributors open PRs, the CI runs their code:
+In **GitHub Actions**, PR workflows run the contributor's code — with access to your CI environment:
 
 </div>
 
@@ -832,7 +832,7 @@ Secrets never exposed to PR code.
 
 <div mt-4>
 
-Three workflows, each with a clear responsibility:
+GitHub Actions lets you split CI into **separate workflow files** with different trigger contexts and permissions:
 
 </div>
 
@@ -859,7 +859,7 @@ on:
 
 <div v-click mt-2 op80>
 
-Key insight: `workflow_run` runs in the **target branch context** (main), not the PR branch — so secrets are safe.
+Key insight: GitHub Actions' `workflow_run` runs in the **target branch context** (main), not the PR branch — so secrets are safe. This is a GHA-specific mechanism; other CI systems may handle this differently.
 
 </div>
 
@@ -877,7 +877,7 @@ The final piece: **how do users trust the package?**
 
 <v-clicks>
 
-- **Trusted Publishing** (PyPI) — GitHub OIDC authenticates directly, no API tokens
+- **Trusted Publishing** (PyPI) — GitHub Actions OIDC authenticates directly, no API tokens
 - **Sigstore signing** — ephemeral certificates, verifiable provenance
 - **GitHub Release** — signed artifacts attached for auditing
 

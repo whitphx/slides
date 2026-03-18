@@ -103,13 +103,70 @@ A Streamlit component for real-time video/audio processing.
 </div>
 
 ---
-layout: statement
+
+# A common starting point
+
+GitHub's own starter template and the PyPA packaging guide:
+
+<div grid="~ cols-2" gap-6 mt-2>
+
+<div v-click="1" border="~ gray/30 rounded-lg" p-3 bg-gray:5>
+
+**"Publish Python Package"** template
+
+```
+release-build → pypi-publish
+```
+
+- Triggers on GitHub Release
+- Build + publish only
+- No tests, no changelog
+
+</div>
+
+<div v-click="2" border="~ gray/30 rounded-lg" p-3 bg-gray:5>
+
+**PyPA packaging guide** workflow
+
+```
+build → publish-to-pypi
+      → publish-to-testpypi
+```
+
+- Trusted Publishing (OIDC)
+- Build/publish separation
+- Still no tests or changelog
+
+</div>
+
+</div>
+
+<div v-click="3" mt-4 op80>
+
+Great foundations — but a **growing OSS library** needs more.
+
+</div>
+
 ---
 
-## Beyond `git push` → PyPI
+# Goal of this talk
 
-<div mt-4 op70 text-xl>
-What does a mature OSS library actually need?
+<div mt-6 text-xl>
+
+<v-clicks>
+
+- **Maximize safety** — prevent bad releases, protect secrets
+- **Minimize manual effort** — automate versioning, changelogs, publishing
+- **Lower the contribution barrier** — make it easy to do the right thing
+
+</v-clicks>
+
+</div>
+
+<div v-click mt-8 text-center text-lg>
+
+Build a release pipeline where the **only human decision** is merging a PR.
+
 </div>
 
 ---
@@ -135,6 +192,10 @@ layout: section
 ---
 
 # 🧪 Test & Build Strategy
+
+<div mt-4 op70>
+Catch bugs before they reach users — across every supported environment.
+</div>
 
 ---
 
@@ -260,6 +321,10 @@ layout: section
 ---
 
 # 📝 Change Management
+
+<div mt-4 op70>
+Track what changed, decide the next version — without manual bookkeeping.
+</div>
 
 ---
 layout: statement
@@ -626,6 +691,10 @@ layout: section
 
 # 🔒 Security
 
+<div mt-4 op70>
+Open source means untrusted code runs in your CI — plan for it.
+</div>
+
 ---
 
 # The untrusted PR problem
@@ -755,6 +824,10 @@ layout: section
 
 # 📖 Documentation
 
+<div mt-4 op70>
+Docs that stay in sync with every release — automatically.
+</div>
+
 ---
 
 # Automated docs deployment
@@ -807,6 +880,10 @@ layout: section
 ---
 
 # 🧑‍💻 Developer Experience
+
+<div mt-4 op70>
+Make it easy to contribute correctly — so you spend less time on review.
+</div>
 
 ---
 

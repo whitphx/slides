@@ -265,6 +265,39 @@ The wheel that passes tests is the **exact same wheel** that gets published.
 </div>
 
 ---
+
+# Tag → build → publish
+
+<div mt-2>
+
+A common pattern: pushing a **version tag** triggers the release pipeline.
+
+</div>
+
+```yaml {*|2-4|8-11}{maxHeight:'280px'}
+# test-build.yml
+on:
+  push:
+    tags: ["v*"]  # Triggers on version tags
+jobs:
+  build:
+    steps:
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+  publish:
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: pypa/gh-action-pypi-publish@release/v1
+```
+
+<div v-click mt-2 op80>
+
+`git tag v1.2.3 && git push --tags` → CI builds and publishes. But **who creates the tag?**
+
+</div>
+
+---
 layout: section
 ---
 
@@ -668,6 +701,63 @@ Two-phase automation, inspired by Changesets' "Version Packages" PR:
 <div v-click="3" mt-2 text-center>
 
 Human reviews the changelog. Machine handles the rest.
+
+</div>
+
+---
+
+# Re-implementing Changesets for Python
+
+<div mt-2>
+
+In JS, [`changesets/action`](https://github.com/changesets/action) handles the two-phase flow automatically.
+
+No equivalent exists for Python — so we build it with a **single GitHub Actions workflow**: `changelog.yml`
+
+</div>
+
+<div mt-4>
+
+<div v-click="1" border="~ sky/50 rounded-lg" p-2 bg-sky:5 text-sm>
+
+**On every push to `main`**: detect if changelog fragments exist
+
+→ **Yes**: collect fragments, calculate version, open/update a **"Preview changelog" PR**
+
+→ **No** (fragments already collected): this must be the merged preview PR → **create a git tag** and push it
+
+</div>
+
+</div>
+
+<div v-click="2" mt-4 op80>
+
+One workflow, two behaviors — driven by the **presence or absence** of fragment files.
+
+The pushed tag then triggers the existing build & publish pipeline (`v*` tag → test → publish to PyPI).
+
+</div>
+
+---
+
+# Why not just use Changesets action?
+
+<div mt-4>
+
+<v-clicks>
+
+- `changesets/action` is JS-only — it reads `package.json`, runs `npm publish`
+- We need Python tools: `scriv` for fragments, `bump-my-version` for tagging
+- The **concept** is the same — only the tooling differs
+- ~150 lines of GitHub Actions YAML to replicate the pattern
+
+</v-clicks>
+
+</div>
+
+<div v-click mt-6 border="~ sky/50 rounded-lg" p-3 bg-sky:10>
+
+The workflow is the most complex piece — but it's **write once, use forever**. Every future release is just: merge a PR with a fragment file.
 
 </div>
 

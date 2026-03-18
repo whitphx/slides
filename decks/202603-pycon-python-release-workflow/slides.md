@@ -166,9 +166,11 @@ jobs:
       - run: pytest
 ```
 
-<div v-click mt-4 op80>
+<div v-click mt-2 op80>
 
 Test the **edges of your compatibility matrix** — oldest and newest supported versions.
+
+Tools like `tox` / `nox` can manage this too — here we use GitHub Actions matrix directly for parallel runs and simpler CI integration.
 
 </div>
 

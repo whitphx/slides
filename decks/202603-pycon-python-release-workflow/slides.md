@@ -508,7 +508,7 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 <v-clicks at="5">
 
 - Version intent is a **dedicated file** — reviewed in the PR
-- One fragment per PR, not per commit
+- Typically one fragment per PR (multiple are fine too)
 - Survives squash/rebase; easy to edit **after merge**
 - Changelog is **human-written prose**
 

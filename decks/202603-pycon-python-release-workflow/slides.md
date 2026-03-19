@@ -84,8 +84,7 @@ A Streamlit component for real-time video/audio processing.
 
 <v-clicks>
 
-- Python + TypeScript (frontend component)
-- Published to **PyPI**
+- Python library published to **PyPI**
 - Open source, external contributors
 - Multi-platform, multi-Python-version support
 - **100+ releases** so far
@@ -350,7 +349,7 @@ These are **coupled** — what changed determines the next version, and the vers
 
 # Phase 1: Everything manual
 
-<div mt-2>
+<div mt-2 text-sm>
 
 | Problem | Solution |
 |---|---|
@@ -360,19 +359,18 @@ These are **coupled** — what changed determines the next version, and the vers
 
 </div>
 
-<div v-click mt-4>
+<div v-click mt-2>
 
 ```toml
-# pyproject.toml
 [project]
 version = "0.49.4"  # manually edited for each release
 ```
 
 </div>
 
-<div v-click mt-4 op80>
+<div v-click mt-2 op80>
 
-The most primitive approach — everything done by hand. Easy to forget the changelog, easy to get the version wrong.
+Everything done by hand — easy to forget the changelog, easy to get the version wrong.
 
 </div>
 
@@ -380,7 +378,7 @@ The most primitive approach — everything done by hand. Easy to forget the chan
 
 # Phase 2: `bump-my-version`
 
-<div mt-2>
+<div mt-2 text-sm>
 
 | Problem | Solution |
 |---|---|
@@ -390,7 +388,7 @@ The most primitive approach — everything done by hand. Easy to forget the chan
 
 </div>
 
-<div v-click mt-4>
+<div v-click mt-2>
 
 ```shell
 $ bump-my-version bump minor --tag --commit
@@ -400,9 +398,9 @@ $ bump-my-version bump minor --tag --commit
 
 </div>
 
-<div v-click mt-4 op80>
+<div v-click mt-2 op80>
 
-Better: no manual file editing for versions. But the **human still picks** patch vs. minor, and changelog is still manual.
+No manual file editing for versions. But the **human still picks** patch vs. minor, and changelog is still manual.
 
 </div>
 
@@ -410,7 +408,7 @@ Better: no manual file editing for versions. But the **human still picks** patch
 
 # Phase 3: `hatch-vcs` eliminates hardcoded version
 
-<div mt-2>
+<div mt-2 text-sm>
 
 | Problem | Solution |
 |---|---|
@@ -423,15 +421,11 @@ Better: no manual file editing for versions. But the **human still picks** patch
 <div v-click="1" mt-2>
 
 ```toml
-# pyproject.toml
 [project]
-dynamic = ["version"]   # no more hardcoded string
+dynamic = ["version"]        # no more hardcoded string
 
 [tool.hatch.version]
-source = "vcs"          # version = latest git tag
-
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
+source = "vcs"               # version = latest git tag
 ```
 
 </div>
@@ -446,10 +440,10 @@ Bonus: `hatch-vcs` generates **dev versions** (e.g., `0.64.6.dev17+g8476028`) fo
 layout: statement
 ---
 
-## Problems #1 and #2 are still manual — can we automate them?
+## Changelog and version bumping are still manual — can we automate them?
 
 <div mt-4 op70 text-xl>
-Changelog management and version bumping
+The remaining pain points
 </div>
 
 ---
@@ -460,7 +454,7 @@ Both automate changelog + versioning by **aggregating structured inputs** — th
 
 <div grid="~ cols-2" gap-6 mt-4>
 
-<div v-click="1" border="~ sky/30 rounded-lg" p-3 bg-sky:5>
+<div v-click="1" border="~ sky/30 rounded-lg" p-2 bg-sky:5>
 
 **Conventional Commits**
 
@@ -478,7 +472,7 @@ Tools: `semantic-release`, `commitizen`, `release-please`
 
 </div>
 
-<div v-click="2" border="~ emerald/30 rounded-lg" p-3 bg-emerald:5>
+<div v-click="2" border="~ emerald/30 rounded-lg" p-2 bg-emerald:5>
 
 **Changelog fragments**
 
@@ -518,7 +512,7 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 </div>
 
-<div v-click="1">
+<div>
 
 **Changelog fragments**
 
@@ -634,7 +628,7 @@ $ scriv create --edit
 
 <div v-click="2" mt-2 op80>
 
-But these tools **only solve problem #1** (changelog). No version calculation, no CI release flow — unlike Changesets which covers all three.
+But these tools **only handle changelogs**. No version calculation, no CI release flow — unlike Changesets which covers all three.
 
 </div>
 
@@ -642,7 +636,7 @@ But these tools **only solve problem #1** (changelog). No version calculation, n
 
 # Phase 4: Filling the gaps
 
-<div mt-2>
+<div mt-2 text-sm>
 
 | Problem | Changesets (JS) | streamlit-webrtc (Python) |
 |---|---|---|
@@ -653,12 +647,12 @@ But these tools **only solve problem #1** (changelog). No version calculation, n
 
 </div>
 
-<div v-click mt-4 op80>
+<div v-click mt-2 op80 text-sm>
 
 I wrote two things to close the gap:
 
-1. **`get_bump_version_level.py`** — reads scriv fragment categories, returns `major`/`minor`/`patch`, creates a git tag
-2. **`changelog.yml`** — a GitHub Actions workflow that replicates the Changesets PR-based release flow
+1. **`get_bump_version_level.py`** — reads fragment categories, returns `major`/`minor`/`patch`
+2. **`changelog.yml`** — GitHub Actions workflow replicating the Changesets release flow
 
 </div>
 
@@ -744,7 +738,7 @@ How all the tools work together in Phase 4:
 
 </div>
 
-<div mt-4>
+<div mt-2 text-sm>
 
 | Problem | Tool | Role |
 |---|---|---|
@@ -756,9 +750,7 @@ How all the tools work together in Phase 4:
 
 <div v-click mt-4 op80>
 
-Each tool solves **one problem**. `scriv` and `hatch-vcs` are off-the-shelf; the custom script and workflow **connect** them into a Changesets-like pipeline.
-
-`hatch-vcs` also gives us **dev versions** for free — CI preview wheels get versions like `0.64.6.dev17+g8476028` without any extra work.
+`scriv` and `hatch-vcs` are off-the-shelf; the custom script and workflow **connect** them into a Changesets-like pipeline. Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476028`) — useful for preview wheels.
 
 </div>
 
@@ -966,9 +958,7 @@ The easier it is to contribute correctly, the less time you spend on review.
 
 <div mt-2>
 
-Every PR gets a deployable wheel — reviewers can test with one command.
-
-This runs in the `workflow_run`-triggered workflow — because deploying to Cloudflare Pages requires **secrets** that aren't available in the `pull_request` context.
+Every PR gets a deployable wheel. This runs in `workflow_run` — deploying needs **secrets** unavailable in `pull_request` context.
 
 </div>
 

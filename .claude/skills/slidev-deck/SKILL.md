@@ -24,6 +24,31 @@ The user may provide:
 
 Ask clarifying questions if you need more context about the audience, event, talk length, or emphasis.
 
+### 1.5. Content design principles
+
+Before writing any slides, plan the **information flow**. A good presentation is a chain of well-connected ideas — each slide should set up the next.
+
+#### Narrative structure
+
+- **Start from what the audience already knows.** Introduce the simplest or most common approach first, then progressively build toward more advanced solutions. For example, if the talk is about CI/CD workflows, start with "run a build script locally" before jumping to "GitHub Actions matrix builds."
+- **Every technique needs motivation.** Before introducing a tool or methodology, explain the **problem** it solves. The audience must feel the pain before they can appreciate the cure. A slide that says "Use scriv for changelogs" without first showing why manual changelogs are painful will not land.
+- **Connect slides explicitly.** Each slide should flow into the next. End problem slides with a question or tension ("But who decides the version?") that the next slide resolves. Avoid abrupt topic jumps.
+- **Section headers should carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users — across every supported environment").
+
+#### Accuracy and assumptions
+
+- **Don't assume prior knowledge.** If a slide references a concept (e.g., "tag-triggered releases," "OIDC authentication"), either explain it briefly or ensure a previous slide has introduced it. The audience should never need to guess what you mean.
+- **Scope your claims to the specific tool/platform.** If a behavior is specific to GitHub Actions (e.g., `workflow_run` execution context, `pull_request` event permissions), say so explicitly. Don't present platform-specific behavior as universal truth. If the entire talk uses one CI platform, establish this early and justify the choice (e.g., "The official Python packaging guide also uses GitHub Actions").
+- **Be precise about tool relationships.** If multiple tools work together (e.g., `hatch-vcs` reads tags at build time, `bump-my-version` creates tags at release time), explain each tool's role clearly. Don't imply one replaces the other when they actually complement each other.
+- **Don't reference unstable or configurable names as if they're fixed.** If a PR title, branch name, or label is configurable, describe it generically (e.g., "a Release PR") rather than using a specific default name that may differ across projects.
+
+#### Content quality
+
+- **Slides that compare approaches should be fair.** Present both sides with concrete examples, not just bullet points of pros/cons. Show the audience *what it looks like* to use each approach, then let them see the tradeoff.
+- **When presenting an evolution/journey, use a consistent framing.** If you're showing how a project evolved through phases, keep the same set of problems visible across phases so the audience can track what improved (e.g., a table with "Changelog | Version bump | Package version" across phases).
+- **Code examples must be accurate.** If you show a workflow snippet, it should reflect what the tool actually does — not a plausible-looking approximation. When the actual code is too long, show the structure as pseudocode/comments but label it clearly (e.g., "concept — actual workflow is ~145 lines").
+- **Use the "Context" or "Case study" slide to set the stage**, not to showcase the project's features. The audience should understand *why this project is a good example* for the topic (e.g., many releases, external contributors, CI complexity), not what the project does as a product.
+
 ### 2. Create the deck package (for new decks)
 
 Create a new directory under `decks/` following the naming convention: `YYYYMM-short-kebab-description` (e.g., `202603-pycon-async-patterns`).

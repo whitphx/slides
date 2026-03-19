@@ -104,9 +104,31 @@ A Streamlit component for real-time video/audio processing.
 
 ---
 
+# How do you release a Python package?
+
+<div mt-4>
+
+<v-clicks>
+
+- The simplest way: run `python -m build` and `twine upload` **on your local machine**
+- Works, but: depends on your environment, easy to forget steps, no audit trail
+- Most mature projects move this to **CI/CD** — reproducible, automated, traceable
+
+</v-clicks>
+
+</div>
+
+<div v-click mt-6 op80>
+
+This talk focuses on **CI-based release workflows** — specifically with GitHub Actions, which the official Python packaging guide also uses.
+
+</div>
+
+---
+
 # A common starting point
 
-GitHub's own starter template and the PyPA packaging guide:
+The [PyPA packaging guide](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/) and GitHub's starter template:
 
 <div grid="~ cols-2" gap-6 mt-2>
 
@@ -142,8 +164,6 @@ build → publish-to-pypi
 </div>
 
 <div v-click="3" mt-4 op80>
-
-Both use **GitHub Actions** — we'll build on that throughout this talk.
 
 Great foundations — but a growing OSS library needs more.
 
@@ -182,8 +202,8 @@ Build a release pipeline where the **only human decision** is merging a PR.
 - 🧪 **Test & Build** — multi-env testing, idempotent builds
 - 📝 **Change Management** — changelog + automated versioning
 - 🔒 **Security** — handling untrusted PRs, securing releases
-- 📖 **Documentation** — automated docs deployment
 - 🧑‍💻 **Developer Experience** — making it easy for contributors
+- 📖 **Documentation** — automated docs deployment
 
 </v-clicks>
 
@@ -346,9 +366,8 @@ version = "0.49.4"  # hardcoded
 ```
 
 ```shell
-$ make release/minor
-# bump-my-version bump minor
-#   --tag --commit
+$ bump-my-version bump minor \
+    --tag --commit
 ```
 
 </div>
@@ -422,20 +441,46 @@ layout: statement
 
 ---
 
-# Existing approaches
+# Two approaches, one concept
 
-<div mt-4>
+Both automate changelog + versioning by **aggregating structured inputs** — they differ in the input source:
 
-<v-clicks>
+<div grid="~ cols-2" gap-6 mt-4>
 
-- **Conventional Commits** — encode intent in commit messages
-  - `feat:`, `fix:`, `BREAKING CHANGE:` → auto-generate changelog & version
-  - Tools: `semantic-release`, `commitizen`, `release-please`
-- **Changelog fragments** — each PR adds a separate file describing the change
-  - A bot aggregates fragments and calculates the version at release time
-  - Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
+<div v-click="1" border="~ sky/30 rounded-lg" p-3 bg-sky:5>
 
-</v-clicks>
+**Conventional Commits**
+
+Input: **commit messages**
+
+```
+feat: add locale-aware dates
+fix: handle null timezone
+BREAKING CHANGE: drop Python 3.9
+```
+
+Tools parse `feat:`→minor, `fix:`→patch, `BREAKING CHANGE:`→major
+
+Tools: `semantic-release`, `commitizen`, `release-please`
+
+</div>
+
+<div v-click="2" border="~ emerald/30 rounded-lg" p-3 bg-emerald:5>
+
+**Changelog fragments**
+
+Input: **dedicated files** per PR
+
+```md
+### Added
+- Locale-aware date formatting
+```
+
+Categories map to SemVer levels
+
+Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
+
+</div>
 
 </div>
 
@@ -659,7 +704,7 @@ How the pieces fit together in streamlit-webrtc today:
 
 <div v-click="4" mt-4 border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
 
-**Before**: maintainer writes changelog by hand, picks version level, runs `make release/minor`
+**Before**: maintainer writes changelog by hand, picks version level, runs `bump-my-version bump minor`
 
 **After**: fragments auto-generate changelog **and** determine version — CI does the rest
 
@@ -669,7 +714,7 @@ How the pieces fit together in streamlit-webrtc today:
 
 # The release flow
 
-Two-phase automation, inspired by Changesets' "Version Packages" PR:
+Two-phase automation, inspired by the Changesets release cycle:
 
 <div mt-2>
 
@@ -712,54 +757,34 @@ Human reviews the changelog. Machine handles the rest.
 
 <div mt-2>
 
-In JS, [`changesets/action`](https://github.com/changesets/action) handles the two-phase flow automatically.
+In JS, [`changesets/action`](https://github.com/changesets/action) handles this flow — but it's JS-only (`package.json`, `npm publish`).
 
-No equivalent exists for Python — so we build it with a **single GitHub Actions workflow**: `changelog.yml`
-
-</div>
-
-<div mt-4>
-
-<div v-click="1" border="~ sky/50 rounded-lg" p-2 bg-sky:5 text-sm>
-
-**On every push to `main`**: detect if changelog fragments exist
-
-→ **Yes**: collect fragments, calculate version, open/update a **"Preview changelog" PR**
-
-→ **No** (fragments already collected): this must be the merged preview PR → **create a git tag** and push it
+We replicate the same concept with a **single GitHub Actions workflow** using Python tools:
 
 </div>
 
-</div>
+```yaml {*}{maxHeight:'240px'}
+# changelog.yml (concept — actual workflow is ~145 lines)
+on:
+  push:
+    branches: [main]
 
-<div v-click="2" mt-4 op80>
+# On every push to main, check for changelog fragments:
+#
+# Fragments EXIST →
+#   scriv collect → aggregate into CHANGELOG.md
+#   get_bump_version_level.py → calculate next version
+#   Push to preview branch, create/update a Release PR
+#
+# Fragments DON'T EXIST (= Release PR was just merged) →
+#   Read bump level from the previous commit
+#   bump-my-version bump $level --tag --no-commit
+#   Push tag → triggers build & publish pipeline
+```
+
+<div v-click mt-2 op80>
 
 One workflow, two behaviors — driven by the **presence or absence** of fragment files.
-
-The pushed tag then triggers the existing build & publish pipeline (`v*` tag → test → publish to PyPI).
-
-</div>
-
----
-
-# Why not just use Changesets action?
-
-<div mt-4>
-
-<v-clicks>
-
-- `changesets/action` is JS-only — it reads `package.json`, runs `npm publish`
-- We need Python tools: `scriv` for fragments, `bump-my-version` for tagging
-- The **concept** is the same — only the tooling differs
-- ~150 lines of GitHub Actions YAML to replicate the pattern
-
-</v-clicks>
-
-</div>
-
-<div v-click mt-6 border="~ sky/50 rounded-lg" p-3 bg-sky:10>
-
-The workflow is the most complex piece — but it's **write once, use forever**. Every future release is just: merge a PR with a fragment file.
 
 </div>
 
@@ -777,54 +802,39 @@ Open source means untrusted code runs in your CI — GitHub Actions has specific
 
 # The untrusted PR problem
 
-<div mt-4>
+<div mt-2>
 
-In **GitHub Actions**, PR workflows run the contributor's code — with access to your CI environment:
-
-</div>
-
-<div grid="~ cols-2" gap-6 mt-6>
-
-<div v-click="1" border="~ red/50 rounded-lg" p-4 bg-red:10>
-
-**Dangerous: single workflow**
-
-```yaml
-on: pull_request
-jobs:
-  test-and-deploy:
-    # Tests run PR author's code
-    # Same job has PyPI token 😱
-```
-
-<div mt-2 op80 text-sm>
-
-A malicious PR could exfiltrate secrets.
+In GitHub Actions, different event types run in **different execution contexts**:
 
 </div>
 
+<div grid="~ cols-2" gap-6 mt-2>
+
+<div v-click="1" border="~ red/50 rounded-lg" p-3 bg-red:10>
+
+**`pull_request` event**
+
+Runs in the **PR author's context** — their fork's code executes in your CI.
+
+If this workflow has access to secrets (PyPI tokens, deploy keys), a malicious PR could **exfiltrate** them.
+
 </div>
 
-<div v-click="2" border="~ emerald/50 rounded-lg" p-4 bg-emerald:10>
+<div v-click="2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
 
-**Safe: separated workflows**
+**`workflow_run` event**
 
-```yaml
-# test-build.yml (PR context)
-# → No secrets, just test & build
+Runs in the **default branch context** — only code that's been merged into `main` can execute.
 
-# post-build.yml (main context)
-# → Has secrets, only runs after
-#   test-build completes on main
-```
-
-<div mt-2 op80 text-sm>
-
-Secrets never exposed to PR code.
+Secrets are safe because the code has been reviewed and merged.
 
 </div>
 
 </div>
+
+<div v-click="3" mt-4 op80>
+
+**Key principle**: run tests/builds on `pull_request` (no secrets needed), run deploys on `workflow_run` (secrets safe).
 
 </div>
 
@@ -861,7 +871,7 @@ on:
 
 <div v-click mt-2 op80>
 
-Key insight: GitHub Actions' `workflow_run` runs in the **target branch context** (main), not the PR branch — so secrets are safe. This is a GHA-specific mechanism; other CI systems may handle this differently.
+`workflow_run` always runs in the **default branch context** — only reviewed, merged code executes with access to secrets.
 
 </div>
 
@@ -895,6 +905,83 @@ The final piece: **how do users trust the package?**
       - uses: pypa/gh-action-pypi-publish@release/v1
         # No token needed! OIDC handles auth
 ```
+
+---
+layout: section
+---
+
+# 🧑‍💻 Developer Experience
+
+<div mt-4 op70>
+Make it easy to contribute correctly — so you spend less time on review.
+</div>
+
+---
+
+# Making it easy for contributors
+
+<div mt-4>
+
+A contributor-friendly workflow lowers the barrier to participation:
+
+</div>
+
+<div mt-4>
+
+<v-clicks>
+
+- **`scriv create --edit`** — one command to add a changelog entry
+  - Template guides contributors through the categories
+- **PR preview wheels** — deployed to Cloudflare Pages, with a `pip install` command posted as a PR comment
+  - Reviewers can test changes before merge
+- **Clear CONTRIBUTING.md** — documents the full workflow
+- **Automated formatting/linting** — pre-commit hooks and CI checks
+
+</v-clicks>
+
+</div>
+
+<div v-click mt-6 border="~ sky/50 rounded-lg" p-4 bg-sky:10>
+
+The easier it is to contribute correctly, the less time you spend on review.
+
+</div>
+
+---
+
+# PR preview wheels
+
+<div mt-2>
+
+Every PR gets a deployable wheel — reviewers can test with one command.
+
+This runs in the `workflow_run`-triggered workflow — because deploying to Cloudflare Pages requires **secrets** that aren't available in the `pull_request` context.
+
+</div>
+
+```yaml {*|2|6-8|10-15}{maxHeight:'280px'}
+  deploy-preview-wheel:
+    if: github.event.workflow_run.event == 'pull_request'
+    steps:
+      - uses: actions/download-artifact@v4
+        # Download the built wheel from test-build
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          command: pages deploy dist/ --project-name=my-preview
+      # Post a comment on the PR:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              body: '🧪 Preview: `pip install <url>`'
+            })
+```
+
+<div v-click mt-2 op80>
+
+Contributors and reviewers can **try changes immediately** — no local checkout needed.
+
+</div>
 
 ---
 layout: section
@@ -950,81 +1037,6 @@ Docs are built and deployed as part of the same CI pipeline:
 </v-clicks>
 
 </div>
-
-</div>
-
----
-layout: section
----
-
-# 🧑‍💻 Developer Experience
-
-<div mt-4 op70>
-Make it easy to contribute correctly — so you spend less time on review.
-</div>
-
----
-
-# Making it easy for contributors
-
-<div mt-4>
-
-A contributor-friendly workflow lowers the barrier to participation:
-
-</div>
-
-<div mt-4>
-
-<v-clicks>
-
-- **`scriv create --edit`** — one command to add a changelog entry
-  - Template guides contributors through the categories
-- **PR preview wheels** — deployed to Cloudflare Pages, with a `pip install` command posted as a PR comment
-  - Reviewers can test changes before merge
-- **Clear CONTRIBUTING.md** — documents the full workflow
-- **Automated formatting/linting** — pre-commit hooks and CI checks
-
-</v-clicks>
-
-</div>
-
-<div v-click mt-6 border="~ sky/50 rounded-lg" p-4 bg-sky:10>
-
-The easier it is to contribute correctly, the less time you spend on review.
-
-</div>
-
----
-
-# PR preview wheels
-
-<div mt-4>
-
-Every PR gets a deployable wheel — reviewers can test with one command:
-
-</div>
-
-```yaml {*|6-8|10-15}{maxHeight:'320px'}
-  deploy-preview-wheel:
-    if: github.event.workflow_run.event == 'pull_request'
-    steps:
-      - uses: actions/download-artifact@v4
-        # Download the built wheel
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          command: pages deploy dist/ --project-name=my-preview
-      # Post a comment on the PR:
-      - uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              body: '🧪 Preview: `pip install <url>`'
-            })
-```
-
-<div v-click mt-4 op80>
-
-Contributors and reviewers can **try changes immediately** — no local checkout needed.
 
 </div>
 

@@ -203,7 +203,6 @@ Build a release pipeline where the **only human decision** is merging a PR.
 - 📝 **Change Management** — changelog + automated versioning
 - 🔒 **Security** — handling untrusted PRs, securing releases
 - 🧑‍💻 **Developer Experience** — making it easy for contributors
-- 📖 **Documentation** — automated docs deployment
 
 </v-clicks>
 
@@ -980,63 +979,6 @@ This runs in the `workflow_run`-triggered workflow — because deploying to Clou
 <div v-click mt-2 op80>
 
 Contributors and reviewers can **try changes immediately** — no local checkout needed.
-
-</div>
-
----
-layout: section
----
-
-# 📖 Documentation
-
-<div mt-4 op70>
-Docs that stay in sync with every release — automatically.
-</div>
-
----
-
-# Automated docs deployment
-
-<div mt-4>
-
-Docs are built and deployed as part of the same CI pipeline:
-
-</div>
-
-<div grid="~ cols-2" gap-6 mt-4>
-
-<div>
-
-```yaml
-  docs-build:
-    steps:
-      - run: make docs
-      - uses: actions/upload-artifact@v4
-        with:
-          name: docs
-          path: docs/_build/
-
-  docs-deploy:
-    needs: [docs-build]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: peaceiris/actions-gh-pages@v4
-```
-
-</div>
-
-<div v-click="1">
-
-<v-clicks>
-
-- Docs are **always built** (catches broken docs early)
-- Only **deployed on main** (no stale previews)
-- Same pipeline = docs stay in sync with code
-- Consider deploying **versioned docs** for libraries with multiple supported versions
-
-</v-clicks>
-
-</div>
 
 </div>
 

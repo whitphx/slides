@@ -494,7 +494,7 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 - Version intent tied to **commit messages**
 - Requires discipline on every commit
-- Squash merges lose granularity
+- Squash merges lose granularity (PR title must follow the convention instead)
 - Changelog reads like a git log
 
 </v-clicks>

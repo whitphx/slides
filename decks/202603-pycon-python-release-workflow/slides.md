@@ -74,13 +74,13 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 ---
 
-# Context: `streamlit-webrtc`
+# Case study: `streamlit-webrtc`
 
-A Streamlit component for real-time video/audio processing.
-
-<div grid="~ cols-2" gap-8 mt-8>
+<div grid="~ cols-2" gap-8 mt-4>
 
 <div>
+
+A Streamlit component for real-time video/audio processing.
 
 <v-clicks>
 
@@ -88,7 +88,7 @@ A Streamlit component for real-time video/audio processing.
 - Published to **PyPI**
 - Open source, external contributors
 - Multi-platform, multi-Python-version support
-- ~50 releases so far
+- **~50 releases** so far
 
 </v-clicks>
 
@@ -96,7 +96,8 @@ A Streamlit component for real-time video/audio processing.
 
 <div flex="~ col" items-center>
 
-<img src="/streamlit_webrtc_demo.gif" alt="streamlit-webrtc demo" w="90%" rounded-lg>
+<!-- TODO: Replace with a screenshot of the GitHub repo main page -->
+<img src="/github_repo.png" alt="streamlit-webrtc GitHub repository" w="100%" rounded-lg border="~ gray/20">
 
 </div>
 
@@ -258,15 +259,16 @@ Tools like `tox` / `nox` can manage this too — here we use GitHub Actions matr
 
 ---
 
-# Build artifacts in CI
+# Idempotent builds and artifact passing
 
-<div mt-6>
+<div mt-2>
 
-Build once, reuse the artifact for all downstream jobs:
+Build the package **once**, then pass the artifact to all downstream jobs:
 
 </div>
 
-```yaml {*|5-7|8-12}
+```yaml {*|2-7|8-14}{maxHeight:'300px'}
+jobs:
   build:
     needs: [test-python, test-frontend]
     steps:
@@ -275,36 +277,6 @@ Build once, reuse the artifact for all downstream jobs:
         with:
           name: dist-${{ github.sha }}
           path: dist/
-  # Later jobs download the same artifact
-  # → no rebuilding, guaranteed same bits
-```
-
-<div v-click mt-4 text-lg>
-
-The wheel that passes tests is the **exact same wheel** that gets published.
-
-</div>
-
----
-
-# Tag → build → publish
-
-<div mt-2>
-
-A common CI pattern (shown here with GitHub Actions): pushing a **version tag** triggers the release pipeline.
-
-</div>
-
-```yaml {*|2-4|8-11}{maxHeight:'280px'}
-# test-build.yml
-on:
-  push:
-    tags: ["v*"]  # Triggers on version tags
-jobs:
-  build:
-    steps:
-      - run: python -m build
-      - uses: actions/upload-artifact@v4
   publish:
     needs: build
     steps:
@@ -314,7 +286,32 @@ jobs:
 
 <div v-click mt-2 op80>
 
-`git tag v1.2.3 && git push --tags` → CI builds and publishes. But **who creates the tag?**
+The wheel that passes tests is the **exact same wheel** that gets published — no second build, no environment drift.
+
+</div>
+
+---
+
+# What triggers a release?
+
+<div mt-4>
+
+A common pattern: pushing a **version tag** triggers the release pipeline.
+
+</div>
+
+```yaml {*|3-4}
+# test-build.yml
+on:
+  push:
+    tags: ["v*"]  # Only version tags
+```
+
+<div v-click mt-4>
+
+`git tag v1.2.3 && git push --tags` → CI builds and publishes.
+
+But **who creates the tag, and how do they decide the version?**
 
 </div>
 

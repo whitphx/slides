@@ -33,7 +33,7 @@ Before writing any slides, plan the **information flow**. A good presentation is
 - **Start from what the audience already knows.** Introduce the simplest or most common approach first, then progressively build toward more advanced solutions. For example, if the talk is about CI/CD workflows, start with "run a build script locally" before jumping to "GitHub Actions matrix builds."
 - **Every technique needs motivation.** Before introducing a tool or methodology, explain the **problem** it solves. The audience must feel the pain before they can appreciate the cure. A slide that says "Use scriv for changelogs" without first showing why manual changelogs are painful will not land.
 - **Connect slides explicitly.** Each slide should flow into the next. End problem slides with a question or tension ("But who decides the version?") that the next slide resolves. Avoid abrupt topic jumps.
-- **Section headers should carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users — across every supported environment").
+- **Section headers can carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users — across every supported environment"). Use this when it helps orient the audience, but don't force it on every section.
 
 #### Accuracy and assumptions
 

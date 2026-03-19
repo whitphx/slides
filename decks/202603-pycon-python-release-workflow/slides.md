@@ -88,7 +88,7 @@ A Streamlit component for real-time video/audio processing.
 - Published to **PyPI**
 - Open source, external contributors
 - Multi-platform, multi-Python-version support
-- **~50 releases** so far
+- **100+ releases** so far
 
 </v-clicks>
 
@@ -96,7 +96,6 @@ A Streamlit component for real-time video/audio processing.
 
 <div flex="~ col" items-center>
 
-<!-- TODO: Replace with a screenshot of the GitHub repo main page -->
 <img src="/github_repo.png" alt="streamlit-webrtc GitHub repository" w="100%" rounded-lg border="~ gray/20">
 
 </div>
@@ -322,96 +321,114 @@ layout: section
 # 📝 Changelog & Versioning
 
 <div mt-4 op70>
-Two sides of the same coin — automate them together.
-</div>
-
----
-layout: statement
----
-
-## Changelog and versioning are **coupled problems**
-
-<div mt-4 op70 text-xl>
-What changed → what version comes next
+Three problems, one story — automate them together.
 </div>
 
 ---
 
-# How streamlit-webrtc started
+# Three problems to solve
 
 <div mt-4>
 
-<div grid="~ cols-2" gap-6>
+<v-clicks>
 
-<div>
+1. **Changelog** — how do you maintain CHANGELOG.md?
+2. **Version bumping** — how do you decide the next version and create a git tag?
+3. **Package version** — how does the built wheel know its `__version__`?
 
-**Changelog**: manual
-
-- Edit CHANGELOG.md by hand before each release
-- Easy to forget, hard to keep consistent
+</v-clicks>
 
 </div>
 
-<div v-click="1">
+<div v-click mt-6 op80>
 
-**Versioning**: `bump-my-version`
+These are **coupled** — what changed determines the next version, and the version must reach the built package. Let's walk through how streamlit-webrtc evolved.
+
+</div>
+
+---
+
+# Phase 1: Everything manual
+
+<div mt-2>
+
+| Problem | Solution |
+|---|---|
+| Changelog | Edit CHANGELOG.md **by hand** before release |
+| Version bump | Manually edit `version = "..."` in pyproject.toml, commit, tag |
+| Package version | **Hardcoded** in `pyproject.toml` |
+
+</div>
+
+<div v-click mt-4>
 
 ```toml
 # pyproject.toml
-version = "0.49.4"  # hardcoded
-```
-
-```shell
-$ bump-my-version bump minor \
-    --tag --commit
+[project]
+version = "0.49.4"  # manually edited for each release
 ```
 
 </div>
 
-</div>
+<div v-click mt-4 op80>
 
-</div>
-
-<div v-click="2" mt-4 op80>
-
-Both fully **manual** — the maintainer decides everything at release time.
+The most primitive approach — everything done by hand. Easy to forget the changelog, easy to get the version wrong.
 
 </div>
 
 ---
 
-# First improvement: `hatch-vcs`
+# Phase 2: `bump-my-version`
 
-<div mt-4>
+<div mt-2>
 
-Eliminate the hardcoded version string:
+| Problem | Solution |
+|---|---|
+| Changelog | Still **manual** |
+| Version bump | **`bump-my-version`** — updates pyproject.toml + creates git tag |
+| Package version | Still hardcoded (but `bump-my-version` keeps it in sync) |
 
 </div>
 
-<div grid="~ cols-2" gap-6 mt-2>
+<div v-click mt-4>
 
-<div>
-
-```toml
-# Before
-[project]
-version = "0.49.4"
-
-[build-system]
-requires = ["hatchling"]
+```shell
+$ bump-my-version bump minor --tag --commit
+# Updates version = "0.49.4" → "0.50.0" in pyproject.toml
+# Creates commit + git tag v0.50.0
 ```
 
 </div>
 
-<div v-click="1">
+<div v-click mt-4 op80>
+
+Better: no manual file editing for versions. But the **human still picks** patch vs. minor, and changelog is still manual.
+
+</div>
+
+---
+
+# Phase 3: `hatch-vcs` eliminates hardcoded version
+
+<div mt-2>
+
+| Problem | Solution |
+|---|---|
+| Changelog | Still **manual** |
+| Version bump | Still `bump-my-version` (human picks level) |
+| Package version | **`hatch-vcs`** — reads the git tag at build time |
+
+</div>
+
+<div v-click="1" mt-2>
 
 ```toml
-# After
+# pyproject.toml
 [project]
-dynamic = ["version"]
+dynamic = ["version"]   # no more hardcoded string
 
 [tool.hatch.version]
-source = "vcs"
+source = "vcs"          # version = latest git tag
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -419,13 +436,9 @@ requires = ["hatchling", "hatch-vcs"]
 
 </div>
 
-</div>
+<div v-click="2" mt-2 op80>
 
-<div v-click="2" mt-4>
-
-Version = latest **git tag** at build time. No more hardcoded strings to keep in sync.
-
-But `bump-my-version` still creates the tag — the **human still decides** the bump level.
+Bonus: `hatch-vcs` generates **dev versions** (e.g., `0.64.6.dev17+g8476028`) for non-tagged builds — useful for preview wheels.
 
 </div>
 
@@ -433,13 +446,17 @@ But `bump-my-version` still creates the tag — the **human still decides** the 
 layout: statement
 ---
 
-## Can we automate **both** changelog and versioning?
+## Problems #1 and #2 are still manual — can we automate them?
+
+<div mt-4 op70 text-xl>
+Changelog management and version bumping
+</div>
 
 ---
 
 # Two approaches, one concept
 
-Both automate changelog + versioning by **aggregating structured inputs** — they differ in the input source:
+Both automate changelog + versioning by **aggregating structured inputs** — they differ in the source:
 
 <div grid="~ cols-2" gap-6 mt-4>
 
@@ -482,7 +499,7 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 ---
 
-# Why Changesets-style?
+# Comparing the two approaches
 
 <div grid="~ cols-2" gap-6 mt-2>
 
@@ -518,74 +535,66 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 </div>
 
-<div v-click mt-4 text-center text-lg>
+<div v-click mt-4 text-center>
 
-Fragments decouple **"what changed"** from **"how it was committed"**.
+I personally prefer fragments — but both are valid. Choose what fits your team.
 
 </div>
 
 ---
 
-# Inspiration: Changesets (JS ecosystem)
+# Changesets: the full package (JS)
 
 <div mt-4>
 
-In the JavaScript world, [Changesets](https://github.com/changesets/changesets) solves both:
+[Changesets](https://github.com/changesets/changesets) provides **both** a local CLI tool and a GitHub Action:
 
 </div>
 
 <div grid="~ cols-2" gap-6 mt-4>
-
-<div>
-
-<v-clicks>
-
-1. Developer adds a "changeset" file with their PR
-2. File declares: **patch / minor / major** + description
-3. On merge, a bot opens a "Version Packages" PR
-4. Merging that PR → release
-
-</v-clicks>
-
-</div>
 
 <div v-click="1">
 
-```md
+**Local tool** (`@changesets/cli`)
+
+- `changeset add` → create a fragment
+- `changeset version` → aggregate fragments, bump versions, update changelog
+
+</div>
+
+<div v-click="2">
+
+**CI automation** (`changesets/action`)
+
+- On merge → opens a "Release PR" that runs `changeset version`
+- Merging the Release PR → publishes packages
+
+</div>
+
+</div>
+
+<div v-click="3" mt-4 op80>
+
+One ecosystem: fragment authoring, version calculation, changelog generation, **and** the CI release flow.
+
+</div>
+
 ---
-"@my-org/utils": minor
----
 
-Added `formatDate()` helper function
-for locale-aware date formatting.
-```
+# Python equivalents?
 
-<div mt-2 op70 text-sm>
+<div mt-2>
 
-One file → changelog entry **and** version bump level.
+[`scriv`](https://github.com/nedbat/scriv) and [`towncrier`](https://github.com/twisted/towncrier) manage changelog fragments for Python.
 
 </div>
 
-</div>
-
-</div>
-
----
-
-# Python equivalent: scriv
-
-<div mt-4>
-
-[`scriv`](https://github.com/nedbat/scriv) manages changelog fragments for Python projects.
-
-</div>
-
-<div grid="~ cols-2" gap-6 mt-4>
+<div grid="~ cols-2" gap-6 mt-2>
 
 <div>
 
 ```toml
-# pyproject.toml
+# pyproject.toml (scriv)
 [tool.scriv]
 categories = [
   "Added", "Changed", "Deprecated",
@@ -604,8 +613,7 @@ md_header_level = 2
 
 ```shell
 $ scriv create --edit
-# Creates a fragment file:
-# changelog.d/20260316_120000_whitphx.md
+# changelog.d/20260316_whitphx.md
 ```
 
 </WindowMockup>
@@ -618,27 +626,49 @@ $ scriv create --edit
   timeout on slow networks
 ```
 
-<div op70 text-sm mt-1>
-
-Each PR gets its own fragment file — no merge conflicts!
-
 </div>
 
 </div>
 
 </div>
+
+<div v-click="2" mt-2 op80>
+
+But these tools **only solve problem #1** (changelog). No version calculation, no CI release flow — unlike Changesets which covers all three.
 
 </div>
 
 ---
 
-# From fragments to version numbers
+# Phase 4: Filling the gaps
 
-scriv handles changelogs — but how do we **derive the version** from them?
+<div mt-2>
 
-<div mt-4>
+| Problem | Changesets (JS) | streamlit-webrtc (Python) |
+|---|---|---|
+| Changelog | `changeset version` | `scriv collect` |
+| Version bump | `changeset version` | **custom script** reads fragment categories |
+| Git tag | `changesets/action` | **custom CI workflow** (`changelog.yml`) |
+| Package version | `package.json` | `hatch-vcs` (reads git tag) |
 
-The fragment categories already carry **semantic intent**:
+</div>
+
+<div v-click mt-4 op80>
+
+I wrote two things to close the gap:
+
+1. **`get_bump_version_level.py`** — reads scriv fragment categories, returns `major`/`minor`/`patch`, creates a git tag
+2. **`changelog.yml`** — a GitHub Actions workflow that replicates the Changesets PR-based release flow
+
+</div>
+
+---
+
+# Custom version calculation
+
+<div mt-2>
+
+Fragment categories carry **semantic intent** — a small script maps them to SemVer levels:
 
 </div>
 
@@ -665,97 +695,17 @@ def get_bump_level():
 
 <div v-click mt-2 op80>
 
-One source of truth: fragments → changelog **and** version bump.
+~40 lines of Python. The same fragments that generate the changelog also determine the version.
 
 </div>
 
 ---
 
-# The full picture
+# Custom CI release workflow
 
 <div mt-2>
 
-How the pieces fit together in streamlit-webrtc today:
-
-</div>
-
-<div mt-2 flex="~ col" gap-1 text-sm>
-
-<div v-click="1" flex="~ gap-2" items-center>
-<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>1</div>
-<div><code>bump-my-version</code> creates git <strong>tag</strong> → <code>hatch-vcs</code> reads it at build time</div>
-</div>
-
-<div v-click="2" flex="~ gap-2" items-center>
-<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>2</div>
-<div><code>scriv</code> collects fragments → CHANGELOG.md</div>
-</div>
-
-<div v-click="3" flex="~ gap-2" items-center>
-<div w-6 h-6 rounded-full bg-gray:20 flex items-center justify-center font-bold shrink-0 text-xs>3</div>
-<div>Custom script reads fragment categories → tells <code>bump-my-version</code> which level</div>
-</div>
-
-</div>
-
-<div v-click="4" mt-4 border="~ emerald/50 rounded-lg" p-3 bg-emerald:10>
-
-**Before**: maintainer writes changelog by hand, picks version level, runs `bump-my-version bump minor`
-
-**After**: fragments auto-generate changelog **and** determine version — CI does the rest
-
-</div>
-
----
-
-# The release flow
-
-Two-phase automation, inspired by the Changesets release cycle:
-
-<div mt-2>
-
-<div flex="~ col" gap-2>
-
-<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-2 bg-sky:10 text-sm>
-
-**Phase 1: Changelog Preview PR** (automated)
-
-1. PR with changelog fragments merges to `main`
-2. CI runs `scriv collect` → aggregates fragments into CHANGELOG.md
-3. CI calculates version via `get_bump_version_level.py`
-4. Opens a "Preview changelog" PR
-
-</div>
-
-<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-2 bg-emerald:10 text-sm>
-
-**Phase 2: Release** (merge the preview PR)
-
-1. Maintainer reviews changelog, merges the PR
-2. CI creates a **git tag** with the calculated version
-3. Tag triggers build → test → **publish to PyPI**
-
-</div>
-
-</div>
-
-</div>
-
-<div v-click="3" mt-2 text-center>
-
-Human reviews the changelog. Machine handles the rest.
-
-</div>
-
----
-
-# Re-implementing Changesets for Python
-
-<div mt-2>
-
-In JS, [`changesets/action`](https://github.com/changesets/action) handles this flow — but it's JS-only (`package.json`, `npm publish`).
-
-We replicate the same concept with a **single GitHub Actions workflow** using Python tools:
+A GitHub Actions workflow that replicates what `changesets/action` does:
 
 </div>
 
@@ -774,13 +724,82 @@ on:
 #
 # Fragments DON'T EXIST (= Release PR was just merged) →
 #   Read bump level from the previous commit
-#   bump-my-version bump $level --tag --no-commit
+#   Create git tag with the calculated version
 #   Push tag → triggers build & publish pipeline
 ```
 
 <div v-click mt-2 op80>
 
 One workflow, two behaviors — driven by the **presence or absence** of fragment files.
+
+</div>
+
+---
+
+# The complete tool chain
+
+<div mt-2>
+
+How all the tools work together in Phase 4:
+
+</div>
+
+<div mt-4>
+
+| Problem | Tool | Role |
+|---|---|---|
+| **Changelog** | `scriv` | Fragment authoring + aggregation into CHANGELOG.md |
+| **Version bump** | Custom script + CI workflow | Reads categories → determines level → creates git tag |
+| **Package version** | `hatch-vcs` | Reads git tag at build time → sets `__version__` |
+
+</div>
+
+<div v-click mt-4 op80>
+
+Each tool solves **one problem**. `scriv` and `hatch-vcs` are off-the-shelf; the custom script and workflow **connect** them into a Changesets-like pipeline.
+
+`hatch-vcs` also gives us **dev versions** for free — CI preview wheels get versions like `0.64.6.dev17+g8476028` without any extra work.
+
+</div>
+
+---
+
+# The release flow
+
+Two-phase automation, mirroring the Changesets release cycle:
+
+<div mt-2>
+
+<div flex="~ col" gap-2>
+
+<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-2 bg-sky:10 text-sm>
+
+**Phase 1: Release PR** (automated)
+
+1. PR with changelog fragments merges to `main`
+2. CI runs `scriv collect` → aggregates fragments into CHANGELOG.md
+3. CI calculates version via `get_bump_version_level.py`
+4. Opens/updates a Release PR
+
+</div>
+
+<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-2 bg-emerald:10 text-sm>
+
+**Phase 2: Release** (merge the Release PR)
+
+1. Maintainer reviews changelog, merges the PR
+2. CI creates a **git tag** with the calculated version
+3. Tag triggers build → test → **publish to PyPI**
+
+</div>
+
+</div>
+
+</div>
+
+<div v-click="3" mt-2 text-center>
+
+Human reviews the changelog. Machine handles the rest.
 
 </div>
 
@@ -930,8 +949,6 @@ A contributor-friendly workflow lowers the barrier to participation:
   - Template guides contributors through the categories
 - **PR preview wheels** — deployed to Cloudflare Pages, with a `pip install` command posted as a PR comment
   - Reviewers can test changes before merge
-- **Clear CONTRIBUTING.md** — documents the full workflow
-- **Automated formatting/linting** — pre-commit hooks and CI checks
 
 </v-clicks>
 
@@ -955,27 +972,39 @@ This runs in the `workflow_run`-triggered workflow — because deploying to Clou
 
 </div>
 
-```yaml {*|2|6-8|10-15}{maxHeight:'280px'}
+<div grid="~ cols-2" gap-4 mt-2>
+
+<div>
+
+```yaml {*|2|4-6|8-12}{maxHeight:'240px'}
   deploy-preview-wheel:
-    if: github.event.workflow_run.event == 'pull_request'
+    if: workflow_run.event == 'pull_request'
     steps:
       - uses: actions/download-artifact@v4
-        # Download the built wheel from test-build
       - uses: cloudflare/wrangler-action@v3
-        with:
-          command: pages deploy dist/ --project-name=my-preview
-      # Post a comment on the PR:
+        # Deploy wheel to Cloudflare Pages
+      # Post pip install command as PR comment:
       - uses: actions/github-script@v7
         with:
           script: |
             github.rest.issues.createComment({
-              body: '🧪 Preview: `pip install <url>`'
+              body: '📦 pip install <url>'
             })
 ```
 
-<div v-click mt-2 op80>
+</div>
 
-Contributors and reviewers can **try changes immediately** — no local checkout needed.
+<div v-click flex="~ col" items-center>
+
+<img src="/pr_preview_comment.png" alt="PR preview wheel comment" w="100%" rounded-lg border="~ gray/20">
+
+<div mt-2 op70 text-sm text-center>
+
+Actual PR comment with `pip install` link
+
+</div>
+
+</div>
 
 </div>
 

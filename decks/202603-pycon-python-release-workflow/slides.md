@@ -828,7 +828,7 @@ Human reviews the changelog. Machine handles the rest.
 
 <div mt-1 op70 text-sm text-center>
 
-Phase 1: automated Release PR
+Phase 1: automated Release PR with changelog preview
 
 </div>
 
@@ -836,17 +836,22 @@ Phase 1: automated Release PR
 
 <div v-click="2" flex="~ col" items-center>
 
-<img src="/github_release.png" alt="GitHub Release with Sigstore" w="100%" rounded-lg border="~ gray/20">
+<img src="/github_release.png" alt="GitHub Release" w="100%" rounded-lg border="~ gray/20">
 
 <div mt-1 op70 text-sm text-center>
 
-Phase 2: published release with Sigstore attestations
+Phase 2: published GitHub Release
 
 </div>
 
 </div>
 
 </div>
+
+<!-- TODO: Add Action log screenshots when Playwright is available:
+     - Action run that created the Release PR (run 19760262992)
+     - Action run triggered by merging the Release PR (run 19760403204)
+-->
 
 ---
 layout: section

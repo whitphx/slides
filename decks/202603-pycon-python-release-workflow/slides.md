@@ -817,6 +817,38 @@ Human reviews the changelog. Machine handles the rest.
 </div>
 
 ---
+
+# The release flow in action
+
+<div grid="~ cols-2" gap-4 mt-2>
+
+<div v-click="1" flex="~ col" items-center>
+
+<img src="/release_pr.png" alt="Changelog Preview PR" w="100%" rounded-lg border="~ gray/20">
+
+<div mt-1 op70 text-sm text-center>
+
+Phase 1: automated Release PR
+
+</div>
+
+</div>
+
+<div v-click="2" flex="~ col" items-center>
+
+<img src="/github_release.png" alt="GitHub Release with Sigstore" w="100%" rounded-lg border="~ gray/20">
+
+<div mt-1 op70 text-sm text-center>
+
+Phase 2: published release with Sigstore attestations
+
+</div>
+
+</div>
+
+</div>
+
+---
 layout: section
 ---
 
@@ -876,29 +908,52 @@ GitHub Actions lets you split CI into **separate workflow files** with different
 
 </div>
 
-```yaml {*|1-4|6-11|13-17}{maxHeight:'300px'}
-# 1️⃣ test-build.yml — triggers on PRs and pushes
-on: [push, pull_request]
-# Runs tests, builds wheel, uploads artifact
-# ⚠️ NO access to secrets
+<div grid="~ cols-3" gap-3 mt-2 text-sm>
 
-# 2️⃣ post-build.yml — triggers AFTER test-build
+<div v-click="1">
+
+**test-build.yml**
+
+```yaml
+on: [push, pull_request]
+# Tests, builds wheel
+# ⚠️ NO secrets
+```
+
+</div>
+
+<div v-click="2">
+
+**post-build.yml**
+
+```yaml
 on:
   workflow_run:
     workflows: ["test-build"]
     types: [completed]
-# ✅ Runs in default branch context → has secrets
+# ✅ Has secrets
+```
 
-# 3️⃣ changelog.yml — triggers on push to main
+</div>
+
+<div v-click="3">
+
+**changelog.yml**
+
+```yaml
 on:
   push:
     branches: [main]
-# Manages Release PRs and version tagging
+# Release PRs + tagging
 ```
 
-<div v-click mt-2 op80>
+</div>
 
-`workflow_run` always runs in the **default branch context** — only reviewed, merged code executes with access to secrets.
+</div>
+
+<div v-click="4" mt-2 op80>
+
+`workflow_run` runs in the **default branch context** — only reviewed, merged code executes with access to secrets.
 
 </div>
 

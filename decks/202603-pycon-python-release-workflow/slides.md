@@ -264,7 +264,7 @@ Build the package **once**, then pass the artifact to all downstream jobs:
 
 </div>
 
-```yaml {*|2-7|8-14}{maxHeight:'300px'}
+```yaml {*|1-9|10-14}{maxHeight:'300px'}
 jobs:
   build:
     needs: [test-python, test-frontend]

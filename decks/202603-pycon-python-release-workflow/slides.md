@@ -80,14 +80,13 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <div>
 
-A Streamlit component for real-time video/audio processing.
-
 <v-clicks>
 
 - Python library published to **PyPI**
 - Open source, external contributors
 - Multi-platform, multi-Python-version support
 - **100+ releases** so far
+- Past talk: [EuroPython 2022](https://av.tib.eu/media/60846)
 
 </v-clicks>
 

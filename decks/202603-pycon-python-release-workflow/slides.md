@@ -842,9 +842,9 @@ In GitHub Actions, different event types run in **different execution contexts**
 
 **`pull_request` event**
 
-Runs in the **PR author's context** — their fork's code executes in your CI.
+Runs **the PR author's code** — external contributors can execute arbitrary code in your CI.
 
-If this workflow has access to secrets (PyPI tokens, deploy keys), a malicious PR could **exfiltrate** them.
+Read-only `GITHUB_TOKEN`, no access to secrets — but you can't deploy or publish from here.
 
 </div>
 
@@ -852,9 +852,9 @@ If this workflow has access to secrets (PyPI tokens, deploy keys), a malicious P
 
 **`workflow_run` event**
 
-Runs in the **default branch context** — only code that's been merged into `main` can execute.
+Runs in the **default branch context** — only code that's been merged into `main` executes.
 
-Secrets are safe because the code has been reviewed and merged.
+Has access to secrets — safe for deployment and publishing.
 
 </div>
 
@@ -876,7 +876,7 @@ GitHub Actions lets you split CI into **separate workflow files** with different
 
 </div>
 
-```yaml {*}{maxHeight:'300px'}
+```yaml {*|1-4|6-11|13-17}{maxHeight:'300px'}
 # 1️⃣ test-build.yml — triggers on PRs and pushes
 on: [push, pull_request]
 # Runs tests, builds wheel, uploads artifact
@@ -887,14 +887,13 @@ on:
   workflow_run:
     workflows: ["test-build"]
     types: [completed]
-# Downloads artifact, publishes to PyPI, creates GitHub Release
-# ✅ Runs in main branch context → has secrets
+# ✅ Runs in default branch context → has secrets
 
 # 3️⃣ changelog.yml — triggers on push to main
 on:
   push:
     branches: [main]
-# Manages changelog preview PRs and version tagging
+# Manages Release PRs and version tagging
 ```
 
 <div v-click mt-2 op80>
@@ -925,7 +924,9 @@ The final piece: **how do users trust the package?**
 
 </div>
 
-```yaml {*|3-5}{at:4}
+<div v-click="4">
+
+```yaml {*|3,5}
   publish-to-pypi:
     permissions:
       id-token: write  # Required for trusted publishing
@@ -933,6 +934,8 @@ The final piece: **how do users trust the package?**
       - uses: pypa/gh-action-pypi-publish@release/v1
         # No token needed! OIDC handles auth
 ```
+
+</div>
 
 ---
 layout: section
@@ -987,7 +990,7 @@ Every PR gets a deployable wheel. This runs in `workflow_run` — deploying need
 
 <div>
 
-```yaml {*|2|4-6|8-12}{maxHeight:'240px'}
+```yaml {*|2|4-5|8-13}{maxHeight:'240px'}
   deploy-preview-wheel:
     if: workflow_run.event == 'pull_request'
     steps:

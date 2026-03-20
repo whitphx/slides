@@ -820,15 +820,15 @@ Human reviews the changelog. Machine handles the rest.
 
 # The release flow in action
 
-<div grid="~ cols-2" gap-4 mt-2>
+<div grid="~ cols-2" gap-3 mt-2>
 
 <div v-click="1" flex="~ col" items-center>
 
-<img src="/release_pr.png" alt="Changelog Preview PR" w="100%" rounded-lg border="~ gray/20">
+<img src="/action_create_pr.png" alt="Action: create Release PR" w="100%" rounded-lg border="~ gray/20">
 
-<div mt-1 op70 text-sm text-center>
+<div mt-1 op70 text-xs text-center>
 
-Phase 1: automated Release PR with changelog preview
+Commit with fragments → changelog.yml creates Release PR
 
 </div>
 
@@ -836,22 +836,41 @@ Phase 1: automated Release PR with changelog preview
 
 <div v-click="2" flex="~ col" items-center>
 
+<img src="/release_pr.png" alt="Release PR" w="100%" rounded-lg border="~ gray/20">
+
+<div mt-1 op70 text-xs text-center>
+
+Automated Release PR with changelog preview
+
+</div>
+
+</div>
+
+<div v-click="3" flex="~ col" items-center>
+
+<img src="/action_release.png" alt="Action: tag and release" w="100%" rounded-lg border="~ gray/20">
+
+<div mt-1 op70 text-xs text-center>
+
+Merged Release PR → changelog.yml creates git tag
+
+</div>
+
+</div>
+
+<div v-click="4" flex="~ col" items-center>
+
 <img src="/github_release.png" alt="GitHub Release" w="100%" rounded-lg border="~ gray/20">
 
-<div mt-1 op70 text-sm text-center>
+<div mt-1 op70 text-xs text-center>
 
-Phase 2: published GitHub Release
-
-</div>
+Published GitHub Release
 
 </div>
 
 </div>
 
-<!-- TODO: Add Action log screenshots when Playwright is available:
-     - Action run that created the Release PR (run 19760262992)
-     - Action run triggered by merging the Release PR (run 19760403204)
--->
+</div>
 
 ---
 layout: section

@@ -412,7 +412,7 @@ No manual file editing for versions. But the **human still picks** patch vs. min
 | Problem | Solution |
 |---|---|
 | Changelog | Still **manual** |
-| Version bump | Still `bump-my-version` (human picks level) |
+| Version bump | Still `bump-my-version` (human picks level, but now only creates **git tag** — no file updates) |
 | Package version | **`hatch-vcs`** — reads the git tag at build time |
 
 </div>
@@ -439,23 +439,21 @@ Bonus: `hatch-vcs` generates **dev versions** (e.g., `0.64.6.dev17+g8476028`) fo
 layout: statement
 ---
 
-## Changelog and version bumping are still manual — can we automate them?
-
-<div mt-4 op70 text-xl>
-The remaining pain points
-</div>
+## Changelog and version bumping<br>are still manual — can we automate them?
 
 ---
 
-# Two approaches, one concept
+# Approaches to automate changelog & versioning
 
-Both automate changelog + versioning by **aggregating structured inputs** — they differ in the source:
+Both work by **aggregating structured inputs** — they differ in the source:
 
 <div grid="~ cols-2" gap-6 mt-4>
 
 <div v-click="1" border="~ sky/30 rounded-lg" p-2 bg-sky:5>
 
 **Conventional Commits**
+
+<div v-click="2">
 
 Input: **commit messages**
 
@@ -465,26 +463,42 @@ fix: handle null timezone
 BREAKING CHANGE: drop Python 3.9
 ```
 
+</div>
+
+<div v-click="3">
+
 Tools parse `feat:`→minor, `fix:`→patch, `BREAKING CHANGE:`→major
 
 Tools: `semantic-release`, `commitizen`, `release-please`
 
 </div>
 
-<div v-click="2" border="~ emerald/30 rounded-lg" p-2 bg-emerald:5>
+</div>
+
+<div v-click="4" border="~ emerald/30 rounded-lg" p-2 bg-emerald:5>
 
 **Changelog fragments**
+
+<div v-click="5">
 
 Input: **dedicated files** per PR
 
 ```md
 ### Added
 - Locale-aware date formatting
+### Fixed
+- Handle null timezone
 ```
+
+</div>
+
+<div v-click="6">
 
 Categories map to SemVer levels
 
 Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
+
+</div>
 
 </div>
 
@@ -528,9 +542,9 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 </div>
 
-<div v-click mt-4 text-center>
+<div v-click="9" mt-2 text-center op80>
 
-I personally prefer fragments — but both are valid. Choose what fits your team.
+I prefer fragments — but both are valid. Choose what fits your team.
 
 </div>
 
@@ -702,23 +716,25 @@ A GitHub Actions workflow that replicates what `changesets/action` does:
 
 </div>
 
-```yaml {*}{maxHeight:'240px'}
-# changelog.yml (concept — actual workflow is ~145 lines)
+```yaml {*|1-5|6-12|13-19}{maxHeight:'300px'}
+# changelog.yml (key parts — full workflow is ~145 lines)
 on:
   push:
     branches: [main]
-
-# On every push to main, check for changelog fragments:
-#
-# Fragments EXIST →
-#   scriv collect → aggregate into CHANGELOG.md
-#   get_bump_version_level.py → calculate next version
-#   Push to preview branch, create/update a Release PR
-#
-# Fragments DON'T EXIST (= Release PR was just merged) →
-#   Read bump level from the previous commit
-#   Create git tag with the calculated version
-#   Push tag → triggers build & publish pipeline
+steps:
+  - run: bump_level=$(python get_bump_version_level.py)
+  # If fragments exist → create/update Release PR
+  - if: bump_level != ''
+    run: |
+      next_version=$(bump-my-version show --increment $bump_level new_version)
+      scriv collect --version $next_version
+      gh pr create --title "Release $next_version" ...
+  # If no fragments → this is the merged Release PR → tag & release
+  - if: bump_level == ''
+    run: |
+      bump_level_prev=$(git checkout HEAD~1 && python get_bump_version_level.py)
+      bump-my-version bump $bump_level_prev --tag --no-commit
+      git push --follow-tags  # triggers build & publish
 ```
 
 <div v-click mt-2 op80>
@@ -747,9 +763,15 @@ How all the tools work together in Phase 4:
 
 </div>
 
-<div v-click mt-4 op80>
+<div v-click="1" mt-2 op80>
 
-`scriv` and `hatch-vcs` are off-the-shelf; the custom script and workflow **connect** them into a Changesets-like pipeline. Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476028`) — useful for preview wheels.
+`scriv` and `hatch-vcs` are off-the-shelf; the custom script and workflow **connect** them.
+
+</div>
+
+<div v-click="2" mt-2 op80>
+
+Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476028`) — useful for preview wheels.
 
 </div>
 

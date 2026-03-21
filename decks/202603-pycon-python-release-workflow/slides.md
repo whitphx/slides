@@ -779,95 +779,26 @@ Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476
 
 # The release flow
 
-Two-phase automation, mirroring the Changesets release cycle:
-
-<div mt-2>
-
-<div flex="~ col" gap-2>
-
-<div v-click="1" data-id="phase1" border="~ sky/50 rounded-lg" p-2 bg-sky:10 text-sm>
-
-**Phase 1: Release PR** (automated)
-
-1. PR with changelog fragments merges to `main`
-2. CI runs `scriv collect` → aggregates fragments into CHANGELOG.md
-3. CI calculates version via `get_bump_version_level.py`
-4. Opens/updates a Release PR
-
-</div>
-
-<div v-click="2" data-id="phase2" border="~ emerald/50 rounded-lg" p-2 bg-emerald:10 text-sm>
-
-**Phase 2: Release** (merge the Release PR)
-
-1. Maintainer reviews changelog, merges the PR
-2. CI creates a **git tag** with the calculated version
-3. Tag triggers build → test → **publish to PyPI**
-
-</div>
-
-</div>
-
-</div>
-
-<div v-click="3" mt-2 text-center>
-
-Human reviews the changelog. Machine handles the rest.
-
-</div>
-
----
-
-# The release flow in action
-
-<div grid="~ cols-2" gap-3 mt-2>
+<div grid="~ cols-4" gap-2 mt-2>
 
 <div v-click="1" flex="~ col" items-center>
-
 <img src="/action_create_pr.png" alt="Action: create Release PR" w="100%" rounded-lg border="~ gray/20">
-
-<div mt-1 op70 text-xs text-center>
-
-Commit with fragments → changelog.yml creates Release PR
-
-</div>
-
+<div op70 text-xs text-center>1. Fragments detected → create PR</div>
 </div>
 
 <div v-click="2" flex="~ col" items-center>
-
 <img src="/release_pr.png" alt="Release PR" w="100%" rounded-lg border="~ gray/20">
-
-<div mt-1 op70 text-xs text-center>
-
-Automated Release PR with changelog preview
-
-</div>
-
+<div op70 text-xs text-center>2. Release PR with changelog</div>
 </div>
 
 <div v-click="3" flex="~ col" items-center>
-
 <img src="/action_release.png" alt="Action: tag and release" w="100%" rounded-lg border="~ gray/20">
-
-<div mt-1 op70 text-xs text-center>
-
-Merged Release PR → changelog.yml creates git tag
-
-</div>
-
+<div op70 text-xs text-center>3. Merged → create git tag</div>
 </div>
 
 <div v-click="4" flex="~ col" items-center>
-
 <img src="/github_release.png" alt="GitHub Release" w="100%" rounded-lg border="~ gray/20">
-
-<div mt-1 op70 text-xs text-center>
-
-Published GitHub Release
-
-</div>
-
+<div op70 text-xs text-center>4. Published release</div>
 </div>
 
 </div>
@@ -939,7 +870,9 @@ GitHub Actions lets you split CI into **separate workflow files** with different
 **test-build.yml**
 
 ```yaml
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 # Tests, builds wheel
 # ⚠️ NO secrets
 ```
@@ -1005,7 +938,7 @@ The final piece: **how do users trust the package?**
 
 <div v-click="4">
 
-```yaml {*|3,5}
+```yaml {*|3,5}{at:5}
   publish-to-pypi:
     permissions:
       id-token: write  # Required for trusted publishing

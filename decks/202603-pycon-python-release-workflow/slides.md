@@ -171,7 +171,7 @@ Great foundations — but a growing OSS library needs more.
 
 # Goal of this talk
 
-<div mt-6 text-xl>
+<div mt-8 text-2xl>
 
 <v-clicks>
 
@@ -183,7 +183,7 @@ Great foundations — but a growing OSS library needs more.
 
 </div>
 
-<div v-click mt-8 text-center text-lg>
+<div v-click mt-8 text-center text-xl>
 
 Build a release pipeline where the **only human decision** is merging a PR.
 
@@ -193,7 +193,7 @@ Build a release pipeline where the **only human decision** is merging a PR.
 
 # Agenda
 
-<div mt-4 text-xl>
+<div mt-6 text-2xl>
 
 <v-clicks>
 
@@ -326,7 +326,7 @@ Three problems, one story — automate them together.
 
 # Three problems to solve
 
-<div mt-4>
+<div mt-6 text-xl>
 
 <v-clicks>
 
@@ -338,9 +338,9 @@ Three problems, one story — automate them together.
 
 </div>
 
-<div v-click mt-6 op80>
+<div v-click mt-6 op80 text-lg>
 
-These are **coupled** — what changed determines the next version, and the version must reach the built package. Let's walk through how streamlit-webrtc evolved.
+These are **coupled** — what changed determines the next version, and the version must reach the built package.
 
 </div>
 
@@ -660,7 +660,7 @@ But these tools **only handle changelogs**. No version calculation, no CI releas
 
 </div>
 
-<div v-click mt-2 op80 text-sm>
+<div v-click mt-2 op80>
 
 I wrote two things to close the gap:
 
@@ -963,13 +963,7 @@ Make it easy to contribute correctly — so you spend less time on review.
 
 # Making it easy for contributors
 
-<div mt-4>
-
-A contributor-friendly workflow lowers the barrier to participation:
-
-</div>
-
-<div mt-4>
+<div mt-6 text-xl>
 
 <v-clicks>
 
@@ -982,7 +976,7 @@ A contributor-friendly workflow lowers the barrier to participation:
 
 </div>
 
-<div v-click mt-6 border="~ sky/50 rounded-lg" p-4 bg-sky:10>
+<div v-click mt-6 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-lg>
 
 The easier it is to contribute correctly, the less time you spend on review.
 
@@ -1090,7 +1084,7 @@ One human decision → everything else is automated.
 
 # Key takeaways
 
-<div mt-6>
+<div mt-6 text-xl>
 
 <v-clicks>
 
@@ -1098,7 +1092,7 @@ One human decision → everything else is automated.
 - **Automate the boring parts** — version calculation, changelog assembly, publishing
 - **Keep humans in the loop** — review the changelog PR before release
 - **Security by design** — separate trusted/untrusted CI contexts
-- **Lower the barrier** — preview wheels, clear docs, contributor-friendly tooling
+- **Lower the barrier** — preview wheels, contributor-friendly tooling
 - **Steal ideas across ecosystems** — Changesets (JS) → scriv + automation (Python)
 
 </v-clicks>

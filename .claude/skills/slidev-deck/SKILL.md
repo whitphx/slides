@@ -48,6 +48,11 @@ Before writing any slides, plan the **information flow**. A good presentation is
 - **When presenting an evolution/journey, use a consistent framing.** If you're showing how a project evolved through phases, keep the same set of problems visible across phases so the audience can track what improved (e.g., a table with "Changelog | Version bump | Package version" across phases).
 - **Code examples must be accurate.** If you show a workflow snippet, it should reflect what the tool actually does — not a plausible-looking approximation. When the actual code is too long, show the structure as pseudocode/comments but label it clearly (e.g., "concept — actual workflow is ~145 lines").
 - **Use the "Context" or "Case study" slide to set the stage**, not to showcase the project's features. The audience should understand *why this project is a good example* for the topic (e.g., many releases, external contributors, CI complexity), not what the project does as a product.
+- **Use emojis to make slides attractive and pull attention.** Emojis work well as visual markers in bullet lists (e.g., `- 🧪 **Test & Build**`, `- 🔒 **Security**`), section headers, and statement slides. They help the audience scan and remember key points. However, avoid overuse — not every bullet needs an emoji. Good use cases:
+  - Section titles or agenda items: `🧪`, `📝`, `🔒`, `🧑‍💻`
+  - Status indicators: `⚠️ NO access to secrets`, `✅ Has secrets`
+  - Reward/benefit lists: `💬 Talk opportunities`, `💼 Job opportunities`, `👛 Sponsorship`
+  - Emotional emphasis on statement slides: `Share it! 👍`
 
 ### 2. Create the deck package (for new decks)
 

@@ -776,32 +776,44 @@ Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476
 </div>
 
 ---
+clicks: 9
+---
 
 # The release flow
 
 <div grid="~ cols-4" gap-2 mt-2>
 
-<div v-click="1" flex="~ col" items-center>
+<div v-click="1" flex="~ col" items-center transition duration-500 :class="$clicks <= 1 ? 'scale-250 translate-x-70 translate-y-30' : ''">
 <img src="/action_create_pr.png" alt="Action: create Release PR" w="100%" rounded-lg border="~ gray/20">
 <div op70 text-xs text-center>1. Fragments detected → create PR</div>
 </div>
 
-<div v-click="2" flex="~ col" items-center>
+<div v-click="3" flex="~ col" items-center transition duration-500 :class="$clicks <= 3 ? 'scale-250 translate-x-30 translate-y-30' : ''">
 <img src="/release_pr.png" alt="Release PR" w="100%" rounded-lg border="~ gray/20">
 <div op70 text-xs text-center>2. Release PR with changelog</div>
 </div>
 
-<div v-click="3" flex="~ col" items-center>
+<div v-click="5" flex="~ col" items-center transition duration-500 :class="$clicks <= 5 ? 'scale-250 translate-x--30 translate-y-30' : ''">
 <img src="/action_release.png" alt="Action: tag and release" w="100%" rounded-lg border="~ gray/20">
-<div op70 text-xs text-center>3. Merged → create git tag</div>
+<div op70 text-xs text-center>3. <span data-id="merged">Merged</span> → create git tag</div>
 </div>
 
-<div v-click="4" flex="~ col" items-center>
+<div v-click="7" flex="~ col" items-center transition duration-500 :class="$clicks <= 7 ? 'scale-250 translate-x--70 translate-y-30' : ''">
 <img src="/github_release.png" alt="GitHub Release" w="100%" rounded-lg border="~ gray/20">
 <div op70 text-xs text-center>4. Published release</div>
 </div>
 
 </div>
+
+<FancyArrow
+  v-click="9"
+  to="[data-id=merged]"
+  arc="-0.2"
+>
+  <template #tail>
+    <span v-click="9" absolute top-80 left-50>Approving the PR is the only manual operation ✅</span>
+  </template>
+</FancyArrow>
 
 ---
 layout: section

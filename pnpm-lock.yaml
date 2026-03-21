@@ -217,8 +217,8 @@ importers:
         specifier: ^52.14.1
         version: 52.14.1(@nuxt/kit@3.15.4(magicast@0.3.5))(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vue/compiler-sfc@3.5.30)(lightningcss@1.29.2)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.1.1)(postcss@8.5.8)(react@18.3.1)(tsx@4.19.2)
       slidev-addon-fancy-arrow:
-        specifier: ^0.13.10
-        version: 0.13.10(typescript@5.9.3)
+        specifier: ^0.16.0
+        version: 0.16.0(typescript@5.9.3)
       slidev-addon-window-mockup:
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.9.3)
@@ -8129,6 +8129,9 @@ packages:
 
   slidev-addon-fancy-arrow@0.13.10:
     resolution: {integrity: sha512-MCB7NZuB7/RKmYQJm2HeqdGlM5uGXD9ppOc2wam5gr3gPQfZaGitbr8n+/LK7DG8Og+QaIXF6S0wM47PRVz3cA==}
+
+  slidev-addon-fancy-arrow@0.16.0:
+    resolution: {integrity: sha512-gO86WtC+TZo1ZXkWKHBBV+UGZ2136ngDAuUliV1hiGpoNtGE1L+mmUwa+MGHmJ+PEMzS/p6ewWPMFi4wR2E32w==}
 
   slidev-addon-fancy-arrow@0.8.0:
     resolution: {integrity: sha512-o5OppRwO+MQltcXIWXKENYd3a4XKDJrhddJ/MKmTVY7s8t+bwsOHD7hwOdIxhNzF+LxnO+Jhzwqj5Nb8O96t+g==}
@@ -21938,10 +21941,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  slidev-addon-fancy-arrow@0.13.10(typescript@5.9.3):
+  slidev-addon-fancy-arrow@0.16.0(typescript@5.9.3):
     dependencies:
       roughjs: 4.6.6
-      vue: 3.5.21(typescript@5.9.3)
+      vue: 3.5.30(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 

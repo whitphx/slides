@@ -19,7 +19,7 @@ A reliable dev/release workflow<br>
 for OSS Python libraries
 </h1>
 
-<!-- Welcome everyone. Today I'll share what I've learned building a release pipeline for an open source Python library — from manual releases to a fully automated workflow. -->
+<!-- Hey everyone! So this talk is basically a collection of small tips, ideas, and things I learned while developing and maintaining an open source Python package. I hope some of these inspire you — just pick up whatever sounds useful for your own projects. -->
 
 ---
 
@@ -74,7 +74,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
   }
 </style>
 
-<!-- I'm Yuichiro Tachibana, also known as whitphx. I build and maintain several open source projects in the Python ecosystem. Today's talk comes from my experience maintaining streamlit-webrtc, which has gone through over 100 releases. -->
+<!-- I'm Yuichiro Tachibana, or whitphx online. I build and maintain several open source projects in the Python ecosystem, and today's talk comes from that experience. -->
 
 ---
 
@@ -104,7 +104,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </div>
 
-<!-- This is the project I'll use as a case study throughout the talk. It's a Python library published to PyPI, with external contributors, multi-platform support, and over 100 releases. The release workflow I'll show you evolved over years of maintaining this project. If you're interested in the library itself, I gave a talk at EuroPython 2022 about it. -->
+<!-- So this is the project I'll use as a case study. It's a Python library on PyPI, developed with external contributors, over 100 releases now. The workflow I'm showing you evolved over years of maintaining this. If you want to know what the library actually does, I gave a talk about it at EuroPython 2022 — link's on the slide. -->
 
 ---
 
@@ -128,7 +128,7 @@ This talk focuses on **CI-based release workflows** — specifically with GitHub
 
 </div>
 
-<!-- Let's start with the basics. The simplest way to release is to build and upload from your laptop. That works, but it's fragile — depends on your local env, easy to skip steps. Most mature projects use CI/CD instead. This talk focuses on GitHub Actions, which is also what the official PyPA packaging guide uses. -->
+<!-- OK so how do you actually release a Python package? The simplest way — just build and upload from your laptop. That works, but it's fragile. Depends on your local env, easy to skip steps. So most mature projects move this to CI/CD. And for this talk, we'll focus on GitHub Actions, which is also what the official Python packaging guide uses. -->
 
 ---
 
@@ -175,7 +175,7 @@ Great foundations — but a growing OSS library needs more.
 
 </div>
 
-<!-- These are the two most common starting points. GitHub's template is minimal — just build and publish. The PyPA guide is better — it separates build and publish, and uses Trusted Publishing. But neither includes testing, changelog management, or security considerations for open source. We need to build on top of these. -->
+<!-- So these are the two most common starting points you'll find. GitHub's template is pretty minimal — just build and publish. The PyPA guide is better — separates build and publish, uses Trusted Publishing. But neither of them includes testing, changelog management, or any security considerations for open source. We need to build on top of these. -->
 
 ---
 
@@ -199,7 +199,7 @@ Build a release pipeline where the **only human decision** is merging a PR.
 
 </div>
 
-<!-- Here's what we're aiming for. Safety, automation, and developer experience. By the end of this talk, you'll see a pipeline where the only thing a human needs to do is review and merge a PR — everything else is automated. -->
+<!-- So here's what we're going for. Safety, automation, and developer experience. By the end of this talk, you'll see a pipeline where the only thing a human needs to do is review and merge a PR. Everything else? Automated. -->
 
 ---
 
@@ -209,7 +209,7 @@ Build a release pipeline where the **only human decision** is merging a PR.
 
 <v-clicks>
 
-- 🧪 **Test & Build** — multi-env testing, idempotent builds
+- 🧪 **Test & Build** — idempotent builds, artifact passing
 - 📝 **Change Management** — changelog + automated versioning
 - 🔒 **Security** — handling untrusted PRs, securing releases
 - 🧑‍💻 **Developer Experience** — making it easy for contributors
@@ -218,7 +218,7 @@ Build a release pipeline where the **only human decision** is merging a PR.
 
 </div>
 
-<!-- We'll cover four areas. First, testing and building across environments. Then the biggest section — how to automate changelogs and versioning together. After that, security considerations specific to GitHub Actions. And finally, developer experience — preview wheels and contributor tooling. -->
+<!-- We'll go through four areas. First, idempotent builds and how releases get triggered. Then the biggest chunk — automating changelogs and versioning together. After that, security stuff specific to GitHub Actions. And finally, developer experience — preview wheels and tooling for contributors. Again, these are tips I picked up over time, so take what's useful for you. -->
 
 ---
 layout: section
@@ -227,50 +227,10 @@ layout: section
 # 🧪 Test & Build Strategy
 
 <div mt-4 op70>
-Catch bugs before they reach users — across every supported environment.
+Build once, test thoroughly, publish the exact same artifact.
 </div>
 
-<!-- Let's start with the foundation — testing and building. -->
-
----
-
-# Multi-environment testing
-
-<div mt-4>
-
-Testing across Python versions and dependency combinations:
-
-</div>
-
-```yaml {*|3-8|9-11|12-18}{maxHeight:'300px'}
-jobs:
-  test-python:
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-        streamlit-version:
-          - "" # latest
-          - "1.45.0"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install specific Streamlit version
-        if: matrix.streamlit-version != ''
-        run: pip install streamlit==${{ matrix.streamlit-version }}
-      - run: pytest
-```
-
-<div v-click mt-2 op80>
-
-Test the **edges of your compatibility matrix** — oldest and newest supported versions.
-
-Tools like `tox` / `nox` can manage this too — here we use GitHub Actions matrix directly for parallel runs and simpler CI integration.
-
-</div>
-
-<!-- Here's a real matrix from streamlit-webrtc. We test across 4 Python versions and 2 Streamlit versions — the latest and the oldest we support. The key insight is to test the edges of your compatibility range. You don't need every combination, but you must cover the extremes. Tools like tox or nox can do this too, but GitHub Actions matrix gives you parallel execution for free. -->
+<!-- Alright, let's start with the foundation — building and releasing. -->
 
 ---
 
@@ -305,7 +265,7 @@ The wheel that passes tests is the **exact same wheel** that gets published — 
 
 </div>
 
-<!-- This is a crucial principle — idempotent builds. Build the wheel once after tests pass, upload it as an artifact, then download that exact same artifact for publishing. Never rebuild at publish time. This guarantees there's no environment drift between what was tested and what gets shipped. -->
+<!-- This is a really important principle — idempotent builds. You build the wheel once, upload it as an artifact, then download that exact same artifact when it's time to publish. Never rebuild at publish time. That way there's zero chance of environment drift between what you tested and what actually gets shipped. -->
 
 ---
 
@@ -332,7 +292,7 @@ But **who creates the tag, and how do they decide the version?**
 
 </div>
 
-<!-- So we have tests and builds. But what kicks off a release? A common pattern is tag-triggered releases — push a version tag, CI does the rest. Simple. But this raises the question — who creates the tag? Who decides if it's a patch or minor bump? That's what we'll tackle next. -->
+<!-- OK so we've got builds. But what actually kicks off a release? A really common pattern is tag-triggered releases — you push a version tag, CI does the rest. Simple and clean. But it raises a question — who creates the tag? And who decides if it's a patch or a minor bump? That's exactly what we'll tackle next. -->
 
 ---
 layout: section
@@ -344,7 +304,7 @@ layout: section
 Three problems, one story — automate them together.
 </div>
 
-<!-- Now the biggest section of the talk — changelog and versioning. These two are deeply connected, and automating them together is the key to a smooth release process. -->
+<!-- OK, now the biggest part of the talk — changelog and versioning. These two are deeply connected, and the trick is automating them together. -->
 
 ---
 
@@ -368,7 +328,7 @@ These are **coupled** — what changed determines the next version, and the vers
 
 </div>
 
-<!-- I think about this as three coupled problems. First, how do you maintain a changelog? Second, how do you decide the next version number and create a tag? Third, how does the built wheel know its version? These aren't independent — what changed determines the version, and the version must flow through to the package. Let me show you how streamlit-webrtc evolved through four phases. -->
+<!-- I like to think about this as three coupled problems. How do you maintain a changelog? How do you decide the next version and create a tag? And how does the built wheel actually know its version? They're not independent — what changed determines the version, and the version has to flow through to the package. Let me walk you through how streamlit-webrtc evolved through four phases. -->
 
 ---
 
@@ -399,7 +359,7 @@ Everything done by hand — easy to forget the changelog, easy to get the versio
 
 </div>
 
-<!-- Phase 1 — everything manual. Edit the changelog by hand, edit the version string in pyproject.toml, commit, tag. This is how most projects start. It works, but it's error-prone. You forget the changelog, you typo the version, you tag before committing... -->
+<!-- Phase 1 — everything manual. You edit the changelog by hand, edit the version string in pyproject.toml, commit, tag. Most projects start here. It works, but it's super error-prone. You forget the changelog, typo the version, tag before committing... -->
 
 ---
 
@@ -431,7 +391,7 @@ No manual file editing for versions. But the **human still picks** patch vs. min
 
 </div>
 
-<!-- Phase 2 — we introduced bump-my-version. Now you just say "bump minor" and it updates pyproject.toml and creates the tag for you. Better, but the human still decides patch vs. minor, and changelog is still manual. -->
+<!-- Phase 2 — so we introduced a tool to help with version bumping. In my case I went with bump-my-version. Now you just say "bump minor" and it updates pyproject.toml and creates the tag. Much better, but the human still decides patch vs. minor, and changelog is still manual. -->
 
 ---
 
@@ -465,7 +425,7 @@ Bonus: `hatch-vcs` generates **dev versions** (e.g., `0.64.6.dev17+g8476028`) fo
 
 </div>
 
-<!-- Phase 3 — hatch-vcs. Now the version isn't hardcoded anywhere. hatch-vcs reads the latest git tag at build time and sets the version automatically. bump-my-version's job is reduced to just creating the git tag. A nice bonus: for non-tagged builds, hatch-vcs generates dev versions like 0.64.6.dev17, which is great for preview wheels — we'll see that later. -->
+<!-- Phase 3 — hatch-vcs. Now the version isn't hardcoded anywhere. hatch-vcs just reads the latest git tag at build time and sets the version automatically. So bump-my-version's job is reduced to just creating the tag. And here's a nice bonus — for non-tagged builds, hatch-vcs generates dev versions like 0.64.6.dev17. That's really handy for preview wheels, which we'll see later. -->
 
 ---
 layout: statement
@@ -473,7 +433,7 @@ layout: statement
 
 ## Changelog and version bumping<br>are still manual — can we automate them?
 
-<!-- But two of our three problems are still manual — the changelog and the version bump level. Can we automate those too? -->
+<!-- But two of our three problems are still manual — changelog and version bump level. Can we do better? -->
 
 ---
 
@@ -538,7 +498,7 @@ Tools: `Changesets` (JS), `scriv` / `towncrier` (Python)
 
 </div>
 
-<!-- There are two main approaches to automating both changelog and versioning. They share the same concept — aggregate structured inputs to generate changelogs and calculate versions. The difference is the input source. Conventional Commits uses commit messages with prefixes like feat: and fix:. Changelog fragments use dedicated files added per PR with categories like Added and Fixed. Both map to SemVer levels automatically. -->
+<!-- So there are two main approaches out there. They actually share the same idea — you aggregate structured inputs to generate changelogs and calculate versions. The difference is just the input source. Conventional Commits uses commit messages with prefixes like feat: and fix:. Changelog fragments use dedicated files you add per PR. Both can map to SemVer levels automatically. -->
 
 ---
 
@@ -584,7 +544,7 @@ I prefer fragments — but both are valid. Choose what fits your team.
 
 </div>
 
-<!-- Let me compare them. Conventional Commits ties version intent to commit messages — requires discipline on every commit, and squash merges lose that granularity so PR titles need to follow the convention too. The changelog tends to read like a git log. Fragments on the other hand are dedicated files reviewed in the PR. They survive squash and rebase, they're easy to edit even after merge, and the changelog is human-written prose. I personally prefer fragments, but both are valid — choose what works for your team. -->
+<!-- Let me compare them side by side. Conventional Commits ties version intent to commit messages — you need discipline on every commit, and if you squash merge, you lose that granularity, so PR titles have to follow the convention instead. And honestly the changelog tends to read like a git log. Fragments on the other hand are just files in your PR. They survive squash and rebase, you can edit them even after merge, and the changelog ends up being actual human-written prose. I personally prefer fragments, but honestly both work — just pick what fits your team. -->
 
 ---
 
@@ -624,7 +584,7 @@ One ecosystem: fragment authoring, version calculation, changelog generation, **
 
 </div>
 
-<!-- In the JavaScript world, Changesets is the gold standard. It provides both a local CLI for creating fragments and calculating versions, AND a GitHub Action that automates the entire release flow with a PR-based process. One ecosystem covers everything — fragment authoring, version calculation, changelog generation, and CI automation. Can we get this for Python? -->
+<!-- In the JavaScript world, Changesets is a well-known tool for this kind of thing. It gives you both a local CLI for creating fragments and calculating versions, AND a GitHub Action that automates the whole release flow with PRs. One ecosystem covers everything — fragments, versions, changelogs, CI automation. So the question is — can we get something like this for Python? -->
 
 ---
 
@@ -685,7 +645,7 @@ But these tools **only handle changelogs**. No version calculation, no CI releas
 
 </div>
 
-<!-- In Python, we have scriv and towncrier for changelog fragments. Here's scriv — you configure categories in pyproject.toml, run scriv create to make a fragment, and fill in your change description. But here's the thing — these tools only handle changelogs. No version calculation, no CI release flow. Unlike Changesets which covers all three. So we need to fill those gaps ourselves. -->
+<!-- In Python we have scriv and towncrier for changelog fragments. Here's scriv — you configure your categories in pyproject.toml, run scriv create, and fill in your change description. But here's the thing — these tools only handle changelogs. No version calculation, no CI release flow. So unlike Changesets which covers everything, we need to fill those gaps ourselves. -->
 
 ---
 
@@ -711,7 +671,7 @@ I wrote two things to close the gap:
 
 </div>
 
-<!-- Here's the gap analysis. Changesets covers everything — scriv only covers changelogs. I needed to write two things: a Python script that reads fragment categories to calculate the version bump level, and a GitHub Actions workflow that replicates the Changesets release flow. Let me show you both. -->
+<!-- So here's the gap. Changesets covers everything — scriv only does changelogs. I needed to write two things: a Python script that reads fragment categories to figure out the bump level, and a GitHub Actions workflow that replicates the Changesets release flow. Let me show you both. -->
 
 ---
 
@@ -750,7 +710,7 @@ def get_bump_level():
 
 </div>
 
-<!-- Here's the version calculation script. It maps scriv categories to SemVer levels — Added and Changed are minor, Removed is major, Fixed and Security are patch. The function reads all fragments, combines them, finds the highest-priority category, and returns the bump level. It's about 40 lines of Python. The key insight: the same fragments that generate your changelog also determine your version. -->
+<!-- So here's the version calculation script. Pretty simple — it maps scriv categories to SemVer levels. Added and Changed are minor, Removed is major, Fixed and Security are patch. The function reads all the fragments, combines them, finds the highest-priority category, and returns the bump level. It's about 40 lines of Python. And the cool thing is — the same fragments that generate your changelog also determine your version. One source of truth. -->
 
 ---
 
@@ -789,7 +749,7 @@ One workflow, two behaviors — driven by the **presence or absence** of fragmen
 
 </div>
 
-<!-- And here's the CI workflow — about 145 lines in full, shown here in simplified form. It triggers on every push to main. First it checks for fragments. If fragments exist, it collects them, calculates the next version, and opens or updates a Release PR. If there are no fragments — meaning the Release PR was just merged — it reads the bump level from the previous commit, creates a git tag, and pushes it. That tag push triggers the build and publish pipeline. One workflow, two behaviors, driven entirely by whether fragment files are present. -->
+<!-- And here's the CI workflow. It's about 145 lines in the real file, but here's the key idea. It triggers on every push to main and checks for fragments. If fragments exist, it collects them, calculates the version, opens or updates a Release PR. If there are no fragments — that means the Release PR was just merged — so it reads the bump level from the previous commit, creates a git tag, and pushes it. That triggers the build and publish pipeline. So it's one workflow with two behaviors, and it all depends on whether fragment files are there or not. -->
 
 ---
 
@@ -823,7 +783,7 @@ Bonus: `hatch-vcs` gives us **dev versions** for free (e.g., `0.64.6.dev17+g8476
 
 </div>
 
-<!-- Here's how all the tools fit together. scriv handles changelog fragments. The custom script plus CI workflow handle version bumping and tagging. hatch-vcs reads the tag at build time to set the package version. scriv and hatch-vcs are off-the-shelf — the custom script and workflow just connect them. And remember that dev version bonus — hatch-vcs gives every non-tagged build a unique dev version, which is perfect for preview wheels. -->
+<!-- So here's how it all fits together. scriv handles the changelog fragments. The custom script and CI workflow handle version bumping and tagging. And hatch-vcs reads the tag at build time to set the package version. scriv and hatch-vcs are both off-the-shelf tools — the custom stuff just connects them. And remember that dev version bonus from earlier — hatch-vcs gives every non-tagged build a unique dev version, which is perfect for those preview wheels. -->
 
 ---
 clicks: 9
@@ -865,7 +825,7 @@ clicks: 9
   </template>
 </FancyArrow>
 
-<!-- Let me walk you through the actual flow with real screenshots from streamlit-webrtc. Step 1: a commit with changelog fragments is pushed to main, the changelog workflow detects them and creates a Release PR. Step 2: here's the automated Release PR with the changelog preview — the bot created this, not me. Step 3: I review and merge the PR. The workflow detects no fragments remain, creates a git tag. Step 4: the tag triggers the build pipeline and publishes to PyPI, creating a GitHub Release. The only manual step in this entire flow is approving and merging the Release PR. Everything else is automated. -->
+<!-- Let me show you the actual flow with real screenshots. Step 1: a commit with fragments lands on main, the workflow picks them up and creates a Release PR. Step 2: here's what that PR looks like — the bot created this, not me. Step 3: I just review it and hit merge. The workflow sees no fragments left, so it creates a git tag. Step 4: that tag triggers the build pipeline, publishes to PyPI, creates a GitHub Release. The only thing I actually did was click merge. Everything else happened automatically. -->
 
 ---
 layout: section
@@ -877,7 +837,7 @@ layout: section
 Open source means untrusted code runs in your CI — GitHub Actions has specific pitfalls.
 </div>
 
-<!-- Now let's talk about security. When you accept contributions from external developers, their code runs in your CI. GitHub Actions has specific security considerations you need to be aware of. -->
+<!-- Alright, let's talk about security. When you accept contributions from external developers, their code runs in your CI. And GitHub Actions has some specific things you really need to be aware of. -->
 
 ---
 
@@ -919,7 +879,7 @@ Has access to secrets — safe for deployment and publishing.
 
 </div>
 
-<!-- In GitHub Actions, different events run in different contexts. The pull_request event runs the PR author's code — external contributors can execute arbitrary code in your CI. But GitHub protects you: it gives a read-only token and no access to secrets. On the other hand, workflow_run runs in the default branch context — only code that's been merged can execute, and it has full access to secrets. The key principle: test on pull_request where you don't need secrets, deploy on workflow_run where secrets are safe. -->
+<!-- So in GitHub Actions, different events run in totally different contexts. The pull_request event runs the PR author's code — meaning external contributors can run arbitrary code in your CI. But GitHub does protect you — it gives a read-only token, no access to secrets. On the other hand, workflow_run runs in the default branch context — only merged code runs, and it gets full access to secrets. So the principle is simple: test on pull_request where you don't need secrets, deploy on workflow_run where secrets are safe. -->
 
 ---
 
@@ -982,7 +942,7 @@ on:
 
 </div>
 
-<!-- Here's how we split it into three workflow files. test-build.yml triggers on pushes and PRs — it runs tests and builds the wheel, but has no access to secrets. post-build.yml triggers via workflow_run after test-build completes — it runs in the default branch context with secrets, so it can publish to PyPI and create GitHub Releases. And changelog.yml handles the release PR flow we just discussed. This separation ensures untrusted PR code never has access to your deployment credentials. -->
+<!-- So here's how we split it into three files. test-build.yml triggers on pushes and PRs — runs tests, builds the wheel, but no secrets. post-build.yml triggers via workflow_run after test-build finishes — runs in the default branch context with secrets, so it can publish to PyPI and create releases. And changelog.yml handles the release PR flow we talked about. This way, untrusted PR code never touches your deployment credentials. -->
 
 ---
 
@@ -1019,7 +979,7 @@ The final piece: **how do users trust the package?**
 
 </div>
 
-<!-- The final security piece — how do users trust the package they install? Trusted Publishing uses OIDC — your GitHub Actions workflow authenticates directly with PyPI without any API tokens stored in your repo. Sigstore signing provides verifiable provenance — anyone can verify this wheel was built by this workflow in this repo. And GitHub Releases attach the signed artifacts for auditing. Notice the workflow snippet — id-token: write is all you need. No PyPI API token anywhere. -->
+<!-- Last security piece — how do users actually trust your package? Trusted Publishing uses OIDC, so your workflow authenticates directly with PyPI. No API tokens stored anywhere. Sigstore signing gives you verifiable provenance — anyone can check that this wheel was built by this workflow in this repo. And GitHub Releases attach the signed artifacts for auditing. Look at the snippet — id-token: write is literally all you need. No PyPI token anywhere in your repo. -->
 
 ---
 layout: section
@@ -1031,7 +991,7 @@ layout: section
 Make it easy to contribute correctly — so you spend less time on review.
 </div>
 
-<!-- Developer experience is the last piece. If contributing correctly is easy, contributors do the right thing and you spend less time on review. -->
+<!-- OK, last section — developer experience. If you make it easy to contribute correctly, people just do the right thing and you spend way less time on review. -->
 
 ---
 
@@ -1056,7 +1016,7 @@ The easier it is to contribute correctly, the less time you spend on review.
 
 </div>
 
-<!-- Two things make contributing easy. First, scriv create --edit — one command to add a changelog fragment. The template guides contributors through the categories so they don't have to guess. Second, PR preview wheels. Every PR automatically gets a built wheel deployed to Cloudflare Pages, with a pip install command posted as a comment. Reviewers can test changes immediately without checking out the branch. -->
+<!-- Two things that really help. First, scriv create --edit — just one command to add a changelog fragment. The template walks contributors through the categories so they don't have to guess. Second, PR preview wheels. Every PR automatically gets a wheel deployed to Cloudflare Pages, with a pip install command right in the PR comments. Reviewers can try changes immediately without checking out the branch. -->
 
 ---
 
@@ -1104,7 +1064,7 @@ Actual PR comment with `pip install` link
 
 </div>
 
-<!-- Here's the preview wheel workflow. Notice it runs in workflow_run context — because deploying to Cloudflare Pages requires secrets that aren't available in the pull_request context. It downloads the built wheel, deploys it to Cloudflare Pages, and posts a comment with the pip install command. On the right you can see what the actual PR comment looks like — contributors and reviewers can test changes with one pip install command, no local checkout needed. -->
+<!-- Here's what that workflow looks like. Notice it runs in workflow_run context — because deploying to Cloudflare Pages needs secrets that aren't available in pull_request. It downloads the built wheel, deploys it, and posts a comment with the pip install command. On the right you can see the actual comment — contributors just copy-paste that pip install and they're testing the changes. No checkout needed. -->
 
 ---
 layout: section
@@ -1112,7 +1072,7 @@ layout: section
 
 # Putting It All Together
 
-<!-- Let's bring everything together and see the complete lifecycle. -->
+<!-- Alright, let's bring it all together. -->
 
 ---
 
@@ -1160,7 +1120,7 @@ One human decision → everything else is automated.
 
 </div>
 
-<!-- Here's the complete lifecycle. A contributor opens a PR with code and a scriv fragment. CI tests across all environments, builds the wheel, deploys a preview. When the PR merges, CI opens a Release PR with the aggregated changelog. The maintainer reviews and merges it — this is the only manual step. CI creates a git tag, publishes to PyPI, and creates a GitHub Release with Sigstore signatures. One human decision — everything else is automated. -->
+<!-- Here's the whole thing end to end. A contributor opens a PR with code and a scriv fragment. CI builds the wheel, deploys a preview. When the PR merges, CI opens a Release PR with the aggregated changelog. I review it and merge — that's the only thing I actually do. CI creates a git tag, publishes to PyPI, creates a GitHub Release with Sigstore signatures. One click from me, everything else is automated. -->
 
 ---
 
@@ -1181,7 +1141,7 @@ One human decision → everything else is automated.
 
 </div>
 
-<!-- Here are the key takeaways. Use a single source of truth for versions and changes. Automate the boring parts but keep humans in the loop for review. Design for security from the start. Lower the barrier for contributors. And don't be afraid to steal ideas from other ecosystems — Changesets from JavaScript inspired this entire approach, adapted with Python tools. -->
+<!-- So to wrap up — single source of truth for versions and changes. Automate the boring stuff but keep humans in the loop for the important decisions. Think about security from the start. Make it easy for people to contribute. And don't be afraid to steal ideas from other ecosystems — this whole approach was inspired by Changesets from JavaScript, just adapted with Python tools. -->
 
 ---
 
@@ -1220,7 +1180,7 @@ One human decision → everything else is automated.
 
 </div>
 
-<!-- Here are links to all the tools and resources mentioned in this talk. The streamlit-webrtc repo has the actual workflow files if you want to see the full implementation. -->
+<!-- Here are all the links if you want to dig deeper. The streamlit-webrtc repo has the actual workflow files — feel free to check them out. -->
 
 ---
 
@@ -1251,4 +1211,4 @@ Slides & contact:
 
 </div>
 
-<!-- Thank you! I hope this gives you ideas for your own release workflows. Feel free to check out the streamlit-webrtc repo for the full implementation, and reach out if you have questions. -->
+<!-- Thanks everyone! I hope you got some ideas for your own projects. The repo's all public if you want to look at the actual code, and feel free to reach out if you have questions. -->

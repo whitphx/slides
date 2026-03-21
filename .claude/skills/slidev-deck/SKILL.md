@@ -53,6 +53,7 @@ Before writing any slides, plan the **information flow**. A good presentation is
   - Status indicators: `⚠️ NO access to secrets`, `✅ Has secrets`
   - Reward/benefit lists: `💬 Talk opportunities`, `💼 Job opportunities`, `👛 Sponsorship`
   - Emotional emphasis on statement slides: `Share it! 👍`
+- **Presenter notes should be written in spoken language tone**, not formal written style. Use contractions ("don't", "it's", "we'll"), filler phrases ("OK so", "alright", "honestly"), and conversational transitions ("let me show you", "here's the thing"). The notes are meant to be read aloud as a speaking script, not as documentation. Avoid overly polished or academic phrasing.
 
 ### 2. Create the deck package (for new decks)
 

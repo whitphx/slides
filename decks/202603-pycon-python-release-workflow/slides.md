@@ -1066,7 +1066,7 @@ From code change to published package:
 
 <div v-click="3" flex="~ gap-3" items-center>
 <div w-8 h-8 rounded-full bg-sky:20 flex items-center justify-center text-sky font-bold shrink-0>3</div>
-<div>PR merges → CI opens <strong>"Preview changelog"</strong> PR</div>
+<div>PR merges → CI opens a <strong>Release PR</strong></div>
 </div>
 
 <div v-click="4" flex="~ gap-3" items-center>

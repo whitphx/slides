@@ -1,0 +1,15 @@
+{
+  "name": "202606-pyconus-report-relaxed",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@iconify-json/ri": "^1.2.5",
+    "@slidev/cli": "^52.14.1",
+    "vue": "^3.5.13"
+  }
+}

@@ -76,6 +76,7 @@ layout: section
 ---
 
 # 気負わず、ただの一参加者として
+<div text-xl op70 mt-1>Just another attendee — no pressure</div>
 
 <div mt-8 text-xl>
 
@@ -139,18 +140,22 @@ layout: section
   <div v-click="1" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🎧</div>
     <div mt-1 font-bold text-base>セッション・キーノート・LT</div>
+    <div text-xs op50 mt-0.5>Talks, keynotes & lightning talks</div>
   </div>
   <div v-click="2" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🏢</div>
     <div mt-1 font-bold text-base>ブースを回る</div>
+    <div text-xs op50 mt-0.5>Visit the booths</div>
   </div>
   <div v-click="3" border="~ cyan/50 rounded-xl" p-3 bg-cyan:10>
     <div text-3xl>👋</div>
     <div mt-1 font-bold text-base>歩くだけで知り合いに会う</div>
+    <div text-xs op50 mt-0.5>Bump into people just walking around</div>
   </div>
   <div v-click="4" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🍻</div>
     <div mt-1 font-bold text-base>初対面の人と盛り上がる</div>
+    <div text-xs op50 mt-0.5>Hit it off with new people</div>
   </div>
 </div>
 
@@ -173,6 +178,7 @@ layout: section
     <img src="/photos/beer-bar.png" alt="前夜のビアバー" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>前夜のバー</div>
+      <div text-xs op50 mt-0.5>The night before</div>
       <div text-sm op70 mt-1>初対面の参加者と自然に相席に</div>
     </div>
   </div>
@@ -180,6 +186,7 @@ layout: section
     <img src="/photos/beer-unofficial.png" alt="非公式ビール飲み会" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>Python Asia の飲み会</div>
+      <div text-xs op50 mt-0.5>Python Asia meetup</div>
       <div text-sm op70 mt-1>アジア各地から集まって乾杯</div>
     </div>
   </div>
@@ -187,13 +194,15 @@ layout: section
     <img src="/photos/sponsor-party.png" alt="スポンサーパーティー" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>スポンサー主催パーティー</div>
+      <div text-xs op50 mt-0.5>Sponsor party</div>
       <div text-sm op70 mt-1>公式の場でも新しい出会い</div>
     </div>
   </div>
 </div>
 
-<div v-click="4" mt-6 text-center text-xl border="~ orange/40 rounded-lg" p-3 bg-orange:5>
-「<span v-mark.highlight.orange="5">また別の国のPyConで会いましょう</span>」 → 実際あちこちで再会して<b>輪が広がる</b>
+<div v-click="4" mt-6 text-center border="~ orange/40 rounded-lg" p-3 bg-orange:5>
+<div text-xl>「<span v-mark.highlight.orange="5">また別の国のPyConで会いましょう</span>」 → 実際あちこちで再会して<b>輪が広がる</b></div>
+<div text-sm op60 mt-1>See you at another country's PyCon — the circle keeps growing</div>
 </div>
 
 <!-- で、個人的に一番楽しいのが飲み会とかパーティーですね。前夜に会場近くのバーで日本から来た人たちと飲んでたら、PyCon USのバッジ付けた初対面の人と自然に相席になったり。Python Asiaが音頭とった飲み会に行ったら、アジア各地から来た人が集まってて、「また別の国のPyConで会おうね」って話になる。これが本当にそうで、別のPyConに行くとまた会うんですよ。そうやってどんどん知り合いの輪が広がっていく。準備なんて要らなくて、同じイベントに来てる時点で話は弾みます。 -->
@@ -208,6 +217,7 @@ layout: section
     <img src="/photos/queen-mary.png" alt="クイーンメアリー号" w-full h-48 object-cover>
     <div p-3>
       <div font-bold>Sprint中に抜け出して観光</div>
+      <div text-xs op50 mt-0.5>Sneaking out during the sprint</div>
       <div text-sm op70 mt-1>タコス → クイーンメアリー号</div>
     </div>
   </div>
@@ -215,13 +225,15 @@ layout: section
     <img src="/photos/long-beach.png" alt="ロングビーチの砂浜" w-full h-48 object-cover>
     <div p-3>
       <div font-bold>海岸を散歩</div>
+      <div text-xs op50 mt-0.5>A walk along the shore</div>
       <div text-sm op70 mt-1>そのまま夜は食事と飲みへ</div>
     </div>
   </div>
 </div>
 
-<div v-click="3" mt-6 text-center text-xl border="~ red/40 rounded-lg" p-3 bg-red:5>
-🎬 3日目は映画にも。<span v-mark.underline.red="4">ホテル代・参加費の元を取ろうと気負いすぎなくていい</span>
+<div v-click="3" mt-6 text-center border="~ red/40 rounded-lg" p-3 bg-red:5>
+<div text-xl>🎬 3日目は映画にも。<span v-mark.underline.red="4">ホテル代・参加費の元を取ろうと気負いすぎなくていい</span></div>
+<div text-sm op60 mt-1>You don't have to squeeze your money's worth out of every session</div>
 </div>
 
 <!-- あと、会場をまるっと抜け出す日があってもいいと思うんですよ。3日目は会場抜けて、現地の友人と映画観に行きました。最終日のSprintも、ランチ行くグループに混ぜてもらったら、そのままタコス食べて、クイーンメアリー号っていう観光地見に行って、夕方は海岸散歩して、そのまま飲みに行っちゃった。せっかく高いお金払ってるんだから全部のセッション出なきゃ、って気負いすぎなくていいんです。元を取ろうとしすぎない。これ大事。 -->
@@ -242,21 +254,25 @@ layout: section
   <div v-click="1" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>💸</div>
     <div mt-2 font-bold>まず Travel Grant に申し込む</div>
+    <div text-xs op50 mt-0.5>Apply for the Travel Grant first</div>
     <div text-sm op70 mt-1>旅費補助。自分は落ちたけど、出さなきゃ始まらない</div>
   </div>
   <div v-click="2" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🛏️</div>
     <div mt-2 font-bold>宿泊費が高い → 相部屋もアリ</div>
+    <div text-xs op50 mt-0.5>Lodging is pricey — share a room</div>
     <div text-sm op70 mt-1>早めに動くほど安い</div>
   </div>
   <div v-click="3" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🧥</div>
     <div mt-2 font-bold>意外と寒い、長袖必須</div>
+    <div text-xs op50 mt-0.5>Surprisingly cold — bring long sleeves</div>
     <div text-sm op70 mt-1>でも暑い日もある → 日焼け・日除け対策も</div>
   </div>
   <div v-click="4" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🏷️</div>
     <div mt-2 font-bold>ステッカーを持参</div>
+    <div text-xs op50 mt-0.5>Bring stickers</div>
     <div text-sm op70 mt-1>名札に貼ったり配ったり、会話のきっかけに</div>
   </div>
 </div>
@@ -272,21 +288,25 @@ layout: section
   <div v-click="1" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🧑‍💻</div>
     <div mt-2 font-bold>Sprint も出よう</div>
+    <div text-xs op50 mt-0.5>Join the sprints too</div>
     <div text-sm op70 mt-1>もくもく会みたいなもの。自分のPCだけで参加OK</div>
   </div>
   <div v-click="2" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🍻</div>
     <div mt-2 font-bold>パーティーに参加</div>
+    <div text-xs op50 mt-0.5>Go to the parties</div>
     <div text-sm op70 mt-1>食費・飲み代が浮く + 友達もできて一石二鳥</div>
   </div>
   <div v-click="3" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🔗</div>
     <div mt-2 font-bold>SNS交換は LinkedIn か X</div>
+    <div text-xs op50 mt-0.5>Swap socials: LinkedIn or X</div>
     <div text-sm op70 mt-1>これが定番</div>
   </div>
   <div v-click="4" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>😎</div>
     <div mt-2 font-bold>社交的な人格を演じる</div>
+    <div text-xs op50 mt-0.5>Play a sociable character</div>
     <div text-sm op70 mt-1>話しかける側に回ると一気に広がる</div>
   </div>
 </div>

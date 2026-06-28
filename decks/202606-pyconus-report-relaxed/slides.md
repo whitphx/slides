@@ -160,7 +160,7 @@ layout: section
 </div>
 
 <div v-click="1">
-<img src="/photos/streamlit-booth.png" alt="Streamlitブース" rounded-lg w-full>
+<img src="/photos/streamlit-booth.jpg" alt="Streamlitブース" rounded-lg w-full>
 <div text-sm op60 text-center mt-1>知り合いの多いStreamlitブースにて</div>
 </div>
 
@@ -175,7 +175,7 @@ layout: section
 
 <div mt-6 grid="~ cols-3" gap-4>
   <div v-click="1" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
-    <img src="/photos/beer-bar.png" alt="前夜のビアバー" w-full h-40 object-cover>
+    <img src="/photos/beer-bar.jpg" alt="前夜のビアバー" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>前夜のバー</div>
       <div text-xs op50 mt-0.5>The night before</div>
@@ -183,7 +183,7 @@ layout: section
     </div>
   </div>
   <div v-click="2" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
-    <img src="/photos/beer-unofficial.png" alt="非公式ビール飲み会" w-full h-40 object-cover>
+    <img src="/photos/beer-unofficial.jpg" alt="非公式ビール飲み会" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>Python Asia の飲み会</div>
       <div text-xs op50 mt-0.5>Python Asia meetup</div>
@@ -191,7 +191,7 @@ layout: section
     </div>
   </div>
   <div v-click="3" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
-    <img src="/photos/sponsor-party.png" alt="スポンサーパーティー" w-full h-40 object-cover>
+    <img src="/photos/sponsor-party.jpg" alt="スポンサーパーティー" w-full h-40 object-cover>
     <div p-3>
       <div font-bold>スポンサー主催パーティー</div>
       <div text-xs op50 mt-0.5>Sponsor party</div>
@@ -214,7 +214,7 @@ layout: section
 
 <div mt-6 grid="~ cols-2" gap-6>
   <div v-click="1" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
-    <img src="/photos/queen-mary.png" alt="クイーンメアリー号" w-full h-48 object-cover>
+    <img src="/photos/queen-mary.jpg" alt="クイーンメアリー号" w-full h-48 object-cover>
     <div p-3>
       <div font-bold>Sprint中に抜け出して観光</div>
       <div text-xs op50 mt-0.5>Sneaking out during the sprint</div>
@@ -222,7 +222,7 @@ layout: section
     </div>
   </div>
   <div v-click="2" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
-    <img src="/photos/long-beach.png" alt="ロングビーチの砂浜" w-full h-48 object-cover>
+    <img src="/photos/long-beach.jpg" alt="ロングビーチの砂浜" w-full h-48 object-cover>
     <div p-3>
       <div font-bold>海岸を散歩</div>
       <div text-xs op50 mt-0.5>A walk along the shore</div>

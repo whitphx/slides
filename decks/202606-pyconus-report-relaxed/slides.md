@@ -47,7 +47,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 - 学術専門職員 <small op70>(Research Software Engineer)</small><br>@ 東大先端研 <small op70>(UTokyo RCAST)</small>
 - Streamlit Creator🎈
-- 🐍 海外PyConによく出没してます <small op70>(JP / APAC / Euro / TW / DE / FR / LT ...)</small>
+- 🐍 旅行がてら各地のPyConに行きます <small op70>(JP / APAC / Euro / TW / DE / FR / LT ...)</small>
 
 </v-clicks>
 

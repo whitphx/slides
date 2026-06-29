@@ -70,8 +70,8 @@ Software Artisan / Indie Dev / OSS Enthusiast
 layout: section
 ---
 
-# 今年のスタンス
-<div text-xl op70 mt-2>This year: no pressure</div>
+# PyCon US に行ってきました
+<div text-xl op70 mt-2>I went to PyCon US 2026 in Long Beach, CA</div>
 
 ---
 

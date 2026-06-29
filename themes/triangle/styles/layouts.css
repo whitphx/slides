@@ -66,6 +66,10 @@
     @apply border-l-4 pl-4;
     border-color: var(--slidev-theme-primary);
   }
+
+  p {
+    line-height: 2.0rem;
+  }
 }
 
 .slidev-layout.cover,

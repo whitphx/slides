@@ -45,8 +45,8 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <v-clicks>
 
-- Research Software Engineer <small op70>(学術専門職員)</small><br><span v-mark.underline.yellow="1">東京大学 先端科学技術研究センター</span> <small op70>(東大先端研 / RCAST)</small>
-- <span v-mark.underline.red="2">Streamlit</span> Creator
+- 学術専門職員 <small op70>(Research Software Engineer)</small><br>@ 東大先端研 <small op70>(UTokyo RCAST)</small>
+- Streamlit Creator🎈
 - 🐍 海外PyConによく出没してます <small op70>(JP / APAC / Euro / TW / DE / FR / LT ...)</small>
 
 </v-clicks>
@@ -75,7 +75,7 @@ layout: section
 
 ---
 
-# 気負わず、ただの一参加者として
+# ただの一参加者
 <div text-xl op70 mt-1>Just another attendee — no pressure</div>
 
 <div mt-8 text-xl>
@@ -97,7 +97,7 @@ layout: section
 
 ---
 
-# しかも、今年はあえて「やらなかった」
+# 特に気張らずに行った
 <div text-xl op70 mt-1>What I deliberately skipped</div>
 
 <div mt-10 grid="~ cols-3" gap-4 text-center>
@@ -116,22 +116,24 @@ layout: section
 
 <div v-click="3" border="~ red/40 rounded-xl" p-5 bg-red:5>
 <div text-4xl>🪑</div>
-<div mt-2 font-bold>SprintのOSSテーブルにも入らない</div>
-<div text-sm op70 mt-1>No sprint table</div>
+<div mt-2 font-bold>Sprintもゆっくり</div>
+<div text-sm op70 mt-1>No full-on Sprint</div>
 </div>
 
 </div>
 
-<div v-click="4" mt-10 text-xl text-center op80>
-去年の報告会は <span v-mark.circle.orange="4">Summit と Sprint を頑張った話</span> だったけど…<br>
-今年は<b>あえて何も気張らずに</b>行ってみた
+<div v-click="3" mt-10 text-xl text-center op80>
+
+[去年の報告会](https://pyconjp.blogspot.com/2025/06/pyconus2025.html)は[Summit と Sprint を頑張った話](https://slides.whitphx.info/202507-pyconus-report/)だったけど…<br>
+今年は何も気張らずに行ってみた
+
 </div>
 
 <!-- しかも今年は、あえて「やらないこと」を決めて行きました。トークはしない。去年はWebAssembly Summitっていうイベントに気合い入れて出たんですけど、今年はそれもなし。Sprintっていう開発合宿みたいなのには参加したんですが、去年みたいにCPythonのOSSテーブルにガッツリ入る、みたいなこともしませんでした。去年のこの報告会、まさにSummitとSprント頑張った話をしたんですけど、今年はその真逆で、特に気張るイベントを作らずに行ってみた、という感じです。で、結論から言うと、それでも十分楽しかったんですよ。 -->
 
 ---
 
-# じゃあ何して過ごしたの？
+# じゃあ何してたの？
 <div text-xl op70 mt-1>So what did I actually do?</div>
 
 <div mt-8 grid="~ cols-2" gap-8 items-center>
@@ -139,29 +141,29 @@ layout: section
 <div grid="~ cols-2" gap-3 text-center>
   <div v-click="1" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🎧</div>
-    <div mt-1 font-bold text-base>セッション・キーノート・LT</div>
+    <div mt-1 font-bold text-base>普通にセッション巡り</div>
     <div text-xs op50 mt-0.5>Talks, keynotes & lightning talks</div>
   </div>
   <div v-click="2" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🏢</div>
-    <div mt-1 font-bold text-base>ブースを回る</div>
+    <div mt-1 font-bold text-base>ブース巡り</div>
     <div text-xs op50 mt-0.5>Visit the booths</div>
   </div>
   <div v-click="3" border="~ cyan/50 rounded-xl" p-3 bg-cyan:10>
     <div text-3xl>👋</div>
-    <div mt-1 font-bold text-base>歩くだけで知り合いに会う</div>
+    <div mt-1 font-bold text-base>歩いてると誰かに会う</div>
     <div text-xs op50 mt-0.5>Bump into people just walking around</div>
   </div>
   <div v-click="4" border="~ gray/30 rounded-xl" p-3 bg-gray:5>
     <div text-3xl>🍻</div>
-    <div mt-1 font-bold text-base>初対面の人と盛り上がる</div>
-    <div text-xs op50 mt-0.5>Hit it off with new people</div>
+    <div mt-1 font-bold text-base>イベントで盛り上がる</div>
+    <div text-xs op50 mt-0.5>Parties, meetups & social events</div>
   </div>
 </div>
 
 <div v-click="1">
 <img src="/photos/streamlit-booth.jpg" alt="Streamlitブース" rounded-lg w-full>
-<div text-sm op60 text-center mt-1>知り合いの多いStreamlitブースにて</div>
+<div text-sm op60 text-center mt-1>知り合いの多いStreamlitブースに遊びに行った</div>
 </div>
 
 </div>
@@ -170,7 +172,7 @@ layout: section
 
 ---
 
-# 飲み会・パーティーが楽しい
+# パーティーが楽しい
 <div text-xl op70 mt-1>The parties are where it happens</div>
 
 <div mt-6 grid="~ cols-3" gap-4>
@@ -179,7 +181,6 @@ layout: section
     <div p-3>
       <div font-bold>前夜のバー</div>
       <div text-xs op50 mt-0.5>The night before</div>
-      <div text-sm op70 mt-1>初対面の参加者と自然に相席に</div>
     </div>
   </div>
   <div v-click="2" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
@@ -187,22 +188,20 @@ layout: section
     <div p-3>
       <div font-bold>Python Asia の飲み会</div>
       <div text-xs op50 mt-0.5>Python Asia meetup</div>
-      <div text-sm op70 mt-1>アジア各地から集まって乾杯</div>
     </div>
   </div>
   <div v-click="3" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
     <img src="/photos/sponsor-party.jpg" alt="スポンサーパーティー" w-full h-40 object-cover>
     <div p-3>
-      <div font-bold>スポンサー主催パーティー</div>
+      <div font-bold>スポンサーパーティー</div>
       <div text-xs op50 mt-0.5>Sponsor party</div>
-      <div text-sm op70 mt-1>公式の場でも新しい出会い</div>
     </div>
   </div>
 </div>
 
 <div v-click="4" mt-6 text-center border="~ orange/40 rounded-lg" p-3 bg-orange:5>
-<div text-xl>「<span v-mark.highlight.orange="5">また別の国のPyConで会いましょう</span>」 → 実際あちこちで再会して<b>輪が広がる</b></div>
-<div text-sm op60 mt-1>See you at another country's PyCon — the circle keeps growing</div>
+<div text-xl>「また別の国のPyConで会いましょう！」</div>
+<div text-sm op60 mt-1>"See you at another country's PyCon!"</div>
 </div>
 
 <!-- で、個人的に一番楽しいのが飲み会とかパーティーですね。前夜に会場近くのバーで日本から来た人たちと飲んでたら、PyCon USのバッジ付けた初対面の人と自然に相席になったり。Python Asiaが音頭とった飲み会に行ったら、アジア各地から来た人が集まってて、「また別の国のPyConで会おうね」って話になる。これが本当にそうで、別のPyConに行くとまた会うんですよ。そうやってどんどん知り合いの輪が広がっていく。準備なんて要らなくて、同じイベントに来てる時点で話は弾みます。 -->
@@ -218,7 +217,6 @@ layout: section
     <div p-3>
       <div font-bold>Sprint中に抜け出して観光</div>
       <div text-xs op50 mt-0.5>Sneaking out during the sprint</div>
-      <div text-sm op70 mt-1>タコス → クイーンメアリー号</div>
     </div>
   </div>
   <div v-click="2" border="~ gray/25 rounded-xl" overflow-hidden bg-gray:5>
@@ -226,13 +224,12 @@ layout: section
     <div p-3>
       <div font-bold>海岸を散歩</div>
       <div text-xs op50 mt-0.5>A walk along the shore</div>
-      <div text-sm op70 mt-1>そのまま夜は食事と飲みへ</div>
     </div>
   </div>
 </div>
 
 <div v-click="3" mt-6 text-center border="~ red/40 rounded-lg" p-3 bg-red:5>
-<div text-xl>🎬 3日目は映画にも。<span v-mark.underline.red="4">ホテル代・参加費の元を取ろうと気負いすぎなくていい</span></div>
+<div text-xl>ホテル代・参加費の元を取ろうと気負いすぎない</div>
 <div text-sm op60 mt-1>You don't have to squeeze your money's worth out of every session</div>
 </div>
 
@@ -253,27 +250,23 @@ layout: section
 <div mt-8 grid="~ cols-2" gap-4 text-lg>
   <div v-click="1" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>💸</div>
-    <div mt-2 font-bold>まず Travel Grant に申し込む</div>
-    <div text-xs op50 mt-0.5>Apply for the Travel Grant first</div>
-    <div text-sm op70 mt-1>旅費補助。自分は落ちたけど、出さなきゃ始まらない</div>
+    <div mt-2 font-bold>Travel Grant（旅費補助）</div>
+    <div text-xs op50 mt-0.5>Apply for the Travel Grant</div>
   </div>
   <div v-click="2" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🛏️</div>
     <div mt-2 font-bold>宿泊費が高い → 相部屋もアリ</div>
     <div text-xs op50 mt-0.5>Lodging is pricey — share a room</div>
-    <div text-sm op70 mt-1>早めに動くほど安い</div>
   </div>
   <div v-click="3" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🧥</div>
     <div mt-2 font-bold>意外と寒い、長袖必須</div>
     <div text-xs op50 mt-0.5>Surprisingly cold — bring long sleeves</div>
-    <div text-sm op70 mt-1>でも暑い日もある → 日焼け・日除け対策も</div>
   </div>
-  <div v-click="4" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
-    <div text-3xl>🏷️</div>
-    <div mt-2 font-bold>ステッカーを持参</div>
-    <div text-xs op50 mt-0.5>Bring stickers</div>
-    <div text-sm op70 mt-1>名札に貼ったり配ったり、会話のきっかけに</div>
+  <div v-click="3" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
+    <div text-3xl>🧥</div>
+    <div mt-2 font-bold>でも暑い日もある → 日焼け・日除け対策も</div>
+    <div text-xs op50 mt-0.5>Hot days too — bring sun protection & umbrella</div>
   </div>
 </div>
 
@@ -299,13 +292,12 @@ layout: section
   </div>
   <div v-click="3" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>🔗</div>
-    <div mt-2 font-bold>SNS交換は LinkedIn か X</div>
-    <div text-xs op50 mt-0.5>Swap socials: LinkedIn or X</div>
-    <div text-sm op70 mt-1>これが定番</div>
+    <div mt-2 font-bold>LinkedIn or X</div>
+    <div text-sm op70 mt-1>英語アカウントがあるとなおよし</div>
   </div>
   <div v-click="4" border="~ sky/30 rounded-xl" p-4 bg-sky:5>
     <div text-3xl>😎</div>
-    <div mt-2 font-bold>社交的な人格を演じる</div>
+    <div mt-2 font-bold>社交的に振る舞ってみる</div>
     <div text-xs op50 mt-0.5>Play a sociable character</div>
     <div text-sm op70 mt-1>話しかける側に回ると一気に広がる</div>
   </div>
@@ -317,7 +309,7 @@ layout: section
 layout: statement
 ---
 
-## 肩の力を抜いて、ゆるく参加してゆるく楽しもう
+## ゆるく参加してもゆるく楽しめるよ
 <div text-xl op70 mt-3>Relax — show up, and just enjoy it</div>
 
 <div mt-10 text-2xl>

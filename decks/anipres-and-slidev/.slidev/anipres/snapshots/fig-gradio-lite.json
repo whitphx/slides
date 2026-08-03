@@ -273,10 +273,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:AGueKlrUijXa-q6nhv0wu",
             "type": "cue",
-            "globalIndex": 4,
             "trackId": "ASTEN50pVWqWhoEJG8IZL",
+            "stepId": "v1step:page:page:4:0",
+            "stepOrderKey": "a4",
             "action": {
               "type": "shapeAnimation"
             }
@@ -314,10 +316,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:gv-Fk0mLwx-hqZ7IH55p6",
             "type": "cue",
-            "globalIndex": 12,
             "trackId": "7qdzRpSHpnoR8b58vHKru",
+            "stepId": "v1step:page:page:12:0",
+            "stepOrderKey": "aC",
             "action": {
               "type": "shapeAnimation"
             }
@@ -460,10 +464,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:NGT_nATsBIFyMvfuCxbzp",
             "type": "cue",
-            "globalIndex": 8,
             "trackId": "3MQufJxzmUVJrOA-lHOFd",
+            "stepId": "v1step:page:page:8:0",
+            "stepOrderKey": "a8",
             "action": {
               "type": "shapeAnimation"
             }
@@ -501,10 +507,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:gFIZyeGQ4gKnceRqraq3A",
             "type": "cue",
-            "globalIndex": 9,
             "trackId": "ZqzW2mM7bxnAjOEnqZWQW",
+            "stepId": "v1step:page:page:9:0",
+            "stepOrderKey": "a9",
             "action": {
               "type": "shapeAnimation"
             }
@@ -581,10 +589,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:SMcE0Rq9fLzC7fFbIUWWk",
             "type": "cue",
-            "globalIndex": 10,
             "trackId": "cIW9A12yUgk8ynU-Ee6II",
+            "stepId": "v1step:page:page:10:0",
+            "stepOrderKey": "aA",
             "action": {
               "type": "shapeAnimation"
             }
@@ -676,10 +686,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:UCsYYbswupnkEjSwKN4GO",
             "type": "cue",
-            "globalIndex": 2,
             "trackId": "SmjixzWOG8N2IyOw9a8fC",
+            "stepId": "v1step:page:page:2:0",
+            "stepOrderKey": "a2",
             "action": {
               "type": "shapeAnimation"
             }
@@ -805,10 +817,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:A8edyOWHJwTIhbb_BT5Qq",
             "type": "cue",
-            "globalIndex": 5,
             "trackId": "ZlAXkWITXBFy_XGt7oqyh",
+            "stepId": "v1step:page:page:5:0",
+            "stepOrderKey": "a5",
             "action": {
               "type": "shapeAnimation"
             }
@@ -839,10 +853,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:vSr2A1vCsrf7glZiMfDfR",
             "type": "cue",
-            "globalIndex": 6,
             "trackId": "SpVW3c-Ci0RQiKK0UQMUa",
+            "stepId": "v1step:page:page:6:0",
+            "stepOrderKey": "a6",
             "action": {
               "type": "shapeAnimation"
             }
@@ -919,10 +935,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:57vSuuVmqmlobkeiwJpIa",
             "type": "cue",
-            "globalIndex": 11,
             "trackId": "C4aC0day10PPvaoBleBYF",
+            "stepId": "v1step:page:page:11:0",
+            "stepOrderKey": "aB",
             "action": {
               "type": "shapeAnimation"
             }
@@ -999,10 +1017,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:O48eJP2AEzSP28ARLmFdU",
             "type": "cue",
-            "globalIndex": 1,
             "trackId": "4Aocu6sFANhBch3n9gJPE",
+            "stepId": "v1step:page:page:1:0",
+            "stepOrderKey": "a1",
             "action": {
               "type": "shapeAnimation",
               "duration": 0
@@ -1025,10 +1045,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "5qV-zcqu3fHhX8t-ZVg7e",
             "type": "cue",
-            "globalIndex": 0,
             "trackId": "JKyUuxbYSYhJ4QJbMLevr",
+            "stepId": "v1step:page:page:0:0",
+            "stepOrderKey": "a0",
             "action": {
               "type": "cameraZoom",
               "duration": 0
@@ -1068,10 +1090,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:B67WiOgaU11LNR03UMUBF",
             "type": "cue",
-            "globalIndex": 3,
             "trackId": "w9FkIg0DgKwr4qBnvB6xv",
+            "stepId": "v1step:page:page:3:0",
+            "stepOrderKey": "a3",
             "action": {
               "type": "shapeAnimation"
             }
@@ -1093,10 +1117,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:qHMqs7w2026z5-MJn2UI_",
             "type": "cue",
-            "globalIndex": 7,
             "trackId": "NJzJixnuDSRFPcJt6My_t",
+            "stepId": "v1step:page:page:7:0",
+            "stepOrderKey": "a7",
             "action": {
               "type": "shapeAnimation"
             }

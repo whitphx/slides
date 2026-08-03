@@ -1983,10 +1983,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "S7r_qWyyN5v7tIs4eEu-8",
             "type": "cue",
-            "globalIndex": 0,
             "trackId": "SuyeAAahl0iT6c-nNkkwa",
+            "stepId": "v1step:page:page:0:0",
+            "stepOrderKey": "a0",
             "action": {
               "type": "cameraZoom",
               "duration": 0

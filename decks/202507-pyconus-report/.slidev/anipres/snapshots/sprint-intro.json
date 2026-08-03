@@ -161,10 +161,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:1LXPack3UNJEZZ8waf_UH",
             "type": "cue",
-            "globalIndex": 3,
             "trackId": "track-1752056046855-WXjTZzbfcjfU4zx1znc7p",
+            "stepId": "v1step:page:page:3:0",
+            "stepOrderKey": "a3",
             "action": {
               "type": "shapeAnimation"
             }
@@ -300,10 +302,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "YEc2a1Ph30sJyGGgvajVv",
             "type": "cue",
-            "globalIndex": 0,
             "trackId": "o8C4y9p99DRJAoD8EWLB-",
+            "stepId": "v1step:page:page:0:0",
+            "stepOrderKey": "a0",
             "action": {
               "type": "cameraZoom",
               "duration": 0
@@ -1010,10 +1014,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "q-fDwsmzwqVDkjrk8IBf_",
             "type": "cue",
-            "globalIndex": 2,
             "trackId": "o8C4y9p99DRJAoD8EWLB-",
+            "stepId": "v1step:page:page:2:0",
+            "stepOrderKey": "a2",
             "action": {
               "type": "cameraZoom",
               "duration": 500
@@ -1039,10 +1045,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:11P0tv12Icwwd-_WQvLkQ",
             "type": "cue",
-            "globalIndex": 2,
             "trackId": "track-1752055508859-wKmtxJhxVcoWJ8aR1C9OL",
+            "stepId": "v1step:page:page:2:0",
+            "stepOrderKey": "a2",
             "action": {
               "type": "shapeAnimation",
               "duration": 1000
@@ -1214,10 +1222,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "shape:diTf59_D3f7XMKfdCBKy1",
             "type": "cue",
-            "globalIndex": 1,
             "trackId": "track-1752055020926-p7K4VbG2rOoOxNYRRkT0-",
+            "stepId": "v1step:page:page:1:0",
+            "stepOrderKey": "a1",
             "action": {
               "type": "shapeAnimation"
             }

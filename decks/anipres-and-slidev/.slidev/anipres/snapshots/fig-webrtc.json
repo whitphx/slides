@@ -1264,10 +1264,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "7CTwXkZtgnq8tviYPLPQQ",
             "type": "cue",
-            "globalIndex": 0,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:0:0",
+            "stepOrderKey": "a0",
             "action": {
               "type": "cameraZoom",
               "duration": 0
@@ -1293,10 +1295,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "CdTKZ4oB_AOEd_YvRL1fb",
             "type": "cue",
-            "globalIndex": 1,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:1:0",
+            "stepOrderKey": "a1",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1322,10 +1326,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "UhyKe60juUxWhJIrhA0JT",
             "type": "cue",
-            "globalIndex": 2,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:2:0",
+            "stepOrderKey": "a2",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1351,10 +1357,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "KxZTYU49jTEINy4qmPUvi",
             "type": "cue",
-            "globalIndex": 3,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:3:0",
+            "stepOrderKey": "a3",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1380,10 +1388,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "VUDE4zHGlwbVAs4DmRXDD",
             "type": "cue",
-            "globalIndex": 4,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:4:0",
+            "stepOrderKey": "a4",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1409,10 +1419,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "nZkH_iWqF6KnKtIPS5KBH",
             "type": "cue",
-            "globalIndex": 5,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:5:0",
+            "stepOrderKey": "a5",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1438,10 +1450,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "wQDJzHJE4JiUQ5-O9GyM5",
             "type": "cue",
-            "globalIndex": 6,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:6:0",
+            "stepOrderKey": "a6",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1467,10 +1481,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "CVYFm_-zyiMHkVdfWlaHY",
             "type": "cue",
-            "globalIndex": 7,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:7:0",
+            "stepOrderKey": "a7",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1496,10 +1512,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "Vp0ggEmv63F1HBoHmDOmt",
             "type": "cue",
-            "globalIndex": 8,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:8:0",
+            "stepOrderKey": "a8",
             "action": {
               "type": "cameraZoom",
               "duration": 1000
@@ -1525,10 +1543,12 @@
         "opacity": 1,
         "meta": {
           "frame": {
+            "v": 2,
             "id": "KOKPhQ402D7udfEyuRJJ3",
             "type": "cue",
-            "globalIndex": 9,
             "trackId": "f1RQJ9XMsFq5sYYFx3knz",
+            "stepId": "v1step:page:page:9:0",
+            "stepOrderKey": "a9",
             "action": {
               "type": "cameraZoom",
               "duration": 1000

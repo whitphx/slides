@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@slidev/cli": "^52.14.1",
-    "slidev-addon-anipres": "^0.8.12",
+    "slidev-addon-anipres": "^0.8.13",
     "slidev-addon-qrcode": "^1.0.2"
   }
 }

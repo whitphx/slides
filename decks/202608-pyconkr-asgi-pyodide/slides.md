@@ -947,47 +947,32 @@ Each needs a **server half** in the browser — **ASGI is the right shape** 💡
 <!-- Because this pattern isn't just my demo — whole Python UI frameworks have been ported into the browser. Stlite is mine, for Streamlit. Posit built Shinylive. marimo ships WASM notebooks. Panel has a convert command that does the same thing. And I worked with the Gradio team on Gradio-Lite, though that one's unmaintained now — the WASM work moved into Gradio itself. Look at the right-hand column, because that's the interesting part: almost all of them are ASGI underneath. Shiny sits on Starlette, Gradio on FastAPI, marimo on Starlette — and Streamlit joined them in 1.57, when it swapped Tornado out for Starlette and Uvicorn. Panel is the holdout, still on Bokeh's Tornado server. And these are heavyweight frameworks: static assets, sessions, per-user state, realtime UI updates. Nothing like a three-endpoint demo. Every one of them needed exactly what we just built — a server half living in the browser — and the standard shape for that is ASGI. -->
 
 ---
+clicks: 1
+---
 
 # Standard Streamlit vs. Stlite
 
-<div grid="~ cols-[1fr_auto_1fr]" gap-3 mt-4 items-start>
+<StackCompare mt-2 :columns="[
+  { key: 'streamlit', label: 'Standard Streamlit' },
+  { key: 'stlite', label: 'Stlite', hidden: $clicks < 1 },
+]">
+  <template #streamlit><StreamlitStackFigure aligned /></template>
+  <template #stlite><StliteStackFigure /></template>
+</StackCompare>
 
-<StackColumn
-  title="Standard Streamlit"
-  env="Remote server"
-  :layers="[
-    { label: 'Your app script', note: 'written in Python', kind: 'app' },
-    { label: 'Streamlit server', note: 'ScriptRunner & app state', kind: 'framework' },
-    { label: 'Uvicorn', note: 'HTTP requests → ASGI calls', kind: 'caller' },
-    { label: 'CPython', note: 'native process on the host OS', kind: 'runtime' },
-    { label: 'HTTP + WebSocket over the network', kind: 'transport' },
-    { label: 'Streamlit frontend', note: 'React UI, in the visitor\'s browser', kind: 'frontend' },
-  ]"
-/>
+<div class="punchline" mt-2 text-center text-lg :class="$clicks >= 1 ? 'op100' : 'op0'">
 
-<div flex="~ col" gap-12 mt-10 text-xs op80 text-center w-24>
-<div v-click="1" border="~ emerald/50 rounded" p-1 bg-emerald:10>✅ same</div>
-<div v-click="1" border="~ violet/50 rounded" p-1 bg-violet:10>✅ stays</div>
-<div v-click="2" border="~ sky/50 rounded" p-1 bg-sky:10>🔄 swapped</div>
-<div v-click="2" border="~ gray/50 rounded" p-1 bg-gray:10>🔄 swapped</div>
-</div>
-
-<StackColumn
-  title="Stlite"
-  env="Web browser — Web Worker"
-  :layers="[
-    { label: 'Your app script', note: 'written in Python', kind: 'app' },
-    { label: 'Streamlit server', note: 'ScriptRunner & app state', kind: 'framework' },
-    { label: 'Custom ASGI bridge', note: 'browser events → app calls', kind: 'caller' },
-    { label: 'Pyodide', note: 'CPython compiled to WebAssembly', kind: 'runtime' },
-    { label: 'in-browser transport (worker messages)', kind: 'transport' },
-    { label: 'Streamlit frontend', note: 'React UI, same page', kind: 'frontend' },
-  ]"
-/>
+Same app, same Streamlit — **only the server half and the runtime change** 🎈
 
 </div>
 
-<!-- Here's Stlite's architecture next to standard Streamlit, and I want you to read it top-down. Left side, the normal deployment: your app script, the Streamlit server with its ScriptRunner and state, a server layer accepting HTTP, all on CPython on some remote machine — and the React frontend in the visitor's browser, talking over the network. Right side, Stlite: your app script — same. The Streamlit server — same, that's the point. What changes is below: the server layer becomes our ASGI bridge fed by browser events, CPython becomes Pyodide, and the network becomes worker messages inside the page. The top of the stack survives untouched; only the bottom adapts to the environment. This is the same picture as our demo app — just with a much bigger passenger on top. -->
+<style>
+.punchline {
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide in a Web Worker, and the network becomes message passing inside the page. Same swap as our forty-five-line demo, just carrying a whole framework. -->
 
 ---
 layout: statement

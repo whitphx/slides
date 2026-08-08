@@ -183,7 +183,7 @@ Write the plan to `decks/<deck-name>/PLAN.md`, creating the directory now if it 
 Open it with a status line naming the stage it has reached and what hasn't started:
 
 ```
-**Status:** Stage 1 (narrative arc): awaiting approval. Stage 2 (slide list) not started.
+**Status:** awaiting approval of Stage 1 (narrative arc). Stage 2 (slide list) not started.
 ```
 
 Whoever opens the file next (often you, in a later session) cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is. Record it there when the plan was the whole ask, too, since an approved slide list looks identical whether the deck is pending or was never requested, and the later session is the one that will act on the difference.

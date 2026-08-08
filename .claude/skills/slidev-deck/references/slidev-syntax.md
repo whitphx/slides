@@ -1,0 +1,276 @@
+# Slidev syntax reference
+
+Authoring syntax for this monorepo's decks. Read this when writing or editing `slides.md`. The workflow around it, including the planning gate that runs first, lives in `SKILL.md`.
+
+- [Animations and interactivity](#animations-and-interactivity)
+- [Addons usage](#addons-usage)
+- [Styling patterns](#styling-patterns)
+- [Code blocks](#code-blocks)
+- [Images and media](#images-and-media)
+- [Custom components](#custom-components)
+
+## Animations and interactivity
+
+Animations are a core part of this author's style. Apply them thoughtfully:
+
+**Bullet point reveals** — wrap lists in `<v-clicks>`:
+
+```html
+<v-clicks>
+
+- First point
+- Second point
+- Third point
+
+</v-clicks>
+```
+
+For nested lists with depth control: `<v-clicks depth="2">`.
+
+**Don't overuse bullet points.** Bullet lists are useful for enumerating discrete items, but not every slide should be a list. When the content is better expressed as a narrative, a diagram, a code example, a comparison table, or a visual layout with positioned elements, use those instead. Vary the slide formats to keep the audience engaged; a deck full of bullet-point slides feels monotonous. Look at the existing decks for inspiration: they mix bullet lists with grids, code blocks, images, modals, statement slides, and free-form HTML layouts.
+
+**Individual element reveals** — use `v-click` directive:
+
+```html
+<div v-click="1">Appears on click 1</div>
+<div v-click="2">Appears on click 2</div>
+```
+
+**Hide on click**: `v-click.hide="3"` hides the element at click 3.
+
+**Text emphasis** — use `v-mark` directive for dynamic highlighting:
+
+```html
+<span v-mark.highlight.orange>important text</span>
+<span v-mark.underline.red="3">appears at click 3</span>
+```
+
+**IMPORTANT: `v-mark` inside `<v-clicks>`** — When using `v-mark` on elements inside a `<v-clicks>` container, you must explicitly specify the click number on the `v-mark` so that the mark animation triggers at the same time as (or after) the element becomes visible. Without an explicit click number, `v-mark` defaults to an early click index and the animation fires before the element is shown, making it invisible.
+
+```html
+<!-- BAD: v-mark fires before the item is revealed by v-clicks -->
+<v-clicks>
+
+- <span v-mark.highlight.orange>This mark may not be visible</span>
+- Another point
+
+</v-clicks>
+
+<!-- GOOD: explicit click number ensures mark fires when/after item appears -->
+<v-clicks>
+
+- <span v-mark.highlight.orange="2">This mark is visible at click 2</span>
+- Another point
+
+</v-clicks>
+```
+
+The same applies to `v-mark` on any element that is inside a `v-click` container. Always coordinate the click numbers.
+
+Other `v-mark` styles:
+
+```html
+<span v-mark.circle.red>circled</span>
+<span v-mark.box.orange>boxed</span>
+```
+
+**Code highlighting with line reveals**:
+
+````
+```py {*|1-3|5-8}
+# Lines revealed progressively
+```
+````
+
+**Magic-move** — for animated code transitions:
+
+`````
+````md magic-move {at: 3}
+
+```py
+# Version 1
+code_v1()
+```
+
+```py
+# Version 2
+code_v2()
+```
+
+````
+`````
+
+## Addons usage
+
+### FancyArrow
+
+For pointing between elements. Give source/target elements `data-id` attributes, then reference them:
+
+```html
+<div data-id="source">Source element</div>
+<div data-id="target">Target element</div>
+
+<FancyArrow from="[data-id=source] @ right" to="[data-id=target] @ left" arc="0.3" v-click="1" />
+```
+
+You can also point to specific code lines:
+```html
+<FancyArrow from="[data-id=desc] @ left" to="[data-id=codeblock] .line:nth-child(5) @ right" arc="-0.2" />
+```
+
+FancyArrow can have content (label):
+```html
+<FancyArrow from="[data-id=a] @ right" to="[data-id=b] @ left" arc="0.6" v-click="1">
+
+`ast.parse(code)`
+
+</FancyArrow>
+```
+
+Position syntax: `@ left`, `@ right`, `@ top`, `@ bottom`, `@ topleft`, `@ topright`, `@ (X%,Y%)`.
+
+### WindowMockup
+
+Wraps content in a macOS-style window frame. Especially good for terminal output and shell commands:
+
+```html
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+$ python main.py
+Hello, world!
+```
+
+</WindowMockup>
+```
+
+Props: `title`, `dark`/`light`, `codeblock` (adjusts padding for code blocks), `padding`.
+
+### Anipres
+
+For complex graphical animations. Declare the addon and use:
+
+```html
+<SlidevAnipres id="my-animation" v-click="1" at="2" />
+```
+
+The animation data lives in `.slidev/anipres/` directory. In most cases, leave the animation area empty and ask the user to edit the motion/shape data manually through the Slidev UI, as the data format is complex.
+
+### QRCode
+
+```html
+<QRCode :width="180" :height="180" type="svg" data="https://example.com"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+```
+
+## Styling patterns
+
+Use UnoCSS utility classes directly on HTML elements (Attributify mode):
+
+**Layout:**
+```html
+<div grid="~ cols-2" gap-4>        <!-- 2-column grid -->
+<div flex="~ col" items-center>    <!-- flex column, centered -->
+<div flex="~ gap-1" items-center>  <!-- flex row with gap -->
+```
+
+**Spacing:** `mt-8`, `ml-10`, `mx-auto`, `my-8`
+
+**Sizing:** `w-full`, `h-50`, `w="400px"`, `h="100%"`
+
+**Text:** `text-2xl`, `text-4xl`, `text-6xl`, `leading-18`, `op50`, `font-300`
+
+**Positioning:** `absolute`, `top-20`, `right-0`, `bottom-10`, `left-12`
+
+**Borders:** `border="~ sky/50 rounded-lg"`, `border-none!`
+
+**Background:** `bg-sky:10`, `backdrop-blur-md`, `rounded-lg`
+
+**Code font size** — adjust per slide via scoped style:
+
+```html
+<style>
+* {
+  --slidev-code-font-size: 22px;
+}
+</style>
+```
+
+## Code blocks
+
+**Inline code blocks** with syntax highlighting:
+
+````
+```py {*|1-3|5-8}{'data-id': 'my-code', maxHeight: '450px'}
+import ast
+# ...
+```
+````
+
+**Code fence meta string format**: Multiple curly-brace option blocks must be written **adjacent with no space** between them. A space between blocks can cause Slidev/Shiki to silently fail to parse the second block.
+
+```
+✅ ```yaml {*|3-5}{at:4}{maxHeight:'320px'}
+❌ ```yaml {*|3-5} {at:4}    ← space breaks parsing
+```
+
+**IMPORTANT: Prevent code block overflow.** Code blocks have no default height limit, so tall code blocks will overflow the slide viewport and get cut off at the bottom. For any code block longer than ~10 lines, always add `maxHeight` to constrain it within the slide. Use `{maxHeight:'300px'}` to `{maxHeight:'380px'}` depending on how much other content is on the slide. The `maxHeight` property goes in the curly-brace options after the line highlight spec:
+
+````
+```yaml {*|3-8}{maxHeight:'320px'}
+# long code here...
+```
+````
+
+**A line highlight spec is required for `maxHeight` to work.** If you don't need line highlights, use `{*}` (highlight all) as a placeholder. Without it, the scroll container is not created and `maxHeight` is silently ignored:
+
+```
+✅ ```yaml {*}{maxHeight:'300px'}     ← scroll works
+❌ ```yaml {maxHeight:'300px'}        ← maxHeight ignored, no scroll
+```
+
+If a code block *and* surrounding text together overflow, either reduce `maxHeight`, trim the code, or reduce margins/padding on other elements. Always consider total slide height when combining code blocks with titles, descriptions, and footer text.
+
+**External code imports** — when code blocks are long, externalize to files:
+
+```
+<<< @/samples/py/example.py py {*}
+<<< @/samples/py/example.py#section_name py {1-5|7-10}
+```
+
+Create a `samples/` directory in the deck for externalized code. Use `#region_name` syntax in the source file to import specific sections.
+
+## Images and media
+
+```html
+<img src="/image.png" alt="Description" h-50 mx-auto>
+
+<!-- Grid of images -->
+<div grid="~ cols-2" gap-4>
+  <img src="/a.png" w-full>
+  <img src="/b.png" w-full>
+</div>
+
+<!-- Absolute positioned overlay -->
+<div absolute top-20 right-0>
+  <img src="/overlay.png" w="400px">
+</div>
+```
+
+Place images in the deck's `public/` directory.
+
+**Video:**
+```html
+<SlidevVideo autoplay muted controls loop>
+  <source src="/demo.mov" />
+</SlidevVideo>
+```
+
+**Tweet embeds:**
+```html
+<Tweet id="1234567890" />
+```
+
+## Custom components
+
+If you need reusable slide components, create them in a `components/` directory within the deck. See existing `Modal.vue` components in decks like `202510-oss-handson` for reference patterns.

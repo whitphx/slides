@@ -27,7 +27,7 @@ Animations are a core part of this author's style. Apply them thoughtfully:
 
 For nested lists with depth control: `<v-clicks depth="2">`.
 
-**Don't overuse bullet points.** Bullet lists are useful for enumerating discrete items, but not every slide should be a list. When the content is better expressed as a narrative, a diagram, a code example, a comparison table, or a visual layout with positioned elements, use those instead. Vary the slide formats to keep the audience engaged — a deck full of bullet-point slides feels monotonous. Look at the existing decks for inspiration: they mix bullet lists with grids, code blocks, images, modals, statement slides, and free-form HTML layouts.
+**Don't overuse bullet points.** Bullet lists are useful for enumerating discrete items, but not every slide should be a list. When the content is better expressed as a narrative, a diagram, a code example, a comparison table, or a visual layout with positioned elements, use those instead. Vary the slide formats to keep the audience engaged; a deck full of bullet-point slides feels monotonous. Look at the existing decks for inspiration: they mix bullet lists with grids, code blocks, images, modals, statement slides, and free-form HTML layouts.
 
 **Individual element reveals** — use `v-click` directive:
 
@@ -65,7 +65,7 @@ For nested lists with depth control: `<v-clicks depth="2">`.
 </v-clicks>
 ```
 
-The same applies to `v-mark` on any element that is inside a `v-click` container — always coordinate the click numbers.
+The same applies to `v-mark` on any element that is inside a `v-click` container. Always coordinate the click numbers.
 
 Other `v-mark` styles:
 

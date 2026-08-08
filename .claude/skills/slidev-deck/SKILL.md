@@ -55,6 +55,16 @@ Before writing any slides, plan the **information flow**. A good presentation is
   - Emotional emphasis on statement slides: `Share it! 👍`
 - **Presenter notes should be written in spoken language tone**, not formal written style. Use contractions ("don't", "it's", "we'll"), filler phrases ("OK so", "alright", "honestly"), and conversational transitions ("let me show you", "here's the thing"). The notes are meant to be read aloud as a speaking script, not as documentation. Avoid overly polished or academic phrasing.
 
+#### Slide text density
+
+**Slides carry keywords; the presenter notes carry sentences.** On-slide text is words, phrases, and taglines that let the audience grasp the point at a glance — with the key information bolded so one or two words draw the eye. Full-sentence explanations belong in the presenter notes, delivered orally; do not embed them in the slide body.
+
+- Prefer `**label** — short phrase` over subject–verb–object sentences in bullets and box contents. `- 💥 **Every upgrade could break it** — no spec, no "done"` beats `- 💥 **The cost:** every Streamlit upgrade could break the emulation — there was no spec saying what "done" meant.`
+- Separators (`·`, `→`, `=`) compress prose into scannable fragments: `**Same file** · 3 Pythons · 3 transports · **0 changes**`.
+- `layout: statement` slides are the exception: their single line *is* the tagline and may be a full sentence.
+- When trimming an existing slide, confirm the removed explanation survives in the presenter notes; move it there if it doesn't.
+- The test: can the audience read the slide in ~3 seconds while still listening to the speaker? If reading competes with listening, cut further.
+
 ### 2. Create the deck package (for new decks)
 
 Create a new directory under `decks/` following the naming convention: `YYYYMM-short-kebab-description` (e.g., `202603-pycon-async-patterns`).

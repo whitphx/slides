@@ -52,3 +52,7 @@ pnpm export           # Export to PDF/PNG
 ## Code Style
 
 ESLint is configured with TypeScript and Vue support. Multi-word component names are allowed in `layouts/*.vue` files.
+
+## Slide Text Style
+
+Slides carry keywords, not prose: words, phrases, and taglines the audience can grasp at a glance, with the key information bolded. Full-sentence explanations go in the presenter notes (HTML comments), to be spoken aloud — never embedded in the slide body. `layout: statement` slides are the exception (their single line is the tagline). See "Slide text density" in `.claude/skills/slidev-deck/SKILL.md` for details.

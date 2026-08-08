@@ -1,11 +1,14 @@
 ---
 name: slidev-deck
 description: >
-  Create or improve Slidev presentation decks in this monorepo.
+  Create or improve Slidev presentation decks in this monorepo, including planning
+  a talk's narrative arc and slide list before any slides are written.
   Use this skill whenever the user wants to create a new presentation, add slides,
-  update an existing deck, or asks about Slidev slide authoring in this project.
+  update an existing deck, outline or restructure a talk, or asks about Slidev slide
+  authoring in this project.
   Triggers on: "create a deck", "new presentation", "add slides", "make a talk",
-  "update my slides", or any mention of creating/editing presentation content.
+  "plan a talk", "outline my talk", "restructure this deck", "update my slides",
+  or any mention of creating/editing presentation content.
 ---
 
 # Slidev Deck Creator
@@ -22,11 +25,15 @@ The user may provide:
 - A request to modify an existing deck
 - A topic description
 
-Ask clarifying questions if you need more context about the audience, event, talk length, or emphasis.
+Ask clarifying questions if you need more context about the audience, event, talk length, or emphasis. These answers shape the plan in section 3, so it's worth asking before drafting it rather than after.
 
-### 1.5. Content design principles
+Ask them with the `AskUserQuestion` tool, not as prose. Picking an option is faster than composing a reply, and the options themselves show the user which facts the plan actually turns on. This matters most when the skill is invoked with no request attached, where a prose menu asks the user to type out something you could have offered as a choice.
 
-Before writing any slides, plan the **information flow**. A good presentation is a chain of well-connected ideas — each slide should set up the next.
+Build the options from what is actually in the repo. "Which deck?" should list real directory names from `decks/`, most recent first, rather than asking the user to remember one. Slot length, audience level, and deck language are all natural choices too. Leave genuinely open content as free text — the talk's topic, a pasted abstract, what went wrong when they last gave it — since the tool's own free-text option already covers the cases your options miss.
+
+### 2. Content design principles
+
+These principles are the material you draft the plan from. The **information flow** — a chain of well-connected ideas where each slide sets up the next — is decided in the plan, where it costs a line to change, not in slides.md, where it costs a rewrite.
 
 #### Narrative structure
 
@@ -55,7 +62,119 @@ Before writing any slides, plan the **information flow**. A good presentation is
   - Emotional emphasis on statement slides: `Share it! 👍`
 - **Presenter notes should be written in spoken language tone**, not formal written style. Use contractions ("don't", "it's", "we'll"), filler phrases ("OK so", "alright", "honestly"), and conversational transitions ("let me show you", "here's the thing"). The notes are meant to be read aloud as a speaking script, not as documentation. Avoid overly polished or academic phrasing.
 
-### 2. Create the deck package (for new decks)
+### 3. Plan the talk before building it
+
+Settle the story before writing a single slide, and present that story for approval.
+
+The reason is not process hygiene. Once `slides.md` exists, attention migrates to layout, overflow, click timing, and whether the code block fits — and the narrative, which is what actually decides whether the talk lands, quietly stops getting examined. Reviewing an outline takes a minute and rewriting it takes another; reaching the same conclusion after 40 slides exist costs an afternoon. The plan is also where you surface the things neither of you can know until the shape of the talk is on the page: that a section has no motivation, that two beats are the same beat, that 30 minutes doesn't hold this much.
+
+So this is a real gate. Present the plan and stop — no scaffolding, no `package.json`, no `slides.md` — until the user approves.
+
+**When to plan:**
+
+- **New deck** — always.
+- **Substantial change to an existing deck** — restructuring the order, adding or removing a whole section, changing what the talk argues. Plan the part that's changing, against the deck as it stands.
+- **Small, local edits** — fixing an overflow, rewording a slide, swapping an image, adding a couple of slides inside an existing section. Skip the gate and just do the work; a planning round-trip on a one-slide fix wastes the user's turn.
+
+When a request sits on the line, ask instead of guessing. "This sounds like a restructure rather than a tweak, want me to sketch the new arc first?" costs one sentence.
+
+One case comes up often enough to be worth naming: the change you are asked for duplicates something the deck already says elsewhere. Let the distance decide. If the two would differ in framing and in the job they do, a foreshadow early and the gotcha later, or a design caveat in one place and a runtime mechanic in another, make the edit, say where the other one lives, and write the earlier one as a forward reference so the second lands as a payoff rather than a repeat. If it would be near-verbatim repetition, do not edit: say what already covers it and where, and let the user choose. The test is whether an audience hearing both would feel the second building on the first, or wonder why they were told twice.
+
+#### Stage 1 — the narrative arc
+
+Present the arc **alone**, with no slide titles, counts, or layouts. Slide-level detail at this stage pulls feedback toward slides when the thing that needs feedback is the story.
+
+An arc is a chain of tension and release. Each beat starts where the audience currently stands, exposes a problem they can feel, and hands that problem to the next beat. Write each one as **what the audience gains** plus **the pain that forces the next step**. If a beat has no pain, it has no reason to be followed by anything — that's the signal to merge it or cut it, and saying so is more useful than quietly padding it out.
+
+```
+STAGE 1 — Narrative arc
+Shipping Python packages without tokens — 30 min, PyCon, intermediate
+
+1. Where we start: pytest on your laptop, twine upload from your laptop
+   Pain: "works on my machine", plus a PyPI token sitting in your shell history
+
+2. Move testing into CI, on every push
+   Pain: green on 3.12 only — your users are on 3.9 through 3.13
+
+3. Matrix builds across versions and OSes
+   Pain: fork PRs can't touch secrets, so releasing is still a manual ritual
+
+4. Trusted publishing — OIDC instead of a long-lived token
+   Payoff: nothing to leak, nothing to rotate
+
+Cut from your draft: the section on conda-forge. It's a different distribution
+story and beat 3 already fills the middle.
+
+Assumed: they read basic Actions YAML but not `workflow_run`. Tell me if that's
+too generous — beat 3 changes shape if it isn't.
+```
+
+Keep each beat to a few lines. The arc earns its keep by being holdable in one glance — the user can see the whole chain at once and judge whether each link really pulls the next. A beat that needs a paragraph to justify itself usually hasn't been reduced to its idea yet, and the paragraph hides that rather than fixing it. Detail belongs in the sections below, not in the beats.
+
+Two sections earn their place alongside the arc:
+
+**What you want decided.** Questions where a different answer changes the plan rather than a detail of it. Lead with anything that would invalidate the arc outright — the language the deck is written in, the length of the slot, whether a whole section survives — and say plainly that it's blocking. A question sitting eighth in a list reads as optional, and the expensive ones are exactly the ones that must not.
+
+**What you assumed.** Audience level, what you cut from the user's material and why, which parts of the request you read as firm. An assumption corrected here costs a sentence; the same assumption discovered on slide 30 costs the section.
+
+Then stop and ask for approval, in the form described under *Asking for approval* below.
+
+#### Stage 2 — the slide list
+
+Once the arc is approved, expand it into slides. Slide-level judgment is now the point: how many slides a beat deserves, which format carries each idea, where animation earns its place.
+
+Group the slides under the approved beats so the story stays visible and the user can see it survived the expansion. Give each slide a title, a format, and one line of content. Formats are the vocabulary from section 5 and from `references/slidev-syntax.md` — `title`, bio, `section`, `statement`, bullets, code block, `WindowMockup`, comparison table, image grid, `FancyArrow` diagram, magic-move, `anipres`. Varying them is a design decision worth making here rather than discovering later that thirty slides in a row are bullet lists.
+
+```
+STAGE 2 — Slide list (38 slides, ~30 min)
+
+Opening (3)
+   1. Title                  title         "Shipping Python packages without tokens"
+   2. Hi 👋                  simple bio    name, handle, avatar
+   3. Agenda                 bullets       the four beats — 🧪 📦 🔒 🚀
+
+Beat 1 — pytest on your laptop (5)
+   4. "It works on my machine"  section    + subtitle: the pain everyone has felt
+   5. Local test run         WindowMockup  terminal, pytest all green
+   6. ...then twine upload   WindowMockup  terminal, token pasted inline
+   7. That token             statement     "It's in your shell history now" ⚠️
+   8. Three ways this bites  bullets       v-clicks, one failure mode each
+
+Beat 2 — CI on every push (7)
+   9. ...
+```
+
+Check the count against the time budget, and say so when the plan runs long — with a concrete proposal for what to cut, ordered. Do that here rather than after building, where cutting means deleting work.
+
+Calibrate the count against this author's own decks rather than a generic rule of thumb. They run far denser than the minute-or-two per slide that general presentation advice assumes, because many slides are a single statement, a click reveal, or one step of an animation, and those go by in seconds. Corrected counts put recent decks around 30 to 55 slides for slots between 25 and 40 minutes, and that is the level to plan against.
+
+Counting takes a little care, because `---` separates slides but also delimits the headmatter and any per-slide frontmatter block. A plain `grep -c '^---$'` therefore runs high, by around 15 to 20 per cent on the decks here, and subtracting the `layout:` lines does not correct it either since not every frontmatter block sets one. Treat the grep as an upper bound, or count properly by skipping each frontmatter block.
+
+Then stop and ask for approval again, the same way.
+
+#### Asking for approval
+
+Put the approval in an `AskUserQuestion` prompt rather than a closing line of prose. Offer approving, revising, and rethinking as separate choices, because they mean genuinely different things: revising accepts the shape and changes what fills it, rethinking says the shape itself is wrong. Which one the user picks tells you how much of the plan to throw away, and that is worth knowing before you read their explanation of why. Nothing is lost by offering the choice, since the tool always carries a free-text option for the paragraph of specific changes.
+
+Ask the blocking questions in the same prompt when they have discrete answers, which the expensive ones usually do: deck language, slot length, how hard to cut a section, which of two framings to build on. `AskUserQuestion` takes several questions at once, so the user settles the approval and the decisions it depends on in one pass instead of a chain of round trips. Keep questions whose answer is a story in prose, where they belong.
+
+#### PLAN.md
+
+Write the plan to `decks/<deck-name>/PLAN.md`, creating the directory now if it doesn't exist (the package scaffolding comes later, in section 4). Present it in the conversation too — that's usually where the discussion happens — but the file is what the user can edit directly and what you re-read while writing slides.
+
+Open it with a status line naming the stage it has reached and what hasn't started:
+
+```
+**Status:** Stage 1 (narrative arc) — awaiting approval. Stage 2 (slide list) not started.
+```
+
+Whoever opens the file next — often you, in a later session — cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is.
+
+When the plan covers a change to part of an existing deck, record the untouched parts too, briefly, as a map. The user is judging whether the new material fits the talk they already have, and they can't see that from the changed section alone.
+
+Keep it current. When the deck changes direction during slide writing — a beat gets cut, two slides merge, a section moves — update `PLAN.md` in the same pass. A stale plan is worse than no plan, because the next session will trust it. It should always read as a map of the talk as it actually stands.
+
+### 4. Create the deck package (for new decks)
 
 Create a new directory under `decks/` following the naming convention: `YYYYMM-short-kebab-description` (e.g., `202603-pycon-async-patterns`).
 
@@ -96,7 +215,9 @@ Look up the latest version for each addon the same way (check existing decks or 
 
 After creating package.json, run `pnpm install` in the deck directory.
 
-### 3. Write slides.md
+### 5. Write slides.md
+
+The authoring syntax you need from here on lives in `references/slidev-syntax.md` (see section 6). Read it before editing `slides.md`, since this section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
 #### Frontmatter
 
@@ -196,280 +317,20 @@ layout: section
 ---
 ```
 
-### 4. Animations and interactivity
+### 6. Slide syntax reference
 
-Animations are a core part of this author's style. Apply them thoughtfully:
+The authoring syntax lives in `references/slidev-syntax.md`: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components.
 
-**Bullet point reveals** — wrap lists in `<v-clicks>`:
+Read it before writing or editing `slides.md`. Planning does not need it, which is why it sits in its own file.
 
-```html
-<v-clicks>
-
-- First point
-- Second point
-- Third point
-
-</v-clicks>
-```
-
-For nested lists with depth control: `<v-clicks depth="2">`.
-
-**Don't overuse bullet points.** Bullet lists are useful for enumerating discrete items, but not every slide should be a list. When the content is better expressed as a narrative, a diagram, a code example, a comparison table, or a visual layout with positioned elements, use those instead. Vary the slide formats to keep the audience engaged — a deck full of bullet-point slides feels monotonous. Look at the existing decks for inspiration: they mix bullet lists with grids, code blocks, images, modals, statement slides, and free-form HTML layouts.
-
-**Individual element reveals** — use `v-click` directive:
-
-```html
-<div v-click="1">Appears on click 1</div>
-<div v-click="2">Appears on click 2</div>
-```
-
-**Hide on click**: `v-click.hide="3"` hides the element at click 3.
-
-**Text emphasis** — use `v-mark` directive for dynamic highlighting:
-
-```html
-<span v-mark.highlight.orange>important text</span>
-<span v-mark.underline.red="3">appears at click 3</span>
-```
-
-**IMPORTANT: `v-mark` inside `<v-clicks>`** — When using `v-mark` on elements inside a `<v-clicks>` container, you must explicitly specify the click number on the `v-mark` so that the mark animation triggers at the same time as (or after) the element becomes visible. Without an explicit click number, `v-mark` defaults to an early click index and the animation fires before the element is shown, making it invisible.
-
-```html
-<!-- BAD: v-mark fires before the item is revealed by v-clicks -->
-<v-clicks>
-
-- <span v-mark.highlight.orange>This mark may not be visible</span>
-- Another point
-
-</v-clicks>
-
-<!-- GOOD: explicit click number ensures mark fires when/after item appears -->
-<v-clicks>
-
-- <span v-mark.highlight.orange="2">This mark is visible at click 2</span>
-- Another point
-
-</v-clicks>
-```
-
-The same applies to `v-mark` on any element that is inside a `v-click` container — always coordinate the click numbers.
-
-Other `v-mark` styles:
-
-```html
-<span v-mark.circle.red>circled</span>
-<span v-mark.box.orange>boxed</span>
-```
-
-**Code highlighting with line reveals**:
-
-````
-```py {*|1-3|5-8}
-# Lines revealed progressively
-```
-````
-
-**Magic-move** — for animated code transitions:
-
-`````
-````md magic-move {at: 3}
-
-```py
-# Version 1
-code_v1()
-```
-
-```py
-# Version 2
-code_v2()
-```
-
-````
-`````
-
-### 5. Addons usage
-
-#### FancyArrow
-
-For pointing between elements. Give source/target elements `data-id` attributes, then reference them:
-
-```html
-<div data-id="source">Source element</div>
-<div data-id="target">Target element</div>
-
-<FancyArrow from="[data-id=source] @ right" to="[data-id=target] @ left" arc="0.3" v-click="1" />
-```
-
-You can also point to specific code lines:
-```html
-<FancyArrow from="[data-id=desc] @ left" to="[data-id=codeblock] .line:nth-child(5) @ right" arc="-0.2" />
-```
-
-FancyArrow can have content (label):
-```html
-<FancyArrow from="[data-id=a] @ right" to="[data-id=b] @ left" arc="0.6" v-click="1">
-
-`ast.parse(code)`
-
-</FancyArrow>
-```
-
-Position syntax: `@ left`, `@ right`, `@ top`, `@ bottom`, `@ topleft`, `@ topright`, `@ (X%,Y%)`.
-
-#### WindowMockup
-
-Wraps content in a macOS-style window frame. Especially good for terminal output and shell commands:
-
-```html
-<WindowMockup title="Terminal" dark codeblock>
-
-```shell
-$ python main.py
-Hello, world!
-```
-
-</WindowMockup>
-```
-
-Props: `title`, `dark`/`light`, `codeblock` (adjusts padding for code blocks), `padding`.
-
-#### Anipres
-
-For complex graphical animations. Declare the addon and use:
-
-```html
-<SlidevAnipres id="my-animation" v-click="1" at="2" />
-```
-
-The animation data lives in `.slidev/anipres/` directory. In most cases, leave the animation area empty and ask the user to edit the motion/shape data manually through the Slidev UI, as the data format is complex.
-
-#### QRCode
-
-```html
-<QRCode :width="180" :height="180" type="svg" data="https://example.com"
-  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
-```
-
-### 6. Styling patterns
-
-Use UnoCSS utility classes directly on HTML elements (Attributify mode):
-
-**Layout:**
-```html
-<div grid="~ cols-2" gap-4>        <!-- 2-column grid -->
-<div flex="~ col" items-center>    <!-- flex column, centered -->
-<div flex="~ gap-1" items-center>  <!-- flex row with gap -->
-```
-
-**Spacing:** `mt-8`, `ml-10`, `mx-auto`, `my-8`
-
-**Sizing:** `w-full`, `h-50`, `w="400px"`, `h="100%"`
-
-**Text:** `text-2xl`, `text-4xl`, `text-6xl`, `leading-18`, `op50`, `font-300`
-
-**Positioning:** `absolute`, `top-20`, `right-0`, `bottom-10`, `left-12`
-
-**Borders:** `border="~ sky/50 rounded-lg"`, `border-none!`
-
-**Background:** `bg-sky:10`, `backdrop-blur-md`, `rounded-lg`
-
-**Code font size** — adjust per slide via scoped style:
-
-```html
-<style>
-* {
-  --slidev-code-font-size: 22px;
-}
-</style>
-```
-
-### 7. Code blocks
-
-**Inline code blocks** with syntax highlighting:
-
-````
-```py {*|1-3|5-8}{'data-id': 'my-code', maxHeight: '450px'}
-import ast
-# ...
-```
-````
-
-**Code fence meta string format**: Multiple curly-brace option blocks must be written **adjacent with no space** between them. A space between blocks can cause Slidev/Shiki to silently fail to parse the second block.
-
-```
-✅ ```yaml {*|3-5}{at:4}{maxHeight:'320px'}
-❌ ```yaml {*|3-5} {at:4}    ← space breaks parsing
-```
-
-**IMPORTANT: Prevent code block overflow.** Code blocks have no default height limit, so tall code blocks will overflow the slide viewport and get cut off at the bottom. For any code block longer than ~10 lines, always add `maxHeight` to constrain it within the slide. Use `{maxHeight:'300px'}` to `{maxHeight:'380px'}` depending on how much other content is on the slide. The `maxHeight` property goes in the curly-brace options after the line highlight spec:
-
-````
-```yaml {*|3-8}{maxHeight:'320px'}
-# long code here...
-```
-````
-
-**A line highlight spec is required for `maxHeight` to work.** If you don't need line highlights, use `{*}` (highlight all) as a placeholder. Without it, the scroll container is not created and `maxHeight` is silently ignored:
-
-```
-✅ ```yaml {*}{maxHeight:'300px'}     ← scroll works
-❌ ```yaml {maxHeight:'300px'}        ← maxHeight ignored, no scroll
-```
-
-If a code block *and* surrounding text together overflow, either reduce `maxHeight`, trim the code, or reduce margins/padding on other elements. Always consider total slide height when combining code blocks with titles, descriptions, and footer text.
-
-**External code imports** — when code blocks are long, externalize to files:
-
-```
-<<< @/samples/py/example.py py {*}
-<<< @/samples/py/example.py#section_name py {1-5|7-10}
-```
-
-Create a `samples/` directory in the deck for externalized code. Use `#region_name` syntax in the source file to import specific sections.
-
-### 8. Images and media
-
-```html
-<img src="/image.png" alt="Description" h-50 mx-auto>
-
-<!-- Grid of images -->
-<div grid="~ cols-2" gap-4>
-  <img src="/a.png" w-full>
-  <img src="/b.png" w-full>
-</div>
-
-<!-- Absolute positioned overlay -->
-<div absolute top-20 right-0>
-  <img src="/overlay.png" w="400px">
-</div>
-```
-
-Place images in the deck's `public/` directory.
-
-**Video:**
-```html
-<SlidevVideo autoplay muted controls loop>
-  <source src="/demo.mov" />
-</SlidevVideo>
-```
-
-**Tweet embeds:**
-```html
-<Tweet id="1234567890" />
-```
-
-### 9. Custom components
-
-If you need reusable slide components, create them in a `components/` directory within the deck. See existing `Modal.vue` components in decks like `202510-oss-handson` for reference patterns.
-
-### 10. Important notes
+### 7. Important notes
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)
 - **Verify all image references**: After writing `slides.md`, scan every `<img src="/...">` path and confirm the file exists in the deck's `public/` directory. Missing images cause Vite build errors at dev/build time.
 - Portfolio images are typically shared — copy from a recent deck's `public/portfolio/` and also any other `public/*.png|svg` files referenced by reused slides
 - Test the deck with `pnpm dev` when possible
-- Keep slide count appropriate for the talk length (roughly 1-2 minutes per slide)
+- Keep slide count appropriate for the talk length, calibrated against recent decks of a similar slot length rather than a generic per-slide rule (see section 3)
 - When content is provided in a language other than the target presentation language, translate appropriately
 - Prefer structured HTML with UnoCSS over plain markdown for non-trivial layouts
 - The author's social links and bio slide content should be kept up-to-date by referencing the most recent deck

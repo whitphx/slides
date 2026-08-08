@@ -436,6 +436,48 @@ Python 3.12 on **darwin/arm64** 🖥️
 <!-- So here's our demo app in its natural habitat — step one of three. I run it with Uvicorn, open localhost:8000, and there's a little page with a button: "Where am I running?" Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. The whole repo is on GitHub at that link — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
 
 ---
+
+# What's actually running where — step 1
+
+<div mt-2 flex justify-center>
+
+<div border="~ gray/40 rounded-xl" p-3 bg-gray:5 w-170 text-sm>
+
+<div border="~ gray/40 rounded-lg" p-2 bg-gray:8>
+
+<div text-center text-xs op60 mb-1>🖥️ Server machine — CPython</div>
+
+<div border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center>
+🐍 <b><code>app/main.py</code></b> — FastAPI
+</div>
+
+<div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
+
+<div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center>
+🦄 <b>Uvicorn</b> — the "server half": TCP sockets, HTTP parsing
+</div>
+
+</div>
+
+<div text-center op50 my-0.5><span text-xs op80>⇅ HTTP, over the network</span></div>
+
+<div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
+📄 <b>The page</b> — htmx UI, ordinary requests
+</div>
+
+</div>
+
+</div>
+
+<div v-click="1" mt-3 text-center text-xl>
+
+The server half = **Uvicorn**. Watch that box 👀
+
+</div>
+
+<!-- Before we break anything, let's map what just happened, top-down. At the top, your app — app/main.py. Below it, Uvicorn, doing the whole server half: it accepts TCP connections, parses the HTTP bytes, builds a scope, and calls the app with scope, receive, and send — the interface we just learned. Both live in a CPython process on some machine. And at the bottom, the browser page, talking to it over the actual network. Completely ordinary. But keep your eye on Uvicorn's box — the sky-blue one — because the entire rest of this talk is about what else can sit in it. -->
+
+---
 layout: statement
 ---
 
@@ -550,7 +592,7 @@ Responses made **inside the tab** — nothing leaves it.
 
 ---
 
-# What's actually running where
+# What's actually running where — step 2
 
 <div mt-2 flex justify-center>
 

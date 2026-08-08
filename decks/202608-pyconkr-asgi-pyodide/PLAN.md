@@ -50,7 +50,7 @@ Thesis: **cutting an interface at ASGI buys portability.** The app side and the 
 - The deleted 202608 deck's pieces (WebSocket choreography, bridge code walkthroughs) are reusable where they fit the new arc; its framing is what's being replaced.
 - Deck directory `decks/202608-pyconkr-asgi-pyodide` (same name as the deleted one), theme `triangle`, full portfolio bio (the talk is about the author's projects).
 
-## Stage 2 — Slide list (43 slides + 4 appendix, ~35–40 min)
+## Stage 2 — Slide list (44 slides + 4 appendix, ~35–40 min)
 
 Calibration: recent comparable decks run 36–45 separators (`202606-pyconkr-contextvars` 36, `202603-pycon-python-release-workflow` 45, deleted 40-min version of this talk 44).
 
@@ -69,57 +69,58 @@ Beat 1 — The boundary you never look at (5)
  8. Not a new idea: WSGI      figure          WSGI (PEP 333, 2003) → ASGI lineage: same decoupling motivation, sync one-call shape vs async events; historical touch only, no deep dive
  9. Taken for granted         statement       "How far can the server side be stretched?"
 
-Beat 2 — ASGI in 90 seconds (6)
+Beat 2 — ASGI in 90 seconds (7)
 10. Section                   section         "⚡ ASGI in 90 seconds"
 11. One async callable        code            `async def app(scope, receive, send)` — annotated with FancyArrow labels
-12. No framework needed       code            raw-ASGI hello world; FastAPI is "just" this callable
+12. No framework needed       code            imported from `samples/raw_asgi.py`; FastAPI is "just" this callable
 13. Three connection types    table           http / websocket / lifespan — same shape, different `scope["type"]`
 14. Demo step 1: the normal case  WindowMockup  `uvicorn app.main:app` + screenshot; live-demo cue in notes
-15. The realization           statement       "The contract has no sockets in it. A server = anything that can call the app." → so do we even need a server machine?
+15. What's running where — step 1  stack figure  app → (`scope`/`receive`/`send`) → Uvicorn on CPython, HTTP over the network, page at the bottom; "watch Uvicorn's box"
+16. The realization           statement       "The contract has no sockets in it. A server = anything that can call the app." → so do we even need a server machine?
 
 Beat 3 — A server inside the browser (5)
-16. Section                   section         "🌐 The extreme case: a server inside your browser"
-17. Pyodide in one slide      bullets+logo    CPython compiled to WebAssembly; enabler, one slide only
-18. Demo step 2: same app, no server  demo    live demo (static page, network tab silent) + QR; fallback screenshot slide notes
-19. What's running where      stack figure    v1: page ↔ appFetch ↔ worker ↔ bridge ↔ app; Uvicorn's box replaced
-20. The impersonation         statement       "Something in that tab is impersonating Uvicorn. What does that take?"
+17. Section                   section         "🌐 The extreme case: a server inside your browser"
+18. Pyodide in one slide      bullets+logo    CPython compiled to WebAssembly; enabler, one slide only; official logo + CC BY 4.0 credit
+19. Demo step 2: same app, no server  demo    live demo (static page, network tab silent) + QR; fallback screenshot slide notes
+20. What's running where — step 2  stack figure  app → bridge on Pyodide in a Web Worker, `postMessage`, page at the bottom — Uvicorn's box replaced; same top-down layering as step 1
+21. The impersonation         statement       "Something in that tab is impersonating Uvicorn. What does that take?"
 
 Beat 4 — Building the impersonator (6)
-21. Section                   section         "🛠️ Building the bridge"
-22. The route of one request  figure          htmx → `appFetch` → postMessage → worker → `app(scope, receive, send)` and back (from demo README)
-23. Request → `scope`         code            build the scope dict from a JS request; line-highlight reveals
-24. Wiring `receive`/`send`   code            body in via `receive`, response events out via `send`
-25. Crossing JS ↔ Python      code            Pyodide proxies / buffer conversion gotchas
-26. Lifespan                  code            driving startup/shutdown
-27. Payoff                    statement       "~45 lines — and the app never noticed. But this bridge is a toy…"
+22. Section                   section         "🛠️ Building the bridge"
+23. The route of one request  figure          htmx → `appFetch` → postMessage → worker → `app(scope, receive, send)` and back (from demo README)
+24. Request → `scope`         code            build the scope dict from a JS request; line-highlight reveals
+25. Wiring `receive`/`send`   code            body in via `receive`, response events out via `send`
+26. Crossing JS ↔ Python      code            Pyodide proxies / buffer conversion gotchas
+27. Lifespan                  code            driving startup/shutdown
+28. Payoff                    statement       "~45 lines — and the app never noticed. But this bridge is a toy…"
 
 Beat 5 — The production proof: Stlite (6)
-28. Section                   section         "🏭 The production proof"
-29. Stlite                    screenshot/demo Streamlit running in a tab; a real framework's demands (static files, state, realtime messaging — named, not explored)
-30. Standard Streamlit vs Stlite  stack figure  the poster's side-by-side, adapted: what stays, what swaps
-31. Emulation → ASGI dispatch  before/after   years of hand-rolled Tornado emulation vs ASGI dispatch; PRs #2043/#2044
-32. Lessons (+ Gradio-Lite)   bullets         what got simpler, what stays framework-specific
-33. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
+29. Section                   section         "🏭 The production proof"
+30. Stlite                    screenshot/demo Streamlit running in a tab; a real framework's demands (static files, state, realtime messaging — named, not explored)
+31. Standard Streamlit vs Stlite  stack figure  the poster's side-by-side, adapted: what stays, what swaps
+32. Emulation → ASGI dispatch  before/after   years of hand-rolled Tornado emulation vs ASGI dispatch; PRs #2043/#2044
+33. Lessons (+ Gradio-Lite)   bullets         what got simpler, what stays framework-specific
+34. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
 
 Beat 6 — The spectrum completed: Cloudflare Workers (5)
-34. Section                   section         "☁️ A third runtime: the edge"
-35. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
-36. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
-37. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
-38. Stlite on Workers         screenshot      PR #2077; same story at product scale
+35. Section                   section         "☁️ A third runtime: the edge"
+36. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
+37. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
+38. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
+39. Stlite on Workers         screenshot      PR #2077; same story at product scale
 
 Beat 7 — What it buys, where it stops (5)
-39. Section                   section         "🧭 When to reach for this"
-40. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
-41. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
-42. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
-43. Thank you & links         QR codes        demo repo, Stlite, slides URL
+40. Section                   section         "🧭 When to reach for this"
+41. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
+42. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
+43. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
+44. Thank you & links         QR codes        demo repo, Stlite, slides URL
 
 Appendix — not presented; Q&A backup (4)
-44. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
-45. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
-46. Awaitable receive queue   code            receive queue fed by JS socket events
-47. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
+45. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
+46. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
+47. Awaitable receive queue   code            receive queue fed by JS socket events
+48. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
 
 ### Scoping decisions (appendix material)
 

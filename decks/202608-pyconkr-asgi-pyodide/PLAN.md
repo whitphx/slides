@@ -1,6 +1,6 @@
 # PLAN — ASGI on Pyodide: building a web server inside your browser
 
-**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 49 slides incl. appendix) and visually verified with the dev server. Remaining: live-demo rehearsal, real screenshots/recordings if wanted, and any content iteration.
+**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 48 slides incl. appendix) and visually verified with the dev server. Remaining: live-demo rehearsal, real screenshots/recordings if wanted, and any content iteration.
 
 Revision 2 reframes the arc per the author's direction: the story is the **portability gained by cutting an interface at ASGI**, not "ASGI and Pyodide as two equal ideas combined." Pyodide is the extreme, relatable example that demonstrates the decoupling — not a co-star.
 
@@ -50,7 +50,7 @@ Thesis: **cutting an interface at ASGI buys portability.** The app side and the 
 - The deleted 202608 deck's pieces (WebSocket choreography, bridge code walkthroughs) are reusable where they fit the new arc; its framing is what's being replaced.
 - Deck directory `decks/202608-pyconkr-asgi-pyodide` (same name as the deleted one), theme `triangle`, full portfolio bio (the talk is about the author's projects).
 
-## Stage 2 — Slide list (45 slides + 4 appendix, ~35–40 min)
+## Stage 2 — Slide list (44 slides + 4 appendix, ~35–40 min)
 
 Calibration: recent comparable decks run 36–45 separators (`202606-pyconkr-contextvars` 36, `202603-pycon-python-release-workflow` 45, deleted 40-min version of this talk 44).
 
@@ -94,34 +94,33 @@ Beat 4 — Building the impersonator (6)
 27. Lifespan                  code            driving startup/shutdown
 28. Payoff                    statement       "~45 lines — and the app never noticed. But this bridge is a toy…"
 
-Beat 5 — The production proof: Stlite (6)
+Beat 5 — The production proof: Stlite (5)
 29. Section                   section         "🏭 The production proof"
-30. Stlite                    screenshot/demo Streamlit running in a tab; a real framework's demands (static files, state, realtime messaging — named, not explored)
-31. Standard Streamlit vs Stlite  stack figure  the poster's side-by-side, adapted: what stays, what swaps
-32. Emulation → ASGI dispatch  before/after   years of hand-rolled Tornado emulation vs ASGI dispatch; PRs #2043/#2044
-33. Lessons (+ Gradio-Lite)   bullets         what got simpler, what stays framework-specific
-34. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
+30. First: what is Streamlit?  code + figure   pure-Python script → Streamlit's own Python HTTP server + bundled SPA; same shape as the demo app. Shiny/Gradio named only in passing
+31. Real frameworks in the browser  table    Streamlit/Stlite, Shinylive, marimo, Panel, Gradio-Lite (unmaintained, downplayed) + their server stacks — nearly all ASGI
+32. Standard Streamlit vs Stlite  stack figure  the poster's side-by-side, adapted: what stays, what swaps
+33. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
 
 Beat 6 — The spectrum completed: Cloudflare Workers (6)
-35. Section                   section         "☁️ A third runtime: the edge"
-36. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
-37. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
-38. What's running where — step 3  stack figure  server + browser stacks, then the edge stack fades in as a third column (`StackCompare`); title crossfades 2 → 3
-39. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
-40. Stlite on Workers         screenshot      PR #2077; same story at product scale
+34. Section                   section         "☁️ A third runtime: the edge"
+35. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
+36. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
+37. What's running where — step 3  stack figure  server + browser stacks, then the edge stack fades in as a third column (`StackCompare`); title crossfades 2 → 3
+38. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
+39. Stlite on Workers         screenshot      PR #2077; same story at product scale
 
 Beat 7 — What it buys, where it stops (5)
-41. Section                   section         "🧭 When to reach for this"
-42. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
-43. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
-44. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
-45. Thank you & links         QR codes        demo repo, Stlite, slides URL
+40. Section                   section         "🧭 When to reach for this"
+41. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
+42. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
+43. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
+44. Thank you & links         QR codes        demo repo, Stlite, slides URL
 
 Appendix — not presented; Q&A backup (4)
-46. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
-47. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
-48. Awaitable receive queue   code            receive queue fed by JS socket events
-49. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
+45. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
+46. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
+47. Awaitable receive queue   code            receive queue fed by JS socket events
+48. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
 
 ### Scoping decisions (appendix material)
 
@@ -139,3 +138,4 @@ Beat 1 gained a WSGI → ASGI lineage slide: same decoupling motivation, WSGI's 
 - Pyodide logo (`public/pyodide-logo.svg`, from the Pyodide project, CC BY 4.0) sits on the enabler slide with a corner credit.
 - The stack diagrams are components (`ServerStackFigure.vue` / `BrowserStackFigure.vue` / `CloudflareStackFigure.vue`), rendered standalone on the step-1 slide and paired by `StackCompare.vue` on the step-2 (server → browser) and step-3 (browser → edge) slides. The reveal animates `transform`/opacity only (never layout), so the punchline stays put, and each comparison slide crossfades its step number in the title on the same timing.
 - Open question, now sharper: the step-3 slide ends on three detailed stacks side by side, and "Three runtimes, one app" immediately repeats that shape in compressed form. One of the two probably has to go, or the thesis slide should become something other than a stack comparison.
+- The Stlite origin story (hand-rolled Tornado emulation → ASGI dispatch, PRs #2043/#2044) was cut: Streamlit moved to Starlette/Uvicorn in 1.57, so the Tornado-era workaround is no longer the audience's world. The `#2043`/`#2044` links survive on the closing links slide.

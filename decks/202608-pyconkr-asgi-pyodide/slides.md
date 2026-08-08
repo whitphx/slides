@@ -123,7 +123,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - ⚡ **ASGI in 90 seconds** — `scope`, `receive`, `send`
 - 🌐 **The extreme case** — the same app, running in a browser tab (demo)
 - 🛠️ **Building the bridge** — impersonating Uvicorn in ~45 lines
-- 🏭 **The production proof** — Stlite & Gradio-Lite
+- 🏭 **The production proof** — Stlite & friends
 - ☁️ **Full circle** — the same stack on Cloudflare Workers
 - 🧭 **When to reach for this** — practical uses & honest limits
 
@@ -854,10 +854,65 @@ layout: section
 # 🏭 The production proof
 
 <div mt-4 op70>
-Stlite & Gradio-Lite
+Streamlit in the browser
 </div>
 
 <!-- It does — and I can say that with some confidence, because I've shipped it. Twice. -->
+
+---
+
+# First: what is Streamlit?
+
+<div grid="~ cols-[1fr_1fr]" gap-6 mt-4 items-start>
+
+<div>
+
+<div text-base mb-2>Pure Python — <b>no HTML, no JS, no frontend build</b>:</div>
+
+```py {*}{maxHeight:'200px'}
+import streamlit as st
+
+st.title("Sales dashboard")
+rows = st.slider("Rows", 10, 100)
+st.line_chart(load_data(rows))
+```
+
+</div>
+
+<div v-click="1" class="w-full text-sm">
+
+<div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
+<div class="text-center text-xs op60 mb-1">🖥️ Server machine — CPython</div>
+<div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
+🐍 <b>Your script</b><br><span class="text-xs op80">the code above</span>
+</div>
+<div class="text-center text-xs op60 my-0.5">⇅</div>
+<div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5 text-center leading-tight">
+🎈 <b>Streamlit server</b><br><span class="text-xs op80">a Python HTTP server</span>
+</div>
+</div>
+
+<div class="text-center text-xs op60 my-0.5">⇅ HTTP + WebSocket</div>
+
+<div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
+<div class="text-center text-xs op60 mb-1">🌐 Browser</div>
+<div class="border border-teal-400/40 rounded-lg p-2 bg-teal-400/10 text-center leading-tight">
+📄 <b>Bundled SPA</b><br><span class="text-xs op80">shipped inside the package</span>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div v-click="2" mt-5 text-center text-xl>
+
+`pip install streamlit` ships **the server *and* its frontend**<br>
+<span text-lg op80>the same shape as our demo app 👀</span>
+
+</div>
+
+<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and you get an interactive web app in your browser. [click] So how does a script become a web page? When you run streamlit run, it starts an HTTP server, written in Python, in your process. That server hands the browser a JavaScript single-page app — and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
 
 ---
 
@@ -865,29 +920,31 @@ Stlite & Gradio-Lite
 
 Whole Python web **UI frameworks** have been ported to run on Pyodide:
 
-<div mt-2 text-base>
+<div mt-2 text-sm>
 
 | Framework | In-browser version | Server stack |
 | --------- | ------------------ | ------------ |
-| Shiny for Python | [Shinylive](https://shiny.posit.co/py/docs/shinylive.html) (Posit) | Starlette — **ASGI native** |
-| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | Tornado |
-| Gradio | [Gradio-Lite](https://www.gradio.app/guides/gradio-lite) (me, w/ Gradio team) | FastAPI — **ASGI native** |
+| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | Starlette — **ASGI** <span op70>(since 1.57)</span> |
+| Shiny for Python | [Shinylive](https://shiny.posit.co/py/docs/shinylive.html) (Posit) | Starlette — **ASGI** |
+| marimo | [WASM notebooks](https://docs.marimo.io/guides/wasm/) | Starlette — **ASGI** |
+| Panel (HoloViz) | [`panel convert`](https://panel.holoviz.org/how_to/wasm/index.html) | Bokeh / Tornado |
+| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | FastAPI — **ASGI** |
 
 </div>
 
-<div v-click="1" mt-4 text-lg>
+<div v-click="1" mt-3 text-lg>
 
 **Heavyweight**: static assets · sessions · state · realtime
 
 </div>
 
-<div v-click="2" mt-3 text-xl>
+<div v-click="2" mt-2 text-xl>
 
 Each needs a **server half** in the browser — **ASGI is the right shape** 💡
 
 </div>
 
-<!-- Because this pattern isn't just my demo — whole Python web UI frameworks have been ported into the browser. Posit made Shinylive for Shiny. I made Stlite for Streamlit, and worked with the Gradio team on Gradio-Lite. And these are heavyweight frameworks — static assets, sessions, per-user state, realtime UI updates. Nothing like a three-endpoint demo. Every one of them needed the same thing we just built: a server half living in the browser. I first saw the pattern reading Shinylive's source — Shiny sits on Starlette, so they drive it through ASGI directly. And after building this layer twice myself, I'm convinced ASGI is exactly the right shape for that hole. Though I have to confess: I didn't build it that way the first time. -->
+<!-- Because this pattern isn't just my demo — whole Python UI frameworks have been ported into the browser. Stlite is mine, for Streamlit. Posit built Shinylive. marimo ships WASM notebooks. Panel has a convert command that does the same thing. And I worked with the Gradio team on Gradio-Lite, though that one's unmaintained now — the WASM work moved into Gradio itself. Look at the right-hand column, because that's the interesting part: almost all of them are ASGI underneath. Shiny sits on Starlette, Gradio on FastAPI, marimo on Starlette — and Streamlit joined them in 1.57, when it swapped Tornado out for Starlette and Uvicorn. Panel is the holdout, still on Bokeh's Tornado server. And these are heavyweight frameworks: static assets, sessions, per-user state, realtime UI updates. Nothing like a three-endpoint demo. Every one of them needed exactly what we just built — a server half living in the browser — and the standard shape for that is ASGI. -->
 
 ---
 
@@ -901,7 +958,7 @@ Each needs a **server half** in the browser — **ASGI is the right shape** 💡
   :layers="[
     { label: 'Your app script', note: 'written in Python', kind: 'app' },
     { label: 'Streamlit server', note: 'ScriptRunner & app state', kind: 'framework' },
-    { label: 'Tornado (→ ASGI)', note: 'HTTP requests → app calls', kind: 'caller' },
+    { label: 'Uvicorn', note: 'HTTP requests → ASGI calls', kind: 'caller' },
     { label: 'CPython', note: 'native process on the host OS', kind: 'runtime' },
     { label: 'HTTP + WebSocket over the network', kind: 'transport' },
     { label: 'Streamlit frontend', note: 'React UI, in the visitor\'s browser', kind: 'frontend' },
@@ -931,44 +988,6 @@ Each needs a **server half** in the browser — **ASGI is the right shape** 💡
 </div>
 
 <!-- Here's Stlite's architecture next to standard Streamlit, and I want you to read it top-down. Left side, the normal deployment: your app script, the Streamlit server with its ScriptRunner and state, a server layer accepting HTTP, all on CPython on some remote machine — and the React frontend in the visitor's browser, talking over the network. Right side, Stlite: your app script — same. The Streamlit server — same, that's the point. What changes is below: the server layer becomes our ASGI bridge fed by browser events, CPython becomes Pyodide, and the network becomes worker messages inside the page. The top of the stack survives untouched; only the bottom adapts to the environment. This is the same picture as our demo app — just with a much bigger passenger on top. -->
-
----
-
-# Confession: I built it wrong first
-
-<div mt-8 text-xl leading-13>
-
-<v-clicks>
-
-- 🏗️ **v1 (2022): hand-rolled Tornado emulation** — ad-hoc mocks, coupled to internals
-- 💥 **Every Streamlit upgrade could break it** — no spec, no "done"
-- 💡 **Shinylive never had this problem** — Shiny speaks ASGI: a *standard*, not internals
-- 🔄 **v2: an ASGI bridge** — <a href="https://github.com/whitphx/stlite/pull/2043" target="_blank">stlite#2043</a> → <a href="https://github.com/whitphx/stlite/pull/2044" target="_blank">#2044</a> <span op70>(Gradio-Lite: ASGI from day one)</span>
-
-</v-clicks>
-
-</div>
-
-<!-- Confession time, because the mistake is the best argument for the thesis. When I started Stlite in 2022, I did not use ASGI. Streamlit runs on Tornado, so I hand-rolled an emulation of Tornado's server layer — ad-hoc mocks reaching deep into Streamlit's internals. And it worked! But the maintenance was brutal. Every Streamlit upgrade could break something, because there was no spec defining what my emulation had to provide. "Done" meant "whatever makes this week's version run." Meanwhile Shinylive never had this problem — Shiny speaks ASGI, so their browser layer targets a published standard instead of somebody's internals. That was the lightbulb. Stlite version two replaced the whole hand-rolled layer with an ASGI bridge — the spike and the replacement PRs are right there if you want to read production code. And Gradio-Lite, sitting on FastAPI, was ASGI-shaped from day one — much smoother ride. The difference between targeting an interface and targeting internals is the difference between a contract and a guess. -->
-
----
-
-# What the interface bought us
-
-<div mt-8 text-xl leading-13>
-
-<v-clicks>
-
-- 🧭 **A definition of "done"** — the spec says what to provide
-- ♻️ **Reusable** — one bridge, *any* ASGI app
-- 🛡️ **Upgrade-safe** — internals churn, the contract holds
-- 🧩 **Not erased**: static files · session quirks · startup conventions — the custom surface *shrinks*
-
-</v-clicks>
-
-</div>
-
-<!-- So concretely, what did cutting the interface buy? First, a definition of done. Before, I could never say my emulation was finished — finished against what? Now the spec answers that. Second, reusability — the old layer was Streamlit-specific by construction; the ASGI bridge doesn't care who's on top. Starlette, FastAPI, anything. Third, upgrade safety — framework internals can churn all they want, because both sides program against the contract, not against each other. And fourth, honestly: what it didn't solve. Static files, cookie quirks, each framework's startup conventions — there's still framework-specific work. The interface shrinks the custom surface dramatically, but it doesn't erase it. That's the honest shape of the win. -->
 
 ---
 layout: statement
@@ -1271,14 +1290,14 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
 - 🌉 **A server = anything that fulfills the contract** — Uvicorn · a tab · the edge
-- 🏭 **Shipping today** — Stlite · Gradio-Lite · Shinylive · the playgrounds
+- 🏭 **Shipping today** — Stlite · Shinylive · marimo · the playgrounds
 - 🧠 **To understand an interface, implement the other side of it**
 
 </v-clicks>
 
 </div>
 
-<!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Gradio-Lite, Shinylive, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
+<!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Shinylive, marimo, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
 
 ---
 

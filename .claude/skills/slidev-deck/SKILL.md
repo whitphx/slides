@@ -152,11 +152,19 @@ Counting takes a little care, because `---` separates slides but also delimits t
 
 Then stop and ask for approval again, the same way.
 
+#### When the plan is the deliverable
+
+Some requests ask for the plan and nothing else — "outline my talk", "sketch an arc for this proposal", "how would you structure this?". There the approved slide list *is* the finished work, and sections 4 onward never run. Approving a plan says the plan is right; it does not say to start building from it.
+
+So read the original request, not the approval, for permission to build. Asked for a deck, section 4 follows the Stage 2 approval as a matter of course. Asked for a plan, stop at the approved slide list, say plainly that no deck exists yet, and offer to build it. When you genuinely can't tell which was asked for — a pasted abstract with no verb around it is ambiguous — make it one of the choices in the Stage 2 approval prompt instead of guessing. This one can wait that long precisely because nothing in the plan changes either way; it decides only what follows the plan. Guessing wrong writes a package and forty slides into the repo that nobody asked for, and that is the expensive direction to be wrong in.
+
 #### Asking for approval
 
 Put the approval in an `AskUserQuestion` prompt rather than a closing line of prose. Offer approving, revising, and rethinking as separate choices, because they mean genuinely different things: revising accepts the shape and changes what fills it, rethinking says the shape itself is wrong. Which one the user picks tells you how much of the plan to throw away, and that is worth knowing before you read their explanation of why. Nothing is lost by offering the choice, since the tool always carries a free-text option for the paragraph of specific changes.
 
 Ask the blocking questions in the same prompt when they have discrete answers, which the expensive ones usually do: deck language, slot length, how hard to cut a section, which of two framings to build on. `AskUserQuestion` takes several questions at once, so the user settles the approval and the decisions it depends on in one pass instead of a chain of round trips. Keep questions whose answer is a story in prose, where they belong.
+
+The two arrive together, though, and that creates a trap: the user can approve a 30-minute arc while, in the question beside it, choosing a 15-minute slot. The approval is real but it is an approval of a plan that the same reply just invalidated. So when an answer contradicts what the plan assumed, the approval riding along with it does not carry — rework the stage against the new answer and ask again, rather than treating the tick as permission to move on. Say why you're asking twice. Settle anything you already suspect will move the plan back in section 1 instead; the questions that reach this prompt should mostly be the ones the drafting itself turned up.
 
 #### PLAN.md
 
@@ -168,7 +176,7 @@ Open it with a status line naming the stage it has reached and what hasn't start
 **Status:** Stage 1 (narrative arc) — awaiting approval. Stage 2 (slide list) not started.
 ```
 
-Whoever opens the file next — often you, in a later session — cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is.
+Whoever opens the file next — often you, in a later session — cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is. Record it there when the plan was the whole ask, too — an approved slide list looks identical whether the deck is pending or was never requested, and the later session is the one that will act on the difference.
 
 When the plan covers a change to part of an existing deck, record the untouched parts too, briefly, as a map. The user is judging whether the new material fits the talk they already have, and they can't see that from the changed section alone.
 

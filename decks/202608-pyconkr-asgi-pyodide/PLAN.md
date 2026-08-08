@@ -129,8 +129,8 @@ The 40-minute talk does not explain WebSocket handling or `more_body` streaming.
 
 Beat 1 gained a WSGI → ASGI lineage slide: same decoupling motivation, WSGI's synchronous one-call shape, and why ASGI succeeded it (async events; WebSockets/streaming/long-lived connections). Deliberately historical and light — this talk does not deep-dive WSGI.
 
-## Later stages (not started)
+## Build notes
 
-- Package scaffolding (`package.json` with latest versions, addons: fancy-arrow, window-mockup, qrcode; `pnpm install`)
-- slides.md, stack-figure component, code samples in `samples/`, `public/` assets (portfolio bio, Stlite screenshots)
-- Visual overflow verification via dev server
+- `samples/` is a self-contained uv project holding the "You don't even need a framework" code (`raw_asgi.py`), imported into the slide via `<<< @/samples/raw_asgi.py`. `uv run pytest` verifies it (a hand-rolled `scope`/`receive`/`send` test plus an httpx `ASGITransport` one); `uv run uvicorn raw_asgi:app` serves it. Edit the file, not the slide.
+- Slide text follows the density policy in `.claude/skills/slidev-deck/SKILL.md` (keywords on slides, sentences in notes).
+- Pyodide logo (`public/pyodide-logo.svg`, from the Pyodide project, CC BY 4.0) sits on the enabler slide with a corner credit.

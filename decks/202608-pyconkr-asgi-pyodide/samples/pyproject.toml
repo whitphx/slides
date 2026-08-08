@@ -1,0 +1,22 @@
+[project]
+name = "raw-asgi-demo"
+version = "0.1.0"
+description = "The raw-ASGI app from the 'You don't even need a framework' slide, runnable and tested"
+readme = "README.md"
+authors = [
+    { name = "Yuichiro Tachibana (Tsuchiya)", email = "t.yic.yt@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "uvicorn>=0.34",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "pytest>=8",
+    "pytest-asyncio>=1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

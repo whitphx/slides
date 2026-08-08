@@ -342,19 +342,7 @@ A complete ASGI app, no framework needed:
 
 </div>
 
-```py {*|2|3-7|8-11|*}{maxHeight:'340px'}
-async def app(scope, receive, send):
-    assert scope["type"] == "http"
-    await send({
-        "type": "http.response.start",
-        "status": 200,
-        "headers": [(b"content-type", b"text/plain")],
-    })
-    await send({
-        "type": "http.response.body",
-        "body": b"Hello, PyCon KR!",
-    })
-```
+<<< @/samples/raw_asgi.py py {*|2|3-7|8-11|*}{maxHeight:'340px'}
 
 <div v-click="4" mt-2 text-lg text-center>
 
@@ -362,7 +350,7 @@ async def app(scope, receive, send):
 
 </div>
 
-<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That's a whole working web app — you could serve this with Uvicorn right now. Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. -->
+<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That's a whole working web app — you could serve this with Uvicorn right now. Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite — one test drives it by hand, one through httpx — so what you're reading is verified working code. -->
 
 ---
 
@@ -483,6 +471,8 @@ A server inside your browser
 
 # The enabler: Pyodide
 
+<img src="/pyodide-logo.svg" alt="Pyodide" absolute top-10 right-12 h-16 />
+
 <div mt-4 text-lg>
 
 [Pyodide](https://pyodide.org/): **CPython compiled to WebAssembly** — real Python, in a browser tab
@@ -517,6 +507,10 @@ A server inside your browser
 
 Runs the **app half** of ASGI. The server half? **Missing.**
 
+</div>
+
+<div absolute bottom-3 right-4 text-xs op40>
+Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
 <!-- One slide on the enabler, because it deserves at least that. Pyodide is CPython — the real thing — compiled to WebAssembly, so it runs inside a browser tab. asyncio works. You can install pure-Python packages with micropip. Python and JavaScript can call each other directly, and Python's event loop rides on the browser's. One constraint to remember: single interpreter, single thread, and no sockets — the browser sandbox doesn't hand those out. So here's where that leaves us. Pyodide can absolutely run the app half of ASGI — FastAPI is just Python. But the server half? There's no Uvicorn in a browser tab. That half is simply missing. We'll have to provide it ourselves. -->
@@ -564,26 +558,26 @@ Responses made **inside the tab** — nothing leaves it.
 
 <div text-center text-xs op70 mb-2>🌐 One browser tab — no backend</div>
 
-<div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
-📄 <b>The page</b> — htmx UI, ordinary requests
-</div>
-
-<div text-center op50 my-0.5><span text-xs op80>⇅ <code>postMessage</code> (Web Worker boundary)</span></div>
-
 <div border="~ gray/40 rounded-lg" p-2 bg-gray:8>
 
 <div text-center text-xs op60 mb-1>Web Worker — Pyodide</div>
-
-<div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center data-id="bridge">
-🌉 <b><code>bridge.py</code></b> — the "server half", ~45 lines
-</div>
-
-<div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
 
 <div border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center data-id="appbox">
 🐍 <b><code>app/main.py</code></b> — FastAPI, unchanged
 </div>
 
+<div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
+
+<div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center data-id="bridge">
+🌉 <b><code>bridge.py</code></b> — the "server half", ~45 lines
+</div>
+
+</div>
+
+<div text-center op50 my-0.5><span text-xs op80>⇅ <code>postMessage</code> (Web Worker boundary)</span></div>
+
+<div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
+📄 <b>The page</b> — htmx UI, ordinary requests
 </div>
 
 </div>
@@ -596,7 +590,7 @@ One new part — **playing Uvicorn's role** 🛠️
 
 </div>
 
-<!-- Here's the anatomy of what you just saw. Everything is in one browser tab. At the top, the page — the UI issues completely ordinary fetch-style requests; it doesn't know anything unusual is going on. Those requests cross into a Web Worker via postMessage. And inside the worker, Pyodide is running two Python files. The bottom one is app/main.py — the exact FastAPI app from step one, unchanged, byte for byte. And above it, the only new code in this whole picture: bridge.py. About forty-five lines. It receives each request from JavaScript and drives the app through scope, receive, and send. In other words — it's playing Uvicorn's role. -->
+<!-- Here's the anatomy of what you just saw, top-down. Everything is in one browser tab. At the top, your app — app/main.py, the exact FastAPI file from step one, unchanged, byte for byte. Right below it, the only new code in this whole picture: bridge.py. About forty-five lines. It drives the app through scope, receive, and send. Those two run on Pyodide inside a Web Worker. And at the bottom, the page — the UI issuing completely ordinary fetch-style requests that cross into the worker via postMessage; it has no idea anything unusual is going on. In other words, the bridge is playing Uvicorn's role — and keep this top-down picture in mind, because we'll see the same layering again with Streamlit later. -->
 
 ---
 layout: statement

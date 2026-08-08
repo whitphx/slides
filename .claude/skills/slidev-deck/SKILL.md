@@ -33,7 +33,7 @@ Build the options from what is actually in the repo. "Which deck?" should list r
 
 ### 2. Content design principles
 
-These principles are the material you draft the plan from. The **information flow**, a chain of well-connected ideas where each slide sets up the next, is decided in the plan, where it costs a line to change, not in slides.md, where it costs a rewrite.
+These principles are the material you draft the plan from. The **information flow** (a chain of well-connected ideas where each slide sets up the next) is decided in the plan, where it costs a line to change, not in `slides.md`, where it costs a rewrite.
 
 #### Narrative structure
 
@@ -62,13 +62,23 @@ These principles are the material you draft the plan from. The **information flo
   - Emotional emphasis on statement slides: `Share it! 👍`
 - **Presenter notes should be written in spoken language tone**, not formal written style. Use contractions ("don't", "it's", "we'll"), filler phrases ("OK so", "alright", "honestly"), and conversational transitions ("let me show you", "here's the thing"). The notes are meant to be read aloud as a speaking script, not as documentation. Avoid overly polished or academic phrasing.
 
+#### Slide text density
+
+**Slides carry keywords; the presenter notes carry sentences.** On-slide text is words, phrases, and taglines that let the audience grasp the point at a glance, with the key information bolded so one or two words draw the eye. Full-sentence explanations belong in the presenter notes, delivered orally; do not embed them in the slide body.
+
+- Prefer `**label** — short phrase` over subject–verb–object sentences in bullets and box contents. `- 💥 **Every upgrade could break it** — no spec, no "done"` beats `- 💥 **The cost:** every Streamlit upgrade could break the emulation — there was no spec saying what "done" meant.`
+- Separators (`·`, `→`, `=`) compress prose into scannable fragments: `**Same file** · 3 Pythons · 3 transports · **0 changes**`.
+- `layout: statement` slides are the exception: their single line *is* the tagline and may be a full sentence.
+- When trimming an existing slide, confirm the removed explanation survives in the presenter notes; move it there if it doesn't.
+- The test: can the audience read the slide in ~3 seconds while still listening to the speaker? If reading competes with listening, cut further.
+
 ### 3. Plan the talk before building it
 
 Settle the story before writing a single slide, and present that story for approval.
 
 The reason is not process hygiene. Once `slides.md` exists, attention migrates to layout, overflow, click timing, and whether the code block fits. The narrative, which is what actually decides whether the talk lands, quietly stops getting examined. Reviewing an outline takes a minute and rewriting it takes another; reaching the same conclusion after 40 slides exist costs an afternoon. The plan is also where you surface the things neither of you can know until the shape of the talk is on the page: that a section has no motivation, that two beats are the same beat, that 30 minutes doesn't hold this much.
 
-So this is a real gate. Present the plan and stop (no scaffolding, no `package.json`, no `slides.md`) until the user approves.
+So this is a real gate. Present the plan and stop until the user approves: no scaffolding, no `package.json`, no `slides.md`.
 
 **When to plan:**
 
@@ -84,7 +94,7 @@ One case comes up often enough to be worth naming: the change you are asked for 
 
 Present the arc **alone**, with no slide titles, counts, or layouts. Slide-level detail at this stage pulls feedback toward slides when the thing that needs feedback is the story.
 
-An arc is a chain of tension and release. Each beat starts where the audience currently stands, exposes a problem they can feel, and hands that problem to the next beat. Write each one as **what the audience gains** plus **the pain that forces the next step**. If a beat has no pain, it has no reason to be followed by anything, and that's the signal to merge it or cut it, and saying so is more useful than quietly padding it out.
+An arc is a chain of tension and release. Each beat starts where the audience currently stands, exposes a problem they can feel, and hands that problem to the next beat. Write each one as **what the audience gains** plus **the pain that forces the next step**. If a beat has no pain, it has no reason to be followed by anything. That's the signal to merge it or cut it, and saying so is more useful than quietly padding it out.
 
 ```
 STAGE 1: Narrative arc
@@ -173,10 +183,10 @@ Write the plan to `decks/<deck-name>/PLAN.md`, creating the directory now if it 
 Open it with a status line naming the stage it has reached and what hasn't started:
 
 ```
-**Status:** Stage 1 (narrative arc), awaiting approval. Stage 2 (slide list) not started.
+**Status:** Stage 1 (narrative arc): awaiting approval. Stage 2 (slide list) not started.
 ```
 
-Whoever opens the file next (often you, in a later session) cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is. Record it there when the plan was the whole ask, too. An approved slide list looks identical whether the deck is pending or was never requested, and the later session is the one that will act on the difference.
+Whoever opens the file next (often you, in a later session) cannot tell from the content alone whether they are looking at an approved plan or a draft still waiting on a reply. Building from an unapproved plan is precisely the failure this section exists to prevent, so make the file say which it is. Record it there when the plan was the whole ask, too, since an approved slide list looks identical whether the deck is pending or was never requested, and the later session is the one that will act on the difference.
 
 When the plan covers a change to part of an existing deck, record the untouched parts too, briefly, as a map. The user is judging whether the new material fits the talk they already have, and they can't see that from the changed section alone.
 
@@ -225,9 +235,9 @@ After creating package.json, run `pnpm install` in the deck directory.
 
 ### 5. Write slides.md
 
-The authoring syntax you need from here on lives in `references/slidev-syntax.md`: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
+Read `references/slidev-syntax.md` before writing or editing `slides.md`. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
 
-Read it before editing `slides.md`. This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
+This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
 #### Frontmatter
 
@@ -332,7 +342,7 @@ layout: section
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)
 - **Verify all image references**: After writing `slides.md`, scan every `<img src="/...">` path and confirm the file exists in the deck's `public/` directory. Missing images cause Vite build errors at dev/build time.
-- Portfolio images are typically shared; copy from a recent deck's `public/portfolio/` and also any other `public/*.png|svg` files referenced by reused slides
+- Portfolio images are typically shared, so copy from a recent deck's `public/portfolio/` and also any other `public/*.png|svg` files referenced by reused slides
 - Test the deck with `pnpm dev` when possible
 - Keep slide count appropriate for the talk length, calibrated against recent decks of a similar slot length rather than a generic per-slide rule (see section 3)
 - When content is provided in a language other than the target presentation language, translate appropriately

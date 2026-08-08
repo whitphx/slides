@@ -342,7 +342,7 @@ A complete ASGI app, no framework needed:
 
 </div>
 
-<<< @/samples/raw_asgi.py py {*|2|3-7|8-11|*}{maxHeight:'340px'}
+<<< @/samples/raw-asgi/raw_asgi.py py {*|2|3-7|8-11|*}{maxHeight:'340px'}
 
 <div v-click="4" mt-2 text-lg text-center>
 
@@ -863,23 +863,27 @@ Streamlit in the browser
 
 # First: what is Streamlit?
 
-<div grid="~ cols-[1fr_1fr]" gap-6 mt-4 items-start>
+<div grid="~ cols-[1fr_1fr]" gap-6 mt-3 items-start>
 
 <div>
 
-<div text-base mb-2>Pure Python — <b>no HTML, no JS, no frontend build</b>:</div>
+<div text-sm mb-1>Pure Python — <b>no HTML, no JS, no frontend build</b>:</div>
 
-```py {*}{maxHeight:'200px'}
-import streamlit as st
+<<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'200px'}
 
-st.title("Sales dashboard")
-rows = st.slider("Rows", 10, 100)
-st.line_chart(load_data(rows))
-```
+<div v-click="1" mt-2>
+
+<WindowMockup title="localhost:8501" light padding="0.4rem">
+
+<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" style="max-height: 168px; width: auto;" />
+
+</WindowMockup>
 
 </div>
 
-<div v-click="1" class="w-full text-sm">
+</div>
+
+<div v-click="2" class="w-full text-sm">
 
 <div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
 <div class="text-center text-xs op60 mb-1">🖥️ Server machine — CPython</div>
@@ -901,18 +905,25 @@ st.line_chart(load_data(rows))
 </div>
 </div>
 
+<div v-click="3" mt-6 text-center text-lg>
+
+`pip install streamlit` ships<br>**the server *and* its frontend**<br>
+<span text-base op80>the same shape as our demo app 👀</span>
+
+</div>
+
 </div>
 
 </div>
 
-<div v-click="2" mt-5 text-center text-xl>
+<style>
+* {
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.5;
+}
+</style>
 
-`pip install streamlit` ships **the server *and* its frontend**<br>
-<span text-lg op80>the same shape as our demo app 👀</span>
-
-</div>
-
-<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and you get an interactive web app in your browser. [click] So how does a script become a web page? When you run streamlit run, it starts an HTTP server, written in Python, in your process. That server hands the browser a JavaScript single-page app — and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
+<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and [click] you get this — an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. [click] So how does a script become a web page? When you run streamlit run, it starts an HTTP server, written in Python, in your process. That server hands the browser a JavaScript single-page app — and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
 
 ---
 

@@ -564,7 +564,9 @@ Responses made **inside the tab** — nothing leaves it.
 
 </div>
 
-<!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide in a Web Worker and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there. -->
+<!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide in a Web Worker and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there.
+
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the worker loads ../app/main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and the worker never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but app/main.py and bridge.py come from that server. -->
 
 ---
 clicks: 1
@@ -1072,7 +1074,9 @@ class Default(WorkerEntrypoint):
 }
 </style>
 
-<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same app/main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes. -->
+<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same app/main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
+
+[DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
 ---
 
@@ -1212,7 +1216,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 <div mt-4 grid="~ cols-2" gap-4 text-lg>
 
 <div v-click="1" border="~ red/40 rounded-lg" p-4 bg-red:5>
-📦 <b>Dependencies</b><br><span op80 text-base>everything downloads; C extensions may not exist for Pyodide</span>
+📦 <b>Dependencies</b><br><span op80 text-base>everything downloads · <b>not every package is in the Pyodide distribution</b></span>
 </div>
 
 <div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
@@ -1235,7 +1239,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 
 </div>
 
-<!-- And the honest part, because this isn't magic. Dependency size: everything ships to the browser, and packages with C extensions may simply not exist for Pyodide. It's single-threaded and sandboxed — and here's a concrete bite: Starlette runs sync def endpoints in a thread pool, and WASM can't spawn threads, so a sync endpoint that works fine under Uvicorn dies in the browser with "can't start new thread." Every endpoint in the demo app is async def for exactly that reason. Secrets are impossible — anything in the page, the user can read. And there's no inbound networking — the tab has no public address, so no webhooks. The takeaway: this complements real servers, it doesn't replace them. Use it where the strengths line up. -->
+<!-- And the honest part, because this isn't magic. Dependencies: everything ships to the browser, and not everything is available. The good news is that the whole stack we've been using — FastAPI, Starlette, Pydantic, anyio — ships inside the Pyodide distribution, so it loads straight from the CDN with no PyPI round-trip. But the demo still needed one extra install: python-multipart, which FastAPI needs to parse a form. It's pure Python, no C extension in sight, and it's simply not in the distribution — so without micropip installing it, that one endpoint 500s. That's the shape of this limit: it's not "no C extensions", it's "check the distribution, then check what micropip can add." It's single-threaded and sandboxed — and here's a concrete bite: Starlette runs sync def endpoints in a thread pool, and WASM can't spawn threads, so a sync endpoint that works fine under Uvicorn dies in the browser with "can't start new thread." Every endpoint in the demo app is async def for exactly that reason. Secrets are impossible — anything in the page, the user can read. And there's no inbound networking — the tab has no public address, so no webhooks. The takeaway: this complements real servers, it doesn't replace them. Use it where the strengths line up. -->
 
 ---
 

@@ -132,7 +132,8 @@ Beat 1 gained a WSGI → ASGI lineage slide: same decoupling motivation, WSGI's 
 
 ## Build notes
 
-- `samples/` is a self-contained uv project holding the "You don't even need a framework" code (`raw_asgi.py`), imported into the slide via `<<< @/samples/raw_asgi.py`. `uv run pytest` verifies it (a hand-rolled `scope`/`receive`/`send` test plus an httpx `ASGITransport` one); `uv run uvicorn raw_asgi:app` serves it. Edit the file, not the slide.
+- `samples/` is a self-contained uv project holding the "You don't even need a framework" code (`raw_asgi.py`), imported into the slide via `<<< @/samples/raw_asgi.py`. `uv run pytest` verifies it (a hand-rolled `scope`/`receive`/`send` test plus an httpx `ASGITransport` one); `uv run uvicorn raw_asgi:app` serves it. Edit the file, not the slide. Re-lock with `UV_DEFAULT_INDEX=https://pypi.org/simple uv lock`: this machine's uv config defaults to a private mirror, and a lockfile pinning it is unresolvable for anyone else cloning this public repo.
+- Demo-runbook details (serve the demo repo from its root; warm the Workers deployment before presenting) live in the presenter notes of the slides they apply to, sourced from the demo repo's `NOTES.md`.
 - Slide text follows the density policy in `.claude/skills/slidev-deck/SKILL.md` (keywords on slides, sentences in notes).
 - Pyodide logo (`public/pyodide-logo.svg`, from the Pyodide project, CC BY 4.0) sits on the enabler slide with a corner credit.
 - The step-1/step-2 stack diagrams are components (`ServerStackFigure.vue` / `BrowserStackFigure.vue`), rendered standalone on the step-1 slide and side by side on the step-2 comparison slide, whose reveal animates `transform`/opacity only (never layout) so the punchline stays put.

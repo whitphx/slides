@@ -439,37 +439,13 @@ Python 3.12 on **darwin/arm64** 🖥️
 
 # What's actually running where — step 1
 
-<div mt-2 flex justify-center>
+<div mt-6>
 
-<div border="~ gray/40 rounded-xl" p-3 bg-gray:5 w-170 text-sm>
-
-<div border="~ gray/40 rounded-lg" p-2 bg-gray:8>
-
-<div text-center text-xs op60 mb-1>🖥️ Server machine — CPython</div>
-
-<div border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center>
-🐍 <b><code>app/main.py</code></b> — FastAPI
-</div>
-
-<div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
-
-<div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center>
-🦄 <b>Uvicorn</b> — the "server half": TCP sockets, HTTP parsing
-</div>
+<ServerStackFigure />
 
 </div>
 
-<div text-center op50 my-0.5><span text-xs op80>⇅ HTTP, over the network</span></div>
-
-<div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
-📄 <b>The page</b> — htmx UI, ordinary requests
-</div>
-
-</div>
-
-</div>
-
-<div v-click="1" mt-3 text-center text-xl>
+<div v-click="1" mt-4 text-center text-xl>
 
 The server half = **Uvicorn**. Watch that box 👀
 
@@ -591,48 +567,54 @@ Responses made **inside the tab** — nothing leaves it.
 <!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide in a Web Worker and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there. -->
 
 ---
+clicks: 1
+---
 
 # What's actually running where — step 2
 
-<div mt-2 flex justify-center>
+<div class="stack-compare" mt-4 :style="{ transform: $clicks >= 1 ? 'none' : 'translateX(25%)' }">
 
-<div border="~ gray/40 rounded-xl" p-3 bg-gray:5 w-170 text-sm>
+<div class="stack-cell">
 
-<div text-center text-xs op70 mb-2>🌐 One browser tab — no backend</div>
+<div text-center text-sm font-600 op70 mb-1>① Server</div>
 
-<div border="~ gray/40 rounded-lg" p-2 bg-gray:8>
-
-<div text-center text-xs op60 mb-1>Web Worker — Pyodide</div>
-
-<div border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center data-id="appbox">
-🐍 <b><code>app/main.py</code></b> — FastAPI, unchanged
-</div>
-
-<div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
-
-<div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center data-id="bridge">
-🌉 <b><code>bridge.py</code></b> — the "server half", ~45 lines
-</div>
+<ServerStackFigure />
 
 </div>
 
-<div text-center op50 my-0.5><span text-xs op80>⇅ <code>postMessage</code> (Web Worker boundary)</span></div>
+<div class="stack-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
 
-<div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
-📄 <b>The page</b> — htmx UI, ordinary requests
-</div>
+<div text-center text-sm font-600 op70 mb-1>② Browser</div>
+
+<BrowserStackFigure />
 
 </div>
 
 </div>
 
-<div v-click="1" mt-3 text-center text-xl>
+<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
 
-One new part — **playing Uvicorn's role** 🛠️
+One box swapped — **the bridge plays Uvicorn's role** 🛠️
 
 </div>
 
-<!-- Here's the anatomy of what you just saw, top-down. Everything is in one browser tab. At the top, your app — app/main.py, the exact FastAPI file from step one, unchanged, byte for byte. Right below it, the only new code in this whole picture: bridge.py. About forty-five lines. It drives the app through scope, receive, and send. Those two run on Pyodide inside a Web Worker. And at the bottom, the page — the UI issuing completely ordinary fetch-style requests that cross into the worker via postMessage; it has no idea anything unusual is going on. In other words, the bridge is playing Uvicorn's role — and keep this top-down picture in mind, because we'll see the same layering again with Streamlit later. -->
+<style>
+.stack-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  transition: transform 700ms ease;
+}
+.stack-cell {
+  min-width: 0;
+  transition: opacity 700ms ease 250ms;
+}
+.punchline {
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became a Web Worker running Pyodide, the network became postMessage… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
 
 ---
 layout: statement

@@ -23,7 +23,9 @@ const offset = computed(() => {
   >
     <div v-for="column in columns" :key="column.key" class="stack-cell" :class="column.hidden ? 'op0' : ''">
       <div class="text-center text-sm font-600 op70 mb-1">{{ column.label }}</div>
-      <slot :name="column.key" />
+      <div class="flex-1 flex flex-col">
+        <slot :name="column.key" />
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +38,8 @@ const offset = computed(() => {
 }
 .stack-cell {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
   transition: opacity 700ms ease 250ms;
 }
 </style>

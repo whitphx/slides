@@ -578,7 +578,7 @@ clicks: 1
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure /></template>
+  <template #server><ServerStackFigure aligned /></template>
   <template #browser><BrowserStackFigure /></template>
 </StackCompare>
 
@@ -1067,7 +1067,7 @@ clicks: 1
   { key: 'browser', label: '② Browser' },
   { key: 'edge', label: '③ Edge', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure /></template>
+  <template #server><ServerStackFigure aligned /></template>
   <template #browser><BrowserStackFigure /></template>
   <template #edge><CloudflareStackFigure /></template>
 </StackCompare>

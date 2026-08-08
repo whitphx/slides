@@ -1,6 +1,6 @@
 # PLAN — ASGI on Pyodide: building a web server inside your browser
 
-**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 46 slides incl. appendix) and visually verified with the dev server. Remaining: live-demo rehearsal, real screenshots/recordings if wanted, and any content iteration.
+**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 49 slides incl. appendix) and visually verified with the dev server. Remaining: live-demo rehearsal, real screenshots/recordings if wanted, and any content iteration.
 
 Revision 2 reframes the arc per the author's direction: the story is the **portability gained by cutting an interface at ASGI**, not "ASGI and Pyodide as two equal ideas combined." Pyodide is the extreme, relatable example that demonstrates the decoupling — not a co-star.
 
@@ -50,7 +50,7 @@ Thesis: **cutting an interface at ASGI buys portability.** The app side and the 
 - The deleted 202608 deck's pieces (WebSocket choreography, bridge code walkthroughs) are reusable where they fit the new arc; its framing is what's being replaced.
 - Deck directory `decks/202608-pyconkr-asgi-pyodide` (same name as the deleted one), theme `triangle`, full portfolio bio (the talk is about the author's projects).
 
-## Stage 2 — Slide list (44 slides + 4 appendix, ~35–40 min)
+## Stage 2 — Slide list (45 slides + 4 appendix, ~35–40 min)
 
 Calibration: recent comparable decks run 36–45 separators (`202606-pyconkr-contextvars` 36, `202603-pycon-python-release-workflow` 45, deleted 40-min version of this talk 44).
 
@@ -82,7 +82,7 @@ Beat 3 — A server inside the browser (5)
 17. Section                   section         "🌐 The extreme case: a server inside your browser"
 18. Pyodide in one slide      bullets+logo    CPython compiled to WebAssembly; enabler, one slide only; official logo + CC BY 4.0 credit
 19. Demo step 2: same app, no server  demo    live demo (static page, network tab silent) + QR; fallback screenshot slide notes
-20. What's running where — step 2  stack figure  opens on the step-1 diagram alone, then a CSS grid transition slides it left while the browser stack fades in beside it — side-by-side, Uvicorn's box swapped for `bridge.py`
+20. What's running where — step 2  stack figure  step-1 diagram alone, then the browser stack fades in beside it (`StackCompare`); title crossfades 1 → 2
 21. The impersonation         statement       "Something in that tab is impersonating Uvicorn. What does that take?"
 
 Beat 4 — Building the impersonator (6)
@@ -102,25 +102,26 @@ Beat 5 — The production proof: Stlite (6)
 33. Lessons (+ Gradio-Lite)   bullets         what got simpler, what stays framework-specific
 34. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
 
-Beat 6 — The spectrum completed: Cloudflare Workers (5)
+Beat 6 — The spectrum completed: Cloudflare Workers (6)
 35. Section                   section         "☁️ A third runtime: the edge"
 36. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
 37. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
-38. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
-39. Stlite on Workers         screenshot      PR #2077; same story at product scale
+38. What's running where — step 3  stack figure  server + browser stacks, then the edge stack fades in as a third column (`StackCompare`); title crossfades 2 → 3
+39. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
+40. Stlite on Workers         screenshot      PR #2077; same story at product scale
 
 Beat 7 — What it buys, where it stops (5)
-40. Section                   section         "🧭 When to reach for this"
-41. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
-42. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
-43. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
-44. Thank you & links         QR codes        demo repo, Stlite, slides URL
+41. Section                   section         "🧭 When to reach for this"
+42. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
+43. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
+44. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
+45. Thank you & links         QR codes        demo repo, Stlite, slides URL
 
 Appendix — not presented; Q&A backup (4)
-45. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
-46. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
-47. Awaitable receive queue   code            receive queue fed by JS socket events
-48. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
+46. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"
+47. Streaming: `more_body`    code            chunked responses to a JS ReadableStream (concept-labeled)
+48. Awaitable receive queue   code            receive queue fed by JS socket events
+49. Session choreography      figure/code     connect → accept → receive/send → close event order over one session
 
 ### Scoping decisions (appendix material)
 
@@ -136,4 +137,5 @@ Beat 1 gained a WSGI → ASGI lineage slide: same decoupling motivation, WSGI's 
 - Demo-runbook details (serve the demo repo from its root; warm the Workers deployment before presenting) live in the presenter notes of the slides they apply to, sourced from the demo repo's `NOTES.md`.
 - Slide text follows the density policy in `.claude/skills/slidev-deck/SKILL.md` (keywords on slides, sentences in notes).
 - Pyodide logo (`public/pyodide-logo.svg`, from the Pyodide project, CC BY 4.0) sits on the enabler slide with a corner credit.
-- The step-1/step-2 stack diagrams are components (`ServerStackFigure.vue` / `BrowserStackFigure.vue`), rendered standalone on the step-1 slide and side by side on the step-2 comparison slide, whose reveal animates `transform`/opacity only (never layout) so the punchline stays put.
+- The stack diagrams are components (`ServerStackFigure.vue` / `BrowserStackFigure.vue` / `CloudflareStackFigure.vue`), rendered standalone on the step-1 slide and paired by `StackCompare.vue` on the step-2 (server → browser) and step-3 (browser → edge) slides. The reveal animates `transform`/opacity only (never layout), so the punchline stays put, and each comparison slide crossfades its step number in the title on the same timing.
+- Open question, now sharper: the step-3 slide ends on three detailed stacks side by side, and "Three runtimes, one app" immediately repeats that shape in compressed form. One of the two probably has to go, or the thesis slide should become something other than a stack comparison.

@@ -574,25 +574,13 @@ clicks: 1
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
 
-<div class="stack-compare" mt-4 :style="{ transform: $clicks >= 1 ? 'none' : 'translateX(25%)' }">
-
-<div class="stack-cell">
-
-<div text-center text-sm font-600 op70 mb-1>① Server</div>
-
-<ServerStackFigure />
-
-</div>
-
-<div class="stack-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
-
-<div text-center text-sm font-600 op70 mb-1>② Browser</div>
-
-<BrowserStackFigure />
-
-</div>
-
-</div>
+<StackCompare mt-4 :columns="[
+  { key: 'server', label: '① Server' },
+  { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
+]">
+  <template #server><ServerStackFigure /></template>
+  <template #browser><BrowserStackFigure /></template>
+</StackCompare>
 
 <div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
 
@@ -601,16 +589,6 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 </div>
 
 <style>
-.stack-compare {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  transition: transform 700ms ease;
-}
-.stack-cell {
-  min-width: 0;
-  transition: opacity 700ms ease 250ms;
-}
 .punchline {
   transition: opacity 700ms ease 250ms;
 }
@@ -1077,6 +1055,47 @@ class Default(WorkerEntrypoint):
 <!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same app/main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
+
+---
+clicks: 1
+---
+
+<h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">2</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">3</span></span></h1>
+
+<StackCompare mt-4 :columns="[
+  { key: 'server', label: '① Server' },
+  { key: 'browser', label: '② Browser' },
+  { key: 'edge', label: '③ Edge', hidden: $clicks < 1 },
+]">
+  <template #server><ServerStackFigure /></template>
+  <template #browser><BrowserStackFigure /></template>
+  <template #edge><CloudflareStackFigure /></template>
+</StackCompare>
+
+<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
+
+Same app on top — **only the server half changes** ☁️
+
+</div>
+
+<style>
+.punchline {
+  transition: opacity 700ms ease 250ms;
+}
+.step-swap {
+  position: relative;
+  display: inline-block;
+}
+.step-swap > span {
+  transition: opacity 700ms ease 250ms;
+}
+.step-swap > .step-two {
+  position: absolute;
+  left: 0;
+}
+</style>
+
+<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a Web Worker on the visitor's. And the frontend went back outside over a real network, exactly like column one. Same app, three environments, and every difference lives below the interface. -->
 
 ---
 

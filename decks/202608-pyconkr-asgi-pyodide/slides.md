@@ -570,7 +570,7 @@ Responses made **inside the tab** — nothing leaves it.
 clicks: 1
 ---
 
-# What's actually running where — step 2
+<h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
 
 <div class="stack-compare" mt-4 :style="{ transform: $clicks >= 1 ? 'none' : 'translateX(25%)' }">
 
@@ -611,6 +611,17 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 }
 .punchline {
   transition: opacity 700ms ease 250ms;
+}
+.step-swap {
+  position: relative;
+  display: inline-block;
+}
+.step-swap > span {
+  transition: opacity 700ms ease 250ms;
+}
+.step-swap > .step-two {
+  position: absolute;
+  left: 0;
 }
 </style>
 

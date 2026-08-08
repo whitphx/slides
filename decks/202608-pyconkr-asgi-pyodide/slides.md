@@ -232,7 +232,46 @@ New servers appear in Rust; new frameworks appear — everything keeps working.
 
 </div>
 
-<!-- Between them sits ASGI — the standard interface between an async Python web app and whatever runs it. On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. On the other, the servers: Uvicorn, Hypercorn, Daphne, Granian. They talk through three things — scope, receive, and send — and we'll unpack those in a minute. But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. -->
+<!-- Between them sits ASGI — the standard interface between an async Python web app and whatever runs it. On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. On the other, the servers: Uvicorn, Hypercorn, Daphne, Granian. They talk through three things — scope, receive, and send — and we'll unpack those in a minute. But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. And by the way — this idea is much older than async Python. -->
+
+---
+
+# Not a new idea: WSGI walked first
+
+<div mt-2 text-lg>
+
+The same motivation — **decouple apps from servers** — already produced a standard once, in the synchronous era:
+
+</div>
+
+<div grid="~ cols-[1fr_auto_1fr]" gap-4 items-stretch mt-5>
+
+<div v-click="1" border="~ gray/40 rounded-lg" p-3 bg-gray:5>
+<div text-lg>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
+<div mt-2 text-sm><code>def app(environ, start_response)</code></div>
+<div op80 text-sm mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
+<div op80 text-sm mt-1>One <b>synchronous</b> call:<br>request in → response out, done</div>
+</div>
+
+<div self-center text-2xl op60>→</div>
+
+<div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
+<div text-lg>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
+<div mt-2 text-sm><code>async def app(scope, receive, send)</code></div>
+<div op80 text-sm mt-1>The same decoupling, <b>redesigned as async events</b></div>
+<div op80 text-sm mt-1>WebSockets, streaming,<br>long-lived connections now fit</div>
+</div>
+
+</div>
+
+<div v-click="3" mt-5 op80 text-center>
+
+WSGI proved the boundary works — 20 years of any-framework-on-any-server.<br>
+ASGI **re-cut it for the async era**: one call became a conversation of events.
+
+</div>
+
+<!-- Because this isn't a new idea. Back in 2003 — PEP 333 — Python standardized WSGI, the same contract with the same motivation, for the synchronous world. One function, environ and start_response, and that's why Flask runs on Gunicorn, uWSGI, whatever — twenty years of any framework on any server. But WSGI's shape is one synchronous call per request: request in, response out, done. And that shape simply can't express a WebSocket, or a response that streams over time, or any long-lived connection — there's no place in the contract for "and then, later, another message." So when Django Channels needed exactly those things, ASGI grew out of that work as WSGI's async successor: same decoupling, but the single call became a conversation of events. That's the contract we'll use all day. I won't go deeper into WSGI — the point is just the lineage: this boundary has been earning its keep for two decades. -->
 
 ---
 layout: statement
@@ -751,35 +790,6 @@ Uvicorn's "network layer" is sockets & parsers. Ours is **type conversion**. �
 
 ---
 
-# Streaming responses: `more_body`
-
-<div mt-1 text-lg>
-
-The app may send the body **in chunks over time** — `StreamingResponse`, server-sent events. Buffering until the end would break them: *(concept — the full version handles backpressure)*
-
-</div>
-
-```py {*|3-6|7-8|*}{maxHeight:'240px'}
-async def send(event):
-    if event["type"] == "http.response.start":
-        # → tell JS: status & headers are ready; open a ReadableStream
-        js_stream.start(event["status"], event["headers"])
-    elif event["type"] == "http.response.body":
-        js_stream.enqueue(event.get("body", b""))   # → push chunk to JS now
-        if not event.get("more_body", False):
-            js_stream.close()                        # → end of response
-```
-
-<div v-click="4" mt-4 op80 text-lg>
-
-Each chunk is forwarded to a JS `ReadableStream` **as it's sent** — so progress bars, SSE, and chatbot-style token streams work in-browser too. 📡
-
-</div>
-
-<!-- One refinement that matters a lot in practice: streaming. The dispatch we just wrote buffers the whole response and returns it at the end. That works — until the app uses StreamingResponse or server-sent events. Think progress updates, or a chatbot streaming tokens one at a time; Gradio's UI leans on this heavily. If you buffer, the user sees nothing until everything is done. The fix is to respect more_body. On response.start we immediately open a JavaScript ReadableStream. Each body event gets enqueued to JS right away, and when more_body goes false we close the stream. The JS side consumes it exactly like a real fetch — and streaming UIs just work, entirely in the page. This slide is the concept version; the production ones also deal with backpressure. -->
-
----
-
 # Lifespan: the app expects a boot signal
 
 <div mt-1 text-lg>
@@ -1269,7 +1279,7 @@ One app. Any caller. 🌐🐍
 
 </div>
 
-<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the demo repo with the three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about WebSockets: I have appendix slides ready. Thank you! -->
+<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the demo repo with the three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about WebSockets or streaming: I have appendix slides ready. Thank you! -->
 
 ---
 layout: section
@@ -1278,10 +1288,39 @@ layout: section
 # 📎 Appendix
 
 <div mt-4 op70>
-WebSockets over the bridge
+Streaming & WebSockets over the bridge
 </div>
 
-<!-- Appendix, for Q&A: how the same bridge idea carries WebSocket sessions. -->
+<!-- Appendix, for Q&A: how the same bridge idea carries streaming responses and WebSocket sessions. -->
+
+---
+
+# Streaming responses: `more_body`
+
+<div mt-1 text-lg>
+
+The app may send the body **in chunks over time** — `StreamingResponse`, server-sent events. Buffering until the end would break them: *(concept — the full version handles backpressure)*
+
+</div>
+
+```py {*|3-6|7-8|*}{maxHeight:'240px'}
+async def send(event):
+    if event["type"] == "http.response.start":
+        # → tell JS: status & headers are ready; open a ReadableStream
+        js_stream.start(event["status"], event["headers"])
+    elif event["type"] == "http.response.body":
+        js_stream.enqueue(event.get("body", b""))   # → push chunk to JS now
+        if not event.get("more_body", False):
+            js_stream.close()                        # → end of response
+```
+
+<div v-click="4" mt-4 op80 text-lg>
+
+Each chunk is forwarded to a JS `ReadableStream` **as it's sent** — so progress bars, SSE, and chatbot-style token streams work in-browser too. 📡
+
+</div>
+
+<!-- The dispatch from the main talk buffers the whole response and returns it at the end. That works — until the app uses StreamingResponse or server-sent events. Think progress updates, or a chatbot streaming tokens one at a time; Gradio's UI leans on this heavily. If you buffer, the user sees nothing until everything is done. The fix is to respect more_body. On response.start we immediately open a JavaScript ReadableStream. Each body event gets enqueued to JS right away, and when more_body goes false we close the stream. The JS side consumes it exactly like a real fetch — and streaming UIs just work, entirely in the page. This slide is the concept version; the production ones also deal with backpressure. -->
 
 ---
 

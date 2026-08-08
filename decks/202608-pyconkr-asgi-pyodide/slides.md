@@ -90,21 +90,22 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 # What this talk is about
 
-<div mt-6 text-xl>
+<div mt-6 text-2xl>
 
 <v-clicks>
 
-- Your FastAPI app **never touches the network**. Uvicorn does. Between them sits an interface: **ASGI**.
-- Because that contract is solid, the two sides don't need to know each other — **either side can be swapped**.
-- This talk asks: how far can the *server* side be stretched? <span v-click="4" font-bold text-sky-600>All the way into a browser tab — and beyond.</span>
+- Your app ⇄ **ASGI** ⇄ Uvicorn
+- Solid contract → **either side swappable**
+- How far can the *server* side stretch? <span v-click="4" font-bold text-sky-600>Into a browser tab — and beyond</span>
 
 </v-clicks>
 
 </div>
 
-<div v-click="5" mt-6 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-lg>
+<div v-click="5" mt-8 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-xl text-center>
 
-**Key message:** Cut a clean interface, and your app runs anywhere something can *call* it. For Python web apps, ASGI is that interface — one FastAPI app runs on three wildly different runtimes today, unchanged.
+**Cut a clean interface → run anywhere something can *call* you.**<br>
+<span op80>One FastAPI app · three runtimes · zero changes</span>
 
 </div>
 
@@ -186,10 +187,10 @@ INFO:  Uvicorn running on
 
 </WindowMockup>
 
-<div mt-4 op80>
+<div mt-4 text-lg>
 
-The app defines *what* to answer.<br>
-Uvicorn handles *how* requests arrive.
+App: ***what* to answer**<br>
+Uvicorn: ***how* requests arrive**
 
 </div>
 
@@ -225,10 +226,9 @@ Uvicorn handles *how* requests arrive.
 
 </div>
 
-<div v-click="4" mt-16 text-xl op80 text-center>
+<div v-click="4" mt-16 text-2xl op90 text-center>
 
-Each side evolves **without asking the other's permission**.<br>
-New servers appear in Rust; new frameworks appear — everything keeps working.
+Each side evolves **independently** — nobody coordinates 🤝
 
 </div>
 
@@ -240,7 +240,7 @@ New servers appear in Rust; new frameworks appear — everything keeps working.
 
 <div mt-2 text-lg>
 
-The same motivation — **decouple apps from servers** — already produced a standard once, in the synchronous era:
+Same motivation, one standard earlier — **the synchronous era**:
 
 </div>
 
@@ -250,7 +250,7 @@ The same motivation — **decouple apps from servers** — already produced a st
 <div text-lg>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
 <div mt-2 text-sm><code>def app(environ, start_response)</code></div>
 <div op80 text-sm mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
-<div op80 text-sm mt-1>One <b>synchronous</b> call:<br>request in → response out, done</div>
+<div op80 text-sm mt-1><b>One sync call</b> — request → response, done</div>
 </div>
 
 <div self-center text-2xl op60>→</div>
@@ -258,16 +258,15 @@ The same motivation — **decouple apps from servers** — already produced a st
 <div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 <div text-lg>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
 <div mt-2 text-sm><code>async def app(scope, receive, send)</code></div>
-<div op80 text-sm mt-1>The same decoupling, <b>redesigned as async events</b></div>
-<div op80 text-sm mt-1>WebSockets, streaming,<br>long-lived connections now fit</div>
+<div op80 text-sm mt-1>Same decoupling, <b>async events</b></div>
+<div op80 text-sm mt-1>WebSockets · streaming · long-lived connections</div>
 </div>
 
 </div>
 
-<div v-click="3" mt-5 op80 text-center>
+<div v-click="3" mt-6 text-xl op90 text-center>
 
-WSGI proved the boundary works — 20 years of any-framework-on-any-server.<br>
-ASGI **re-cut it for the async era**: one call became a conversation of events.
+**One call → a conversation of events**
 
 </div>
 
@@ -305,7 +304,7 @@ layout: section
 
 <div mt-2 text-lg>
 
-The entire ASGI app interface is **a single coroutine** with three arguments:
+The entire interface: **one coroutine, three arguments**
 
 </div>
 
@@ -320,13 +319,13 @@ async def app(scope, receive, send):
 <div v-click="5" mt-5 grid="~ cols-3" gap-3 text-sm>
 
 <div border="~ sky/40 rounded-lg" p-3 bg-sky:8>
-📋 <b><code>scope</code></b><br><span op80>Type + metadata: kind of connection, path, headers…</span>
+📋 <b><code>scope</code></b><br><span op80>connection type · path · headers</span>
 </div>
 <div border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-📥 <b><code>receive()</code></b><br><span op80>An async <i>inbox</i>: request body, events from the client</span>
+📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
 </div>
 <div border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
-📤 <b><code>send()</code></b><br><span op80>An async <i>outbox</i>: response status, headers, body</span>
+📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
 </div>
 
 </div>
@@ -357,9 +356,9 @@ async def app(scope, receive, send):
     })
 ```
 
-<div v-click="4" mt-2 op80 text-base>
+<div v-click="4" mt-2 text-lg text-center>
 
-Starlette & FastAPI compile down to this loop. **Whoever calls `app(...)` is the server.** 🖥️
+**Whoever calls `app(...)` = the server** 🖥️
 
 </div>
 
@@ -371,7 +370,7 @@ Starlette & FastAPI compile down to this loop. **Whoever calls `app(...)` is the
 
 <div mt-4 text-lg>
 
-`scope["type"]` tells the app which protocol it's speaking. All three use the same `receive` / `send` loop:
+`scope["type"]` — three protocols, **one loop**:
 
 </div>
 
@@ -379,30 +378,25 @@ Starlette & FastAPI compile down to this loop. **Whoever calls `app(...)` is the
 
 <div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
 <div text-xl mb-1>🌐 <b><code>"http"</code></b></div>
-<span op80>Request → response.<br>
-<code>receive</code>: body chunks<br>
-<code>send</code>: status + body</span>
+<span op80>request → response</span>
 </div>
 
 <div v-click="2" border="~ violet/40 rounded-lg" p-4 bg-violet:5>
 <div text-xl mb-1>🔌 <b><code>"websocket"</code></b></div>
-<span op80>Long-lived, two-way.<br>
-Same loop, different events<br>
-<span op60>(→ appendix, if you're curious)</span></span>
+<span op80>long-lived, two-way<br>
+<span op60>(→ appendix)</span></span>
 </div>
 
 <div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
 <div text-xl mb-1>♻️ <b><code>"lifespan"</code></b></div>
-<span op80>App startup / shutdown.<br>
-<code>receive</code>: startup / shutdown<br>
-<code>send</code>: ...complete</span>
+<span op80>startup / shutdown</span>
 </div>
 
 </div>
 
-<div v-click="4" mt-8 text-center text-xl op80>
+<div v-click="4" mt-8 text-center text-xl>
 
-Today we focus on **`http`** (+ a look at `lifespan`) — it carries the whole idea. ✅
+Today: **`http`** + `lifespan` ✅
 
 </div>
 
@@ -444,10 +438,10 @@ Python 3.12 on **darwin/arm64** 🖥️
 
 </div>
 
-<div v-click="2" mt-6 text-center text-lg op80>
+<div v-click="2" mt-6 text-center text-xl>
 
-Nothing surprising yet — a FastAPI app, a Uvicorn process, a real HTTP round-trip.<br>
-📎 <a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">github.com/whitphx/runtime-agnostic-asgi-app-example</a>
+**Nothing surprising — yet.**<br>
+<span text-base op70>📎 <a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">github.com/whitphx/runtime-agnostic-asgi-app-example</a></span>
 
 </div>
 
@@ -491,7 +485,7 @@ A server inside your browser
 
 <div mt-4 text-lg>
 
-[Pyodide](https://pyodide.org/) is **CPython compiled to WebAssembly**. Real Python — `asyncio`, `pip`-installed packages — running inside a browser tab.
+[Pyodide](https://pyodide.org/): **CPython compiled to WebAssembly** — real Python, in a browser tab
 
 </div>
 
@@ -501,10 +495,10 @@ A server inside your browser
 
 <v-clicks>
 
-- No backend, no install — just a web page
-- Python ↔ JavaScript call each other directly
-- `asyncio` runs on the browser's event loop
-- ⚠️ Single interpreter, **single thread**, no sockets
+- No backend, no install — **just a web page**
+- Python ⇄ JavaScript, direct calls
+- `asyncio` on the browser's event loop
+- ⚠️ **Single thread** · no sockets
 
 </v-clicks>
 
@@ -519,9 +513,9 @@ A server inside your browser
 
 </div>
 
-<div v-click="6" mt-4 text-lg op80>
+<div v-click="6" mt-4 text-xl text-center>
 
-So Pyodide can run the **app** half of ASGI. But there's no Uvicorn here — the **server half is missing**.
+Runs the **app half** of ASGI. The server half? **Missing.**
 
 </div>
 
@@ -539,10 +533,10 @@ So Pyodide can run the **app** half of ASGI. But there's no Uvicorn here — the
 
 <v-clicks>
 
-- 📄 A **static page** loads `app/main.py` — the *same file* from step 1 — into Pyodide
-- 🖱️ The same UI appears; click **"Where am I running?"** → `Python 3.14 on emscripten/wasm32` 🤯
-- 🕵️ DevTools: the **Network tab stays silent**
-- ✂️ Kill the static file server — **the app keeps answering**
+- 📄 Static page + Pyodide + **the same `app/main.py`**
+- 🖱️ "Where am I running?" → `Python 3.14 on emscripten/wasm32` 🤯
+- 🕵️ Network tab: **silent**
+- ✂️ Kill the file server → **still answering**
 
 </v-clicks>
 
@@ -552,9 +546,9 @@ So Pyodide can run the **app** half of ASGI. But there's no Uvicorn here — the
 
 </div>
 
-<div v-click="5" mt-4 text-center op80>
+<div v-click="5" mt-4 text-center text-xl>
 
-No network request leaves the tab. The response is produced by Python **next to** the JavaScript.
+Responses made **inside the tab** — nothing leaves it.
 
 </div>
 
@@ -571,7 +565,7 @@ No network request leaves the tab. The response is produced by Python **next to*
 <div text-center text-xs op70 mb-2>🌐 One browser tab — no backend</div>
 
 <div border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-center>
-📄 <b>The page</b> — htmx UI, ordinary <code>fetch()</code>-style requests
+📄 <b>The page</b> — htmx UI, ordinary requests
 </div>
 
 <div text-center op50 my-0.5><span text-xs op80>⇅ <code>postMessage</code> (Web Worker boundary)</span></div>
@@ -581,13 +575,13 @@ No network request leaves the tab. The response is produced by Python **next to*
 <div text-center text-xs op60 mb-1>Web Worker — Pyodide</div>
 
 <div border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center data-id="bridge">
-🌉 <b><code>bridge.py</code></b> — the "server half" (our code, ~45 lines)
+🌉 <b><code>bridge.py</code></b> — the "server half", ~45 lines
 </div>
 
 <div text-center op50 my-0.5><span text-xs op80>⇅ <code>scope</code>, <code>receive</code>, <code>send</code></span></div>
 
 <div border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center data-id="appbox">
-🐍 <b><code>app/main.py</code></b> — FastAPI (unchanged from step 1)
+🐍 <b><code>app/main.py</code></b> — FastAPI, unchanged
 </div>
 
 </div>
@@ -596,9 +590,9 @@ No network request leaves the tab. The response is produced by Python **next to*
 
 </div>
 
-<div v-click="1" mt-3 text-center op80 text-lg>
+<div v-click="1" mt-3 text-center text-xl>
 
-Only one part is new: the bridge. **It's playing Uvicorn's role.** 🛠️
+One new part — **playing Uvicorn's role** 🛠️
 
 </div>
 
@@ -652,9 +646,9 @@ Impersonating Uvicorn, one piece at a time
 🐍 <code>await app(scope, receive, send)</code><br><span op70 text-sm>the unchanged FastAPI app</span>
 </div>
 
-<div v-click="6" mt-3 text-lg op80>
+<div v-click="6" mt-3 text-xl>
 
-The response takes the same road back: bridge → `postMessage` → `Response` object → UI. 🔁
+Response: **same road back** 🔁
 
 </div>
 
@@ -668,7 +662,7 @@ The response takes the same road back: bridge → `postMessage` → `Response` o
 
 <div mt-1 text-lg>
 
-From `bridge.py` — reshape what JavaScript sent into the dict ASGI specifies:
+From `bridge.py` — JS request → **the dict ASGI specifies**:
 
 </div>
 
@@ -689,9 +683,10 @@ async def dispatch(app, request):
     }
 ```
 
-<div v-click="5" mt-3 op80 text-lg>
+<div v-click="5" mt-3 text-lg text-center>
 
-ASGI is strict: headers are **lists of `(bytes, bytes)`**, the path is `str`, the query is `bytes`. Getting these types right *is* "implementing the server."
+Strict types — headers `(bytes, bytes)` · path `str` · query `bytes`<br>
+**Getting them right *is* "implementing the server"**
 
 </div>
 
@@ -710,7 +705,7 @@ ASGI is strict: headers are **lists of `(bytes, bytes)`**, the path is `str`, th
 
 <div mt-1 text-lg>
 
-`receive` feeds the request body in; `send` collects the response out:
+`receive`: **body in** · `send`: **response out**
 
 </div>
 
@@ -731,9 +726,9 @@ ASGI is strict: headers are **lists of `(bytes, bytes)`**, the path is `str`, th
     return {"status": status, "headers": headers, "body": b"".join(chunks)}
 ```
 
-<div v-click="4" mt-2 op70 text-sm>
+<div v-click="4" mt-2 text-base text-center>
 
-Build `scope` → define `receive` / `send` → `await app(...)`. **That's a server.**
+`scope` + `receive` + `send` + `await app(...)` = **a server**
 
 </div>
 
@@ -752,37 +747,37 @@ Build `scope` → define `receive` / `send` → `await app(...)`. **That's a ser
 
 <div mt-1 text-lg>
 
-The bridge sits *on* the [Pyodide FFI](https://pyodide.org/en/stable/usage/type-conversions.html) — and the conversions are where the bugs live:
+The bridge sits *on* the [Pyodide FFI](https://pyodide.org/en/stable/usage/type-conversions.html) — **the bugs live in the conversions**:
 
 </div>
 
 <div grid="~ cols-2" gap-4 mt-4 text-sm>
 
 <div v-click="1" border="~ sky/40 rounded-lg" p-3 bg-sky:8>
-🟦→🐍 <b>JS values arrive as proxies</b><br>
-<span op80>A <code>JsProxy</code>, not a dict — convert explicitly (<code>pyodide.toPy()</code> / <code>.to_py()</code>)</span>
+🟦→🐍 <b>Proxies, not values</b><br>
+<span op80><code>JsProxy</code>, not <code>dict</code> → <code>.to_py()</code></span>
 </div>
 
 <div v-click="2" border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-📦 <b>Binary bodies need care</b><br>
-<span op80><code>Uint8Array</code> → <code>bytes(...)</code>; each conversion <b>copies</b> the buffer</span>
+📦 <b>Binary bodies</b><br>
+<span op80><code>Uint8Array</code> → <code>bytes()</code> — <b>every conversion copies</b></span>
 </div>
 
 <div v-click="3" border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
 🐍→🟦 <b>Going back: <code>to_js()</code></b><br>
-<span op80>A Python <code>dict</code> becomes a JS <code>Map</code> by default — pass a <code>dict_converter</code> for a plain object</span>
+<span op80><code>dict</code> → JS <code>Map</code> by default! (<code>dict_converter</code>)</span>
 </div>
 
 <div v-click="4" border="~ amber/40 rounded-lg" p-3 bg-amber:8>
-⏳ <b>Async crosses the boundary</b><br>
-<span op80>A Python coroutine awaited from JS becomes a <code>Promise</code> — the two event loops interleave cleanly</span>
+⏳ <b>Async composes</b><br>
+<span op80>coroutine ⇄ <code>Promise</code> — loops interleave</span>
 </div>
 
 </div>
 
-<div v-click="5" mt-5 text-center op80 text-lg>
+<div v-click="5" mt-5 text-center text-xl>
 
-Uvicorn's "network layer" is sockets & parsers. Ours is **type conversion**. 🔁
+Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
 
 </div>
 
@@ -794,7 +789,7 @@ Uvicorn's "network layer" is sockets & parsers. Ours is **type conversion**. �
 
 <div mt-1 text-lg>
 
-`lifespan` isn't a client connection — it's the app's own boot/teardown protocol. The server must drive it; so must we:
+Not a client connection — **the app's boot/teardown protocol**. The server drives it; so must we:
 
 </div>
 
@@ -814,9 +809,9 @@ async def run_lifespan(app):
     # on teardown: inbox.put_nowait({"type": "lifespan.shutdown"})
 ```
 
-<div v-click="4" mt-2 op70 text-sm>
+<div v-click="4" mt-2 text-base text-center>
 
-Classic bridge bug: skip this, and FastAPI's <code>lifespan=</code> hooks (DB pools, models…) silently never run.
+⚠️ Skip it → `lifespan=` hooks (DB pools, models…) **silently never run**
 
 </div>
 
@@ -871,15 +866,15 @@ Whole Python web **UI frameworks** have been ported to run on Pyodide:
 
 </div>
 
-<div v-click="1" mt-4 text-lg op80>
+<div v-click="1" mt-4 text-lg>
 
-These are **heavyweight** apps: static assets, sessions, state, realtime updates — far beyond our 3-endpoint demo.
+**Heavyweight**: static assets · sessions · state · realtime
 
 </div>
 
-<div v-click="2" mt-3 text-lg op80>
+<div v-click="2" mt-3 text-xl>
 
-Each needed a **server half** in the browser. Reading Shinylive, then building Stlite & Gradio-Lite, taught me: **ASGI is the right shape for it.** 💡
+Each needs a **server half** in the browser — **ASGI is the right shape** 💡
 
 </div>
 
@@ -932,14 +927,14 @@ Each needed a **server half** in the browser. Reading Shinylive, then building S
 
 # Confession: I built it wrong first
 
-<div mt-4 text-lg>
+<div mt-8 text-xl leading-13>
 
 <v-clicks>
 
-- 🏗️ **Stlite v1 (2022): hand-rolled server emulation.** Streamlit runs on **Tornado**, so Stlite mimicked Tornado's server layer with ad-hoc mocks — deeply coupled to Streamlit internals.
-- 💥 **The cost:** every Streamlit upgrade could break the emulation — no spec defined what "done" meant.
-- 💡 **The realization:** Shinylive never had this problem. Shiny speaks **ASGI** — their browser layer targets a *standard*, not internals.
-- 🔄 **Stlite v2: an ASGI bridge.** Spike in <a href="https://github.com/whitphx/stlite/pull/2043" target="_blank">stlite#2043</a>, hand-rolled layer replaced in <a href="https://github.com/whitphx/stlite/pull/2044" target="_blank">stlite#2044</a>. (Gradio-Lite, on FastAPI, was ASGI-shaped from day one.)
+- 🏗️ **v1 (2022): hand-rolled Tornado emulation** — ad-hoc mocks, coupled to internals
+- 💥 **Every Streamlit upgrade could break it** — no spec, no "done"
+- 💡 **Shinylive never had this problem** — Shiny speaks ASGI: a *standard*, not internals
+- 🔄 **v2: an ASGI bridge** — <a href="https://github.com/whitphx/stlite/pull/2043" target="_blank">stlite#2043</a> → <a href="https://github.com/whitphx/stlite/pull/2044" target="_blank">#2044</a> <span op70>(Gradio-Lite: ASGI from day one)</span>
 
 </v-clicks>
 
@@ -951,14 +946,14 @@ Each needed a **server half** in the browser. Reading Shinylive, then building S
 
 # What the interface bought us
 
-<div mt-6 text-lg>
+<div mt-8 text-xl leading-13>
 
 <v-clicks>
 
-- 🧭 **A definition of "done."** An ad-hoc emulation became a *standard target* — the spec says exactly what the server half must provide.
-- ♻️ **Reusability.** The emulation layer was Streamlit-specific by construction; the ASGI bridge drives **any** ASGI app.
-- 🛡️ **Upgrade safety.** Framework internals can churn freely — the contract is what they and we both program against.
-- 🧩 **What it *didn't* solve:** static file serving, cookie/session quirks, and per-framework startup conventions still need care. The interface shrinks the custom surface; it doesn't erase it.
+- 🧭 **A definition of "done"** — the spec says what to provide
+- ♻️ **Reusable** — one bridge, *any* ASGI app
+- 🛡️ **Upgrade-safe** — internals churn, the contract holds
+- 🧩 **Not erased**: static files · session quirks · startup conventions — the custom surface *shrinks*
 
 </v-clicks>
 
@@ -996,14 +991,14 @@ The same stack, back on the server — at the edge
 
 # Cloudflare Workers run Python — on Pyodide
 
-<div mt-6 text-lg>
+<div mt-8 text-xl leading-13>
 
 <v-clicks>
 
-- ☁️ **Cloudflare Workers**: serverless functions running on Cloudflare's edge, on the **workerd** JS/WASM runtime
-- 🐍 **Python Workers** execute Python via… **Pyodide** — the same WASM CPython from our browser story, now *server-side*
-- 🔁 **Full circle:** just as V8 took browser-born JavaScript to the server, workerd takes the browser-born Python stack back to the edge
-- 🧰 The SDK ships an **`asgi` module** — a production-grade sibling of our `bridge.py`, translating JS `Request` objects into ASGI calls
+- ☁️ **Cloudflare Workers** — serverless at the edge, on **workerd** (JS/WASM)
+- 🐍 **Python Workers = Pyodide** — the same WASM CPython, now *server-side*
+- 🔁 **Full circle** — what V8 did for JS, workerd does for this Python stack
+- 🧰 **SDK `asgi` module** — `bridge.py`'s production-grade sibling
 
 </v-clicks>
 
@@ -1017,7 +1012,7 @@ The same stack, back on the server — at the edge
 
 <div mt-2 text-lg>
 
-Everything Cloudflare needs, from the demo repo — `src/main.py` is a **symlink** to step 1's `app/main.py`:
+The whole file — and `src/main.py` = **a symlink to step 1's app**:
 
 </div>
 
@@ -1035,9 +1030,9 @@ class Default(WorkerEntrypoint):
         return await asgi.fetch(app, request, self.env, self.ctx)
 ```
 
-<div v-click="4" mt-3 op80>
+<div v-click="4" mt-3 text-center>
 
-Deployed at <a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> — the button answers `Python 3.13 on emscripten/wasm32`, **from the edge**. 🌍
+<a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> → `Python 3.13 on emscripten/wasm32` — **from the edge** 🌍
 
 </div>
 
@@ -1093,8 +1088,8 @@ Deployed at <a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" targ
 
 <div v-click="4" mt-5 text-center text-xl op80>
 
-The top layer is **the same file** — three Python versions, three transports, **zero changes**.<br>
-<span v-click="5" font-bold text-sky-600>The interface holds; everything below it is swappable.</span>
+**Same file** · 3 Pythons · 3 transports · **0 changes**<br>
+<span v-click="5" font-bold text-sky-600>The interface holds — everything below it is swappable</span>
 
 </div>
 
@@ -1127,9 +1122,9 @@ The top layer is **the same file** — three Python versions, three transports, 
 
 <v-clicks>
 
-`@stlite/cloudflare` (<a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental): the browser bundle, redeployed as an edge app
+`@stlite/cloudflare` — <a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental
 
-Same kernel, same ASGI bridge idea — **only the caller changed**. 🔁
+**Same kernel — only the caller changed** 🔁
 
 </v-clicks>
 
@@ -1156,26 +1151,26 @@ Practical uses — and honest limits
 <div mt-4 grid="~ cols-2" gap-4 text-lg>
 
 <div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-📡 <b>Static-hosted demos</b><br><span op80 text-base>Ship a full web app as static files — GitHub Pages, a CDN, no backend to run or pay for.</span>
+📡 <b>Static-hosted demos</b><br><span op80 text-base>GitHub Pages / CDN — <b>no backend</b></span>
 </div>
 
 <div v-click="2" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-📖 <b>Runnable documentation</b><br><span op80 text-base>Live, editable API examples right inside the docs page.</span>
+📖 <b>Runnable documentation</b><br><span op80 text-base>live, editable examples in the docs</span>
 </div>
 
 <div v-click="3" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-🎓 <b>Education</b><br><span op80 text-base>Teach FastAPI or Streamlit with zero local setup — it just runs in the browser.</span>
+🎓 <b>Education</b><br><span op80 text-base><b>zero setup</b> — it's just a web page</span>
 </div>
 
 <div v-click="4" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-🔒 <b>Privacy-preserving apps</b><br><span op80 text-base>Data never leaves the device — everything runs client-side.</span>
+🔒 <b>Privacy-preserving apps</b><br><span op80 text-base>data <b>never leaves the device</b></span>
 </div>
 
 </div>
 
-<div v-click="5" mt-5 text-center op80>
+<div v-click="5" mt-5 text-center text-lg>
 
-Already shipping: the [Streamlit Playground](https://streamlit.io/playground) and [Gradio Playground](https://www.gradio.app/playground) run on exactly this. 🚀
+In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradio Playground](https://www.gradio.app/playground) 🚀
 
 </div>
 
@@ -1188,26 +1183,26 @@ Already shipping: the [Streamlit Playground](https://streamlit.io/playground) an
 <div mt-4 grid="~ cols-2" gap-4 text-lg>
 
 <div v-click="1" border="~ red/40 rounded-lg" p-4 bg-red:5>
-📦 <b>Dependency size & availability</b><br><span op80 text-base>Everything downloads to the browser; C-extension packages may not exist for Pyodide.</span>
+📦 <b>Dependencies</b><br><span op80 text-base>everything downloads; C extensions may not exist for Pyodide</span>
 </div>
 
 <div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
-🧵 <b>Single thread, sandboxed</b><br><span op80 text-base>No real parallelism (sync endpoints can't even run! → <code>async def</code> only); no raw sockets or filesystem.</span>
+🧵 <b>Single thread, sandboxed</b><br><span op80 text-base>no threads → <b><code>async def</code> only</b> · no raw sockets</span>
 </div>
 
 <div v-click="3" border="~ red/40 rounded-lg" p-4 bg-red:5>
-🔑 <b>No safe secrets</b><br><span op80 text-base>Anything in the page is visible to the user — no server-side API keys.</span>
+🔑 <b>No safe secrets</b><br><span op80 text-base>the page is public — <b>no API keys</b></span>
 </div>
 
 <div v-click="4" border="~ red/40 rounded-lg" p-4 bg-red:5>
-📥 <b>No inbound requests</b><br><span op80 text-base>The tab can't receive external webhooks — there's no public address to hit.</span>
+📥 <b>No inbound requests</b><br><span op80 text-base>no public address — <b>no webhooks</b></span>
 </div>
 
 </div>
 
-<div v-click="5" mt-5 text-center op80>
+<div v-click="5" mt-5 text-center text-xl>
 
-This **complements** real servers — it doesn't replace them. 🤝
+**Complements** real servers — doesn't replace them 🤝
 
 </div>
 
@@ -1221,11 +1216,11 @@ This **complements** real servers — it doesn't replace them. 🤝
 
 <v-clicks>
 
-- 🧩 **ASGI cuts a clean interface**: the app on one side — and *whoever can call it* on the other.
-- ⚡ The whole contract is **`scope`, `receive`, `send`** — and it mentions no sockets, ports, or machines.
-- 🌉 A "server" is **anything that fulfills the contract**: Uvicorn, ~45 lines of `bridge.py` in a tab, or an edge runtime.
-- 🏭 This is **shipping**, not a stunt: Stlite, Gradio-Lite, Shinylive — and their playgrounds in production.
-- 🧠 **Implementing the other side of an interface is the best way to understand it.**
+- 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
+- ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
+- 🌉 **A server = anything that fulfills the contract** — Uvicorn · a tab · the edge
+- 🏭 **Shipping today** — Stlite · Gradio-Lite · Shinylive · the playgrounds
+- 🧠 **To understand an interface, implement the other side of it**
 
 </v-clicks>
 
@@ -1299,7 +1294,7 @@ Streaming & WebSockets over the bridge
 
 <div mt-1 text-lg>
 
-The app may send the body **in chunks over time** — `StreamingResponse`, server-sent events. Buffering until the end would break them: *(concept — the full version handles backpressure)*
+`StreamingResponse` / SSE: the body arrives **in chunks over time** — buffering breaks them *(concept)*:
 
 </div>
 
@@ -1314,9 +1309,9 @@ async def send(event):
             js_stream.close()                        # → end of response
 ```
 
-<div v-click="4" mt-4 op80 text-lg>
+<div v-click="4" mt-4 text-lg text-center>
 
-Each chunk is forwarded to a JS `ReadableStream` **as it's sent** — so progress bars, SSE, and chatbot-style token streams work in-browser too. 📡
+Chunk → JS `ReadableStream` **as it's sent** — token streams work in-browser 📡
 
 </div>
 
@@ -1328,7 +1323,7 @@ Each chunk is forwarded to a JS `ReadableStream` **as it's sent** — so progres
 
 <div mt-1 text-lg>
 
-The hard part: JS messages arrive *whenever*, but the app `await`s `receive()`. An `asyncio.Queue` bridges push to pull:
+JS pushes *whenever* · the app `await`s — **`asyncio.Queue` bridges push → pull**:
 
 </div>
 
@@ -1348,10 +1343,10 @@ class WebSocketSession:
 <div v-click="3" mt-4 grid="~ cols-2" gap-4 text-sm>
 
 <div border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-🟦 JS side calls <code>on_js_message</code> — <b>synchronous, fire-and-forget</b>
+🟦 JS: <code>on_js_message</code> — <b>fire-and-forget</b>
 </div>
 <div border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
-🐍 App side <code>await</code>s <code>receive()</code> — <b>suspends until a message exists</b>
+🐍 App: <code>await receive()</code> — <b>suspends until a message</b>
 </div>
 
 </div>
@@ -1371,7 +1366,7 @@ class WebSocketSession:
 
 <div mt-2 text-lg>
 
-The app drives the handshake through the same `receive` / `send` events:
+Same `receive` / `send` — **new event names**:
 
 </div>
 
@@ -1388,9 +1383,9 @@ The app drives the handshake through the same `receive` / `send` events:
 #    or app receives {"type": "websocket.disconnect"}    ← JS closed it
 ```
 
-<div v-click="4" mt-4 op80 text-lg>
+<div v-click="4" mt-4 text-lg text-center>
 
-Same `receive` / `send` shape as HTTP — only the **event types and the lifetime** differ. 🔁
+Same shape as HTTP — **only events & lifetime differ** 🔁
 
 </div>
 

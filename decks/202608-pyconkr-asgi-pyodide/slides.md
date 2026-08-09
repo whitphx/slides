@@ -795,7 +795,7 @@ clicks: 4
 
 # So… can we just call our app?
 
-<div grid="~ cols-2" gap-8 mt-4>
+<div grid="~ cols-2" gap-8 mt-2>
 
 <div>
 
@@ -828,7 +828,7 @@ const res = await fetch("/api/runtime", {
 So if we had **our own `fetch`**, the page could call the Python app directly:
 
 ```js
-async function ourFetch(url, options) {
+async function appFetch(url, options) {
   ...
 
   await app(scope, receive, send);
@@ -842,10 +842,11 @@ async function ourFetch(url, options) {
 
 </div>
 
-<div v-click="4" absolute bottom-16 inset-x-0 text-3xl text-center>
-
-then, **how?** 🤔
-
+<div v-click="4" absolute bottom-5 inset-x-0 flex justify-center>
+<div border="~ red/50 rounded-lg" px-6 py-3 bg-white dark:bg-black text-center>
+<div text-2xl>🕳️ missing: <b>HTTP request</b> → <b>ASGI call</b></div>
+<div mt-1 op80>on a server, that’s <b><code>uvicorn</code></b> · in Pyodide, <b>nobody</b></div>
+</div>
 </div>
 
 <style>
@@ -855,95 +856,21 @@ then, **how?** 🤔
 }
 </style>
 
-<!-- So let us line up what we have. [click] Pyodide hands us the app object — one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. [click] And the page already knows how to speak HTTP: fetch is right there, and every frontend in the world is written against it. [click] So put those together. If we had our own fetch — same signature, same Request in, same Response out — but instead of going to the network, it called our app the way ASGI says to call it, then the frontend would not know the difference. That is the whole design. And you can see the hole in the middle of it: scope, receive and send do not exist yet. Nobody builds them. In a normal deployment that is Uvicorn's job, and there is no Uvicorn in a browser tab. [click] So: then, how? That is the rest of this talk, and it is about forty-five lines of Python. Let me show you it working first. -->
-
----
-
-# Demo, step 2: the same app, no server
-
-<div mt-2 flex justify-center>
-
-<WindowMockup title="Live demo" light w-160>
-
-<div p-5 text-lg>
-
-<v-clicks>
-
-- 📄 Static page + Pyodide + **the same `main.py`**
-- 🖱️ "Where am I running?" → `Python 3.14 on emscripten/wasm32` 🤯
-- 🕵️ Network tab: **silent**
-- ✂️ Kill the file server → **still answering**
-
-</v-clicks>
-
-</div>
-
-</WindowMockup>
-
-</div>
-
-<div v-click="5" mt-4 text-center text-xl>
-
-Responses made **inside the tab** — nothing leaves it.
-
-</div>
-
-<!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide right there on the page and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there.
-
-[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
-
----
-clicks: 1
----
-
-<h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
-
-<StackCompare mt-4 :columns="[
-  { key: 'server', label: '① Server' },
-  { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
-]">
-  <template #server><ServerStackFigure /></template>
-  <template #browser><BrowserStackFigure /></template>
-</StackCompare>
-
-<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
-
-One box swapped — **the bridge plays Uvicorn's role** 🛠️
-
-</div>
-
-<style>
-.punchline {
-  transition: opacity 700ms ease 250ms;
-}
-.step-swap {
-  position: relative;
-  display: inline-block;
-}
-.step-swap > span {
-  transition: opacity 700ms ease 250ms;
-}
-.step-swap > .step-two {
-  position: absolute;
-  left: 0;
-}
-</style>
-
-<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
+<!-- So let us line up what we have. [click] Pyodide hands us the app object — one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. [click] And the page already knows how to speak HTTP: fetch is right there, and every frontend in the world is written against it. [click] So put those together. If we had our own fetch — same signature, same Request in, same Response out — but instead of going to the network, it called our app the way ASGI says to call it, then the frontend would not know the difference. That is the whole design. And you can see the hole in the middle of it: scope, receive and send do not exist yet. Nobody builds them. [click] So let me name the missing piece precisely, because it is the whole problem. On a server, a request comes off the network as HTTP bytes, and something turns those bytes into an ASGI call — builds the scope dict, implements receive and send, awaits the app. That something is Uvicorn. Simplifying a little, that translation layer is exactly what does not exist in Pyodide. There is no Uvicorn in a browser tab, so nobody turns a request into an ASGI call. That, and only that, is what we are missing. -->
 
 ---
 layout: statement
 ---
 
-## Something in that tab is<br>**impersonating Uvicorn**.
+## No Uvicorn in the tab.<br>**So let's write that layer ourselves.** 🛠️
 
 <div mt-8 text-2xl op80 v-click="1">
 
-What does the impersonation take? Let's write it. ✍️
+It's small enough to read in a talk ✍️
 
 </div>
 
-<!-- So that's the trick, stated honestly: something in that tab is impersonating Uvicorn. And the best part of this whole topic is that the impersonation is small enough to read in a talk. So let's write it. -->
+<!-- Which is, honestly, the fun part. Nobody has written that translation layer for the browser, so we are going to write it. [click] And the reason I can put it on slides at all is that it is small — small enough to read end to end in the next few minutes. -->
 
 ---
 layout: section
@@ -955,7 +882,7 @@ layout: section
 Impersonating Uvicorn, one piece at a time
 </div>
 
-<!-- This is the heart of the talk. Everything on the next few slides is real code from the demo repo — bridge.py, slightly trimmed for the screen. -->
+<!-- Here is the how. Nobody has written that server for us, so we are going to write it — this is the heart of the talk. Everything on the next few slides is real code from the demo repo — bridge.py, slightly trimmed for the screen. -->
 
 ---
 
@@ -1149,11 +1076,99 @@ layout: statement
 
 <div mt-8 text-2xl op80 v-click="1">
 
+Does it actually run? **Let's watch it.** 👀
+
+</div>
+
+<!-- So step back and look at what we built. Forty-five lines of Python. No sockets, no HTTP parsing, no server process — and a full FastAPI app is supposed to run on top of it, completely unaware that anything unusual is happening. That is the claim. Let's go see whether it holds. -->
+
+---
+
+# Demo, step 2: the same app, no server
+
+<div mt-2 flex justify-center>
+
+<WindowMockup title="Live demo" light w-160>
+
+<div p-5 text-lg>
+
+<v-clicks>
+
+- 📄 Static page + Pyodide + **the same `main.py`**
+- 🖱️ "Where am I running?" → `Python 3.14 on emscripten/wasm32` 🤯
+- 🕵️ Network tab: **silent**
+- ✂️ Kill the file server → **still answering**
+
+</v-clicks>
+
+</div>
+
+</WindowMockup>
+
+</div>
+
+<div v-click="5" mt-4 text-center text-xl>
+
+Responses made **inside the tab** — nothing leaves it.
+
+</div>
+
+<!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide right there on the page and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab — by the forty-five lines you just read. OK — back to slides.
+
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
+
+---
+clicks: 1
+---
+
+<h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
+
+<StackCompare mt-4 :columns="[
+  { key: 'server', label: '① Server' },
+  { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
+]">
+  <template #server><ServerStackFigure /></template>
+  <template #browser><BrowserStackFigure /></template>
+</StackCompare>
+
+<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
+
+One box swapped — **the bridge plays Uvicorn's role** 🛠️
+
+</div>
+
+<style>
+.punchline {
+  transition: opacity 700ms ease 250ms;
+}
+.step-swap {
+  position: relative;
+  display: inline-block;
+}
+.step-swap > span {
+  transition: opacity 700ms ease 250ms;
+}
+.step-swap > .step-two {
+  position: absolute;
+  left: 0;
+}
+</style>
+
+<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
+
+---
+layout: statement
+---
+
+## Something in that tab is<br>**impersonating Uvicorn**.
+
+<div mt-8 text-2xl op80 v-click="1">
+
 But a tidy demo is not proof. 🧐<br>Does the contract survive a **real framework**?
 
 </div>
 
-<!-- So step back and look at what we built. Forty-five lines of Python. No sockets, no HTTP parsing, no server process — and a full FastAPI app runs on top of it, completely unaware that anything unusual is happening. The interface held. But let's be honest with ourselves: a demo app with three endpoints is a tidy little world. Real frameworks are messy. Static files, sessions, realtime updates, state everywhere. Does the contract survive contact with one of those? -->
+<!-- So that's the trick, stated honestly: something in that tab is impersonating Uvicorn — and the impersonation was small enough to read in a talk, which is the part I find genuinely lovely. But let's be honest with ourselves: a demo app with three endpoints is a tidy little world. Real frameworks are messy. Static files, sessions, realtime updates, state everywhere. Does the contract survive contact with one of those? -->
 
 ---
 layout: section

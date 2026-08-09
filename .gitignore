@@ -132,3 +132,6 @@ dist
 # Playwright MCP screenshots
 .playwright-mcp/
 .pnpm-store/
+
+# Claude Code session worktrees
+.claude/worktrees/

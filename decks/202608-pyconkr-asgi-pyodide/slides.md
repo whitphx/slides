@@ -349,7 +349,7 @@ async def app(scope, receive, send):
 <!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 # You don't even need a framework
@@ -374,7 +374,11 @@ clicks: 1
 $ uvicorn raw_asgi:app
 INFO:  Uvicorn running on
        http://127.0.0.1:8000
+```
 
+<div v-click="2">
+
+```shell
 $ curl -i localhost:8000
 HTTP/1.1 200 OK
 content-type: text/plain
@@ -382,9 +386,11 @@ content-type: text/plain
 Hello, PyCon KR!
 ```
 
+</div>
+
 </WindowMockup>
 
-<div mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
+<div v-click="2" mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
 
 </div>
 
@@ -407,7 +413,7 @@ Hello, PyCon KR!
 }
 </style>
 
-<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app. [click] And here it is running — I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, curl it, and get a real HTTP response back. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
+<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
 
 ---
 
@@ -840,6 +846,41 @@ Strict types — headers `(bytes, bytes)` · path `str` · query `bytes`<br>
 </style>
 
 <!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We just listen and stash. And then the punchline, one line: await app with our scope, our receive, our send. When it returns, we assemble the response and hand it back to JavaScript. That's it. That's a complete HTTP server — no sockets, no parser, no port. Just a function that fulfills a contract. -->
+
+---
+
+# ③ Call it from JavaScript
+
+<div mt-1 text-sm><code>worker.js</code> — boot Pyodide, then reach into it for <code>dispatch</code>:</div>
+
+```js {*}{maxHeight:'330px'}
+const pyodide = await loadPyodide();
+await pyodide.runPythonAsync(
+  "from main import app\nfrom bridge import dispatch"
+);
+
+const app = pyodide.globals.get("app");        // the FastAPI app
+const dispatch = pyodide.globals.get("dispatch");  // our bridge
+
+// one request in → one ASGI call → one response out
+const result = await dispatch(app, pyodide.toPy(request));
+const response = result.toJs({ dict_converter: Object.fromEntries });
+```
+
+<div mt-3 text-center text-lg>
+
+Python objects are **just JS values** — <code>await</code> a coroutine, get a <code>Promise</code>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 17px;
+  --slidev-code-line-height: 1.5;
+}
+</style>
+
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, inside the Web Worker. Boot Pyodide, run two import statements, and then the interesting bit: pyodide.globals.get pulls the app and our dispatch function straight out of the Python namespace and hands them back as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary. And remember appFetch from the route diagram: it has fetch's exact signature, posts the request here, and awaits what comes back — so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. -->
 
 ---
 

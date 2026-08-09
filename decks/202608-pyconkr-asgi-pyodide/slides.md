@@ -122,7 +122,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - 🧩 **The boundary you use every day** — what ASGI already does for you
 - ⚡ **ASGI in 90 seconds** — `scope`, `receive`, `send`
 - 🌐 **The extreme case** — the same app, running in a browser tab (demo)
-- 🛠️ **Building the bridge** — impersonating Uvicorn in ~45 lines
+- 🛠️ **Building the bridge** — doing Uvicorn's job in ~45 lines
 - 🏭 **The production proof** — Stlite & friends
 - ☁️ **Full circle** — the same stack on Cloudflare Workers
 - 🧭 **When to reach for this** — practical uses & honest limits
@@ -131,7 +131,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </div>
 
-<!-- The plan for the next forty minutes. We start with the boundary you already use every day without looking at it. Then a quick ASGI refresher — ninety seconds, just the three words you need. Then the fun part: the same app running in a browser tab, live. Then we build the thing that makes it possible — a bridge that impersonates Uvicorn in about forty-five lines of Python. Then the production side: Stlite and Gradio-Lite, where this actually ships. Then we go full circle and run the same stack on Cloudflare Workers. And we close with what this is actually good for, and where it honestly breaks down. -->
+<!-- The plan for the next forty minutes. We start with the boundary you already use every day without looking at it. Then a quick ASGI refresher — ninety seconds, just the three words you need. Then the fun part: the same app running in a browser tab, live. Then we build the thing that makes it possible — a bridge that does Uvicorn's job in about forty-five lines of Python. Then the production side: Stlite and Gradio-Lite, where this actually ships. Then we go full circle and run the same stack on Cloudflare Workers. And we close with what this is actually good for, and where it honestly breaks down. -->
 
 ---
 layout: section
@@ -879,40 +879,64 @@ layout: section
 # 🛠️ Building the bridge
 
 <div mt-4 op70>
-Impersonating Uvicorn, one piece at a time
+Doing Uvicorn's job, one piece at a time
 </div>
 
 <!-- Here is the how. Nobody has written that server for us, so we are going to write it — this is the heart of the talk. Everything on the next few slides is real code from the demo repo — bridge.py, slightly trimmed for the screen. -->
 
 ---
 
-# The route of one request
+# The one function we have to write
 
-<div mt-6 flex="~ col" items-center gap-2 text-center>
+<div mt-2 text-lg>
 
-<div flex="~ gap-2" items-center justify-center w-full>
-<div v-click="1" border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-sm flex-1>📄 <b>Frontend JS</b><br><span op70 text-xs>an ordinary HTTP request</span></div>
-<div v-click="2" text-lg op50>→</div>
-<div v-click="2" border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-sm flex-1>🧰 <code>appFetch()</code><br><span op70 text-xs>same signature as <code>fetch()</code></span></div>
-<div v-click="3" text-lg op50>→</div>
-<div v-click="3" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-sm flex-1>🌉 <code>dispatch(app, request)</code><br><span op70 text-xs>bridge.py, in Pyodide</span></div>
-</div>
-
-<div v-click="5" text-2xl op60 my-2>⇅</div>
-
-<div v-click="5" border="~ emerald/40 rounded-lg" px-6 py-3 bg-emerald:8 w-max max-w-full whitespace-nowrap>
-🐍 <code>await app(scope, receive, send)</code><br><span op70 text-sm>the unchanged FastAPI app</span>
-</div>
-
-<div v-click="6" mt-3 text-xl>
-
-Response: **same road back** 🔁
+`bridge.py` — request in, **one ASGI call**, response out:
 
 </div>
 
+```py {*}{'data-id':'skeleton'}
+async def dispatch(app, request):
+    ...
+
+    await app(scope, receive, send)
+
+    ...
+
+    return response
+```
+
+<div v-click="1">
+<div data-id="ann-before" absolute top-36 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ sky/50 rounded-lg" text-sm>
+
+① the **`scope`** · ② **`receive`** + **`send`**
+
+</div>
+<FancyArrow from="[data-id=ann-before] @ left" to="[data-id=skeleton] .line:nth-child(2) @ right" arc="-0.05" />
 </div>
 
-<!-- Before the code, the route of one request, end to end. The frontend JavaScript issues an ordinary HTTP request. That lands in a little function called appFetch, which has the exact same signature as fetch, except its "server" is Pyodide running on the same page. It hands the method, path, headers, and body straight to bridge.py's dispatch, which makes one ASGI call: await app with scope, receive, and send. The app processes it — routing, validation, all the FastAPI machinery — and the response rides the same road back: bridge, a Response object, the page. Two functions on the JS side, one function on the Python side. Now let's zoom into that one Python function. -->
+<div v-click="2">
+<div data-id="ann-after" absolute top-66 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg" text-sm>
+
+collect what the app **sent**
+
+</div>
+<FancyArrow from="[data-id=ann-after] @ left" to="[data-id=skeleton] .line:nth-child(6) @ right" arc="0.05" />
+</div>
+
+<div v-click="3" absolute bottom-12 inset-x-0 text-xl text-center>
+
+Fill in the blanks and you have **a server** 🛠️
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 22px;
+  --slidev-code-line-height: 1.5;
+}
+</style>
+
+<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] Everything before that call is the server's homework — build the scope dict, and implement receive and send. [click] Everything after it is collecting what the app pushed out through send and handing it back. [click] That is genuinely all a server is, once someone else owns the sockets. So let's fill in the blanks, in that order. -->
 
 ---
 
@@ -1024,7 +1048,7 @@ Python objects are **just JS values** — <code>await</code> a coroutine, get a 
 }
 </style>
 
-<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary — two lines to get the objects, one line to call them. And remember appFetch from the route diagram: it has fetch's exact signature and awaits dispatch directly, so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. One note for production: running Python on the page's main thread blocks rendering while it works, so real apps move it to a Web Worker. That costs you a message-passing layer and nothing else — the bridge is identical — and there's an appendix slide plus a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary — two lines to get the objects, one line to call them. And this is the appFetch we sketched a few slides ago: it has fetch's exact signature and awaits dispatch directly, so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. One note for production: running Python on the page's main thread blocks rendering while it works, so real apps move it to a Web Worker. That costs you a message-passing layer and nothing else — the bridge is identical — and there's an appendix slide plus a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
 
 ---
 
@@ -1160,7 +1184,7 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 layout: statement
 ---
 
-## Something in that tab is<br>**impersonating Uvicorn**.
+## Something in that tab is<br>**doing Uvicorn's job**.
 
 <div mt-8 text-2xl op80 v-click="1">
 
@@ -1168,7 +1192,7 @@ But a tidy demo is not proof. 🧐<br>Does the contract survive a **real framewo
 
 </div>
 
-<!-- So that's the trick, stated honestly: something in that tab is impersonating Uvicorn — and the impersonation was small enough to read in a talk, which is the part I find genuinely lovely. But let's be honest with ourselves: a demo app with three endpoints is a tidy little world. Real frameworks are messy. Static files, sessions, realtime updates, state everywhere. Does the contract survive contact with one of those? -->
+<!-- So that's the trick, stated honestly: something in that tab is doing Uvicorn's job — and that something was small enough to read in a talk, which is the part I find genuinely lovely. But let's be honest with ourselves: a demo app with three endpoints is a tidy little world. Real frameworks are messy. Static files, sessions, realtime updates, state everywhere. Does the contract survive contact with one of those? -->
 
 ---
 layout: section

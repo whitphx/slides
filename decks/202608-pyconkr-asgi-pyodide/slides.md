@@ -146,35 +146,34 @@ layout: section
 <!-- Let's start with the thing you already do, probably every week. -->
 
 ---
+clicks: 1
+---
 
 # You deploy this pair every week
 
-<div grid="~ cols-2" gap-5 mt-4>
+<div class="deploy-grid" mt-4 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
 
-<div>
+<div class="deploy-cell">
 
-An excerpt from today's demo app — ordinary FastAPI:
+<div text-sm mb-1>Demo app — <b>ordinary FastAPI</b></div>
 
-```py {*}{maxHeight:'260px'}
+```py {*}
 import platform, sys
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-@app.get("/api/runtime", response_class=HTMLResponse)
+@app.get("/api/runtime")
 async def runtime() -> str:
-    return (
-        f"<p>Python {platform.python_version()} on "
-        f"<strong>{sys.platform}/{platform.machine()}</strong></p>"
-    )
+    py = platform.python_version()
+    return f"Python {py} on {sys.platform}"
 ```
 
 </div>
 
-<div v-click="1">
+<div class="deploy-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
 
-…and the way everyone runs it:
+<div text-sm mb-1>…and how everyone runs it</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -197,6 +196,24 @@ Uvicorn: ***how* requests arrive**
 </div>
 
 </div>
+
+<style>
+/* Sized so the longest line still fits once the grid halves the code column. */
+* {
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.6;
+}
+.deploy-grid {
+  display: grid;
+  gap: 1.25rem;
+  transition: grid-template-columns 700ms ease;
+}
+.deploy-cell {
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity 700ms ease 250ms;
+}
+</style>
 
 <!-- This is an excerpt from the demo app we'll use all day. It has an endpoint that answers the question "where am I running?" — it reports the Python version and the platform. Completely ordinary FastAPI; if you've written any, this is muscle memory. And on the right, the way everyone runs it: uvicorn app dot main colon app. Done. But notice the division of labor here, because it's the whole talk. Your app defines what to answer. Uvicorn deals with how requests arrive — sockets, HTTP parsing, all of it. Your code and Uvicorn's code never actually touch. Something sits between them. -->
 
@@ -333,24 +350,65 @@ async def app(scope, receive, send):
 <!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
 
 ---
+clicks: 1
+---
 
 # You don't even need a framework
 
-<div mt-1 text-base>
+<div class="framework-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
 
-A complete ASGI app, no framework needed:
+<div class="framework-cell">
 
-</div>
+<div text-sm mb-1>A complete ASGI app — <b>no framework</b></div>
 
-<<< @/samples/raw-asgi/raw_asgi.py py {*|2|3-7|8-11|*}{maxHeight:'340px'}
-
-<div v-click="4" mt-2 text-lg text-center>
-
-**Whoever calls `app(...)` = the server** 🖥️
+<<< @/samples/raw-asgi/raw_asgi.py py {*}
 
 </div>
 
-<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That's a whole working web app — you could serve this with Uvicorn right now. Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite — one test drives it by hand, one through httpx — so what you're reading is verified working code. -->
+<div class="framework-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+
+<div text-sm mb-1>…and Uvicorn serves it, no questions asked</div>
+
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+$ uvicorn raw_asgi:app
+INFO:  Uvicorn running on
+       http://127.0.0.1:8000
+
+$ curl -i localhost:8000
+HTTP/1.1 200 OK
+content-type: text/plain
+
+Hello, PyCon KR!
+```
+
+</WindowMockup>
+
+<div mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
+
+</div>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 13px;
+  --slidev-code-line-height: 1.55;
+}
+.framework-grid {
+  display: grid;
+  gap: 1.25rem;
+  transition: grid-template-columns 700ms ease;
+}
+.framework-cell {
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app. [click] And here it is running — I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, curl it, and get a real HTTP response back. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
 
 ---
 
@@ -391,10 +449,40 @@ Today: **`http`** + `lifespan` ✅
 <!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. The nice part is they all share the same receive-and-send loop, so once you understand one, the others are variations. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP, with a quick look at lifespan. WebSocket works exactly the same way in spirit, and I've put the details in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
 
 ---
+clicks: 1
+---
 
 # Demo, step 1: the normal case
 
-<div grid="~ cols-2" gap-5 mt-4>
+<div class="demo-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
+
+<div class="demo-cell">
+
+<div text-sm mb-1><code>app/main.py</code> <span op70>— the whole demo app, abridged</span></div>
+
+```py {*}
+app = FastAPI()
+
+@app.get("/")
+async def index() -> str:
+    return PAGE          # the frontend page
+
+@app.get("/api/runtime")
+async def runtime() -> str:
+    return f"Python {py} on {sys.platform}"
+
+@app.post("/api/count")
+async def increment() -> str:
+    global count
+    count += 1
+    return f"Count: {count}"
+```
+
+</div>
+
+<div class="demo-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+
+<div text-sm mb-1>…run it, open the page, click the button</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -406,34 +494,44 @@ INFO:  Uvicorn running on
 
 </WindowMockup>
 
+<div mt-3>
+
 <WindowMockup title="http://127.0.0.1:8000" light>
 
-<div p-4 text-sm>
-
-**Runtime**
-
-<button border="~ gray/40 rounded" px-2 py-1 text-sm bg-gray:10>Where am I running?</button>
-
-<div v-click="1" mt-2 font-mono>
-
-Python 3.12 on **darwin/arm64** 🖥️
-
-</div>
-
+<div p-3>
+<div text-base font-bold mb-2>Runtime</div>
+<button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
+<div mt-2 font-mono text-sm>Python 3.12 on <b>darwin/arm64</b> 🖥️</div>
 </div>
 
 </WindowMockup>
 
 </div>
 
-<div v-click="2" mt-6 text-center text-xl>
-
-**Nothing surprising — yet.**<br>
-<span text-base op70>📎 <a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">github.com/whitphx/runtime-agnostic-asgi-app-example</a></span>
+</div>
 
 </div>
 
-<!-- So here's our demo app in its natural habitat — step one of three. I run it with Uvicorn, open localhost:8000, and there's a little page with a button: "Where am I running?" Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. The whole repo is on GitHub at that link — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
+<div mt-2 text-center text-sm op70>📎 <a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">github.com/whitphx/runtime-agnostic-asgi-app-example</a></div>
+
+<style>
+* {
+  --slidev-code-font-size: 13px;
+  --slidev-code-line-height: 1.5;
+}
+.demo-grid {
+  display: grid;
+  gap: 1.25rem;
+  transition: grid-template-columns 700ms ease;
+}
+.demo-cell {
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And here it is in its natural habitat: uvicorn app.main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. The whole repo is at that link — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
 
 ---
 
@@ -497,7 +595,7 @@ A server inside your browser
 
 </div>
 
-<div grid="~ cols-2" gap-8 mt-6 items-center>
+<div grid="~ cols-[2fr_1fr]" gap-8 mt-6 items-center>
 
 <div>
 
@@ -512,11 +610,11 @@ A server inside your browser
 
 </div>
 
-<div v-click="5" border="~ gray/40 rounded-lg" p-4 bg-gray:5 text-center>
-<div text-sm op70 mb-2>Browser tab</div>
+<div v-click="5" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
+<div text-xs op70 mb-2>Browser tab</div>
+<div border="~ violet/40 rounded" p-2 bg-violet:5 text-sm>🐍 Pyodide<br><span text-xs op80>CPython on WASM</span></div>
+<div text-xl op50 my-1>⇅</div>
 <div border="~ sky/40 rounded" p-2 bg-sky:5 text-sm>🌐 JavaScript / DOM</div>
-<div text-2xl op50 my-1>⇅</div>
-<div border="~ violet/40 rounded" p-2 bg-violet:5 text-sm>🐍 Pyodide — CPython on WASM</div>
 </div>
 
 </div>
@@ -640,7 +738,7 @@ Impersonating Uvicorn, one piece at a time
 <div mt-6 flex="~ col" items-center gap-2 text-center>
 
 <div flex="~ gap-2" items-center justify-center w-full>
-<div v-click="1" border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-sm flex-1>📄 UI (htmx)<br><span op70 text-xs>an ordinary request</span></div>
+<div v-click="1" border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-sm flex-1>📄 <b>Frontend JS</b><br><span op70 text-xs>an ordinary HTTP request</span></div>
 <div v-click="2" text-lg op50>→</div>
 <div v-click="2" border="~ teal/40 rounded-lg" p-2 bg-teal:8 text-sm flex-1>🧰 <code>appFetch()</code><br><span op70 text-xs>same signature as <code>fetch()</code></span></div>
 <div v-click="3" text-lg op50>→</div>
@@ -651,7 +749,7 @@ Impersonating Uvicorn, one piece at a time
 
 <div v-click="5" text-2xl op60 my-2>⇅</div>
 
-<div v-click="5" border="~ emerald/40 rounded-lg" p-3 bg-emerald:8 w-100>
+<div v-click="5" border="~ emerald/40 rounded-lg" px-6 py-3 bg-emerald:8 w-max max-w-full whitespace-nowrap>
 🐍 <code>await app(scope, receive, send)</code><br><span op70 text-sm>the unchanged FastAPI app</span>
 </div>
 
@@ -663,7 +761,7 @@ Response: **same road back** 🔁
 
 </div>
 
-<!-- Before the code, the route of one request, end to end. The UI — it's htmx in the demo — issues an ordinary request. That lands in a little function called appFetch, which has the exact same signature as fetch, except its "server" is a Web Worker. It posts the method, path, headers, and body to the worker as a plain message. Inside the worker, bridge.py's dispatch function picks it up… and makes one ASGI call: await app with scope, receive, and send. The app processes it — routing, validation, all the FastAPI machinery — and the response rides the same road back: bridge, postMessage, a Response object, the UI. Two functions on the JS side, one function on the Python side. Now let's zoom into that one Python function. -->
+<!-- Before the code, the route of one request, end to end. The frontend JavaScript issues an ordinary HTTP request. That lands in a little function called appFetch, which has the exact same signature as fetch, except its "server" is a Web Worker. It posts the method, path, headers, and body to the worker as a plain message. Inside the worker, bridge.py's dispatch function picks it up… and makes one ASGI call: await app with scope, receive, and send. The app processes it — routing, validation, all the FastAPI machinery — and the response rides the same road back: bridge, message, a Response object, the page. Two functions on the JS side, one function on the Python side. Now let's zoom into that one Python function. -->
 
 ---
 

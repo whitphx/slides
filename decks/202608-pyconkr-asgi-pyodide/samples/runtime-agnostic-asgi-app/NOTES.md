@@ -77,3 +77,15 @@ For roughly a minute after `pywrangler deploy`, requests intermittently returned
 UV_INDEX_URL=https://pypi.org/simple uv lock
 cd step3-cloudflare && UV_INDEX_URL=https://pypi.org/simple uv lock
 ```
+
+## Step 2 runs Pyodide on the main thread on purpose
+
+`step2-browser/` calls `dispatch` straight from `appFetch`, so the path from a
+request to an ASGI call is one function call with nothing in between. That is
+the clearest version to read, and it is what the talk shows.
+
+It is not what you would ship: Python on the main thread blocks rendering and
+input while it runs. `step2b-browser-worker/` is the same demo with Pyodide in
+a Web Worker, which is the shape Stlite uses. The bridge, the scope dict, and
+the app are identical between the two; only the transport between `appFetch`
+and `dispatch` differs.

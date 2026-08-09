@@ -1,4 +1,5 @@
 // Runs the FastAPI app inside Pyodide, in a Web Worker.
+// Same bridge as step2-browser; only the thread it runs on differs.
 import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v314.0.4/full/pyodide.mjs";
 
 async function boot() {
@@ -10,7 +11,7 @@ async function boot() {
   // Load the exact same main.py that Uvicorn serves in step 1.
   for (const [url, filename] of [
     ["../main.py", "main.py"],
-    ["./bridge.py", "bridge.py"],
+    ["../step2-browser/bridge.py", "bridge.py"],
   ]) {
     const source = await (await fetch(url)).text();
     pyodide.FS.writeFile(filename, source);

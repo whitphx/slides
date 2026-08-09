@@ -1,6 +1,7 @@
 """The claim the slide makes: a FastAPI `app` is itself an ASGI application.
 
-No test client, no server. The tests call the object the way a server would.
+No test client, no server. The tests call the object the way a server would,
+and assert exactly what the slide's REPL session shows.
 """
 
 import inspect
@@ -9,13 +10,12 @@ import json
 from app import app
 
 
-def test_app_object_takes_the_asgi_signature():
+def test_app_takes_the_asgi_parameters():
     assert callable(app)
-    parameters = list(inspect.signature(type(app).__call__).parameters)
-    assert parameters == ["self", "scope", "receive", "send"]
+    assert list(inspect.signature(app).parameters) == ["scope", "receive", "send"]
 
 
-async def test_calling_the_app_directly_answers_the_request():
+async def test_awaiting_the_app_sends_the_response():
     scope = {
         "type": "http",
         "asgi": {"version": "3.0", "spec_version": "2.3"},
@@ -36,7 +36,12 @@ async def test_calling_the_app_directly_answers_the_request():
     async def send(event):
         events.append(event)
 
-    await app(scope, receive, send)
+    # The call returns nothing; the response leaves through `send`.
+    assert await app(scope, receive, send) is None
+    assert [event["type"] for event in events] == [
+        "http.response.start",
+        "http.response.body",
+    ]
 
     start, *body_events = events
     assert start["status"] == 200

@@ -7,8 +7,8 @@
         <div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5">
           <div class="text-center text-xs op60 mb-1">🐍 Pyodide</div>
           <div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight min-h-13">
-            🐍 <b><code>app/main.py</code></b><br>
-            <span class="text-xs op80">FastAPI</span>
+            🐍 <b><code>app</code></b> <span class="op70">in <code>main.py</code></span><br>
+            <span class="text-xs op80">ASGI application (FastAPI)</span>
           </div>
           <div class="text-center text-xs op60 my-0.5">⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
           <div class="border border-sky-400/40 rounded-lg p-2 bg-sky-400/10 text-center leading-tight min-h-13">

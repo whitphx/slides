@@ -1,0 +1,18 @@
+[project]
+name = "runtime-agnostic-asgi-app-example"
+version = "0.1.0"
+description = "One FastAPI app running on Uvicorn, in the browser via Pyodide, and on Cloudflare Workers"
+readme = "README.md"
+authors = [
+    { name = "Yuichiro Tachibana (Tsuchiya)", email = "t.yic.yt@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "python-multipart>=0.0.32",
+]
+
+[dependency-groups]
+dev = [
+    "uvicorn>=0.52.1",
+]

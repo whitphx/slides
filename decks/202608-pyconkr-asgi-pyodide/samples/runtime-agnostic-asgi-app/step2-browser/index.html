@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step 2: FastAPI in the browser (Pyodide)</title>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta6/dist/htmx.min.js" integrity="sha384-6lyVbhrs13b9z7mLOpt/N6R76rtkEBWgCjAXRs/DSWyi2AMnQSs10ijWk+PI8n7W" crossorigin="anonymous"></script>
+</head>
+<body>
+<p id="status" style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto;">
+  Loading the Python runtime in a Web Worker…
+</p>
+<div id="app"></div>
+<script type="module">
+  import { appFetch } from "./main.js";
+
+  // Route every htmx-triggered request to the in-browser app.
+  document.body.addEventListener("htmx:before:request", (event) => {
+    event.detail.ctx.fetch = appFetch;
+  });
+
+  const response = await appFetch("/");
+  document.querySelector("#app").innerHTML = await response.text();
+  htmx.process(document.querySelector("#app"));
+  document.querySelector("#status").remove();
+</script>
+</body>
+</html>

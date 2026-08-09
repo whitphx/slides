@@ -178,7 +178,7 @@ async def runtime() -> str:
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-$ uvicorn app.main:app
+$ uvicorn main:app
 INFO:  Started server process
 INFO:  Uvicorn running on
        http://127.0.0.1:8000
@@ -269,7 +269,7 @@ Same motivation, one standard earlier — **the synchronous era**:
 <div op80 text-sm mt-1><b>One sync call</b> — request → response, done</div>
 </div>
 
-<div self-center text-2xl op60>→</div>
+<div v-click="2" self-center text-2xl op60>→</div>
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 <div text-lg>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
@@ -349,22 +349,22 @@ async def app(scope, receive, send):
 <!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
 
 ---
-clicks: 2
+clicks: 6
 ---
 
 # You don't even need a framework
 
-<div class="framework-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
+<div class="framework-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 5 ? '1fr 1fr' : '1fr 0fr' }">
 
 <div class="framework-cell">
 
 <div text-sm mb-1>A complete ASGI app — <b>no framework</b></div>
 
-<<< @/samples/raw-asgi/raw_asgi.py py {*}
+<<< @/samples/raw-asgi/raw_asgi.py py {*|1|2|3-7|8-11|*}
 
 </div>
 
-<div class="framework-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="framework-cell" :class="$clicks >= 5 ? 'op100' : 'op0'">
 
 <div text-sm mb-1>…and Uvicorn serves it, no questions asked</div>
 
@@ -376,7 +376,7 @@ INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
 
-<div v-click="2">
+<div v-click="6">
 
 ```shell
 $ curl -i localhost:8000
@@ -390,7 +390,7 @@ Hello, PyCon KR!
 
 </WindowMockup>
 
-<div v-click="2" mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
+<div v-click="6" mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
 
 </div>
 
@@ -413,7 +413,66 @@ Hello, PyCon KR!
 }
 </style>
 
-<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
+<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app — and it is worth walking through, because every line is doing something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be handed HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, carrying the status and the headers. [click] And the second: response.body, carrying the bytes. Two sends, and the response is complete. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
+
+---
+clicks: 2
+---
+
+# So what does a framework give you?
+
+<div class="fw-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
+
+<div class="fw-cell">
+
+<div text-sm mb-1>FastAPI — routing, validation, docs…</div>
+
+<<< @/samples/fastapi-is-asgi/app.py py {*}
+
+</div>
+
+<div class="fw-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+
+<div text-sm mb-1>…and <code>app</code> is <b>still just the callable</b></div>
+
+```py {*}
+>>> callable(app)
+True
+
+>>> signature(type(app).__call__)
+(self, scope, receive, send)
+
+>>> await app(scope, receive, send)
+```
+
+<div v-click="2" mt-3 text-center text-lg leading-tight>
+
+🎁 A framework is a **nicer way to write the same callable**
+
+</div>
+
+</div>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 19px;
+  --slidev-code-line-height: 1.5;
+}
+.fw-grid {
+  display: grid;
+  gap: 1.25rem;
+  transition: grid-template-columns 700ms ease;
+}
+.fw-cell {
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- So if eleven lines is a working app, what is FastAPI for? All the things you actually want: routing, request parsing, validation, dependency injection, generated docs. You write decorated functions instead of dictionaries. [click] But here's the part that matters today — the thing FastAPI hands you, this app object, is not some special framework construct that a server has to know about. It defines __call__ with exactly three parameters: scope, receive, send. It IS an ASGI application, in the same sense our eleven lines were. You can await it directly, no server anywhere, and it answers. That's checked by a test in the repo, by the way — it reads the signature off type(app).__call__ and calls the object by hand. [click] So a framework is not a different kind of thing from what we just wrote. It is a much nicer way to write the same callable. Which means anything that can call our eleven lines can call FastAPI too — hold that thought. -->
 
 ---
 
@@ -463,7 +522,7 @@ clicks: 1
 
 <div class="demo-cell">
 
-<div text-sm mb-1><code>app/main.py</code> <span op70>— the demo app (abridged)</span></div>
+<div text-sm mb-1><code>main.py</code> <span op70>— the demo app (abridged)</span></div>
 
 ```py {*}
 app = FastAPI()
@@ -486,7 +545,7 @@ async def runtime() -> str:
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-$ uv run uvicorn app.main:app
+$ uv run uvicorn main:app
 INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
@@ -548,7 +607,7 @@ The server half = **Uvicorn**. Watch that box 👀
 
 </div>
 
-<!-- Before we break anything, let's map what just happened, top-down. At the top, your app — app/main.py. Below it, Uvicorn, doing the whole server half: it accepts TCP connections, parses the HTTP bytes, builds a scope, and calls the app with scope, receive, and send — the interface we just learned. Both live in a CPython process on some machine. And at the bottom, the browser page, talking to it over the actual network. Completely ordinary. But keep your eye on Uvicorn's box — the sky-blue one — because the entire rest of this talk is about what else can sit in it. -->
+<!-- Before we break anything, let's map what just happened, top-down. At the top, your app — main.py. Below it, Uvicorn, doing the whole server half: it accepts TCP connections, parses the HTTP bytes, builds a scope, and calls the app with scope, receive, and send — the interface we just learned. Both live in a CPython process on some machine. And at the bottom, the browser page, talking to it over the actual network. Completely ordinary. But keep your eye on Uvicorn's box — the sky-blue one — because the entire rest of this talk is about what else can sit in it. -->
 
 ---
 layout: statement
@@ -642,7 +701,7 @@ Pyodide logo by the Pyodide project, CC BY 4.0
 
 <v-clicks>
 
-- 📄 Static page + Pyodide + **the same `app/main.py`**
+- 📄 Static page + Pyodide + **the same `main.py`**
 - 🖱️ "Where am I running?" → `Python 3.14 on emscripten/wasm32` 🤯
 - 🕵️ Network tab: **silent**
 - ✂️ Kill the file server → **still answering**
@@ -663,7 +722,7 @@ Responses made **inside the tab** — nothing leaves it.
 
 <!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide in a Web Worker and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there.
 
-[DEMO SETUP] Serve the repo root, not step2-browser/ — the worker loads ../app/main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and the worker never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but app/main.py and bridge.py come from that server. -->
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the worker loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and the worker never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but app/main.py and bridge.py come from that server. -->
 
 ---
 clicks: 1
@@ -851,21 +910,13 @@ Strict types — headers `(bytes, bytes)` · path `str` · query `bytes`<br>
 
 # ③ Call it from JavaScript
 
-<div mt-1 text-sm><code>worker.js</code> — boot Pyodide, then reach into it for <code>dispatch</code>:</div>
+<div mt-1 text-sm><code>worker.js</code> — once Pyodide has booted, reach in for <code>app</code> and <code>dispatch</code>:</div>
 
-```js {*}{maxHeight:'330px'}
-const pyodide = await loadPyodide();
-await pyodide.runPythonAsync(
-  "from main import app\nfrom bridge import dispatch"
-);
+<<< @/samples/runtime-agnostic-asgi-app/step2-browser/worker.js#slide-call js {*}
 
-const app = pyodide.globals.get("app");        // the FastAPI app
-const dispatch = pyodide.globals.get("dispatch");  // our bridge
+<div mt-2 text-sm>…then every request is one call across the boundary:</div>
 
-// one request in → one ASGI call → one response out
-const result = await dispatch(app, pyodide.toPy(request));
-const response = result.toJs({ dict_converter: Object.fromEntries });
-```
+<<< @/samples/runtime-agnostic-asgi-app/step2-browser/worker.js#slide-dispatch js {*}
 
 <div mt-3 text-center text-lg>
 
@@ -1172,19 +1223,7 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 
 </div>
 
-```py {*|1,4|8-11|*}{maxHeight:'300px'}
-import asgi
-from workers import WorkerEntrypoint
-
-from main import app   # ← the exact same FastAPI app, unchanged
-
-
-class Default(WorkerEntrypoint):
-    async def fetch(self, request):
-        # asgi.fetch is the SDK's ASGI bridge: the production-grade
-        # version of what step2's bridge.py does by hand.
-        return await asgi.fetch(app, request, self.env, self.ctx)
-```
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,6|9-13|*}{maxHeight:'320px'}
 
 <div v-click="4" mt-3 text-center>
 
@@ -1255,7 +1294,7 @@ Same app on top — **only the server half changes** ☁️
   title="① Server"
   env="your machine / cloud VM"
   :layers="[
-    { label: 'app/main.py', note: 'FastAPI', kind: 'app' },
+    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
     { label: 'Uvicorn', note: 'HTTP over TCP sockets', kind: 'caller' },
     { label: 'CPython 3.12', note: 'native process', kind: 'runtime' },
   ]"
@@ -1266,7 +1305,7 @@ Same app on top — **only the server half changes** ☁️
   title="② Browser"
   env="each visitor's tab"
   :layers="[
-    { label: 'app/main.py', note: 'FastAPI', kind: 'app' },
+    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
     { label: 'bridge.py', note: 'postMessage from the page', kind: 'caller' },
     { label: 'Pyodide 3.14', note: 'WASM, in a Web Worker', kind: 'runtime' },
   ]"
@@ -1277,7 +1316,7 @@ Same app on top — **only the server half changes** ☁️
   title="③ Edge"
   env="Cloudflare's network"
   :layers="[
-    { label: 'app/main.py', note: 'FastAPI', kind: 'app' },
+    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
     { label: 'SDK asgi module', note: 'JS Request / Response', kind: 'caller' },
     { label: 'Pyodide 3.13', note: 'WASM, on workerd', kind: 'runtime' },
   ]"

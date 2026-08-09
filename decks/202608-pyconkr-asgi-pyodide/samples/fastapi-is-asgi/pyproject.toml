@@ -1,0 +1,18 @@
+[project]
+name = "fastapi-is-asgi"
+version = "0.1.0"
+description = "Shows that a FastAPI app object is itself an ASGI callable"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

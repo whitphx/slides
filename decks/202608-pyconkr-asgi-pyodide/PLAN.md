@@ -132,6 +132,7 @@ Beat 1 gained a WSGI → ASGI lineage slide: same decoupling motivation, WSGI's 
 
 ## Build notes
 
+- `samples/runtime-agnostic-asgi-app/` is the vendored three-runtime demo (formerly the separate `whitphx/runtime-agnostic-asgi-app-example` repo, now superseded by this copy). Slides import its real files through `slide-*` region markers, so the code on screen cannot drift from the code that runs.
 - `samples/` is a self-contained uv project holding the "You don't even need a framework" code (`raw_asgi.py`), imported into the slide via `<<< @/samples/raw_asgi.py`. `uv run pytest` verifies it (a hand-rolled `scope`/`receive`/`send` test plus an httpx `ASGITransport` one); `uv run uvicorn raw_asgi:app` serves it. Edit the file, not the slide. Re-lock with `UV_DEFAULT_INDEX=https://pypi.org/simple uv lock`: this machine's uv config defaults to a private mirror, and a lockfile pinning it is unresolvable for anyone else cloning this public repo.
 - Demo-runbook details (serve the demo repo from its root; warm the Workers deployment before presenting) live in the presenter notes of the slides they apply to, sourced from the demo repo's `NOTES.md`.
 - Slide text follows the density policy in `.claude/skills/slidev-deck/SKILL.md` (keywords on slides, sentences in notes).

@@ -917,7 +917,7 @@ async def dispatch(app, request):
 <div v-click="2">
 <div data-id="ann-after" absolute top-66 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg" text-sm>
 
-collect what the app **sent**
+③ collect what the app **sent**
 
 </div>
 <FancyArrow from="[data-id=ann-after] @ left" to="[data-id=skeleton] .line:nth-child(6) @ right" arc="0.05" />
@@ -982,13 +982,13 @@ Filling this dict correctly **is** what "implementing the server" means
 
 # ② Wire up `receive` and `send`
 
-<div mt-0 text-lg>
+<div mt-1 text-lg>
 
 `receive`: **body in** · `send`: **response out**
 
 </div>
 
-```py {*|1-3|5-11|13-15|*}{maxHeight:'360px','data-id':'wire-up'}
+```py {*|1-3|5-11|*}{maxHeight:'330px','data-id':'wire-up'}
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
@@ -1000,50 +1000,100 @@ Filling this dict correctly **is** what "implementing the server" means
             status, headers = event["status"], event["headers"]
         elif event["type"] == "http.response.body":
             chunks.append(bytes(event.get("body", b"")))
+```
 
+<div v-click="3" mt-3 text-center text-lg>
+
+An **inbox** and an **outbox** — that's the whole server side 📥📤
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 18px;
+  --slidev-code-line-height: 1.45;
+}
+</style>
+
+<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. [click] send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We don't interpret any of it; we just listen and stash. [click] And that is the whole server side of the contract: an inbox the app pulls from, an outbox it pushes to. Two closures over a few local variables. -->
+
+---
+
+# ③ Run the app, return the response
+
+<div mt-1 text-lg>
+
+**One call** — then collect what `send` gathered:
+
+</div>
+
+```py {*|1|2-3|*}{'data-id':'run-app'}
     await app(scope, receive, send)
     response = {"status": status, "headers": headers, "body": b"".join(chunks)}
     return response
 ```
 
-<div v-click="4">
-<div data-id="ann-server" mt-1 w-max mx-auto text-base text-center>
+<div v-click="3">
+<div data-id="ann-server" mt-10 w-max mx-auto text-xl text-center>
 
 `scope` + `receive` + `send` + `await app(...)` = **a server**
 
 </div>
-<FancyArrow from="[data-id=ann-server] @ topleft" to="[data-id=wire-up] .line:nth-child(13) span:nth-child(2) @ bottom" arc="0.3" color="red" />
+<FancyArrow from="[data-id=ann-server] @ topleft" to="[data-id=run-app] .line:nth-child(1) span:nth-child(2) @ bottom" arc="0.3" color="red" />
 </div>
 
 <style>
 * {
-  --slidev-code-font-size: 15px;
-  --slidev-code-line-height: 1.35;
+  --slidev-code-font-size: 17px;
+  --slidev-code-line-height: 1.6;
 }
 </style>
 
-<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We just listen and stash. And then the punchline, one line: await app with our scope, our receive, our send. When it returns, we assemble the response and hand it back to JavaScript. That's it. That's a complete HTTP server — no sockets, no parser, no port. Just a function that fulfills a contract. -->
+<!-- And here is the punchline the whole section was walking towards, and it is one line. [click] Await the app, with our scope, our receive, our send. That is the call. Everything on the last three slides existed to make those three arguments. [click] When the coroutine returns, the response is already sitting in the variables send filled in — status, headers, and the body chunks joined together — so we package them up and hand them back to JavaScript. [click] And that is the whole thing. A scope, a receive, a send, and one await. No sockets, no HTTP parsing, no port, no process. Just a function that fulfills a contract. -->
 
 ---
 
-# ③ Call it from JavaScript
+# ④ Call it from JavaScript
 
 <div mt-1 text-sm><code>main.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-call js {*}
 
-<div mt-2 text-sm>…then every request is one call across the boundary:</div>
+<div mt-2 text-sm>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-dispatch js {1-7,10|10|*}{'data-id':'dispatch-js'}
+```js {1-2,5,8-12|1,8-12|5|*}{'data-id':'dispatch-js'}
+export async function appFetch(input, init) {
+  const jsRequest = { ... };
 
-<div v-click="2">
-<div data-id="ann-ffi" absolute top-68 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
+  const pyRequest = pyodide.toPy(jsRequest);
+  const result = await dispatch(app, pyRequest);
+  const response = result.toJs({ dict_converter: Object.fromEntries });
+
+  return new Response(response.body, {
+    status: response.status,
+    headers: response.headers,
+  });
+}
+```
+
+<div v-click="[1,2]">
+<div data-id="ann-sig" absolute top-40 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ teal/60 rounded-lg" text-sm>
+
+`fetch()`'s exact shape — **`Request` in, `Response` out**
+
+</div>
+<FancyArrow from="[data-id=ann-sig] @ left" to="[data-id=dispatch-js] .line:nth-child(1) @ right" arc="-0.15" />
+<FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(8) @ right" arc="0.25" />
+</div>
+
+<div v-click="3">
+<div data-id="ann-ffi" absolute bottom-4 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
 
 **Pyodide's FFI** — values get converted <span op70>(→ appendix)</span>
 
 </div>
-<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(8) @ right" arc="0.2" color="red" />
-<FancyArrow from="[data-id=ann-ffi] @ bottom" to="[data-id=dispatch-js] .line:nth-child(12) @ right" arc="-0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ top" to="[data-id=dispatch-js] .line:nth-child(4) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(6) @ right" arc="0.2" color="red" />
 </div>
 
 <style>
@@ -1053,7 +1103,7 @@ Filling this dict correctly **is** what "implementing the server" means
 }
 </style>
 
-<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. Then a request comes in, and we build a plain JavaScript object out of it — method, path, query, headers, body. [click] And here is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it exactly like a Promise. This is the appFetch we sketched earlier: it has fetch's exact signature and awaits dispatch directly, so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. [click] Now the two lines I greyed out. Because we are sitting on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. I have an appendix slide on what that costs and where it bites — ask me in Q&A. One more production note: running Python on the page's main thread blocks rendering, so real apps move it to a Web Worker; the bridge is identical, and there is a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. And the thing we wrap them in is appFetch — the function we sketched before the section started. [click] Look at its two ends, because they are the whole design. It takes input and init, exactly what fetch takes, and it returns a Response, exactly what fetch returns. Anything on the page that can call fetch can call this instead and never notice. [click] In between is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it exactly like a Promise. [click] Now the two lines I greyed out. Because we are sitting on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. I have an appendix slide on what that costs and where it bites — ask me in Q&A. One more production note: running Python on the page's main thread blocks rendering, so real apps move it to a Web Worker; the bridge is identical, and there is a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
 
 ---
 layout: statement

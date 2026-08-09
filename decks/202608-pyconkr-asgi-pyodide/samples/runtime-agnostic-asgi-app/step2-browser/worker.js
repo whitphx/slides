@@ -17,12 +17,8 @@ async function boot() {
   }
 
   // region slide-call
-  await pyodide.runPythonAsync(`
-from main import app
-from bridge import dispatch
-`);
-  const app = pyodide.globals.get("app");
-  const dispatch = pyodide.globals.get("dispatch");
+  const { app } = pyodide.pyimport("main");
+  const { dispatch } = pyodide.pyimport("bridge");
   // endregion slide-call
   return { app, dispatch, toPy: (value) => pyodide.toPy(value) };
 }

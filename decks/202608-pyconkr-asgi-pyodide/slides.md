@@ -413,7 +413,7 @@ Hello, PyCon KR!
 }
 </style>
 
-<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app — and it is worth walking through, because every line is doing something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be handed HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, carrying the status and the headers. [click] And the second: response.body, carrying the bytes. Two sends, and the response is complete. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — hold that thought, we come back to it when we build the bridge. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
+<!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app — and it is worth walking through, because every line is doing something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be handed HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, carrying the status and the headers. [click] And the second: response.body, carrying the bytes. Two sends, and the response is complete. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — our bridge ignores it too, and there is an appendix slide on it if anyone asks. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
 
 ---
 clicks: 2
@@ -506,11 +506,11 @@ True
 
 <div v-click="4" mt-8 text-center text-xl>
 
-Today: **`http`** + `lifespan` ✅
+Today: **`http`** — it carries the whole idea ✅
 
 </div>
 
-<!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. The nice part is they all share the same receive-and-send loop, so once you understand one, the others are variations. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP, with a quick look at lifespan. WebSocket works exactly the same way in spirit, and I've put the details in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
+<!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. The nice part is they all share the same receive-and-send loop, so once you understand one, the others are variations. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP. WebSocket and lifespan work the same way in spirit, and I've put both in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
 
 ---
 clicks: 1
@@ -862,7 +862,7 @@ From `bridge.py` — JS request → **the dict ASGI specifies**:
 
 </div>
 
-```py {*|3|6-8|10-12|*}
+```py {*|3|6-8|10-11|*}
 async def dispatch(app, request):
     scope = {
         "type": "http",
@@ -873,8 +873,7 @@ async def dispatch(app, request):
         "path": request["path"],
         "raw_path": request["path"].encode(),
         "query_string": request["query"].encode(),
-        "headers": [(k.lower().encode(), v.encode())
-                    for k, v in request["headers"]],
+        "headers": [(k.lower().encode(), v.encode()) for k, v in request["headers"]],
     }
 ```
 
@@ -886,7 +885,7 @@ Filling this dict correctly **is** what "implementing the server" means
 
 <style>
 * {
-  --slidev-code-font-size: 15px;
+  --slidev-code-font-size: 16px;
   --slidev-code-line-height: 1.45;
 }
 </style>
@@ -939,7 +938,7 @@ Filling this dict correctly **is** what "implementing the server" means
 
 # ③ Call it from JavaScript
 
-<div mt-1 text-sm><code>worker.js</code> — once Pyodide has booted, reach in for <code>app</code> and <code>dispatch</code>:</div>
+<div mt-1 text-sm><code>worker.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/worker.js#slide-call js {*}
 
@@ -955,12 +954,12 @@ Python objects are **just JS values** — <code>await</code> a coroutine, get a 
 
 <style>
 * {
-  --slidev-code-font-size: 17px;
+  --slidev-code-font-size: 20px;
   --slidev-code-line-height: 1.5;
 }
 </style>
 
-<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, inside the Web Worker. Boot Pyodide, run two import statements, and then the interesting bit: pyodide.globals.get pulls the app and our dispatch function straight out of the Python namespace and hands them back as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary. And remember appFetch from the route diagram: it has fetch's exact signature, posts the request here, and awaits what comes back — so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. -->
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, inside the Web Worker. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary — two lines to get the objects, one line to call them. And remember appFetch from the route diagram: it has fetch's exact signature, posts the request here, and awaits what comes back — so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. -->
 
 ---
 
@@ -1003,47 +1002,6 @@ Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
 </div>
 
 <!-- Now, one layer real servers don't have: the foreign function interface between JavaScript and Python. And I can tell you from years of this — the bugs live here. Four things to know. JS objects arrive in Python as proxies, not dicts — convert explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer — that matters when someone uploads a fifty-megabyte file. Going the other way, to_js turns a dict into a JavaScript Map by default, not a plain object — there's a dict_converter option, and every Pyodide developer hits this exactly once. And one pleasant surprise: async composes beautifully — JS can await a Python coroutine as a Promise, and the two event loops interleave without drama. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. Different plumbing, same role in the stack. -->
-
----
-
-# Lifespan: the app expects a boot signal
-
-<div mt-1 text-lg>
-
-Not a client connection — **the app's boot/teardown protocol**. The server drives it; so must we:
-
-</div>
-
-```py {*|2-4|6-9|11-13|*}{maxHeight:'320px'}
-async def run_lifespan(app):
-    scope = {"type": "lifespan"}
-    inbox = asyncio.Queue()
-    inbox.put_nowait({"type": "lifespan.startup"})
-
-    async def receive():
-        return await inbox.get()
-    async def send(event):
-        ...  # await "lifespan.startup.complete" before serving
-
-    # runs in the background for the whole app lifetime
-    asyncio.ensure_future(app(scope, receive, send))
-    # on teardown: inbox.put_nowait({"type": "lifespan.shutdown"})
-```
-
-<div v-click="4" mt-2 text-base text-center>
-
-⚠️ Skip it → `lifespan=` hooks (DB pools, models…) **silently never run**
-
-</div>
-
-<style>
-* {
-  --slidev-code-font-size: 15px;
-  --slidev-code-line-height: 1.45;
-}
-</style>
-
-<!-- One more protocol, because skipping it is the classic bridge bug: lifespan. There's no client involved — it's how the app gets told "you're starting up" and "you're shutting down." It's where FastAPI runs its lifespan handlers: opening database pools, loading models, warming caches. Uvicorn drives this when the process starts; our bridge has to drive it when the page loads. Same tools as before: a lifespan scope, a queue, receive and send. We push a startup event, wait for the app to answer startup-complete before serving any request, and keep the whole thing running as a background task until teardown. If you forget this, everything looks fine — until someone's database pool is mysteriously never initialized, and they spend an afternoon finding out why. Don't skip lifespan. -->
 
 ---
 layout: statement
@@ -1139,35 +1097,33 @@ Streamlit in the browser
 
 ---
 
-# Real frameworks, really in the browser
-
-Whole Python web **UI frameworks** have been ported to run on Pyodide:
+# What are these frameworks built on?
 
 <div mt-2 text-sm>
 
-| Framework | In-browser version | Server stack |
-| --------- | ------------------ | ------------ |
-| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | Starlette — **ASGI** <span op70>(since 1.57)</span> |
-| Shiny for Python | [Shinylive](https://shiny.posit.co/py/docs/shinylive.html) (Posit) | Starlette — **ASGI** |
-| marimo | [WASM notebooks](https://docs.marimo.io/guides/wasm/) | Starlette — **ASGI** |
-| Panel (HoloViz) | [`panel convert`](https://panel.holoviz.org/how_to/wasm/index.html) | Bokeh / Tornado |
-| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | FastAPI — **ASGI** |
+| Framework | Server stack |
+| --------- | ------------ |
+| Streamlit | Starlette — **ASGI** <span op70>(since 1.57)</span> |
+| Shiny for Python | Starlette — **ASGI** |
+| marimo | Starlette — **ASGI** |
+| Panel (HoloViz) | Bokeh / Tornado |
+| Gradio | FastAPI — **ASGI** |
 
 </div>
 
-<div v-click="1" mt-3 text-lg>
+<div v-click="1" mt-4 text-lg>
 
-**Heavyweight**: static assets · sessions · state · realtime
+**Heavyweight** apps: static assets · sessions · state · realtime
 
 </div>
 
 <div v-click="2" mt-2 text-xl>
 
-Each needs a **server half** in the browser — **ASGI is the right shape** 💡
+Underneath, nearly all of them are **an ASGI app + a server** 🤔
 
 </div>
 
-<!-- Because this pattern isn't just my demo — whole Python UI frameworks have been ported into the browser. Stlite is mine, for Streamlit. Posit built Shinylive. marimo ships WASM notebooks. Panel has a convert command that does the same thing. And I worked with the Gradio team on Gradio-Lite, though that one's unmaintained now — the WASM work moved into Gradio itself. Look at the right-hand column, because that's the interesting part: almost all of them are ASGI underneath. Shiny sits on Starlette, Gradio on FastAPI, marimo on Starlette — and Streamlit joined them in 1.57, when it swapped Tornado out for Starlette and Uvicorn. Panel is the holdout, still on Bokeh's Tornado server. And these are heavyweight frameworks: static assets, sessions, per-user state, realtime UI updates. Nothing like a three-endpoint demo. Every one of them needed exactly what we just built — a server half living in the browser — and the standard shape for that is ASGI. -->
+<!-- Before we go further, look at what these frameworks are actually built on. Streamlit, Shiny, marimo, Gradio — the right-hand column is the interesting one, because almost all of them are ASGI underneath. Shiny sits on Starlette, Gradio on FastAPI, marimo on Starlette, and Streamlit joined them in 1.57 when it swapped Tornado out for Starlette and Uvicorn. Panel is the holdout, still on Bokeh's Tornado server. [click] And these are heavyweight things — static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But structurally? An ASGI app with a server underneath it. Which is exactly the shape we just took apart. So the obvious question: if the server half is swappable for our forty-five lines, is it swappable for these too? -->
 
 ---
 clicks: 1
@@ -1196,6 +1152,46 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 </style>
 
 <!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide in a Web Worker, and the network becomes message passing inside the page. Same swap as our forty-five-line demo, just carrying a whole framework. -->
+
+---
+clicks: 1
+---
+
+# Real frameworks, really in the browser
+
+Not just Streamlit — the same swap, done across the ecosystem:
+
+<div class="fw-table" mt-2 text-sm :class="$clicks >= 1 ? 'reveal' : ''">
+
+| Framework | In-browser version | Server stack |
+| --------- | ------------------ | ------------ |
+| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | Starlette — **ASGI** <span op70>(since 1.57)</span> |
+| Shiny for Python | [Shinylive](https://shiny.posit.co/py/docs/shinylive.html) (Posit) | Starlette — **ASGI** |
+| marimo | [WASM notebooks](https://docs.marimo.io/guides/wasm/) | Starlette — **ASGI** |
+| Panel (HoloViz) | [`panel convert`](https://panel.holoviz.org/how_to/wasm/index.html) | Bokeh / Tornado |
+| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | FastAPI — **ASGI** |
+
+</div>
+
+<div v-click="1" mt-4 text-xl text-center>
+
+Each one needed a **server half** in the browser — **ASGI is the right shape** 💡
+
+</div>
+
+<style>
+/* The middle column is present from the start so the table never reflows;
+   it just is not visible until the click. */
+.fw-table :is(th, td):nth-child(2) {
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+.fw-table.reveal :is(th, td):nth-child(2) {
+  opacity: 1;
+}
+</style>
+
+<!-- So it worked for Streamlit. [click] And it is not just Streamlit: the middle column is every project that has already done this. Posit built Shinylive for Shiny. marimo ships WASM notebooks. Panel has a convert command. I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. Every one of them faced the same hole where the server used to be, and filled it the same way. For the ASGI-native ones that is a bridge like ours; Panel, on Tornado, had to do more work. That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
 
 ---
 layout: statement
@@ -1541,7 +1537,7 @@ One app. Any caller. 🌐🐍
 
 </div>
 
-<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the demo repo with the three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about WebSockets or streaming: I have appendix slides ready. Thank you! -->
+<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the demo repo with the three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about lifespan, streaming, or WebSockets: I have appendix slides ready. Thank you! -->
 
 ---
 layout: section
@@ -1550,10 +1546,52 @@ layout: section
 # 📎 Appendix
 
 <div mt-4 op70>
-Streaming & WebSockets over the bridge
+Lifespan, streaming & WebSockets over the bridge
 </div>
 
-<!-- Appendix, for Q&A: how the same bridge idea carries streaming responses and WebSocket sessions. -->
+<!-- Appendix, for Q&A: the two sub-protocols the main talk skips, plus streaming. -->
+
+---
+
+# Lifespan: the app expects a boot signal
+
+<div mt-1 text-lg>
+
+Not a client connection — **the app's boot/teardown protocol**. The server drives it; so must we:
+
+</div>
+
+```py {*|2-4|6-9|11-13|*}{maxHeight:'320px'}
+async def run_lifespan(app):
+    scope = {"type": "lifespan"}
+    inbox = asyncio.Queue()
+    inbox.put_nowait({"type": "lifespan.startup"})
+
+    async def receive():
+        return await inbox.get()
+    async def send(event):
+        ...  # await "lifespan.startup.complete" before serving
+
+    # runs in the background for the whole app lifetime
+    asyncio.ensure_future(app(scope, receive, send))
+    # on teardown: inbox.put_nowait({"type": "lifespan.shutdown"})
+```
+
+<div v-click="4" mt-2 text-base text-center>
+
+⚠️ Skip it → `lifespan=` hooks (DB pools, models…) **silently never run**
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.45;
+}
+</style>
+
+<!-- One more protocol, because skipping it is the classic bridge bug: lifespan. There's no client involved — it's how the app gets told "you're starting up" and "you're shutting down." It's where FastAPI runs its lifespan handlers: opening database pools, loading models, warming caches. Uvicorn drives this when the process starts; our bridge has to drive it when the page loads. Same tools as before: a lifespan scope, a queue, receive and send. We push a startup event, wait for the app to answer startup-complete before serving any request, and keep the whole thing running as a background task until teardown. If you forget this, everything looks fine — until someone's database pool is mysteriously never initialized, and they spend an afternoon finding out why. Don't skip lifespan. -->
+
 
 ---
 

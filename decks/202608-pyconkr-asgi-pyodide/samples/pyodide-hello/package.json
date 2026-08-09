@@ -1,0 +1,13 @@
+{
+  "name": "pyodide-hello",
+  "private": true,
+  "type": "module",
+  "description": "Runs Python from JavaScript, for the Pyodide slide",
+  "scripts": {
+    "start": "node hello.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "pyodide": "^0.28.0"
+  }
+}

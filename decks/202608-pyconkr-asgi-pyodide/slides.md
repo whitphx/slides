@@ -691,6 +691,37 @@ Pyodide logo by the Pyodide project, CC BY 4.0
 
 ---
 
+# Python, called from JavaScript
+
+<div mt-1 text-sm>The whole boundary in one file — Python source as a <b>string</b>, the value comes back:</div>
+
+<<< @/samples/pyodide-hello/hello.mjs js {*|1,3|5-9|11|*}
+
+<div v-click="4" mt-2>
+
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+$ node hello.mjs
+Python 3.13.2 on emscripten
+```
+
+</WindowMockup>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 16px;
+  --slidev-code-line-height: 1.45;
+}
+</style>
+
+<!-- Concretely, what does calling Python from JavaScript look like? This is the whole thing. Import loadPyodide, await it — that downloads the WebAssembly build and starts an interpreter. Then runPythonAsync takes Python source as a plain JavaScript string; here I import sys and evaluate an f-string. And the last expression's value comes straight back across the boundary as a JavaScript string, which I can just console.log. [click] Run it with node, and there it is: Python 3.13.2 on emscripten — emscripten being the WebAssembly platform, which is Python telling us it is not on your operating system any more. That is the entire trick the rest of this talk builds on: JavaScript can start Python, hand it code, and get values back. -->
+
+---
+
+
 # Demo, step 2: the same app, no server
 
 <div mt-2 flex justify-center>
@@ -831,18 +862,17 @@ From `bridge.py` — JS request → **the dict ASGI specifies**:
 
 </div>
 
-```py {*|3|6-8|10-11|*}{maxHeight:'340px'}
+```py {*|3|6-8|10-12|*}
 async def dispatch(app, request):
     scope = {
         "type": "http",
         "asgi": {"version": "3.0", "spec_version": "2.3"},
         "http_version": "1.1",
-        "method": request["method"],        # "POST"
+        "method": request["method"],
         "scheme": "http",
-        "path": request["path"],            # "/api/greet"
+        "path": request["path"],
         "raw_path": request["path"].encode(),
-        "query_string": request["query"].encode(),  # bytes!
-        # (bytes, bytes) pairs, names lowercased:
+        "query_string": request["query"].encode(),
         "headers": [(k.lower().encode(), v.encode())
                     for k, v in request["headers"]],
     }
@@ -850,8 +880,7 @@ async def dispatch(app, request):
 
 <div v-click="5" mt-3 text-lg text-center>
 
-Strict types — headers `(bytes, bytes)` · path `str` · query `bytes`<br>
-**Getting them right *is* "implementing the server"**
+Filling this dict correctly **is** what "implementing the server" means
 
 </div>
 
@@ -862,7 +891,7 @@ Strict types — headers `(bytes, bytes)` · path `str` · query `bytes`<br>
 }
 </style>
 
-<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical, but look at the details, because this is where the spec stops being abstract. The type is the string http. Headers are not a dict — they're a list of two-byte-string tuples, names lowercased. The path is a str, but the query string is bytes. Raw path, also bytes. ASGI is picky about every one of these, and honestly? Getting these types exactly right is most of what "being a server" means. You never learn this from using FastAPI. You learn it the moment you stand on the other side of the contract. -->
+<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict — they're a list of two-byte-string tuples, with the names lowercased. ASGI is picky about every one of these. And that pickiness is the point: filling this dict correctly is what implementing the server actually means. You never learn this from using FastAPI. You learn it the moment you stand on the other side of the contract. -->
 
 ---
 

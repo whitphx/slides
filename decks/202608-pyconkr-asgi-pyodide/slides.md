@@ -1061,20 +1061,7 @@ An **inbox** and an **outbox** — that's the whole server side 📥📤
 
 <div mt-2 text-sm>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
 
-```js {1-2,5,8-12|1,8-12|5|*}{'data-id':'dispatch-js'}
-export async function appFetch(input, init) {
-  const jsRequest = { ... };
-
-  const pyRequest = pyodide.toPy(jsRequest);
-  const result = await dispatch(app, pyRequest);
-  const response = result.toJs({ dict_converter: Object.fromEntries });
-
-  return new Response(response.body, {
-    status: response.status,
-    headers: response.headers,
-  });
-}
-```
+<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-fetch js {1-3,6,9-13|1,9-13|6|*}{'data-id':'dispatch-js'}
 
 <div v-click="[1,2]">
 <div data-id="ann-sig" absolute top-40 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ teal/60 rounded-lg" text-sm>
@@ -1083,7 +1070,7 @@ export async function appFetch(input, init) {
 
 </div>
 <FancyArrow from="[data-id=ann-sig] @ left" to="[data-id=dispatch-js] .line:nth-child(1) @ right" arc="-0.15" />
-<FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(8) @ right" arc="0.25" />
+<FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(9) @ right" arc="0.25" />
 </div>
 
 <div v-click="3">
@@ -1092,8 +1079,8 @@ export async function appFetch(input, init) {
 **Pyodide's FFI** — values get converted <span op70>(→ appendix)</span>
 
 </div>
-<FancyArrow from="[data-id=ann-ffi] @ top" to="[data-id=dispatch-js] .line:nth-child(4) @ right" arc="0.2" color="red" />
-<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(6) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ top" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(7) @ right" arc="0.2" color="red" />
 </div>
 
 <style>

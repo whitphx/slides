@@ -26,29 +26,30 @@ async function boot() {
 
 const bootPromise = boot();
 
-export async function appFetch(input, init) {
+async function toJsRequest(input, init) {
   const request = new Request(input, init);
   const url = new URL(request.url);
-  const body = new Uint8Array(await request.arrayBuffer());
-  const { pyodide, app, dispatch } = await bootPromise;
-
-  // region slide-dispatch
-  const jsRequest = {
+  return {
     method: request.method,
     path: url.pathname,
     query: url.search.replace(/^\?/, ""),
     headers: [...request.headers],
-    body,
+    body: new Uint8Array(await request.arrayBuffer()),
   };
+}
+
+// region slide-fetch
+export async function appFetch(input, init) {
+  const { pyodide, app, dispatch } = await bootPromise;
+  const jsRequest = await toJsRequest(input, init);
+
   const pyRequest = pyodide.toPy(jsRequest);
-
   const result = await dispatch(app, pyRequest);
-
   const response = result.toJs({ dict_converter: Object.fromEntries });
-  // endregion slide-dispatch
 
   return new Response(response.body, {
     status: response.status,
     headers: response.headers,
   });
 }
+// endregion slide-fetch

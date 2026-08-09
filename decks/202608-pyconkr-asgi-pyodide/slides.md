@@ -828,7 +828,7 @@ const res = await fetch("/api/runtime", {
 So if we had **our own `fetch`**, the page could call the Python app directly:
 
 ```js
-async function appFetch(url, options) {
+async function asgiFetch(url, options) {
   ...
 
   await app(scope, receive, send);
@@ -1090,7 +1090,7 @@ An **inbox** and an **outbox** — that's the whole server side 📥📤
 }
 </style>
 
-<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. And the thing we wrap them in is appFetch — the function we sketched before the section started. [click] Look at its two ends, because they are the whole design. It takes input and init, exactly what fetch takes, and it returns a Response, exactly what fetch returns. Anything on the page that can call fetch can call this instead and never notice. [click] In between is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it exactly like a Promise. [click] Now the two lines I greyed out. Because we are sitting on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. I have an appendix slide on what that costs and where it bites — ask me in Q&A. One more production note: running Python on the page's main thread blocks rendering, so real apps move it to a Web Worker; the bridge is identical, and there is a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. And the thing we wrap them in is asgiFetch — the function we sketched before the section started. [click] Look at its two ends, because they are the whole design. It takes input and init, exactly what fetch takes, and it returns a Response, exactly what fetch returns. Anything on the page that can call fetch can call this instead and never notice. [click] In between is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it exactly like a Promise. [click] Now the two lines I greyed out. Because we are sitting on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. I have an appendix slide on what that costs and where it bites — ask me in Q&A. One more production note: running Python on the page's main thread blocks rendering, so real apps move it to a Web Worker; the bridge is identical, and there is a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
 
 ---
 layout: statement
@@ -1742,13 +1742,13 @@ Python on the page's main thread **blocks rendering** while it runs. Production 
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2 — main thread</div>
-<div text-center>appFetch → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → <b><code>dispatch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>one call · easiest to read</div>
 </div>
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2b — Web Worker</div>
-<div text-center>appFetch → message → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → message → <b><code>dispatch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>UI stays responsive · what Stlite ships</div>
 </div>
 
@@ -1766,7 +1766,7 @@ Same <code>bridge.py</code>, same ASGI call — **only the thread changes** 🧵
 
 </div>
 
-<!-- If someone asks why the demo ran Python on the main thread: because it makes the call visible — appFetch calls dispatch, one line, nothing in between. The cost is that while Python is working, the page cannot paint or respond, which for a three-endpoint demo you will never notice and for a real app you absolutely will. So production puts Pyodide in a Web Worker, and appFetch posts a message instead of calling dispatch directly, correlating replies by id. Everything below that — bridge.py, the scope dict, receive and send, the app — is byte-for-byte identical. The repo has both variants side by side if you want to diff them. -->
+<!-- If someone asks why the demo ran Python on the main thread: because it makes the call visible — asgiFetch calls dispatch, one line, nothing in between. The cost is that while Python is working, the page cannot paint or respond, which for a three-endpoint demo you will never notice and for a real app you absolutely will. So production puts Pyodide in a Web Worker, and asgiFetch posts a message instead of calling dispatch directly, correlating replies by id. Everything below that — bridge.py, the scope dict, receive and send, the app — is byte-for-byte identical. The repo has both variants side by side if you want to diff them. -->
 
 ---
 

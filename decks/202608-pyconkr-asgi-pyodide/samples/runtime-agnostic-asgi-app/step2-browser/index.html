@@ -12,14 +12,14 @@
 </p>
 <div id="app"></div>
 <script type="module">
-  import { appFetch } from "./main.js";
+  import { asgiFetch } from "./main.js";
 
   // Route every htmx-triggered request to the in-browser app.
   document.body.addEventListener("htmx:before:request", (event) => {
-    event.detail.ctx.fetch = appFetch;
+    event.detail.ctx.fetch = asgiFetch;
   });
 
-  const response = await appFetch("/");
+  const response = await asgiFetch("/");
   document.querySelector("#app").innerHTML = await response.text();
   htmx.process(document.querySelector("#app"));
   document.querySelector("#status").remove();

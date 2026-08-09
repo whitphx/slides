@@ -35,13 +35,13 @@ Open http://localhost:8080/step2-browser/. After Pyodide boots (a few seconds), 
 
 How it works, in four small files:
 
-- [`index.html`](step2-browser/index.html) fetches `/` from the in-browser app, injects the HTML, and registers one listener: `htmx:before:request` sets `ctx.fetch = appFetch`, so every request htmx would send over the network goes to the app instead.
-- [`main.js`](step2-browser/main.js) defines `appFetch()`, a function with the same signature as `fetch()` whose "server" is Pyodide on the same page: it boots the runtime, then hands each request's method, path, headers, and body to `dispatch` and wraps the result in a `Response`.
+- [`index.html`](step2-browser/index.html) fetches `/` from the in-browser app, injects the HTML, and registers one listener: `htmx:before:request` sets `ctx.fetch = asgiFetch`, so every request htmx would send over the network goes to the app instead.
+- [`main.js`](step2-browser/main.js) defines `asgiFetch()`, a function with the same signature as `fetch()` whose "server" is Pyodide on the same page: it boots the runtime, then hands each request's method, path, headers, and body to `dispatch` and wraps the result in a `Response`.
 - [`step2b-browser-worker/`](step2b-browser-worker/) is the same thing with Pyodide moved into a Web Worker, which is what a real app does so Python cannot block rendering. Same `bridge.py`, one message-passing layer added.
 - [`bridge.py`](step2-browser/bridge.py) is the whole trick: a small function that turns one HTTP request into one ASGI call by building a `scope` and handing the app `receive`/`send` callables.
 
 ```text
-htmx ──fetch signature──▶ appFetch ──dispatch()──▶ app(scope, receive, send)
+htmx ──fetch signature──▶ asgiFetch ──dispatch()──▶ app(scope, receive, send)
      ◀───Response──────────────────◀──────────────────◀──────────────
 ```
 

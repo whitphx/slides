@@ -87,7 +87,7 @@ Beat 3 — A server inside the browser (5)
 
 Beat 4 — Building the impersonator (6)
 22. Section                   section         "🛠️ Building the bridge"
-23. The route of one request  figure          htmx → `appFetch` → postMessage → worker → `app(scope, receive, send)` and back (from demo README)
+23. The route of one request  figure          htmx → `asgiFetch` → postMessage → worker → `app(scope, receive, send)` and back (from demo README)
 24. Request → `scope`         code            build the scope dict from a JS request; line-highlight reveals
 25. Wiring `receive`/`send`   code            body in via `receive`, response events out via `send`
 26. Crossing JS ↔ Python      code            Pyodide proxies / buffer conversion gotchas

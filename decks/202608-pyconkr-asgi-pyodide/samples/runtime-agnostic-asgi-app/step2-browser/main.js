@@ -39,7 +39,7 @@ async function toJsRequest(input, init) {
 }
 
 // region slide-fetch
-export async function appFetch(input, init) {
+export async function asgiFetch(input, init) {
   const { pyodide, app, dispatch } = await bootPromise;
   const jsRequest = await toJsRequest(input, init);
 

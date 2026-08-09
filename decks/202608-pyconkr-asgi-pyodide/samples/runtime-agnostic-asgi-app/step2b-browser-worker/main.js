@@ -11,7 +11,7 @@ worker.onmessage = (event) => {
   pending.delete(id);
 };
 
-export async function appFetch(input, init) {
+export async function asgiFetch(input, init) {
   const request = new Request(input, init);
   const url = new URL(request.url);
   const body = new Uint8Array(await request.arrayBuffer());

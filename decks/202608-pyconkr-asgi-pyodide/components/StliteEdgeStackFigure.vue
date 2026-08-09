@@ -1,0 +1,33 @@
+<template>
+  <div class="w-full max-w-130 mx-auto text-xs h-full flex flex-col">
+    <div class="border border-gray-400/40 rounded-xl p-1.5 bg-gray-400/5">
+      <div class="text-center op60 mb-1">☁️ Cloudflare edge</div>
+      <div class="border border-gray-400/40 rounded-lg p-1.5 bg-gray-400/10">
+        <div class="text-center op60 mb-1">⚙️ Python Worker</div>
+        <div class="border border-violet-400/40 rounded-lg p-1.5 bg-violet-400/5">
+          <div class="text-center op60 mb-1">🐍 Pyodide</div>
+          <div class="border border-emerald-400/40 rounded-lg p-1.5 bg-emerald-400/10 text-center text-sm">
+            🐍 <b>Your app script</b>
+          </div>
+          <div class="text-center op60 my-0.5">⇅ runs your script</div>
+          <div class="border border-amber-400/40 rounded-lg p-1.5 bg-amber-400/10 text-center leading-tight">
+            🎈 <span class="text-sm"><b>Streamlit server</b></span><br>
+            <span class="op80">ScriptRunner &amp; app state</span>
+          </div>
+          <div class="text-center op60 my-0.5">⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
+          <div class="border border-sky-400/40 rounded-lg p-1.5 bg-sky-400/10 text-center leading-tight">
+            🌉 <span class="text-sm"><b>Stlite's ASGI bridge</b></span><br>
+            <span class="op80">edge requests → <b>ASGI calls</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center op60 my-0.5 mt-auto">⇅ HTTP + WebSocket over the network</div>
+    <div class="border border-gray-400/40 rounded-xl p-1.5 bg-gray-400/5">
+      <div class="text-center op60 mb-1">🌐 Browser</div>
+      <div class="border border-teal-400/40 rounded-lg p-1.5 bg-teal-400/10 text-center text-sm">
+        📄 <b>Streamlit frontend</b> <span class="text-xs op80">— the bundled React SPA</span>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1536,41 +1536,38 @@ Same app on top — **only the server half changes** ☁️
 <!-- And here is the whole talk in one picture. Three columns, three runtimes. A server with Uvicorn on native CPython. A browser tab with our bridge on Pyodide. Cloudflare's edge with their SDK bridge, also on Pyodide. Now look at the top row: it's the same file. Literally — two of them load it and one symlinks it. It ran on Python 3.12, 3.14, and 3.13, over TCP sockets, a direct call, and JS Request objects — zero changes. Everything below the interface got swapped per environment; nothing above it moved. That's what "cut a clean interface" buys you. Not a deployment trick — a property of the architecture. -->
 
 ---
+clicks: 2
+---
 
 # Stlite went to the edge, too
 
-<div mt-4 flex justify-center>
+<StackCompare mt-2 :columns="[
+  { key: 'streamlit', label: 'Standard Streamlit' },
+  { key: 'stlite', label: 'Stlite — in the browser' },
+  { key: 'edge', label: 'Stlite — on Cloudflare', hidden: $clicks < 1 },
+]">
+  <template #streamlit><StreamlitStackFigure aligned /></template>
+  <template #stlite><StliteStackFigure /></template>
+  <template #edge><StliteEdgeStackFigure aligned /></template>
+</StackCompare>
 
-<div border="~ gray/40 rounded-xl" p-4 bg-gray:5 w-130 text-center>
-
-<div border="~ teal/40 rounded-lg" p-3 bg-teal:8>
-🌐 <b>Browser frontend</b> — the standard Streamlit React UI
-</div>
-
-<div text-lg op60 my-1>⇅ <span text-sm op70>WebSocket, over the real network this time</span></div>
-
-<div border="~ gray/40 rounded-lg" p-3 bg-gray:8>
-<div text-xs op60 mb-1>Cloudflare Python Worker</div>
-<div border="~ violet/40 rounded-lg" p-2 bg-violet:8>🎈 <b>Streamlit server on Pyodide</b> — the same Stlite kernel</div>
-</div>
-
-</div>
-
-</div>
-
-<div mt-5 text-lg op80 text-center>
-
-<v-clicks>
-
-`@stlite/cloudflare` — <a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental
+<div v-click="2" mt-2 text-center text-xl>
 
 **Same kernel — only the caller changed** 🔁
 
-</v-clicks>
-
 </div>
 
-<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. This is stlite PR 2077 — at-stlite-slash-cloudflare, experimental. The architecture flips back to something familiar: the Streamlit React frontend runs in your browser, and it talks over a real WebSocket to… the Stlite kernel, running on Pyodide, inside a Python Worker at the edge. The same kernel that runs in a browser tab. The same ASGI bridge thinking. The only thing that changed is who's calling the app — browser events before, edge requests now. When your server half targets an interface instead of an environment, redeploying to a new environment is configuration, not a rewrite. -->
+<div class="punchline" absolute top-14 right-6 text-sm :class="$clicks >= 1 ? 'op60' : 'op0'">
+<code>@stlite/cloudflare</code> — <a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental
+</div>
+
+<style>
+.punchline {
+  transition: opacity 700ms ease 250ms;
+}
+</style>
+
+<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw, and read the rows across them one more time: your script, the Streamlit server, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again — but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again — but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the leftmost column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] Nothing about the kernel changed. Only the caller did. When your server half targets an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
 
 ---
 layout: section

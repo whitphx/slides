@@ -324,27 +324,42 @@ The entire interface: **one coroutine, three arguments**
 
 </div>
 
-```py {*|1|2|3|4|*}{maxHeight:'230px'}
+```py {*}{'data-id':'asgi-signature'}
 async def app(scope, receive, send):
-    #          scope   → a dict describing this connection
-    #          receive → await it to GET an event from the client
-    #          send    → await it to PUSH an event to the client
     ...
 ```
 
-<div v-click="5" mt-5 grid="~ cols-3" gap-3 text-sm>
+<div mt-24 grid="~ cols-3" gap-6 text-sm>
 
-<div border="~ sky/40 rounded-lg" p-3 bg-sky:8>
+<div v-click="1">
+<div data-id="ann-scope" border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
 📋 <b><code>scope</code></b><br><span op80>connection type · path · headers</span>
 </div>
-<div border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
+<FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="0.2" />
 </div>
-<div border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
-📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
+
+<div v-click="2">
+<div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b> — events from the client</span>
+</div>
+<FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="0.2" />
+</div>
+
+<div v-click="3">
+<div data-id="ann-send" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b> — events to the client</span>
+</div>
+<FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.2" />
 </div>
 
 </div>
+
+<style>
+* {
+  --slidev-code-font-size: 28px;
+  --slidev-code-line-height: 1.5;
+}
+</style>
 
 <!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
 
@@ -592,7 +607,7 @@ app = FastAPI()
 
 @app.get("/")
 async def index() -> str:
-    return PAGE   # the frontend page
+    return PAGE
 
 @app.get("/api/runtime")
 async def runtime() -> str:
@@ -775,41 +790,72 @@ Python 3.13.2 on emscripten
 <!-- Concretely, what does calling Python from JavaScript look like? This is the whole thing. Import loadPyodide, await it — that downloads the WebAssembly build and starts an interpreter. Then runPythonAsync takes Python source as a plain JavaScript string; here I import sys and evaluate an f-string. And the last expression's value comes straight back across the boundary as a JavaScript string, which I can just console.log. [click] Run it with node, and there it is: Python 3.13.2 on emscripten — emscripten being the WebAssembly platform, which is Python telling us it is not on your operating system any more. That is the entire trick the rest of this talk builds on: JavaScript can start Python, hand it code, and get values back. -->
 
 ---
-clicks: 3
+clicks: 4
 ---
 
 # So… can we just call our app?
 
-<div mt-2 text-sm>Pyodide gives us the <b>app object</b>. ASGI tells us <b>how to call it</b>:</div>
+<div grid="~ cols-2" gap-8 mt-4>
 
-```js {*|1-2|4-5|*}
-// our FastAPI app object, now in JavaScript
+<div>
+
+<div v-click="1">
+
+Now we can reach **`app`** from JavaScript:
+
+```js
 const { app } = pyodide.pyimport("main");
-
-await app(scope, receive, send);
-//        ^^^^^^^^^^^^^^^^^^^^  ...but who builds these?
 ```
-
-<div v-click="2" mt-4 text-xl text-center>
-
-Pyodide runs the **app half** of ASGI. The server half? **Missing.** 🕳️
 
 </div>
 
-<div v-click="3" mt-3 text-xl text-center>
+<div v-click="2" mt-6>
 
-No Uvicorn in a browser tab — **so let's write that half ourselves** 🛠️
+And JavaScript already speaks HTTP, with **`fetch`**:
+
+```js
+const res = await fetch("/api/runtime", {
+  method: "GET",
+});
+```
+
+</div>
+
+</div>
+
+<div v-click="3">
+
+So if we had **our own `fetch`**, the page could call the Python app directly:
+
+```js
+async function ourFetch(url, options) {
+  ...
+
+  await app(scope, receive, send);
+
+  ...
+  return response;
+}
+```
+
+</div>
+
+</div>
+
+<div v-click="4" absolute bottom-16 inset-x-0 text-3xl text-center>
+
+then, **how?** 🤔
 
 </div>
 
 <style>
 * {
-  --slidev-code-font-size: 24px;
+  --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.5;
 }
 </style>
 
-<!-- So let's put the two halves together. Pyodide hands us the app object — one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. And we know exactly how to call it, because we spent the last section on that: scope, receive, send. [click] Except look at the arguments. Nobody is building them. A scope does not appear from nowhere; receive and send have to be implemented by something. [click] That is the shape of the gap: Pyodide runs the app half of ASGI perfectly well — it is just Python — but the server half, the half that takes a request and turns it into that call, does not exist in a browser tab. There is no Uvicorn here. [click] Which is the fun part, and the rest of this talk: nobody has written that server for us, so we are going to write it. It is about forty-five lines. Let me show you it working first. -->
+<!-- So let us line up what we have. [click] Pyodide hands us the app object — one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. [click] And the page already knows how to speak HTTP: fetch is right there, and every frontend in the world is written against it. [click] So put those together. If we had our own fetch — same signature, same Request in, same Response out — but instead of going to the network, it called our app the way ASGI says to call it, then the frontend would not know the difference. That is the whole design. And you can see the hole in the middle of it: scope, receive and send do not exist yet. Nobody builds them. In a normal deployment that is Uvicorn's job, and there is no Uvicorn in a browser tab. [click] So: then, how? That is the rest of this talk, and it is about forty-five lines of Python. Let me show you it working first. -->
 
 ---
 
@@ -991,27 +1037,30 @@ Filling this dict correctly **is** what "implementing the server" means
 
 </div>
 
-```py {*|1-3|5-11|13-14|*}{maxHeight:'340px'}
-    async def receive():                 # 📥 the app pulls the body
+```py {*|1-3|5-11|13-14|*}{maxHeight:'340px','data-id':'wire-up'}
+    async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
 
     status, headers, chunks = None, [], []
-    async def send(event):               # 📤 the app pushes the response
+    async def send(event):
         nonlocal status, headers
         if event["type"] == "http.response.start":
             status, headers = event["status"], event["headers"]
         elif event["type"] == "http.response.body":
             chunks.append(bytes(event.get("body", b"")))
 
-    await app(scope, receive, send)      # ← run the app!
+    await app(scope, receive, send)
     return {"status": status, "headers": headers, "body": b"".join(chunks)}
 ```
 
-<div v-click="4" mt-2 text-base text-center>
+<div v-click="4">
+<div data-id="ann-server" mt-2 w-max mx-auto text-base text-center>
 
 `scope` + `receive` + `send` + `await app(...)` = **a server**
 
+</div>
+<FancyArrow from="[data-id=ann-server] @ topleft" to="[data-id=wire-up] .line:nth-child(13) span:nth-child(2) @ bottom" arc="0.3" color="red" />
 </div>
 
 <style>
@@ -1690,7 +1739,7 @@ Not a client connection — **the app's boot/teardown protocol**. The server dri
 
 </div>
 
-```py {*|2-4|6-9|11-13|*}{maxHeight:'320px'}
+```py {*|2-4|6-9|11|*}{maxHeight:'320px','data-id':'lifespan'}
 async def run_lifespan(app):
     scope = {"type": "lifespan"}
     inbox = asyncio.Queue()
@@ -1699,12 +1748,19 @@ async def run_lifespan(app):
     async def receive():
         return await inbox.get()
     async def send(event):
-        ...  # await "lifespan.startup.complete" before serving
+        ...
 
-    # runs in the background for the whole app lifetime
     asyncio.ensure_future(app(scope, receive, send))
-    # on teardown: inbox.put_nowait({"type": "lifespan.shutdown"})
 ```
+
+<div v-click="3">
+<div data-id="ann-lifespan" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
+
+not awaited — **it runs for the whole app lifetime**
+
+</div>
+<FancyArrow from="[data-id=ann-lifespan] @ left" to="[data-id=lifespan] .line:nth-child(11) @ right" arc="0.2" />
+</div>
 
 <div v-click="4" mt-2 text-base text-center>
 
@@ -1732,16 +1788,24 @@ async def run_lifespan(app):
 
 </div>
 
-```py {*|3-6|7-8|*}{maxHeight:'240px'}
+```py {*|2-3|4-5|6-7|*}{maxHeight:'240px','data-id':'streaming'}
 async def send(event):
     if event["type"] == "http.response.start":
-        # → tell JS: status & headers are ready; open a ReadableStream
         js_stream.start(event["status"], event["headers"])
     elif event["type"] == "http.response.body":
-        js_stream.enqueue(event.get("body", b""))   # → push chunk to JS now
+        js_stream.enqueue(event.get("body", b""))
         if not event.get("more_body", False):
-            js_stream.close()                        # → end of response
+            js_stream.close()
 ```
+
+<div v-click="3">
+<div data-id="ann-more-body" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg" text-sm>
+
+**keep the stream open** while `more_body`
+
+</div>
+<FancyArrow from="[data-id=ann-more-body] @ left" to="[data-id=streaming] .line:nth-child(6) @ right" arc="0.2" />
+</div>
 
 <div v-click="4" mt-4 text-lg text-center>
 
@@ -1761,26 +1825,33 @@ JS pushes *whenever* · the app `await`s — **`asyncio.Queue` bridges push → 
 
 </div>
 
-```py {*|3|5-7|9-10|*}{maxHeight:'300px'}
+```py {*|3|5-7|9-10|*}{maxHeight:'300px','data-id':'ws-session'}
 class WebSocketSession:
     def __init__(self):
         self._inbox = asyncio.Queue()
 
-    def on_js_message(self, data):                 # 🟦 called FROM JavaScript
+    def on_js_message(self, data):
         self._inbox.put_nowait(
             {"type": "websocket.receive", "text": data})
 
-    async def receive(self):                       # 🐍 awaited BY the app
-        return await self._inbox.get()             # blocks until JS pushes
+    async def receive(self):
+        return await self._inbox.get()
 ```
 
-<div v-click="3" mt-4 grid="~ cols-2" gap-4 text-sm>
+<div mt-8 grid="~ cols-2" gap-4 text-sm>
 
-<div border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-🟦 JS: <code>on_js_message</code> — <b>fire-and-forget</b>
+<div v-click="2">
+<div data-id="ann-js-push" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+🟦 called <b>from JavaScript</b> — <code>on_js_message</code> is <b>fire-and-forget</b>
 </div>
-<div border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
-🐍 App: <code>await receive()</code> — <b>suspends until a message</b>
+<FancyArrow from="[data-id=ann-js-push] @ top" to="[data-id=ws-session] .line:nth-child(5) @ right" arc="0.2" />
+</div>
+
+<div v-click="3">
+<div data-id="ann-app-pull" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+🐍 awaited <b>by the app</b> — <code>await receive()</code> <b>suspends until JS pushes</b>
+</div>
+<FancyArrow from="[data-id=ann-app-pull] @ topleft" to="[data-id=ws-session] .line:nth-child(9) @ right" arc="-0.2" />
 </div>
 
 </div>
@@ -1804,18 +1875,29 @@ Same `receive` / `send` — **new event names**:
 
 </div>
 
-```py {*|3|6|9|*}{maxHeight:'260px'}
-# What the app expects to see, in order, over one WS connection:
+<div grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-4 text-sm items-center>
+<div></div>
+<div text-center op70>📥 the app <b>receives</b></div>
+<div text-center op70>📤 the app <b>sends</b></div>
+</div>
 
-# 1. App receives:  {"type": "websocket.connect"}      ← we enqueue on open
-#    App sends:     {"type": "websocket.accept"}        → we tell JS "open"
+<div v-click="1" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div text-base>① <b>open</b></div>
+<div border="~ violet/40 rounded-lg" p-2><code>"websocket.connect"</code><br><span op70 text-xs>we enqueue it when JS opens</span></div>
+<div border="~ emerald/40 rounded-lg" p-2><code>"websocket.accept"</code><br><span op70 text-xs>we tell JS the socket is open</span></div>
+</div>
 
-# 2. App receives:  {"type": "websocket.receive", ...}  ← per JS message
-#    App sends:     {"type": "websocket.send", ...}      → we post to JS
+<div v-click="2" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div text-base>② <b>message</b></div>
+<div border="~ violet/40 rounded-lg" p-2><code>"websocket.receive"</code><br><span op70 text-xs>one per message JS pushes</span></div>
+<div border="~ emerald/40 rounded-lg" p-2><code>"websocket.send"</code><br><span op70 text-xs>we post it back out to JS</span></div>
+</div>
 
-# 3. App sends:     {"type": "websocket.close"}          → we close the JS socket
-#    or app receives {"type": "websocket.disconnect"}    ← JS closed it
-```
+<div v-click="3" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div text-base>③ <b>close</b></div>
+<div border="~ violet/40 rounded-lg" p-2><code>"websocket.disconnect"</code><br><span op70 text-xs>JS closed it first</span></div>
+<div border="~ emerald/40 rounded-lg" p-2><code>"websocket.close"</code><br><span op70 text-xs>we close the JS socket</span></div>
+</div>
 
 <div v-click="4" mt-4 text-lg text-center>
 

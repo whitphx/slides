@@ -69,6 +69,7 @@ These principles are the material you draft the plan from. The **information flo
 - Prefer `**label** — short phrase` over subject–verb–object sentences in bullets and box contents. `- 💥 **Every upgrade could break it** — no spec, no "done"` beats `- 💥 **The cost:** every Streamlit upgrade could break the emulation — there was no spec saying what "done" meant.`
 - Separators (`·`, `→`, `=`) compress prose into scannable fragments: `**Same file** · 3 Pythons · 3 transports · **0 changes**`.
 - `layout: statement` slides are the exception: their single line *is* the tagline and may be a full sentence.
+- The same rule applies inside code blocks: **a code block holds code, never slide commentary.** To call out a line, point at it with a `FancyArrow` into a floating box, rather than writing an explanatory comment or an ASCII pointer (`^^^^`, `# ← this one`) into the source. See "Annotating code" under `FancyArrow` in `references/slidev-syntax.md`.
 - When trimming an existing slide, confirm the removed explanation survives in the presenter notes; move it there if it doesn't.
 - The test: can the audience read the slide in ~3 seconds while still listening to the speaker? If reading competes with listening, cut further.
 

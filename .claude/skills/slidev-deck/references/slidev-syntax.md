@@ -118,6 +118,41 @@ You can also point to specific code lines:
 <FancyArrow from="[data-id=desc] @ left" to="[data-id=codeblock] .line:nth-child(5) @ right" arc="-0.2" />
 ```
 
+#### Annotating code: arrow + floating box, never a comment
+
+**This is the only way to call out a line of code on a slide.** Never write the explanation as a code comment, and never draw pointers in the code itself (`# ← this one`, `^^^^^^`, trailing `// what this does`). The code block shows code that could have been copied out of the repo; the commentary lives outside it, in a floating box the arrow connects to the line.
+
+Give the code block a `data-id` through its second meta object, put each explanation in an absolutely positioned box with its own `data-id`, and wrap box and arrow together in one `v-click` so they appear as a unit:
+
+`````md
+````md
+```js {*|1|3|*}{'data-id':'call-app'}
+const { app } = pyodide.pyimport("main");
+
+await app(scope, receive, send);
+```
+````
+
+<div v-click="1">
+<div data-id="ann-app" absolute top-24 right-5 w-60 bg-white dark:bg-black p-2 rounded border="~ violet/50 rounded-lg" text-sm>
+
+the **`app`** object, now in JavaScript
+
+</div>
+<FancyArrow from="[data-id=ann-app] @ left" to="[data-id=call-app] .line:nth-child(1) @ right" arc="-0.2" />
+</div>
+`````
+
+Notes that save a round of fiddling:
+
+- `.line:nth-child(N)` counts **every** rendered line, blank lines included. In the block above `await` is line 3, not line 2.
+- Pair the arrows with a line-highlight sequence (`{*|1|3|*}`) so the highlighted line and the arrow appear on the same click.
+- Boxes need `bg-white dark:bg-black` and a border. They float over the code block's background, so a transparent box is unreadable.
+- Position boxes absolutely (`absolute top-24 right-5 w-60`) and check the rendered slide: stacked boxes collide easily, because a box grows downward as its text wraps. Leave a visible gap rather than computing one exactly.
+- When two boxes on one side crowd the text below them, move the prose into `<div absolute bottom-20 inset-x-0>` so it is anchored to the bottom of the slide instead of flowing under the code.
+- Colour-code when the annotations mean different things (a neutral arrow for "here is what this is", `color="red"` for "here is the problem").
+- Screenshots taken right after navigation can miss the arrowheads: FancyArrow draws itself with an animation. Wait ~2s before capturing, or an arrow will look headless (or absent) when it is actually fine.
+
 FancyArrow can have content (label):
 ```html
 <FancyArrow from="[data-id=a] @ right" to="[data-id=b] @ left" arc="0.6" v-click="1">

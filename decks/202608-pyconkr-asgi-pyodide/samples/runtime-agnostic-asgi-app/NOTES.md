@@ -55,7 +55,7 @@ If you add endpoints that pull in another non-bundled package, it needs adding i
 
 ## Step 2 must be served from the repository root
 
-`worker.js` loads the shared app with a relative fetch of `../main.py`, which is the whole point: the browser build has no copy of its own. Running `python3 -m http.server` from inside `step2-browser/` places that path outside the document root and the worker fails to boot. Serve the repo root and open `/step2-browser/`.
+`worker.js` loads the shared app with a relative fetch of `../main.py`, which is the whole point: the browser build has no copy of its own. Running `python3 -m http.server` from inside `step2-browser/` puts that path outside the document root and the worker fails to boot. Serve the repo root and open `/step2-browser/`.
 
 ## Renaming or moving the repo invalidates the virtualenvs
 

@@ -198,10 +198,9 @@ Uvicorn: ***how* requests arrive**
 </div>
 
 <style>
-/* Sized so the longest line still fits once the grid halves the code column. */
 * {
-  --slidev-code-font-size: 15px;
-  --slidev-code-line-height: 1.6;
+  --slidev-code-font-size: 24px;
+  --slidev-code-line-height: 1.5;
 }
 .deploy-grid {
   display: grid;
@@ -393,8 +392,8 @@ Hello, PyCon KR!
 
 <style>
 * {
-  --slidev-code-font-size: 13px;
-  --slidev-code-line-height: 1.55;
+  --slidev-code-font-size: 22px;
+  --slidev-code-line-height: 1.5;
 }
 .framework-grid {
   display: grid;
@@ -458,24 +457,18 @@ clicks: 1
 
 <div class="demo-cell">
 
-<div text-sm mb-1><code>app/main.py</code> <span op70>— the whole demo app, abridged</span></div>
+<div text-sm mb-1><code>app/main.py</code> <span op70>— the demo app (abridged)</span></div>
 
 ```py {*}
 app = FastAPI()
 
 @app.get("/")
 async def index() -> str:
-    return PAGE          # the frontend page
+    return PAGE   # the frontend page
 
 @app.get("/api/runtime")
 async def runtime() -> str:
     return f"Python {py} on {sys.platform}"
-
-@app.post("/api/count")
-async def increment() -> str:
-    global count
-    count += 1
-    return f"Count: {count}"
 ```
 
 </div>
@@ -516,7 +509,7 @@ INFO:  Uvicorn running on
 
 <style>
 * {
-  --slidev-code-font-size: 13px;
+  --slidev-code-font-size: 22px;
   --slidev-code-line-height: 1.5;
 }
 .demo-grid {

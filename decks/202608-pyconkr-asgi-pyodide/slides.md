@@ -561,7 +561,8 @@ clicks: 6
 
 <div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
 <div text-xl mb-1>♻️ <b><code>"lifespan"</code></b></div>
-<span op80>startup / shutdown</span>
+<span op80>startup / shutdown<br>
+<span op60>(→ appendix)</span></span>
 </div>
 
 </div>
@@ -632,8 +633,6 @@ INFO:  Uvicorn running on
 
 </div>
 
-<div mt-2 text-center text-sm op70>📎 <a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">github.com/whitphx/runtime-agnostic-asgi-app-example</a></div>
-
 <style>
 * {
   --slidev-code-font-size: 22px;
@@ -651,7 +650,7 @@ INFO:  Uvicorn running on
 }
 </style>
 
-<!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And here it is in its natural habitat: uvicorn app.main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. The whole repo is at that link — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
+<!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And here it is in its natural habitat: uvicorn main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. All of this is in the slides repo, if you want it — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
 
 ---
 
@@ -739,17 +738,11 @@ A server inside your browser
 
 </div>
 
-<div v-click="6" mt-4 text-xl text-center>
-
-Runs the **app half** of ASGI. The server half? **Missing.**
-
-</div>
-
 <div absolute bottom-3 right-4 text-xs op40>
 Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
-<!-- One slide on the enabler, because it deserves at least that. Pyodide is CPython — the real thing — compiled to WebAssembly, so it runs inside a browser tab. asyncio works. You can install pure-Python packages with micropip. Python and JavaScript can call each other directly, and Python's event loop rides on the browser's. One constraint to remember: single interpreter, single thread, and no sockets — the browser sandbox doesn't hand those out. So here's where that leaves us. Pyodide can absolutely run the app half of ASGI — FastAPI is just Python. But the server half? There's no Uvicorn in a browser tab. That half is simply missing. We'll have to provide it ourselves. -->
+<!-- One slide on the enabler, because it deserves at least that. Pyodide is CPython — the real thing — compiled to WebAssembly, so it runs inside a browser tab. asyncio works. You can install pure-Python packages with micropip. Python and JavaScript can call each other directly, and Python's event loop rides on the browser's. One constraint to remember: single interpreter, single thread, and no sockets — the browser sandbox doesn't hand those out. Keep those four facts in mind — every one of them comes back later. -->
 
 ---
 
@@ -782,7 +775,43 @@ Python 3.13.2 on emscripten
 <!-- Concretely, what does calling Python from JavaScript look like? This is the whole thing. Import loadPyodide, await it — that downloads the WebAssembly build and starts an interpreter. Then runPythonAsync takes Python source as a plain JavaScript string; here I import sys and evaluate an f-string. And the last expression's value comes straight back across the boundary as a JavaScript string, which I can just console.log. [click] Run it with node, and there it is: Python 3.13.2 on emscripten — emscripten being the WebAssembly platform, which is Python telling us it is not on your operating system any more. That is the entire trick the rest of this talk builds on: JavaScript can start Python, hand it code, and get values back. -->
 
 ---
+clicks: 3
+---
 
+# So… can we just call our app?
+
+<div mt-2 text-sm>Pyodide gives us the <b>app object</b>. ASGI tells us <b>how to call it</b>:</div>
+
+```js {*|1-2|4-5|*}
+// our FastAPI app object, now in JavaScript
+const { app } = pyodide.pyimport("main");
+
+await app(scope, receive, send);
+//        ^^^^^^^^^^^^^^^^^^^^  ...but who builds these?
+```
+
+<div v-click="2" mt-4 text-xl text-center>
+
+Pyodide runs the **app half** of ASGI. The server half? **Missing.** 🕳️
+
+</div>
+
+<div v-click="3" mt-3 text-xl text-center>
+
+No Uvicorn in a browser tab — **so let's write that half ourselves** 🛠️
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 24px;
+  --slidev-code-line-height: 1.5;
+}
+</style>
+
+<!-- So let's put the two halves together. Pyodide hands us the app object — one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. And we know exactly how to call it, because we spent the last section on that: scope, receive, send. [click] Except look at the arguments. Nobody is building them. A scope does not appear from nowhere; receive and send have to be implemented by something. [click] That is the shape of the gap: Pyodide runs the app half of ASGI perfectly well — it is just Python — but the server half, the half that takes a request and turns it into that call, does not exist in a browser tab. There is no Uvicorn here. [click] Which is the fun part, and the rest of this talk: nobody has written that server for us, so we are going to write it. It is about forty-five lines. Let me show you it working first. -->
+
+---
 
 # Demo, step 2: the same app, no server
 
@@ -815,7 +844,7 @@ Responses made **inside the tab** — nothing leaves it.
 
 <!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide right there on the page and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab. OK — back to slides. Let's see what's in there.
 
-[DEMO SETUP] Serve the repo root, not step2-browser/ — the worker loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and the worker never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but app/main.py and bridge.py come from that server. -->
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
 clicks: 1
@@ -1323,7 +1352,7 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 }
 </style>
 
-<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same app/main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
+<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
@@ -1565,7 +1594,7 @@ One app. Any caller. 🌐🐍
 
 <div flex="~ gap-2" items-center>
 <div i-ri-code-s-slash-line text-xl op50 />
-<div><a href="https://github.com/whitphx/runtime-agnostic-asgi-app-example" target="_blank">whitphx/runtime-agnostic-asgi-app-example</a> — today's demo, all three steps</div>
+<div><a href="https://github.com/whitphx/slides/tree/main/decks/202608-pyconkr-asgi-pyodide/samples" target="_blank">whitphx/slides</a> — this deck, with every sample you saw</div>
 </div>
 
 <div flex="~ gap-2" items-center>
@@ -1597,7 +1626,7 @@ One app. Any caller. 🌐🐍
 
 </div>
 
-<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the demo repo with the three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about lifespan, streaming, or WebSockets: I have appendix slides ready. Thank you! -->
+<!-- And that's it — one app, any caller. Thank you so much for listening. The slides are at the QR code, with all the links: the samples with all three steps, the Stlite PRs if you want to read a production bridge, the spec, everything. I'd love to hear what you'd build with this — please come find me, and I'm happy to take questions. And if anyone asks about lifespan, streaming, or WebSockets: I have appendix slides ready. Thank you! -->
 
 ---
 layout: section

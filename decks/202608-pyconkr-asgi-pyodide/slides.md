@@ -982,13 +982,13 @@ Filling this dict correctly **is** what "implementing the server" means
 
 # ② Wire up `receive` and `send`
 
-<div mt-1 text-lg>
+<div mt-0 text-lg>
 
 `receive`: **body in** · `send`: **response out**
 
 </div>
 
-```py {*|1-3|5-11|13-14|*}{maxHeight:'340px','data-id':'wire-up'}
+```py {*|1-3|5-11|13-15|*}{maxHeight:'360px','data-id':'wire-up'}
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
@@ -1002,11 +1002,12 @@ Filling this dict correctly **is** what "implementing the server" means
             chunks.append(bytes(event.get("body", b"")))
 
     await app(scope, receive, send)
-    return {"status": status, "headers": headers, "body": b"".join(chunks)}
+    response = {"status": status, "headers": headers, "body": b"".join(chunks)}
+    return response
 ```
 
 <div v-click="4">
-<div data-id="ann-server" mt-2 w-max mx-auto text-base text-center>
+<div data-id="ann-server" mt-1 w-max mx-auto text-base text-center>
 
 `scope` + `receive` + `send` + `await app(...)` = **a server**
 
@@ -1017,7 +1018,7 @@ Filling this dict correctly **is** what "implementing the server" means
 <style>
 * {
   --slidev-code-font-size: 15px;
-  --slidev-code-line-height: 1.45;
+  --slidev-code-line-height: 1.35;
 }
 </style>
 
@@ -1033,64 +1034,26 @@ Filling this dict correctly **is** what "implementing the server" means
 
 <div mt-2 text-sm>…then every request is one call across the boundary:</div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-dispatch js {*}
+<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-dispatch js {1-7,10|10|*}{'data-id':'dispatch-js'}
 
-<div mt-3 text-center text-lg>
+<div v-click="2">
+<div data-id="ann-ffi" absolute top-68 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
 
-Python objects are **just JS values** — <code>await</code> a coroutine, get a <code>Promise</code>
+**Pyodide's FFI** — values get converted <span op70>(→ appendix)</span>
 
+</div>
+<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(8) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ bottom" to="[data-id=dispatch-js] .line:nth-child(12) @ right" arc="-0.2" color="red" />
 </div>
 
 <style>
 * {
-  --slidev-code-font-size: 20px;
-  --slidev-code-line-height: 1.5;
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.45;
 }
 </style>
 
-<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. From there, calling Python is just calling a function — dispatch(app, request) — and because dispatch is a coroutine, JavaScript awaits it like any Promise. toPy converts the request object on the way in, toJs converts the response dict on the way out. That's the whole boundary — two lines to get the objects, one line to call them. And this is the appFetch we sketched a few slides ago: it has fetch's exact signature and awaits dispatch directly, so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. One note for production: running Python on the page's main thread blocks rendering while it works, so real apps move it to a Web Worker. That costs you a message-passing layer and nothing else — the bridge is identical — and there's an appendix slide plus a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
-
----
-
-# The boundary tax: JS ↔ Python
-
-<div mt-1 text-lg>
-
-The bridge sits *on* the [Pyodide FFI](https://pyodide.org/en/stable/usage/type-conversions.html) — **the bugs live in the conversions**:
-
-</div>
-
-<div grid="~ cols-2" gap-4 mt-4 text-sm>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-3 bg-sky:8>
-🟦→🐍 <b>Proxies, not values</b><br>
-<span op80><code>JsProxy</code>, not <code>dict</code> → <code>.to_py()</code></span>
-</div>
-
-<div v-click="2" border="~ violet/40 rounded-lg" p-3 bg-violet:8>
-📦 <b>Binary bodies</b><br>
-<span op80><code>Uint8Array</code> → <code>bytes()</code> — <b>every conversion copies</b></span>
-</div>
-
-<div v-click="3" border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
-🐍→🟦 <b>Going back: <code>to_js()</code></b><br>
-<span op80><code>dict</code> → JS <code>Map</code> by default! (<code>dict_converter</code>)</span>
-</div>
-
-<div v-click="4" border="~ amber/40 rounded-lg" p-3 bg-amber:8>
-⏳ <b>Async composes</b><br>
-<span op80>coroutine ⇄ <code>Promise</code> — loops interleave</span>
-</div>
-
-</div>
-
-<div v-click="5" mt-5 text-center text-xl>
-
-Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
-
-</div>
-
-<!-- Now, one layer real servers don't have: the foreign function interface between JavaScript and Python. And I can tell you from years of this — the bugs live here. Four things to know. JS objects arrive in Python as proxies, not dicts — convert explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer — that matters when someone uploads a fifty-megabyte file. Going the other way, to_js turns a dict into a JavaScript Map by default, not a plain object — there's a dict_converter option, and every Pyodide developer hits this exactly once. And one pleasant surprise: async composes beautifully — JS can await a Python coroutine as a Promise, and the two event loops interleave without drama. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. Different plumbing, same role in the stack. -->
+<!-- Fair question at this point: we've written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, spelled in JavaScript: it hands back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. Then a request comes in, and we build a plain JavaScript object out of it — method, path, query, headers, body. [click] And here is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it exactly like a Promise. This is the appFetch we sketched earlier: it has fetch's exact signature and awaits dispatch directly, so the page issues what looks like a completely normal HTTP call and never learns that Python answered it. [click] Now the two lines I greyed out. Because we are sitting on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. I have an appendix slide on what that costs and where it bites — ask me in Q&A. One more production note: running Python on the page's main thread blocks rendering, so real apps move it to a Web Worker; the bridge is identical, and there is a step-2b variant in the repo. Stlite does exactly that, as you'll see in a minute. -->
 
 ---
 layout: statement
@@ -1767,6 +1730,48 @@ Same <code>bridge.py</code>, same ASGI call — **only the thread changes** 🧵
 </div>
 
 <!-- If someone asks why the demo ran Python on the main thread: because it makes the call visible — appFetch calls dispatch, one line, nothing in between. The cost is that while Python is working, the page cannot paint or respond, which for a three-endpoint demo you will never notice and for a real app you absolutely will. So production puts Pyodide in a Web Worker, and appFetch posts a message instead of calling dispatch directly, correlating replies by id. Everything below that — bridge.py, the scope dict, receive and send, the app — is byte-for-byte identical. The repo has both variants side by side if you want to diff them. -->
+
+---
+
+# The boundary tax: JS ↔ Python
+
+<div mt-1 text-lg>
+
+The bridge sits *on* the [Pyodide FFI](https://pyodide.org/en/stable/usage/type-conversions.html) — **the bugs live in the conversions**:
+
+</div>
+
+<div grid="~ cols-2" gap-4 mt-4 text-sm>
+
+<div v-click="1" border="~ sky/40 rounded-lg" p-3 bg-sky:8>
+🟦→🐍 <b>Proxies, not values</b><br>
+<span op80><code>JsProxy</code>, not <code>dict</code> → <code>.to_py()</code></span>
+</div>
+
+<div v-click="2" border="~ violet/40 rounded-lg" p-3 bg-violet:8>
+📦 <b>Binary bodies</b><br>
+<span op80><code>Uint8Array</code> → <code>bytes()</code> — <b>every conversion copies</b></span>
+</div>
+
+<div v-click="3" border="~ emerald/40 rounded-lg" p-3 bg-emerald:8>
+🐍→🟦 <b>Going back: <code>to_js()</code></b><br>
+<span op80><code>dict</code> → JS <code>Map</code> by default! (<code>dict_converter</code>)</span>
+</div>
+
+<div v-click="4" border="~ amber/40 rounded-lg" p-3 bg-amber:8>
+⏳ <b>Async composes</b><br>
+<span op80>coroutine ⇄ <code>Promise</code> — loops interleave</span>
+</div>
+
+</div>
+
+<div v-click="5" mt-5 text-center text-xl>
+
+Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
+
+</div>
+
+<!-- This is the appendix slide I promised when I greyed out the two conversion lines. The bridge sits on one layer real servers don't have: the foreign function interface between JavaScript and Python. And I can tell you from years of this — the bugs live here. Four things to know. JS objects arrive in Python as proxies, not dicts — convert explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer — that matters when someone uploads a fifty-megabyte file. Going the other way, to_js turns a dict into a JavaScript Map by default, not a plain object — there's a dict_converter option, and every Pyodide developer hits this exactly once. And one pleasant surprise: async composes beautifully — JS can await a Python coroutine as a Promise, and the two event loops interleave without drama. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. Different plumbing, same role in the stack. -->
 
 ---
 

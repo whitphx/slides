@@ -54,4 +54,5 @@ async def dispatch(app, request):
 
     await app(scope, receive, send)
 
-    return {"status": status, "headers": headers, "body": b"".join(chunks)}
+    response = {"status": status, "headers": headers, "body": b"".join(chunks)}
+    return response

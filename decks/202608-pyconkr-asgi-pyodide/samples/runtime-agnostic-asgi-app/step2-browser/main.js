@@ -33,13 +33,17 @@ export async function appFetch(input, init) {
   const { pyodide, app, dispatch } = await bootPromise;
 
   // region slide-dispatch
-  const result = await dispatch(app, pyodide.toPy({
+  const jsRequest = {
     method: request.method,
     path: url.pathname,
     query: url.search.replace(/^\?/, ""),
     headers: [...request.headers],
     body,
-  }));
+  };
+  const pyRequest = pyodide.toPy(jsRequest);
+
+  const result = await dispatch(app, pyRequest);
+
   const response = result.toJs({ dict_converter: Object.fromEntries });
   // endregion slide-dispatch
 

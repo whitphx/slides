@@ -676,7 +676,7 @@ clicks: 6
 
 # One `await` is the whole request
 
-<div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-2 text-sm items-center>
+<div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-2 pr-14 text-sm items-center>
 
 <div text-center text-xs op60 font-bold>🖥️ Server <span op70>(e.g. Uvicorn)</span></div>
 <div></div>
@@ -684,7 +684,7 @@ clicks: 6
 
 <div v-click="1" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center>builds <code>scope</code><br><span text-xs op70><code>{"type": "http", …}</code></span></div>
 <div v-click="1" text-center text-xl op60>→</div>
-<div v-click="1" text-xs op80><code>await app(scope, receive, send)</code><br><span op70>one call for the whole request</span></div>
+<div v-click="1" text-xs op80><code>await app(scope, receive, send)</code><br><span op70>opens here — everything below is <b>inside</b> it</span></div>
 
 <div v-click="2" text-xs op80 text-right>the app wants the body</div>
 <div v-click="2" text-center text-xl op60>←</div>
@@ -708,6 +708,15 @@ clicks: 6
 
 </div>
 
+<div v-click="1" absolute right-3 top-32 bottom-10 flex items-stretch gap-1 op60 text-xs>
+<svg width="12" overflow-visible aria-hidden="true">
+  <line x1="1" y1="1" x2="10" y2="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+  <line x1="10" y1="1" x2="10" y2="99%" stroke="currentColor" stroke-width="1.5" />
+  <line x1="1" y1="99%" x2="10" y2="99%" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+</svg>
+<div self-center style="writing-mode: vertical-rl">one <code>await</code></div>
+</div>
+
 <div absolute left-4 top-30 bottom-10 flex="~ col" items-center gap-1 op50 text-xs>
 <div>time</div>
 <svg width="14" flex-1 overflow-visible aria-hidden="true">
@@ -720,46 +729,7 @@ clicks: 6
 </svg>
 </div>
 
-<!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call — for HTTP, exactly one call carries the whole request. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
-
----
-
-# Why `http` is enough for today
-
-<div mt-4 text-lg>
-
-`scope["type"]` says which one — **the call never changes**
-
-</div>
-
-<div grid="~ cols-3" gap-4 mt-6 text-sm>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
-<div text-xl mb-1>🌐 <b><code>"http"</code></b></div>
-<span op80>request → response</span>
-</div>
-
-<div v-click="2" border="~ violet/40 rounded-lg" p-4 bg-violet:5>
-<div text-xl mb-1>🔌 <b><code>"websocket"</code></b></div>
-<span op80>long-lived, two-way<br>
-<span op60>(→ appendix)</span></span>
-</div>
-
-<div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
-<div text-xl mb-1>♻️ <b><code>"lifespan"</code></b></div>
-<span op80>startup / shutdown<br>
-<span op60>(→ appendix)</span></span>
-</div>
-
-</div>
-
-<div v-click="4" mt-8 text-center text-xl>
-
-Only the **event names** differ — learn one, you can read all three ✅
-
-</div>
-
-<!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. Here is the part that matters for the next forty minutes: the call is identical for all three. Same three arguments, same awaiting of receive, same calling of send — what changes is only the strings inside the events. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP. WebSocket and lifespan work the same way in spirit, and I've put both in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
+<!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call. Watch the bracket on the right, because this is the bit that trips people up: that await is not a step at the top, it is the whole height of this slide. It opens here and does not return until the bottom, and every exchange you are about to see happens inside it — the app calls back into the server's receive and send while the caller sits at that one await. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
 
 ---
 clicks: 1
@@ -1911,10 +1881,10 @@ layout: section
 # 📎 Appendix
 
 <div mt-4 op70>
-Web Workers, lifespan, streaming & WebSockets
+Web Workers, the FFI, and the parts of ASGI the talk skipped
 </div>
 
-<!-- Appendix, for Q&A: the two sub-protocols the main talk skips, plus streaming. -->
+<!-- Appendix, for Q&A: the boundary tax I promised, and the two connection types the main talk skips, plus streaming. -->
 
 ---
 
@@ -1997,6 +1967,46 @@ Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
 </div>
 
 <!-- This is the appendix slide I promised when I greyed out the two conversion lines. The bridge sits on one layer real servers don't have: the foreign function interface between JavaScript and Python. And I can tell you from years of this — the bugs live here. Four things to know. JS objects arrive in Python as proxies, not dicts — convert explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer — that matters when someone uploads a fifty-megabyte file. Going the other way, to_js turns a dict into a JavaScript Map by default, not a plain object — there's a dict_converter option, and every Pyodide developer hits this exactly once. And one pleasant surprise: async composes beautifully — JS can await a Python coroutine as a Promise, and the two event loops interleave without drama. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. Different plumbing, same role in the stack. -->
+
+---
+
+# `scope["type"]`: the three connection types
+
+<div mt-4 text-lg>
+
+`scope["type"]` says which one — **the call never changes**
+
+</div>
+
+<div grid="~ cols-3" gap-4 mt-6 text-sm>
+
+<div border="~ sky/40 rounded-lg" p-4 bg-sky:5>
+<div text-xl mb-1>🌐 <b><code>"http"</code></b></div>
+<span op80>request → response<br>
+<span op60>(the whole talk)</span></span>
+</div>
+
+<div border="~ violet/40 rounded-lg" p-4 bg-violet:5>
+<div text-xl mb-1>🔌 <b><code>"websocket"</code></b></div>
+<span op80>long-lived, two-way<br>
+<span op60>(ahead)</span></span>
+</div>
+
+<div border="~ amber/40 rounded-lg" p-4 bg-amber:5>
+<div text-xl mb-1>♻️ <b><code>"lifespan"</code></b></div>
+<span op80>startup / shutdown<br>
+<span op60>(ahead)</span></span>
+</div>
+
+</div>
+
+<div mt-8 text-center text-xl>
+
+Only the **event names** differ — learn one, you can read all three ✅
+
+</div>
+
+<!-- The index for the rest of this appendix, if the question is "what about the other two?". ASGI carries three kinds of connection and the app reads scope type to find out which it has. The important part is that the call is identical for all three: same three arguments, same awaiting of receive, same calling of send. What changes is only the strings inside the events — websocket.receive instead of http.request, and so on. So everything in the main talk transfers; the next slides are just the event names. -->
 
 ---
 

@@ -1216,7 +1216,7 @@ Filling this dict correctly **is** what "implementing the server" means
 <div v-click="2">
 <div data-id="ann-send" class="wire-note" absolute style="top: 300px; left: 626px; width: 288px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
-<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response&nbsp;—▸</div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the <span style="white-space: nowrap">response —▸</span></div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
 <FancyArrow from="[data-id=ann-send] @ left" to="[data-id=wire-up] .line:nth-child(6) @ right" arc="0.15" />
@@ -1362,7 +1362,7 @@ Responses made **inside the tab** — nothing leaves it.
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
-clicks: 2
+clicks: 1
 ---
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
@@ -1382,7 +1382,12 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 </div>
 
 <style>
-.punchline {
+/* The two beats share one cell, so the second costs no height. */
+.punchline-stack {
+  display: grid;
+}
+.punchline-stack > * {
+  grid-area: 1 / 1;
   transition: opacity 700ms ease 250ms;
 }
 .step-swap {
@@ -1440,9 +1445,10 @@ Streamlit in the browser
 
 <div v-click="1" mt-2>
 
-<WindowMockup title="localhost:8501" light padding="0.4rem">
+<WindowMockup title="localhost:8501" padding="0.4rem">
 
-<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" style="max-height: 168px; width: auto;" />
+<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="dark:hidden" style="max-height: 168px; width: auto;" />
+<img src="/streamlit-demo-dark.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="hidden dark:block" style="max-height: 168px; width: auto;" />
 
 </WindowMockup>
 
@@ -1560,13 +1566,11 @@ Not just Streamlit — the same swap, done across the ecosystem:
 
 <div class="fw-table" mt-2 text-sm :class="$clicks >= 1 ? 'reveal' : ''">
 
-| Framework | In-browser version | Server stack |
-| --------- | ------------------ | ------------ |
-| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | Starlette — **ASGI** <span op70>(since 1.57)</span> |
-| Shiny for Python | [Shinylive](https://shiny.posit.co/py/docs/shinylive.html) (Posit) | Starlette — **ASGI** |
-| marimo | [WASM notebooks](https://docs.marimo.io/guides/wasm/) | Starlette — **ASGI** |
-| Panel (HoloViz) | [`panel convert`](https://panel.holoviz.org/how_to/wasm/index.html) | Bokeh / Tornado |
-| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | FastAPI — **ASGI** |
+| Framework | In-browser version | What bridges it |
+| --------- | ------------------ | --------------- |
+| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | `asgi-bridge.ts` — **`app(scope, receive, send)`** |
+| Shiny for Python | [Shinylive](https://github.com/posit-dev/shinylive) (Posit) | `messageporthttp.ts` — **`asgiFunc(scope, …)`** |
+| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | `webworker/index.ts` — **`app(scope, rcv, snd)`** |
 
 </div>
 
@@ -1588,7 +1592,7 @@ Each one needed a **server half** in the browser — **ASGI is the right shape**
 }
 </style>
 
-<!-- So it worked for Streamlit. [click] And it is not just Streamlit: the middle column is every project that has already done this. Posit built Shinylive for Shiny. marimo ships WASM notebooks. Panel has a convert command. I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. Every one of them faced the same hole where the server used to be, and filled it the same way. For the ASGI-native ones that is a bridge like ours; Panel, on Tornado, had to do more work. That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
+<!-- So it worked for Streamlit. [click] And it is not just Streamlit. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. The right-hand column is the point: these are three separate teams who never talked to each other, and if you open the source you find the same line in all three. Shinylive builds a scope from the Request and awaits the app with it. Gradio-Lite converts the scope with to_py and awaits the app with its own receive and send. Stlite does what bridge.py does, because bridge.py is a trimmed copy of it. Nobody agreed on this; they each rediscovered that the server half is the part you have to write, and ASGI is the shape it has to be. That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
 
 ---
 layout: statement
@@ -1673,7 +1677,7 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">2</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">3</span></span></h1>
@@ -1688,16 +1692,9 @@ clicks: 1
   <template #edge><CloudflareStackFigure /></template>
 </StackCompare>
 
-<div class="punchline" mt-3 text-center text-lg :class="$clicks >= 1 ? 'op100' : 'op0'">
-
-**Same file** · 3 Pythons · 3 transports · **0 changes**
-
-</div>
-
-<div v-click="2" mt-1 text-center text-xl font-bold text-sky-600>
-
-The interface holds — everything below it is swappable
-
+<div class="punchline-stack" mt-4 text-center text-xl>
+<div :class="$clicks === 1 ? 'op100' : 'op0'"><b>Same file</b> · 3 Pythons · 3 transports · <b>0 changes</b></div>
+<div :class="$clicks >= 2 ? 'op100' : 'op0'" font-bold text-sky-600>The interface holds — everything below it is swappable</div>
 </div>
 
 <style>

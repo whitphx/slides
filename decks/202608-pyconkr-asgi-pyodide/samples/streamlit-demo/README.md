@@ -6,4 +6,9 @@ The Streamlit app shown on the "What is Streamlit?" slide, kept runnable so the 
 uv run streamlit run app.py
 ```
 
-The screenshot on that slide (`../../public/streamlit-demo.png`) is this app at its default slider position, cropped to the main content area.
+The slide shows two screenshots of this app at its default slider position, cropped to the main content area, one per slide theme:
+
+| File | Captured with |
+| --- | --- |
+| `../../public/streamlit-demo.png` | `uv run streamlit run app.py` |
+| `../../public/streamlit-demo-dark.png` | `uv run streamlit run app.py --theme.base dark` |

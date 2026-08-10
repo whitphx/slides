@@ -1043,10 +1043,10 @@ async def dispatch(app, request):
     return response
 ```
 
-<div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-2xl style="left: 166px; top: 186px" aria-hidden="true">❓</div>
-<div class="blank-mark" :class="$clicks >= 2 ? 'shown' : ''" absolute text-2xl style="left: 166px; top: 318px" aria-hidden="true">❓</div>
+<div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 183px" aria-hidden="true">❓</div>
+<div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 315px" aria-hidden="true">❓</div>
 
-<div v-click="3" absolute bottom-12 inset-x-0 text-xl text-center>
+<div v-click="2" absolute bottom-12 inset-x-0 text-xl text-center>
 
 Fill in the blanks and you have **a server** 🛠️
 
@@ -1077,7 +1077,7 @@ Fill in the blanks and you have **a server** 🛠️
 }
 </style>
 
-<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] The first blank is the server's homework — build the scope dict, and implement receive and send. [click] The second is collecting what the app pushed out through send and handing it back. [click] That is genuinely all a server is, once someone else owns the sockets. So let's fill in the blanks, in that order. -->
+<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] Two blanks. The first is the server's homework — build the scope dict, and implement receive and send. The second is collecting what the app pushed out through send and handing it back. [click] That is genuinely all a server is, once someone else owns the sockets. So let's fill in the blanks, in that order. -->
 
 ---
 

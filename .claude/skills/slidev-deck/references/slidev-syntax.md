@@ -143,9 +143,12 @@ the **`app`** object, now in JavaScript
 </div>
 `````
 
+**This applies to `<<<` imports too.** A comment in a sample file renders on the slide exactly like one typed into `slides.md`, so the rule reaches into `samples/`. When a sample carries a comment that exists to explain the slide rather than the code, delete it and re-anchor the point as an arrow + box. Check first whether the fact is already recorded elsewhere for a repo reader (the sample's README is usually the right home); if it is, the comment was pure slide commentary and nothing is lost. Removing lines renumbers the file, so update the highlight spec and every `.line:nth-child(N)` with it.
+
 Notes that save a round of fiddling:
 
 - `.line:nth-child(N)` counts **every** rendered line, blank lines included. In the block above `await` is line 3, not line 2.
+- Size a box so its text does not wrap to an orphaned last word. Besides reading badly, an orphan wrap has been observed to leave a stray fragment of the text painted in the slide's left margin, with no element there in the DOM to explain it; widening the box until the line fits cleared it.
 - Pair the arrows with a line-highlight sequence (`{*|1|3|*}`) so the highlighted line and the arrow appear on the same click.
 - Boxes need `bg-white dark:bg-black` and a border. They float over the code block's background, so a transparent box is unreadable.
 - Position boxes absolutely (`absolute top-24 right-5 w-60`) and check the rendered slide: stacked boxes collide easily, because a box grows downward as its text wraps. Leave a visible gap rather than computing one exactly.

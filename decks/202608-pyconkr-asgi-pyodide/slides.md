@@ -1654,19 +1654,28 @@ The browser runtime, running someone's production traffic
 
 <div mt-2 text-lg>
 
-The whole file — and `src/main.py` = **a symlink to step 1's app**:
+The whole file — nothing left out:
 
 </div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,6|9-11|1,11}{maxHeight:'320px','data-id':'entry'}
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,4|7-9|1,9}{maxHeight:'320px','data-id':'entry'}
 
-<div v-click="3">
-<div data-id="ann-asgi" absolute bottom-28 right-6 w-64 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm shadow-lg>
+<div v-click="[1,2]">
+<div data-id="ann-symlink" class="entry-note" absolute style="top: 205px; left: 640px; width: 320px" bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
+
+`src/main.py` is **a symlink to step 1's app**
+
+</div>
+<FancyArrow from="[data-id=ann-symlink] @ left" to="[data-id=entry] .line:nth-child(4) @ right" arc="0.15" />
+</div>
+
+<div v-click="[3,4]">
+<div data-id="ann-asgi" class="entry-note" absolute style="top: 392px; left: 600px; width: 360px" bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
 
 🤯 Cloudflare **ships the bridge** — `asgi` does what we just wrote by hand
 
 </div>
-<FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(11) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(9) @ right" arc="0.2" color="red" />
 </div>
 
 <div v-click="4" mt-3 text-center>
@@ -1679,6 +1688,11 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 * {
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.45;
+}
+.entry-note, .entry-note p {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
 }
 </style>
 

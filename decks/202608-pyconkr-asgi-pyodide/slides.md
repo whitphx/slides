@@ -482,7 +482,7 @@ clicks: 6
 
 <div text-sm mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
 
-<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}{'data-id':'post-app'}
+<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|7|8-9|11-13|*}{'data-id':'post-app'}
 
 </div>
 
@@ -511,7 +511,7 @@ You said: hello, PyCon KR
 
 </WindowMockup>
 
-<div v-click="6" mt-3 text-center text-lg leading-tight>📥 <b>The body arrives as events</b> — never as a value</div>
+<div v-click="6" mt-3 text-center text-lg leading-tight>📥 The body isn't in <code>scope</code> —<br>you <b><code>await</code></b> it, <b>in pieces</b></div>
 
 </div>
 

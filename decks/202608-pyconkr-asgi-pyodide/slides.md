@@ -112,28 +112,6 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <!-- Here's the whole talk in one slide. When you write a FastAPI app, your code never actually touches the network. Uvicorn does that part, and between your app and Uvicorn there's an interface — ASGI. Now, because that interface is a real, well-specified contract, the two sides are decoupled. Frameworks evolve on one side, servers evolve on the other, and neither needs to know the other's internals. And the question I want to push on today is: how far can you stretch the server side? The answer turns out to be: much further than you'd think. Into a browser tab. And past it. So here's the key message to hold onto: cut a clean interface, and your app runs anywhere something can call it. To prove it, one FastAPI app is going to run on three wildly different runtimes today, without changing a line. -->
 
 ---
-
-# Agenda
-
-<div mt-6 text-xl>
-
-<v-clicks>
-
-- 🧩 **The boundary you use every day** — what ASGI already does for you
-- ⚡ **ASGI in 90 seconds** — `scope`, `receive`, `send`
-- 🌐 **The extreme case** — the same app, running in a browser tab (demo)
-- 🛠️ **Building the bridge** — doing Uvicorn's job in ~45 lines
-- 🏭 **The production proof** — Stlite & friends
-- ☁️ **Stranger still** — the same stack on Cloudflare Workers
-- 🧭 **When to reach for this** — practical uses & honest limits
-
-</v-clicks>
-
-</div>
-
-<!-- The plan for the next forty minutes. We start with the boundary you already use every day without looking at it. Then a quick ASGI refresher — ninety seconds, just the three words you need. Then the fun part: the same app running in a browser tab, live. Then we build the thing that makes it possible — a bridge that does Uvicorn's job in about forty-five lines of Python. Then the production side: Stlite and Gradio-Lite, where this actually ships. Then it gets stranger: the same stack, running production traffic on Cloudflare Workers. And we close with what this is actually good for, and where it honestly breaks down. -->
-
----
 layout: section
 ---
 
@@ -1065,23 +1043,8 @@ async def dispatch(app, request):
     return response
 ```
 
-<div v-click="1">
-<div data-id="ann-before" absolute top-36 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ sky/50 rounded-lg" text-sm>
-
-① the **`scope`** · ② **`receive`** + **`send`**
-
-</div>
-<FancyArrow from="[data-id=ann-before] @ left" to="[data-id=skeleton] .line:nth-child(2) @ right" arc="-0.05" />
-</div>
-
-<div v-click="2">
-<div data-id="ann-after" absolute top-66 right-6 w-56 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg" text-sm>
-
-③ collect what the app **sent**
-
-</div>
-<FancyArrow from="[data-id=ann-after] @ left" to="[data-id=skeleton] .line:nth-child(6) @ right" arc="0.05" />
-</div>
+<div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-2xl style="left: 166px; top: 186px" aria-hidden="true">❓</div>
+<div class="blank-mark" :class="$clicks >= 2 ? 'shown' : ''" absolute text-2xl style="left: 166px; top: 318px" aria-hidden="true">❓</div>
 
 <div v-click="3" absolute bottom-12 inset-x-0 text-xl text-center>
 
@@ -1094,9 +1057,27 @@ Fill in the blanks and you have **a server** 🛠️
   --slidev-code-font-size: 22px;
   --slidev-code-line-height: 1.5;
 }
+/* v-click toggles opacity, which a CSS animation cannot key off; binding the
+   class instead lets the pop run at the moment the mark appears. */
+.blank-mark {
+  opacity: 0;
+}
+.blank-mark.shown {
+  animation: blank-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes blank-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
 </style>
 
-<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] Everything before that call is the server's homework — build the scope dict, and implement receive and send. [click] Everything after it is collecting what the app pushed out through send and handing it back. [click] That is genuinely all a server is, once someone else owns the sockets. So let's fill in the blanks, in that order. -->
+<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] The first blank is the server's homework — build the scope dict, and implement receive and send. [click] The second is collecting what the app pushed out through send and handing it back. [click] That is genuinely all a server is, once someone else owns the sockets. So let's fill in the blanks, in that order. -->
 
 ---
 

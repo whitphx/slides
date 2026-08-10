@@ -1198,28 +1198,30 @@ Filling this dict correctly **is** what "implementing the server" means
             chunks.append(bytes(event.get("body", b"")))
 ```
 
-<div v-click="3" mt-2 grid="~ cols-2" gap-4 text-xs>
-
-<div border="~ violet/40 rounded-lg" px-3 py-1.5 bg-violet:5>
-<div text-center text-sm font-bold>📥 <code>receive()</code> <span op70 font-normal>— the <b>return value</b> carries it</span></div>
-<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center mt-1>
-<div op70 self-center style="grid-row: span 2">🐍 app</div>
+<div v-click="1">
+<div data-id="ann-receive" class="wire-note" absolute style="top: 150px; left: 494px; width: 420px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center>
+<div op70 style="grid-row: span 2">🐍 app</div>
 <div text-center op60>——— calls ———▸</div>
-<div op70 self-center style="grid-row: span 2">🖥️ server</div>
+<div op70 style="grid-row: span 2">🖥️ server</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— the body ———</div>
 </div>
+<div text-center op70 mt-0.5>the <b>return value</b> carries it</div>
+</div>
+<FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.15" />
 </div>
 
-<div border="~ emerald/40 rounded-lg" px-3 py-1.5 bg-emerald:5>
-<div text-center text-sm font-bold>📤 <code>send(event)</code> <span op70 font-normal>— the <b>argument</b> carries it</span></div>
-<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center mt-1>
-<div op70 self-center style="grid-row: span 2">🐍 app</div>
+<div v-click="2">
+<div data-id="ann-send" class="wire-note" absolute style="top: 286px; left: 494px; width: 420px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center>
+<div op70 style="grid-row: span 2">🐍 app</div>
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>—— the response ——▸</div>
-<div op70 self-center style="grid-row: span 2">🖥️ server</div>
+<div op70 style="grid-row: span 2">🖥️ server</div>
 <div text-center op60>◂——— <code>None</code> ———</div>
 </div>
+<div text-center op70 mt-0.5>the <b>argument</b> carries it</div>
 </div>
-
+<FancyArrow from="[data-id=ann-send] @ left" to="[data-id=wire-up] .line:nth-child(6) @ right" arc="0.15" />
 </div>
 
 <style>
@@ -1227,9 +1229,14 @@ Filling this dict correctly **is** what "implementing the server" means
   --slidev-code-font-size: 18px;
   --slidev-code-line-height: 1.45;
 }
+/* Small enough to sit between two code lines without covering the next one. */
+.wire-note {
+  font-size: 11px;
+  line-height: 1.35;
+}
 </style>
 
-<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. [click] send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We don't interpret any of it; we just listen and stash. [click] And notice the asymmetry, because it catches people out. The app calls both of them, so both arrows point the same way — but the payload does not. With receive, the app calls and the body comes back as the return value: data travels server to app. With send, the app passes the response in as the argument and gets nothing back: data travels app to server. Same caller, opposite directions, and which slot carries the payload is the difference. Two closures over a few local variables, and that is the whole server side of the contract. -->
+<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. Notice the direction in the note beside it: the app calls receive, and the body comes back as the return value — data travelling server to app. [click] send is the reverse in every sense: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We don't interpret any of it; we just listen and stash. And the direction flips: the payload rides in as the argument, and nothing comes back. Same caller both times, opposite directions, and which slot carries the data is the whole difference. [click] And notice the asymmetry, because it catches people out. The app calls both of them, so both arrows point the same way — but the payload does not. With receive, the app calls and the body comes back as the return value: data travels server to app. With send, the app passes the response in as the argument and gets nothing back: data travels app to server. Same caller, opposite directions, and which slot carries the payload is the difference. Two closures over a few local variables, and that is the whole server side of the contract. -->
 
 ---
 

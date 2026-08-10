@@ -678,7 +678,7 @@ clicks: 6
 
 <div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-2 text-sm items-center>
 
-<div text-center text-xs op60 font-bold>🖥️ Server <span op70>(Uvicorn, here)</span></div>
+<div text-center text-xs op60 font-bold>🖥️ Server <span op70>(e.g. Uvicorn)</span></div>
 <div></div>
 <div text-center text-xs op60 font-bold>🐍 ASGI application</div>
 

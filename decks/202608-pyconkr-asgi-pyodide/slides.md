@@ -595,8 +595,8 @@ clicks: 3
 class FastAPI(Starlette):
     ...
     async def __call__(
-        self,
-        scope: Scope, receive: Receive, send: Send
+        self, scope: Scope,
+        receive: Receive, send: Send,
     ) -> None:
         ...
 ```
@@ -637,8 +637,8 @@ True
 
 <style>
 * {
-  --slidev-code-font-size: 16px;
-  --slidev-code-line-height: 1.5;
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.45;
 }
 .fw-grid {
   display: grid;

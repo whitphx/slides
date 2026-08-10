@@ -471,6 +471,87 @@ Hello, PyCon KR!
 <!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app — and it is worth walking through, because every line is doing something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be handed HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, carrying the status and the headers. [click] And the second: response.body, carrying the bytes. Two sends, and the response is complete. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — our bridge ignores it too, and there is an appendix slide on it if anyone asks. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
 
 ---
+clicks: 6
+---
+
+# Now a POST — enter `receive`
+
+<div class="post-grid" mt-3 :class="$clicks >= 5 ? 'revealed' : ''">
+
+<div class="post-cell post-left">
+
+<div text-sm mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
+
+<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}
+
+</div>
+
+<div class="post-cell post-right">
+
+<div text-sm mb-1>…and the body comes back out the other side</div>
+
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+$ uvicorn raw_asgi_post:app
+INFO:  Uvicorn running on
+       http://127.0.0.1:8000
+```
+
+<div v-click="6">
+
+```shell
+$ curl -X POST localhost:8000 \
+       -d 'hello, PyCon KR'
+You said: hello, PyCon KR
+```
+
+</div>
+
+</WindowMockup>
+
+<div v-click="6" mt-3 text-center text-lg leading-tight>📥 <b>The body arrives as events</b> — never as a value</div>
+
+</div>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 18px;
+  --slidev-code-line-height: 1.5;
+}
+.post-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.post-cell {
+  min-width: 0;
+}
+.post-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.post-grid.revealed .post-left {
+  width: 100%;
+}
+.post-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.post-grid.revealed .post-right {
+  transform: translateX(0);
+  opacity: 1;
+}
+</style>
+
+<!-- That app never touched receive, because a GET has no body to read. So here is the same eleven lines with the third argument doing its job. [click] This block is the whole difference: the request body is not a value sitting in scope, it is a stream you pull. [click] You await receive, and you get one event. [click] And you keep going until an event comes back with more_body false, because a large upload arrives in pieces and the client is still typing while your handler is already running. That is why receive is an async callable and not a bytes attribute — the body may not exist yet when the app starts. [click] After that it is the send pair you already know, with the body echoed back. [click] Point Uvicorn at it, same as before. [click] POST some bytes, and they come back out. Everything a framework does with request.body or a parsed form starts here, in this loop. And this is the last piece of the contract: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
+
+---
 clicks: 3
 ---
 

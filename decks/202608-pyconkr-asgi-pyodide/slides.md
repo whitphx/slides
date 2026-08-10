@@ -124,14 +124,14 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - 🌐 **The extreme case** — the same app, running in a browser tab (demo)
 - 🛠️ **Building the bridge** — doing Uvicorn's job in ~45 lines
 - 🏭 **The production proof** — Stlite & friends
-- ☁️ **Full circle** — the same stack on Cloudflare Workers
+- ☁️ **Stranger still** — the same stack on Cloudflare Workers
 - 🧭 **When to reach for this** — practical uses & honest limits
 
 </v-clicks>
 
 </div>
 
-<!-- The plan for the next forty minutes. We start with the boundary you already use every day without looking at it. Then a quick ASGI refresher — ninety seconds, just the three words you need. Then the fun part: the same app running in a browser tab, live. Then we build the thing that makes it possible — a bridge that does Uvicorn's job in about forty-five lines of Python. Then the production side: Stlite and Gradio-Lite, where this actually ships. Then we go full circle and run the same stack on Cloudflare Workers. And we close with what this is actually good for, and where it honestly breaks down. -->
+<!-- The plan for the next forty minutes. We start with the boundary you already use every day without looking at it. Then a quick ASGI refresher — ninety seconds, just the three words you need. Then the fun part: the same app running in a browser tab, live. Then we build the thing that makes it possible — a bridge that does Uvicorn's job in about forty-five lines of Python. Then the production side: Stlite and Gradio-Lite, where this actually ships. Then it gets stranger: the same stack, running production traffic on Cloudflare Workers. And we close with what this is actually good for, and where it honestly breaks down. -->
 
 ---
 layout: section
@@ -1548,13 +1548,13 @@ Then the browser can't be the only unusual caller… 😏
 layout: section
 ---
 
-# ☁️ Full circle
+# ☁️ Stranger still: Pyodide on the edge
 
 <div mt-4 op70>
-The same stack, back on the server — at the edge
+The browser runtime, running someone's production traffic
 </div>
 
-<!-- And here's my favorite one, because it closes a loop. -->
+<!-- And here's my favorite one, because it takes the strange thing one step further. -->
 
 ---
 

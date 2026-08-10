@@ -1572,25 +1572,25 @@ Not just Streamlit — the same swap, done across the ecosystem:
 
 </div>
 
-<div v-click="1" mt-4 text-xl text-center>
+<div v-click="2" mt-4 text-xl text-center>
 
 Each one needed a **server half** in the browser — **ASGI is the right shape** 💡
 
 </div>
 
 <style>
-/* The middle column is present from the start so the table never reflows;
-   it just is not visible until the click. */
-.fw-table :is(th, td):nth-child(2) {
+/* The bridging column is present from the start so the table never reflows;
+   it just is not visible until the click that makes it the point. */
+.fw-table :is(th, td):nth-child(3) {
   opacity: 0;
   transition: opacity 600ms ease;
 }
-.fw-table.reveal :is(th, td):nth-child(2) {
+.fw-table.reveal :is(th, td):nth-child(3) {
   opacity: 1;
 }
 </style>
 
-<!-- So it worked for Streamlit. [click] And it is not just Streamlit. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. The right-hand column is the point: open any of these and you find the same call. And I should be straight about the order — Shinylive did it first, and Stlite's bridge is heavily inspired by theirs. So this is not three teams converging by accident; it is one good idea being picked up, which is the more useful story anyway. Nobody had to invent a protocol, because ASGI already was one. The server half was the only part anyone had to write, and once you have read one of these bridges you can read all of them. That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
+<!-- So it worked for Streamlit — and it is not just Streamlit. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. Three frameworks, three ports, three separate codebases. [click] Now the last column, which is the point: open any of them and you find the same call. And I should be straight about the order — Shinylive did it first, and Stlite's bridge is heavily inspired by theirs. So this is not three teams converging by accident; it is one good idea being picked up, which is the more useful story anyway. Nobody had to invent a protocol, because ASGI already was one. The server half was the only part anyone had to write, and once you have read one of these bridges you can read all of them. [click] That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
 
 ---
 layout: statement

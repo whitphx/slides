@@ -1508,8 +1508,6 @@ Streamlit in the browser
 | --------- | ------------ |
 | Streamlit | Starlette — **ASGI** <span op70>(since 1.57)</span> |
 | Shiny for Python | Starlette — **ASGI** |
-| marimo | Starlette — **ASGI** |
-| Panel (HoloViz) | Bokeh / Tornado |
 | Gradio | FastAPI — **ASGI** |
 
 </div>
@@ -1522,11 +1520,11 @@ Streamlit in the browser
 
 <div v-click="2" mt-2 text-xl>
 
-Underneath, nearly all of them are **an ASGI app + a server** 🤔
+Underneath, every one of them is **an ASGI app + a server** 🤔
 
 </div>
 
-<!-- Before we go further, look at what these frameworks are actually built on. Streamlit, Shiny, marimo, Gradio — the right-hand column is the interesting one, because almost all of them are ASGI underneath. Shiny sits on Starlette, Gradio on FastAPI, marimo on Starlette, and Streamlit joined them in 1.57 when it swapped Tornado out for Starlette and Uvicorn. Panel is the holdout, still on Bokeh's Tornado server. [click] And these are heavyweight things — static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But structurally? An ASGI app with a server underneath it. Which is exactly the shape we just took apart. So the obvious question: if the server half is swappable for our forty-five lines, is it swappable for these too? -->
+<!-- Before we go further, look at what these frameworks are actually built on. The right-hand column is the interesting one. Shiny sits on Starlette, Gradio on FastAPI, and Streamlit joined them in 1.57, when it swapped Tornado out for Starlette and Uvicorn. Not every Python app framework is ASGI — Panel, for one, is still on Bokeh's Tornado server — but these three are, and they are the three we will follow into the browser in a minute. [click] And these are heavyweight things — static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But structurally? An ASGI app with a server underneath it. Which is exactly the shape we just took apart. So the obvious question: if the server half is swappable for our forty-five lines, is it swappable for these too? -->
 
 ---
 clicks: 1
@@ -1844,7 +1842,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 
 </div>
 
-<!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Shinylive, marimo, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
+<!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Shinylive, Gradio-Lite, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
 
 ---
 

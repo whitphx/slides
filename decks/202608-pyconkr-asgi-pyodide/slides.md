@@ -1184,7 +1184,7 @@ Filling this dict correctly **is** what "implementing the server" means
 
 </div>
 
-```py {*|1-3|5-11|*}{maxHeight:'300px','data-id':'wire-up'}
+```py {*|1-3|5-11|*}{'data-id':'wire-up'}
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
@@ -1199,12 +1199,12 @@ Filling this dict correctly **is** what "implementing the server" means
 ```
 
 <div v-click="1">
-<div data-id="ann-receive" class="wire-note" absolute style="top: 150px; left: 494px; width: 420px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-receive" class="wire-note" absolute style="top: 150px; left: 652px; width: 262px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center>
 <div op70 style="grid-row: span 2">🐍 app</div>
-<div text-center op60>——— calls ———▸</div>
+<div text-center op60>—— calls ——▸</div>
 <div op70 style="grid-row: span 2">🖥️ server</div>
-<div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— the body ———</div>
+<div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— the body ——</div>
 </div>
 <div text-center op70 mt-0.5>the <b>return value</b> carries it</div>
 </div>
@@ -1212,12 +1212,12 @@ Filling this dict correctly **is** what "implementing the server" means
 </div>
 
 <div v-click="2">
-<div data-id="ann-send" class="wire-note" absolute style="top: 286px; left: 494px; width: 420px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-send" class="wire-note" absolute style="top: 310px; left: 652px; width: 262px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center>
 <div op70 style="grid-row: span 2">🐍 app</div>
-<div text-center text-emerald-600 dark:text-emerald-400 font-bold>—— the response ——▸</div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— the response —▸</div>
 <div op70 style="grid-row: span 2">🖥️ server</div>
-<div text-center op60>◂——— <code>None</code> ———</div>
+<div text-center op60>◂—— <code>None</code> ——</div>
 </div>
 <div text-center op70 mt-0.5>the <b>argument</b> carries it</div>
 </div>
@@ -1226,7 +1226,7 @@ Filling this dict correctly **is** what "implementing the server" means
 
 <style>
 * {
-  --slidev-code-font-size: 18px;
+  --slidev-code-font-size: 22px;
   --slidev-code-line-height: 1.45;
 }
 /* Small enough to sit between two code lines without covering the next one. */

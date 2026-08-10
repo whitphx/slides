@@ -674,11 +674,11 @@ True
 clicks: 6
 ---
 
-# One request, start to finish
+# One `await` is the whole request
 
 <div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-2 text-sm items-center>
 
-<div text-center text-xs op60 font-bold>🖥️ Server <span op70>(Uvicorn · <code>bridge.py</code>)</span></div>
+<div text-center text-xs op60 font-bold>🖥️ Server <span op70>(Uvicorn, here)</span></div>
 <div></div>
 <div text-center text-xs op60 font-bold>🐍 ASGI application</div>
 
@@ -708,17 +708,27 @@ clicks: 6
 
 </div>
 
-<div absolute left-6 top-40 text-xs op50 style="writing-mode: vertical-rl">time ↓</div>
+<div absolute left-4 top-30 bottom-10 flex="~ col" items-center gap-1 op50 text-xs>
+<div>time</div>
+<svg width="14" flex-1 overflow-visible aria-hidden="true">
+  <defs>
+    <marker id="time-axis-head" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="9">
+      <path d="M2,2 L6,9 L10,2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    </marker>
+  </defs>
+  <line x1="7" y1="2" x2="7" y2="96%" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#time-axis-head)" />
+</svg>
+</div>
 
-<!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call — for HTTP, exactly one call carries the whole request. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is — which is exactly why our bridge could just await the app and then read what it had collected. -->
+<!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call — for HTTP, exactly one call carries the whole request. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
 
 ---
 
-# Three connection types, one shape
+# Why `http` is enough for today
 
 <div mt-4 text-lg>
 
-`scope["type"]` — three protocols, **one loop**:
+`scope["type"]` says which one — **the call never changes**
 
 </div>
 
@@ -745,11 +755,11 @@ clicks: 6
 
 <div v-click="4" mt-8 text-center text-xl>
 
-Today: **`http`** — it carries the whole idea ✅
+Only the **event names** differ — learn one, you can read all three ✅
 
 </div>
 
-<!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. The nice part is they all share the same receive-and-send loop, so once you understand one, the others are variations. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP. WebSocket and lifespan work the same way in spirit, and I've put both in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
+<!-- ASGI carries three kinds of connection, and the app figures out which one by reading scope type. Here is the part that matters for the next forty minutes: the call is identical for all three. Same three arguments, same awaiting of receive, same calling of send — what changes is only the strings inside the events. HTTP is request-response. WebSocket is the long-lived two-way one — same loop, different event names. And lifespan is the odd one — it's not a client connection at all, it's the app's own startup and shutdown signal. Now, to keep this talk focused, I'm going to do everything through HTTP. WebSocket and lifespan work the same way in spirit, and I've put both in appendix slides at the end — happy to walk through them in Q&A. HTTP alone carries the whole idea. -->
 
 ---
 clicks: 1

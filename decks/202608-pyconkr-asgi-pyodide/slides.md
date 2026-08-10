@@ -1280,27 +1280,31 @@ Filling this dict correctly **is** what "implementing the server" means
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-call js {*}
 
+<div v-click="1">
+
 <div mt-2 text-sm>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-fetch js {1-3,6,9-13|1,9-13|6|*}{'data-id':'dispatch-js'}
+<<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-fetch js {1-3,6,9-13|1,9-13|6|*}{at:2,'data-id':'dispatch-js'}
 
-<div v-click="[1,2]">
-<div data-id="ann-sig" absolute top-40 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ teal/60 rounded-lg" text-sm>
+</div>
+
+<div v-click="[2,3]">
+<div data-id="ann-sig" class="js-note" absolute style="top: 214px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ teal/60 rounded-lg">
 
 `fetch()`'s exact shape — **`Request` in, `Response` out**
 
 </div>
-<FancyArrow from="[data-id=ann-sig] @ left" to="[data-id=dispatch-js] .line:nth-child(1) @ right" arc="-0.15" />
-<FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(9) @ right" arc="0.25" />
+<FancyArrow from="[data-id=ann-sig] @ left" to="[data-id=dispatch-js] .line:nth-child(1) @ right" arc="-0.1" />
+<FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(9) @ right" arc="0.4" />
 </div>
 
-<div v-click="3">
-<div data-id="ann-ffi" absolute bottom-4 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
+<div v-click="4">
+<div data-id="ann-ffi" class="js-note" absolute style="top: 322px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
 
 **Pyodide's FFI** — values get converted <span op70>(→ appendix)</span>
 
 </div>
-<FancyArrow from="[data-id=ann-ffi] @ top" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="-0.2" color="red" />
 <FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(7) @ right" arc="0.2" color="red" />
 </div>
 
@@ -1308,6 +1312,13 @@ Filling this dict correctly **is** what "implementing the server" means
 * {
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.45;
+}
+/* The typography preset sizes `p` directly, so inheriting a smaller size on
+   the box alone would not reach the markdown paragraph inside it. */
+.js-note, .js-note p {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
 }
 </style>
 

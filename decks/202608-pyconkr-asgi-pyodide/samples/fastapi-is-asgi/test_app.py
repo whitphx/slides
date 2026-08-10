@@ -1,7 +1,8 @@
 """The claim the slide makes: a FastAPI `app` is itself an ASGI application.
 
-No test client, no server. The tests call the object the way a server would,
-and assert exactly what the slide's REPL session shows.
+No test client, no server. The first test asserts what the slide's REPL shows;
+the second goes further than the slide does and calls the object the way a
+server would, which is the part that needs a scope, a receive and a send.
 """
 
 import inspect

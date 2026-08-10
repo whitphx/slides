@@ -609,20 +609,16 @@ class FastAPI(Starlette):
 
 <div class="fw-cell fw-right">
 
-<div text-sm mb-1>…and <code>app</code> is <b>still just the callable</b> <span op70>(<code>python -m asyncio</code> allows <code>await</code>)</span></div>
+<div text-sm mb-1>…and <code>app</code> is <b>still just the callable</b></div>
 
 ```py {*}
-$ python -m asyncio
+$ python
 
 >>> callable(app)
 True
+
 >>> list(inspect.signature(app).parameters)
 ['scope', 'receive', 'send']
-
->>> await app(scope, receive, send)
->>> events
-['http.response.start',
- 'http.response.body']
 ```
 
 <div v-click="3" mt-3 text-center text-lg leading-tight>
@@ -637,8 +633,8 @@ True
 
 <style>
 * {
-  --slidev-code-font-size: 14px;
-  --slidev-code-line-height: 1.45;
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.5;
 }
 .fw-grid {
   display: grid;
@@ -672,7 +668,7 @@ True
 }
 </style>
 
-<!-- So if eleven lines is a working app, what is FastAPI for? All the things you actually want: routing, request parsing, validation, dependency injection, generated docs. You write decorated functions instead of dictionaries. [click] And here is why, straight from FastAPI's own source: the class defines __call__ with the ASGI signature, and hands straight through to Starlette. [click] So the thing FastAPI gives you is not some special framework construct that a server has to know about. Ask inspect for its signature and you get exactly three parameters: scope, receive, send. It IS an ASGI application, in the same sense our eleven lines were. You can await it directly, no server anywhere — it returns None, because the response went out through the send callable we passed in, which is precisely the ASGI contract. That's checked by a test in the repo, by the way — it reads the signature off type(app).__call__ and calls the object by hand. [click] So a framework is not a different kind of thing from what we just wrote. It is a much nicer way to write the same callable. Which means anything that can call our eleven lines can call FastAPI too — hold that thought. -->
+<!-- So if eleven lines is a working app, what is FastAPI for? All the things you actually want: routing, request parsing, validation, dependency injection, generated docs. You write decorated functions instead of dictionaries. [click] And here is why, straight from FastAPI's own source: the class defines __call__ with the ASGI signature, and hands straight through to Starlette. [click] So the thing FastAPI gives you is not some special framework construct that a server has to know about. Ask inspect for its signature and you get exactly three parameters: scope, receive, send. It IS an ASGI application, in the same sense our eleven lines were. And you can go further than the signature: hand it a scope and a receive and a send of your own, and it runs, no server anywhere, returning None because the response goes out through send. I have kept that off the slide because it needs three variables you cannot see, but there is a test in the repo that does exactly it, if anyone wants the receipt. [click] So a framework is not a different kind of thing from what we just wrote. It is a much nicer way to write the same callable. Which means anything that can call our eleven lines can call FastAPI too — hold that thought. -->
 
 ---
 clicks: 6

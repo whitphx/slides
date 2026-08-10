@@ -753,7 +753,7 @@ INFO:  Uvicorn running on
 
 <WindowMockup title="http://127.0.0.1:8000" light>
 
-<div p-3>
+<div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>
 <button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
 <div mt-2 font-mono text-sm>Python 3.12 on <b>darwin/arm64</b> 🖥️</div>
@@ -771,6 +771,12 @@ INFO:  Uvicorn running on
 * {
   --slidev-code-font-size: 22px;
   --slidev-code-line-height: 1.5;
+}
+/* WindowMockup's `light` pins the frame to white but leaves slot content on the
+   theme's text colour, so this has to be pinned too or it vanishes in dark mode.
+   Pinned rather than dropped because the page being mocked really is white. */
+.mock-page {
+  color: #1f2937;
 }
 .demo-grid {
   display: grid;
@@ -1210,7 +1216,7 @@ Filling this dict correctly **is** what "implementing the server" means
 <div v-click="2">
 <div data-id="ann-send" class="wire-note" absolute style="top: 300px; left: 626px; width: 288px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
-<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response&nbsp;—▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
 <FancyArrow from="[data-id=ann-send] @ left" to="[data-id=wire-up] .line:nth-child(6) @ right" arc="0.15" />
@@ -1223,8 +1229,8 @@ Filling this dict correctly **is** what "implementing the server" means
 }
 /* Small enough to sit between two code lines without covering the next one. */
 .wire-note {
-  font-size: 11px;
-  line-height: 1.35;
+  font-size: 13px;
+  line-height: 1.4;
 }
 </style>
 
@@ -1356,7 +1362,7 @@ Responses made **inside the tab** — nothing leaves it.
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
@@ -1621,13 +1627,12 @@ The browser runtime, running someone's production traffic
 - ☁️ **Cloudflare Workers** — serverless at the edge, on **workerd** (JS/WASM)
 - 🐍 **Python Workers = Pyodide** — the same WASM CPython, now *server-side*
 - 🔁 **Full circle** — what V8 did for JS, workerd does for this Python stack
-- 🧰 **SDK `asgi` module** — `bridge.py`'s production-grade sibling
 
 </v-clicks>
 
 </div>
 
-<!-- Cloudflare Workers are serverless functions running on Cloudflare's edge network, on a runtime called workerd — it's built on V8, it speaks JavaScript and WebAssembly. And when Cloudflare added Python support, guess how they did it. Pyodide. The exact same WebAssembly CPython from our browser story — except now it's running server-side, on the edge. I love this because it rhymes with history: V8 took browser-born JavaScript and put it on the server, and now workerd is doing the same thing to the browser-born Python stack. And here's the part that matters for us: their SDK ships an asgi module — a production-grade sibling of our bridge.py — whose job is translating JavaScript Request objects into ASGI calls. Sound familiar? -->
+<!-- Cloudflare Workers are serverless functions running on Cloudflare's edge network, on a runtime called workerd — it's built on V8, it speaks JavaScript and WebAssembly. And when Cloudflare added Python support, guess how they did it. Pyodide. The exact same WebAssembly CPython from our browser story — except now it's running server-side, on the edge. I love this because it rhymes with history: V8 took browser-born JavaScript and put it on the server, and now workerd is doing the same thing to the browser-born Python stack. Which is a lovely bit of symmetry on its own. But the part I actually want to show you is on the next slide, so let's just look at the code. -->
 
 ---
 
@@ -1639,7 +1644,16 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 
 </div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,6|9-13|*}{maxHeight:'320px'}
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,6|9-11|1,11}{maxHeight:'320px','data-id':'entry'}
+
+<div v-click="3">
+<div data-id="ann-asgi" absolute bottom-28 right-6 w-64 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm shadow-lg>
+
+🤯 Cloudflare **ships the bridge** — `asgi` does what we just wrote by hand
+
+</div>
+<FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(11) @ right" arc="0.2" color="red" />
+</div>
 
 <div v-click="4" mt-3 text-center>
 
@@ -1654,7 +1668,7 @@ The whole file — and `src/main.py` = **a symlink to step 1's app**:
 }
 </style>
 
-<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Import the SDK's asgi module. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the fetch handler, one line: hand the app to asgi.fetch. Their bridge does what ours did — builds the scope, wires receive and send — except production-grade. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
+<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Two imports and a fetch handler. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the handler, one line: hand the app to asgi.fetch. [click] Now read that first import again, because this is the bit I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to prove it could be done. They wrote it as a supported product feature. If you had walked in here thinking the browser thing was a stunt, this is the slide where it stops being one. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
@@ -1674,9 +1688,15 @@ clicks: 1
   <template #edge><CloudflareStackFigure /></template>
 </StackCompare>
 
-<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="punchline" mt-3 text-center text-lg :class="$clicks >= 1 ? 'op100' : 'op0'">
 
-Same app on top — **only the server half changes** ☁️
+**Same file** · 3 Pythons · 3 transports · **0 changes**
+
+</div>
+
+<div v-click="2" mt-1 text-center text-xl font-bold text-sky-600>
+
+The interface holds — everything below it is swappable
 
 </div>
 
@@ -1697,57 +1717,7 @@ Same app on top — **only the server half changes** ☁️
 }
 </style>
 
-<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. Same app, three environments, and every difference lives below the interface. -->
-
----
-
-# Three runtimes, one app
-
-<div grid="~ cols-3" gap-3 mt-4 items-start>
-
-<StackColumn
-  v-click="1"
-  title="① Server"
-  env="your machine / cloud VM"
-  :layers="[
-    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
-    { label: 'Uvicorn', note: 'HTTP over TCP sockets', kind: 'caller' },
-    { label: 'CPython 3.12', note: 'native process', kind: 'runtime' },
-  ]"
-/>
-
-<StackColumn
-  v-click="2"
-  title="② Browser"
-  env="each visitor's tab"
-  :layers="[
-    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
-    { label: 'bridge.py', note: 'a call from the page', kind: 'caller' },
-    { label: 'Pyodide 3.14', note: 'WASM, on the page', kind: 'runtime' },
-  ]"
-/>
-
-<StackColumn
-  v-click="3"
-  title="③ Edge"
-  env="Cloudflare's network"
-  :layers="[
-    { label: 'app', note: 'ASGI application (FastAPI)', kind: 'app' },
-    { label: 'SDK asgi module', note: 'JS Request / Response', kind: 'caller' },
-    { label: 'Pyodide 3.13', note: 'WASM, on workerd', kind: 'runtime' },
-  ]"
-/>
-
-</div>
-
-<div v-click="4" mt-5 text-center text-xl op80>
-
-**Same file** · 3 Pythons · 3 transports · **0 changes**<br>
-<span v-click="5" font-bold text-sky-600>The interface holds — everything below it is swappable</span>
-
-</div>
-
-<!-- And here is the whole talk in one picture. Three columns, three runtimes. A server with Uvicorn on native CPython. A browser tab with our bridge on Pyodide. Cloudflare's edge with their SDK bridge, also on Pyodide. Now look at the top row: it's the same file. Literally — two of them load it and one symlinks it. It ran on Python 3.12, 3.14, and 3.13, over TCP sockets, a direct call, and JS Request objects — zero changes. Everything below the interface got swapped per environment; nothing above it moved. That's what "cut a clean interface" buys you. Not a deployment trick — a property of the architecture. -->
+<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
 
 ---
 clicks: 2
@@ -1767,7 +1737,7 @@ clicks: 2
 
 <div v-click="2" mt-2 text-center text-xl>
 
-**Same kernel — only the caller changed** 🔁
+**Same app, same bridge — only the caller changed** 🔁
 
 </div>
 
@@ -1781,7 +1751,7 @@ clicks: 2
 }
 </style>
 
-<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw, and read the rows across them one more time: your script, the Streamlit server, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again — but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again — but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the leftmost column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] Nothing about the kernel changed. Only the caller did. When your server half targets an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
+<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw, and read the rows across them one more time: your script, the Streamlit server, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again — but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again — but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the leftmost column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] Nothing from the bridge upward changed. Only the caller did. When your server half targets an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
 
 ---
 layout: section

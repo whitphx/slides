@@ -898,14 +898,13 @@ A server inside your browser
 
 - No backend, no install — **just a web page**
 - Python ⇄ JavaScript, direct calls
-- `asyncio` on the browser's event loop
-- ⚠️ **Single thread** · no sockets
+- **`micropip`** installs packages, in the page
 
 </v-clicks>
 
 </div>
 
-<div v-click="5" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
+<div v-click="4" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
 <div text-xs op70 mb-2>Browser tab</div>
 <div border="~ violet/40 rounded" p-2 bg-violet:5 text-sm>🐍 Pyodide<br><span text-xs op80>CPython on WASM</span></div>
 <div text-xl op50 my-1>⇅</div>
@@ -918,7 +917,7 @@ A server inside your browser
 Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
-<!-- One slide on the enabler, because it deserves at least that. Pyodide is CPython — the real thing — compiled to WebAssembly, so it runs inside a browser tab. asyncio works. You can install pure-Python packages with micropip. Python and JavaScript can call each other directly, and Python's event loop rides on the browser's. One constraint to remember: single interpreter, single thread, and no sockets — the browser sandbox doesn't hand those out. Keep those four facts in mind — every one of them comes back later. -->
+<!-- One slide on the enabler, because it deserves at least that. Pyodide is CPython — the real thing — compiled to WebAssembly, so it runs inside a browser tab. No backend, no install: it is a web page. Python and JavaScript can call each other directly, in both directions, which is the part the whole demo rests on. And micropip installs packages from PyPI into the page at runtime. There are real constraints too — no threads, no raw sockets — but they are not what this slide is for; I have an honest-limits slide near the end and I would rather you first believe that this works at all. -->
 
 ---
 

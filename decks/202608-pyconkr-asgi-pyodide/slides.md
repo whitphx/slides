@@ -18,7 +18,7 @@ addons:
 <h1 text-5xl leading-16>
 ASGI on Pyodide
 <br>
-<small text-3xl op80>Building a web server <span v-mark.underline.sky="1">inside your browser</span></small>
+<small text-3xl op80>Building a web server inside your browser</small>
 </h1>
 
 <div mt-12 text-xl op80>
@@ -45,7 +45,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 - <span class="heading">Created</span>: <span class="item"><img src="/portfolio/awesome_emacs_keymap.svg">Awesome Emacs Keymap</span>, <span class="item"><img src="/portfolio/stlite.png">Stlite: In-browser Streamlit</span>, <span class="item">🎈 Streamlit-WebRTC</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio-Lite: Serverless Gradio</span>, <span class="item">🤗 Transformers.js.py</span>
 - <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
-- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🌏APAC, 🇪🇺Euro, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT</span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍SciPyData2026</span>
+- <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🌏APAC, 🇪🇺Euro, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, <span v-mark.circle.red="2">🇰🇷KR</span></span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍SciPyData2026</span>
 
 <div absolute top-48 right-0>
 <a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
@@ -55,7 +55,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </div>
 
-<div absolute left-12 bottom-10 w-min flex="~ gap-1" items-center justify-center v-click="2">
+<div absolute left-12 bottom-10 w-min flex="~ gap-1" items-center justify-center v-click="3">
   <div i-ri-user-3-line op50 ma text-2xl />
   <div><a href="https://whitphx.info/" target="_blank" class="border-none! font-300">whitphx.info</a></div>
   <div i-ri-github-line op50 ma text-2xl ml4/>
@@ -151,9 +151,9 @@ clicks: 1
 
 # You deploy this pair every week
 
-<div class="deploy-grid" mt-4 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
+<div class="deploy-grid" mt-4 :class="$clicks >= 1 ? 'revealed' : ''">
 
-<div class="deploy-cell">
+<div class="deploy-cell deploy-left">
 
 <div text-sm mb-1>Demo app — <b>ordinary FastAPI</b></div>
 
@@ -171,7 +171,7 @@ async def runtime() -> str:
 
 </div>
 
-<div class="deploy-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="deploy-cell deploy-right">
 
 <div text-sm mb-1>…and how everyone runs it</div>
 
@@ -204,13 +204,33 @@ Uvicorn: ***how* requests arrive**
 }
 .deploy-grid {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  transition: grid-template-columns 700ms ease;
 }
 .deploy-cell {
   min-width: 0;
-  overflow: hidden;
-  transition: opacity 700ms ease 250ms;
+}
+/* Both panes sit at their final width for the whole animation, so nothing
+   inside them re-wraps while it moves. The code starts spanning both columns
+   and shrinks into one; a code block scrolls rather than re-wraps, so its
+   width is the one thing here that is safe to animate. */
+.deploy-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.deploy-grid.revealed .deploy-left {
+  width: 100%;
+}
+.deploy-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.deploy-grid.revealed .deploy-right {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>
 
@@ -369,9 +389,9 @@ clicks: 6
 
 # You don't even need a framework
 
-<div class="framework-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 5 ? '1fr 1fr' : '1fr 0fr' }">
+<div class="framework-grid" mt-3 :class="$clicks >= 5 ? 'revealed' : ''">
 
-<div class="framework-cell">
+<div class="framework-cell framework-left">
 
 <div text-sm mb-1>A complete ASGI app — <b>no framework</b></div>
 
@@ -379,7 +399,7 @@ clicks: 6
 
 </div>
 
-<div class="framework-cell" :class="$clicks >= 5 ? 'op100' : 'op0'">
+<div class="framework-cell framework-right">
 
 <div text-sm mb-1>…and Uvicorn serves it, no questions asked</div>
 
@@ -418,13 +438,33 @@ Hello, PyCon KR!
 }
 .framework-grid {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  transition: grid-template-columns 700ms ease;
 }
 .framework-cell {
   min-width: 0;
-  overflow: hidden;
-  transition: opacity 700ms ease 250ms;
+}
+/* Both panes sit at their final width for the whole animation, so nothing
+   inside them re-wraps while it moves. The code starts spanning both columns
+   and shrinks into one; a code block scrolls rather than re-wraps, so its
+   width is the one thing here that is safe to animate. */
+.framework-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.framework-grid.revealed .framework-left {
+  width: 100%;
+}
+.framework-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.framework-grid.revealed .framework-right {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>
 
@@ -436,9 +476,9 @@ clicks: 3
 
 # So what does a framework give you?
 
-<div class="fw-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 2 ? '1fr 1fr' : '1fr 0fr' }">
+<div class="fw-grid" mt-3 :class="$clicks >= 2 ? 'revealed' : ''">
 
-<div class="fw-cell">
+<div class="fw-cell fw-left">
 
 <div text-sm mb-1>FastAPI — routing, validation, docs…</div>
 
@@ -462,7 +502,7 @@ class FastAPI(Starlette):
 
 </div>
 
-<div class="fw-cell" :class="$clicks >= 2 ? 'op100' : 'op0'">
+<div class="fw-cell fw-right">
 
 <div text-sm mb-1>…and <code>app</code> is <b>still just the callable</b> <span op70>(<code>python -m asyncio</code> allows <code>await</code>)</span></div>
 
@@ -497,13 +537,33 @@ True
 }
 .fw-grid {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  transition: grid-template-columns 700ms ease;
 }
 .fw-cell {
   min-width: 0;
-  overflow: hidden;
-  transition: opacity 700ms ease 250ms;
+}
+/* Both panes sit at their final width for the whole animation, so nothing
+   inside them re-wraps while it moves. The code starts spanning both columns
+   and shrinks into one; a code block scrolls rather than re-wraps, so its
+   width is the one thing here that is safe to animate. */
+.fw-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.fw-grid.revealed .fw-left {
+  width: 100%;
+}
+.fw-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.fw-grid.revealed .fw-right {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>
 
@@ -596,9 +656,9 @@ clicks: 1
 
 # Demo, step 1: the normal case
 
-<div class="demo-grid" mt-3 :style="{ gridTemplateColumns: $clicks >= 1 ? '1fr 1fr' : '1fr 0fr' }">
+<div class="demo-grid" mt-3 :class="$clicks >= 1 ? 'revealed' : ''">
 
-<div class="demo-cell">
+<div class="demo-cell demo-left">
 
 <div text-sm mb-1><code>main.py</code> <span op70>— the demo app (abridged)</span></div>
 
@@ -616,7 +676,7 @@ async def runtime() -> str:
 
 </div>
 
-<div class="demo-cell" :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="demo-cell demo-right">
 
 <div text-sm mb-1>…run it, open the page, click the button</div>
 
@@ -655,13 +715,33 @@ INFO:  Uvicorn running on
 }
 .demo-grid {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  transition: grid-template-columns 700ms ease;
 }
 .demo-cell {
   min-width: 0;
-  overflow: hidden;
-  transition: opacity 700ms ease 250ms;
+}
+/* Both panes sit at their final width for the whole animation, so nothing
+   inside them re-wraps while it moves. The code starts spanning both columns
+   and shrinks into one; a code block scrolls rather than re-wraps, so its
+   width is the one thing here that is safe to animate. */
+.demo-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.demo-grid.revealed .demo-left {
+  width: 100%;
+}
+.demo-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.demo-grid.revealed .demo-right {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>
 

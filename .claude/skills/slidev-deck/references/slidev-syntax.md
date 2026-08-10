@@ -181,6 +181,28 @@ Hello, world!
 
 Props: `title`, `dark`/`light`, `codeblock` (adjusts padding for code blocks), `padding`.
 
+Without `dark`/`light` the frame follows the deck's theme, which is always safe. Force one only to depict something that really is that colour — a terminal, or a light web page — and then **pin the content's colour too**:
+
+`````md
+````md
+<WindowMockup title="http://127.0.0.1:8000" light>
+
+<div p-3 class="mock-page">…</div>
+
+</WindowMockup>
+
+<style>
+/* `light` pins the frame to white but leaves slot content on the theme's
+   text colour: white-on-white in dark mode without this. */
+.mock-page { color: #1f2937; }
+</style>
+````
+`````
+
+The addon sets the frame's background and special-cases shiki, so code blocks and images are fine unaided. Anything else — prose, buttons, mocked UI — inherits the slide's text colour and disappears in the opposite theme.
+
+The rule generalises past this addon: **whenever you pin a background independently of the theme, pin the foreground with it.** Both themes ship, so check a slide in each before calling it done; in the dev server, `document.documentElement.classList.add('dark')` flips it without touching the deck.
+
 ### Anipres
 
 For complex graphical animations. Declare the addon and use:

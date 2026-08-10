@@ -1837,7 +1837,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
 - 🌉 **A server = anything that fulfills the contract** — Uvicorn · a tab · the edge
-- 🏭 **Shipping today** — Stlite · Shinylive · marimo · the playgrounds
+- 🏭 **Shipping today** — Stlite · Shinylive · Gradio-Lite · the playgrounds
 - 🧠 **To understand an interface, implement the other side of it**
 
 </v-clicks>

@@ -1089,6 +1089,10 @@ From `bridge.py` — JS request → **the dict ASGI specifies**:
 
 </div>
 
+<div class="scope-grid" :class="$clicks >= 5 ? 'revealed' : ''">
+
+<div class="scope-code">
+
 ```py {*|3|6-8|10-11|*}
 async def dispatch(app, request):
     scope = {
@@ -1104,7 +1108,21 @@ async def dispatch(app, request):
     }
 ```
 
-<div v-click="5" mt-3 text-lg text-center>
+</div>
+
+<div class="scope-spec">
+<div text-xs op70 mb-1>…every key is spelled out in the spec:</div>
+<iframe
+  src="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope"
+  title="ASGI specification — HTTP connection scope"
+  loading="lazy"
+  class="spec-frame"
+/>
+</div>
+
+</div>
+
+<div v-click="6" mt-2 text-lg text-center>
 
 Filling this dict correctly **is** what "implementing the server" means
 
@@ -1115,9 +1133,46 @@ Filling this dict correctly **is** what "implementing the server" means
   --slidev-code-font-size: 16px;
   --slidev-code-line-height: 1.45;
 }
+.scope-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+/* Same reveal as the deck's other two-pane slides: both sides hold their final
+   width the whole time, so nothing re-wraps while the spec slides in. */
+.scope-code {
+  min-width: 0;
+  width: calc(200% + 1rem);
+  transition: width 700ms ease;
+}
+.scope-grid.revealed .scope-code {
+  width: 100%;
+}
+.scope-spec {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(calc(100% + 1rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.scope-grid.revealed .scope-spec {
+  transform: translateX(0);
+  opacity: 1;
+}
+.spec-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 300px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 0.5rem;
+  background: white;
+}
 </style>
 
-<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict — they're a list of two-byte-string tuples, with the names lowercased. ASGI is picky about every one of these. And that pickiness is the point: filling this dict correctly is what implementing the server actually means. You never learn this from using FastAPI. You learn it the moment you stand on the other side of the contract. -->
+<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict — they're a list of two-byte-string tuples, with the names lowercased. ASGI is picky about every one of these. [click] And none of this is folklore — here is the spec itself, the HTTP connection scope section, listing every key and its type. This is the document you actually work from when you write one of these. [click] And that pickiness is the point: filling this dict correctly is what implementing the server actually means. You never learn this from using FastAPI. You learn it the moment you stand on the other side of the contract. -->
 
 ---
 
@@ -1129,7 +1184,7 @@ Filling this dict correctly **is** what "implementing the server" means
 
 </div>
 
-```py {*|1-3|5-11|*}{maxHeight:'330px','data-id':'wire-up'}
+```py {*|1-3|5-11|*}{maxHeight:'300px','data-id':'wire-up'}
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
@@ -1143,9 +1198,27 @@ Filling this dict correctly **is** what "implementing the server" means
             chunks.append(bytes(event.get("body", b"")))
 ```
 
-<div v-click="3" mt-3 text-center text-lg>
+<div v-click="3" mt-2 grid="~ cols-2" gap-4 text-xs>
 
-An **inbox** and an **outbox** — that's the whole server side 📥📤
+<div border="~ violet/40 rounded-lg" px-3 py-1.5 bg-violet:5>
+<div text-center text-sm font-bold>📥 <code>receive()</code> <span op70 font-normal>— the <b>return value</b> carries it</span></div>
+<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center mt-1>
+<div op70 self-center style="grid-row: span 2">🐍 app</div>
+<div text-center op60>——— calls ———▸</div>
+<div op70 self-center style="grid-row: span 2">🖥️ server</div>
+<div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— the body ———</div>
+</div>
+</div>
+
+<div border="~ emerald/40 rounded-lg" px-3 py-1.5 bg-emerald:5>
+<div text-center text-sm font-bold>📤 <code>send(event)</code> <span op70 font-normal>— the <b>argument</b> carries it</span></div>
+<div grid="~ cols-[auto_1fr_auto]" gap-x-2 items-center mt-1>
+<div op70 self-center style="grid-row: span 2">🐍 app</div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>—— the response ——▸</div>
+<div op70 self-center style="grid-row: span 2">🖥️ server</div>
+<div text-center op60>◂——— <code>None</code> ———</div>
+</div>
+</div>
 
 </div>
 
@@ -1156,7 +1229,7 @@ An **inbox** and an **outbox** — that's the whole server side 📥📤
 }
 </style>
 
-<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. [click] send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We don't interpret any of it; we just listen and stash. [click] And that is the whole server side of the contract: an inbox the app pulls from, an outbox it pushes to. Two closures over a few local variables. -->
+<!-- Step two: the two callables. receive is how the app asks for the request body — we hand back one http.request event carrying the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client's gone. [click] send is the reverse: the app emits its response in pieces — first http.response.start with the status and headers, then http.response.body events with the bytes. We don't interpret any of it; we just listen and stash. [click] And notice the asymmetry, because it catches people out. The app calls both of them, so both arrows point the same way — but the payload does not. With receive, the app calls and the body comes back as the return value: data travels server to app. With send, the app passes the response in as the argument and gets nothing back: data travels app to server. Same caller, opposite directions, and which slot carries the payload is the difference. Two closures over a few local variables, and that is the whole server side of the contract. -->
 
 ---
 

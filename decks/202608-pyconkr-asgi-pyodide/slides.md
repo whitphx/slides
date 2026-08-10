@@ -482,7 +482,7 @@ clicks: 6
 
 <div text-sm mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
 
-<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}
+<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}{'data-id':'post-app'}
 
 </div>
 
@@ -517,25 +517,31 @@ You said: hello, PyCon KR
 
 </div>
 <div v-click="2">
-<div class="receive-impl" absolute top-30 left-14 w-108 bg-white dark:bg-black p-3 rounded border="~ violet/50 rounded-lg">
-<div text-xs op70 mb-1>…and the other side of it — what a server hands in:</div>
+<div class="receive-impl" data-id="ann-receive-impl" absolute top-30 left-20 w-96 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
+<div text-xs op70 mb-1>what a server hands in:</div>
 
 ```py
 async def receive():
-    return {
-        "type": "http.request",
-        "body": b"hello, PyCon KR",
-        "more_body": False,
-    }
+    return {"type": "http.request",
+            "body": b"hello, PyCon KR",
+            "more_body": False}
 ```
 
 </div>
+<FancyArrow from="[data-id=ann-receive-impl] @ bottomright" to="[data-id=post-app] .line:nth-child(6) span:nth-child(5) @ topright" arc="0.35" />
 </div>
 
 <style>
 * {
   --slidev-code-font-size: 18px;
   --slidev-code-line-height: 1.5;
+}
+/* The `*` rule above sets the variable on every descendant, so trimming the
+   aside a little has to reach the descendants too. */
+.receive-impl,
+.receive-impl * {
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.35;
 }
 .post-grid {
   display: grid;

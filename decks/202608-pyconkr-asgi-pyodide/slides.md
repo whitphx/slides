@@ -1205,7 +1205,7 @@ Filling this dict correctly **is** what "implementing the server" means
 ```
 
 <div v-click="1">
-<div data-id="ann-receive" class="wire-note" absolute style="top: 148px; left: 626px; width: 288px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-receive" class="wire-note" absolute style="top: 140px; left: 560px; width: 375px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
@@ -1214,9 +1214,9 @@ Filling this dict correctly **is** what "implementing the server" means
 </div>
 
 <div v-click="2">
-<div data-id="ann-send" class="wire-note" absolute style="top: 300px; left: 626px; width: 288px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-send" class="wire-note" absolute style="top: 276px; left: 560px; width: 375px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
-<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the <span style="white-space: nowrap">response —▸</span></div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
 <FancyArrow from="[data-id=ann-send] @ left" to="[data-id=wire-up] .line:nth-child(6) @ right" arc="0.15" />
@@ -1224,12 +1224,13 @@ Filling this dict correctly **is** what "implementing the server" means
 
 <style>
 * {
-  --slidev-code-font-size: 22px;
+  --slidev-code-font-size: 19px;
   --slidev-code-line-height: 1.45;
 }
-/* Small enough to sit between two code lines without covering the next one. */
+/* Wide enough that no line inside a note wraps, which the code font size is
+   traded down to make room for. */
 .wire-note {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.4;
 }
 </style>

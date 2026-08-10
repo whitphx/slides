@@ -1,9 +1,12 @@
 """Bridges one HTTP request to one ASGI call, with no HTTP server involved.
 
 This is the same job Uvicorn does for bytes read from a socket, and the same
-job Cloudflare's Python Workers SDK does for a JS Request object. The pattern
-follows those production implementations, with streaming, WebSocket, and
-error handling stripped away:
+job Cloudflare's Python Workers SDK does for a JS Request object. The design
+comes from Shinylive, which did it first: it builds an ASGI scope from a
+Request and awaits the app with its own receive and send. Stlite's bridge
+follows that design, and this file is a trimmed copy of Stlite's, with
+streaming, WebSocket, and error handling taken out:
+- https://github.com/posit-dev/shinylive/blob/main/src/messageporthttp.ts
 - https://github.com/whitphx/stlite/blob/main/packages/kernel/src/asgi-bridge.ts
 - https://github.com/cloudflare/workers-py/blob/main/packages/runtime-sdk/src/asgi.py
 """

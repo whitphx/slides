@@ -482,9 +482,10 @@ clicks: 6
 
 <div text-sm mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
 
-<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}
+<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|8-9|11-13|*}{'data-id':'post-app'}
 
 </div>
+
 
 <div class="post-cell post-right">
 
@@ -515,11 +516,32 @@ You said: hello, PyCon KR
 </div>
 
 </div>
+<div v-click="[2,4]">
+<div class="receive-impl" data-id="ann-receive-impl" absolute top-40 right-6 w-88 bg-white dark:bg-black p-3 rounded border="~ violet/50 rounded-lg">
+<div text-xs op70 mb-1>…and the other side of it — what a server hands in:</div>
+
+```py
+async def receive():
+    return {"type": "http.request",
+            "body": b"hello, PyCon KR",
+            "more_body": False}
+```
+
+</div>
+<FancyArrow from="[data-id=ann-receive-impl] @ left" to="[data-id=post-app] .line:nth-child(6) @ right" arc="-0.15" />
+</div>
 
 <style>
 * {
   --slidev-code-font-size: 18px;
   --slidev-code-line-height: 1.5;
+}
+/* The `*` rule above sets the variable on every descendant, so overriding it
+   for the aside has to reach the descendants too. */
+.receive-impl,
+.receive-impl * {
+  --slidev-code-font-size: 13px;
+  --slidev-code-line-height: 1.4;
 }
 .post-grid {
   display: grid;
@@ -549,7 +571,7 @@ You said: hello, PyCon KR
 }
 </style>
 
-<!-- That app never touched receive, because a GET has no body to read. So here is the same eleven lines with the third argument doing its job. [click] This block is the whole difference: the request body is not a value sitting in scope, it is a stream you pull. [click] You await receive, and you get one event. [click] And you keep going until an event comes back with more_body false, because a large upload arrives in pieces and the client is still typing while your handler is already running. That is why receive is an async callable and not a bytes attribute — the body may not exist yet when the app starts. [click] After that it is the send pair you already know, with the body echoed back. [click] Point Uvicorn at it, same as before. [click] POST some bytes, and they come back out. Everything a framework does with request.body or a parsed form starts here, in this loop. And this is the last piece of the contract: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
+<!-- That app never touched receive, because a GET has no body to read. So here is the same eleven lines with the third argument doing its job. [click] This block is the whole difference: the request body is not a value sitting in scope, it is a stream you pull. [click] You await receive, and you get one event — and since everyone always wants to see the other side, that is what the server hands in: a plain async callable it closes over the request, returning one http.request event per call. Uvicorn's is fed by its HTTP parser as bytes come off the socket; ours, later in this talk, is fed by a JavaScript value. Same four lines either way. [click] And you keep going until an event comes back with more_body false, because a large upload arrives in pieces and the client is still typing while your handler is already running. That is why receive is an async callable and not a bytes attribute — the body may not exist yet when the app starts. [click] After that it is the send pair you already know, with the body echoed back. [click] Point Uvicorn at it, same as before. [click] POST some bytes, and they come back out. Everything a framework does with request.body or a parsed form starts here, in this loop. And this is the last piece of the contract: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
 
 ---
 clicks: 3
@@ -571,9 +593,11 @@ clicks: 3
 
 ```py {*}
 class FastAPI(Starlette):
-    async def __call__(self, scope: Scope,
-                       receive: Receive,
-                       send: Send) -> None:
+    ...
+    async def __call__(
+        self,
+        scope: Scope, receive: Receive, send: Send
+    ) -> None:
         ...
 ```
 

@@ -101,13 +101,20 @@ Beat 5 — The production proof: Stlite (5)
 32. Standard Streamlit vs Stlite  stack figure  the poster's side-by-side, adapted: what stays, what swaps
 33. Hook                      statement       "If the caller can be anything… the browser can't be the only unusual caller."
 
-Beat 6 — The spectrum completed: Cloudflare Workers (6)
+Beat 6 — The spectrum completed: Cloudflare Workers (7)
 34. Section                   section         "☁️ A third runtime: the edge"
 35. Python Workers            bullets         Cloudflare runs Pyodide server-side — the browser stack, full circle
 36. The whole entrypoint      code            4 lines: hand `app` to the SDK's `asgi` module — the production sibling of our bridge
 37. What's running where — step 3  stack figure  server + browser stacks, then the edge stack fades in as a third column (`StackCompare`); title crossfades 2 → 3
 38. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
-39. Stlite on Workers         screenshot      PR #2077; same story at product scale
+39. You've probably already done this  table  evidence for #38's thesis from outside the deck's own demos:
+                                              Lambda/`Mangum`, Azure/`AsgiFunctionApp`, Vercel (no adapter at all),
+                                              Cloudflare, and our 45 lines revealed as the last row — all the same
+                                              three steps. WSGI prequel (Zappa 2016) pays off the beat-1 lineage
+                                              slide. Sits *before* #40 so the beat still ends on Pyodide: beat 7
+                                              is entirely about in-browser Python, and a FaaS slide immediately
+                                              before it reads as a topic change.
+40. Stlite on Workers         screenshot      PR #2077; same story at product scale
 
 Beat 7 — What it buys, where it stops (4)
 40. Section                   section         "🧭 When to reach for this"

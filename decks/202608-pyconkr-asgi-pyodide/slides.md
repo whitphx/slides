@@ -226,7 +226,7 @@ Uvicorn: ***how* requests arrive**
 <span op70>FastAPI · Starlette · Django<br>Litestar · Quart …</span>
 </div>
 
-<div v-click="3" px-2 text-center data-id="asgi">
+<div v-click="4" px-2 text-center data-id="asgi">
 <div text-2xl op60>⇄</div>
 <div text-2xl><b>ASGI</b></div>
 </div>
@@ -234,18 +234,46 @@ Uvicorn: ***how* requests arrive**
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5 data-id="servers">
 <div text-2xl>🖥️</div>
 <b>Servers</b><br>
-<span op70>Uvicorn · Hypercorn<br>Daphne · Granian …</span>
+<span op70><span data-id="srv-uvicorn">Uvicorn</span> · Hypercorn<br>Granian · <span data-id="srv-mangum">Mangum</span> …</span>
 </div>
 
 </div>
 
-<div v-click="4" mt-16 text-2xl op90 text-center>
+<div v-click="3">
+<div data-id="env-host" class="env-note" absolute top-74 right-64 w-46 bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
+
+🖥️ **a Linux box**<br><span op70>a port to listen on</span>
+
+</div>
+<FancyArrow from="[data-id=env-host] @ (25%, 0)" to="[data-id=srv-uvicorn] @ left" arc="0.4" />
+</div>
+
+<div v-click="3">
+<div data-id="env-lambda" class="env-note" absolute top-74 right-12 w-46 bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
+
+☁️ **AWS Lambda**<br><span op70>no port at all</span>
+
+</div>
+<FancyArrow from="[data-id=env-lambda] @ top" to="[data-id=srv-mangum] @ bottom" arc="0.1" color="red" />
+</div>
+
+<div v-click="5" mt-30 text-2xl op90 text-center>
 
 Each side evolves **independently** — nobody coordinates 🤝
 
 </div>
 
-<!-- Between them sits ASGI — the standard interface between an async Python web app and whatever runs it. On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. On the other, the servers: Uvicorn, Hypercorn, Daphne, Granian. They talk through one small, fixed contract, and we'll open that up in a minute. But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. And by the way — this idea is much older than async Python. -->
+<style>
+/* The typography preset sizes the inner `p` directly, so the box's own size
+   would not reach the markdown paragraph inside it. */
+.env-note, .env-note p {
+  font-size: 16px;
+  line-height: 1.35;
+  margin: 0;
+}
+</style>
+
+<!-- [click] On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. [click] On the other, the servers: Uvicorn, Hypercorn, Granian — and Mangum, which is the odd one out in that list; hold that thought, we come back to it near the end. [click] Because look at what those servers actually run on. Uvicorn wants a Linux box and a port to listen on — a process, sitting there, waiting. Mangum has neither. There is no port on AWS Lambda; there is no process of yours running between requests. These are not variations on one environment, they are completely different worlds. [click] And between them sits ASGI — the standard interface between an async Python web app and whatever runs it. They talk through one small, fixed contract, and we'll open that up in a minute. [click] But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. And by the way — this idea is much older than async Python. -->
 
 ---
 
@@ -1816,6 +1844,50 @@ plainBackground: true
 </style>
 
 <!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
+
+---
+clicks: 3
+---
+
+# You've probably already done this
+
+<div class="faas-table" mt-2 text-5 :class="$clicks >= 1 ? 'reveal' : ''">
+
+| Platform | What calls your app |
+| -------- | ------------------- |
+| λ **AWS Lambda** | `Mangum(app)` <span op60>— the community's</span> |
+| 🔷 **Azure Functions** | `func.AsgiFunctionApp(app)` <span op60>— in the SDK</span> |
+| ▲ **Vercel** | <span op60>nothing — it finds your `app`</span> |
+| ☁️ **Cloudflare Workers** | `asgi.fetch(app, …)` <span op60>— in the SDK</span> |
+| 🌐 **Your browser tab** | `bridge.py` <span op60>— 45 lines, ours</span> |
+
+</div>
+
+<div v-click="2" mt-4 text-center text-6>
+
+Every one: build a `scope` · wire `receive` / `send` · **`await app(...)`**
+
+</div>
+
+<div v-click="3" mt-2 text-center text-5 op80>
+
+Older than ASGI — WSGI had Zappa (2016) · `apig-wsgi` · `serverless-wsgi`
+
+</div>
+
+<style>
+/* The last row lands after the familiar ones, so our own bridge arrives as a
+   peer of the vendors' rather than as another item in a list. */
+.faas-table tbody tr:last-child {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.faas-table.reveal tbody tr:last-child {
+  opacity: 1;
+}
+</style>
+
+<!-- That claim deserves evidence from outside my own demos, so here it is. And remember the servers list from the beginning of the talk — Uvicorn, Hypercorn, Granian, and one name that did not belong. Here it is. If you have ever deployed a FastAPI app to AWS Lambda, you have almost certainly used Mangum: one import, wrap your app, done. Azure ships the same thing inside their own SDK. Vercel does not even ask you to name it — it finds an object called app and calls it. And Cloudflare we just watched. [click] Now here is our forty-five lines, in the same list. [click] Because every one of these is the code we wrote together: build a scope, wire up receive and send, await the app. I went and read Mangum's source while putting this talk together, and it is uncanny — its receive is a get off a queue that was pre-loaded with the request body, its send captures response.start for the status and headers and buffers the body chunks, then it awaits the app and reshapes the result for Lambda. It even buffers instead of streaming, exactly the shortcut we took. My favourite detail: Mangum is maintained by Marcelo Trylesinski, who also maintains Uvicorn and Starlette. The same person maintains the thing that calls your app off a TCP socket and the thing that calls it off a Lambda event, and that is not a coincidence — that is what an interface is for. [click] And this is older than ASGI. Zappa was doing it for WSGI back in 2016, and apig-wsgi and serverless-wsgi are still doing it. So: the browser was the unusual one, but the technique is completely mainstream — most of you have already shipped it without thinking about what that import was doing. Now, one last look at what it bought me. -->
 
 ---
 clicks: 2

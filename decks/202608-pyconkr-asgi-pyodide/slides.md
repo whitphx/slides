@@ -352,6 +352,11 @@ async def app(scope, receive, send):
 
 </div>
 
+<div v-click="4" mt-10 text-center>
+<div text-xl>🤝 This signature is <b>the contract</b></div>
+<div mt-2 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
+</div>
+
 <style>
 * {
   --slidev-code-font-size: 28px;
@@ -359,7 +364,7 @@ async def app(scope, receive, send):
 }
 </style>
 
-<!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
+<!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. [click] And here is the word I want you to hold onto for the rest of the talk: contract. This signature is an agreement between two sides. Your app promises to be a coroutine taking these three arguments; whoever calls it promises to supply them. Neither side needs to know anything else about the other. Write a callable that satisfies it and any ASGI server will serve your app — you never picked a server, you satisfied a contract. That is the whole reason the rest of this talk is possible. -->
 
 ---
 clicks: 6

@@ -133,7 +133,7 @@ clicks: 1
 
 <div class="deploy-cell deploy-left">
 
-<div text-sm mb-1>Demo app — <b>ordinary FastAPI</b></div>
+<div mb-1>Demo app — <b>ordinary FastAPI</b></div>
 
 ```py {*}
 import platform, sys
@@ -151,7 +151,7 @@ async def runtime() -> str:
 
 <div class="deploy-cell deploy-right">
 
-<div text-sm mb-1>…and how everyone runs it</div>
+<div mb-1>…and how everyone runs it</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -223,7 +223,7 @@ Uvicorn: ***how* requests arrive**
 <div v-click="1" border="~ violet/40 rounded-lg" p-4 bg-violet:5 data-id="apps">
 <div text-2xl>🐍</div>
 <b>App frameworks</b><br>
-<span op70 text-sm>FastAPI · Starlette · Django<br>Litestar · Quart …</span>
+<span op70>FastAPI · Starlette · Django<br>Litestar · Quart …</span>
 </div>
 
 <div v-click="3" px-2 text-center data-id="asgi">
@@ -234,7 +234,7 @@ Uvicorn: ***how* requests arrive**
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5 data-id="servers">
 <div text-2xl>🖥️</div>
 <b>Servers</b><br>
-<span op70 text-sm>Uvicorn · Hypercorn<br>Daphne · Granian …</span>
+<span op70>Uvicorn · Hypercorn<br>Daphne · Granian …</span>
 </div>
 
 </div>
@@ -261,18 +261,18 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 <div v-click="1" border="~ gray/40 rounded-lg" p-3 bg-gray:5>
 <div text-lg>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
-<div mt-2 text-sm><code>def app(environ, start_response)</code></div>
-<div op80 text-sm mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
-<div op80 text-sm mt-1><b>One sync call</b> — request → response, done</div>
+<div mt-2><code>def app(environ, start_response)</code></div>
+<div op80 mt-1>Flask · Django ⇄<br>Gunicorn · uWSGI</div>
+<div op80 mt-1><b>One sync call</b><br>request → response, done</div>
 </div>
 
 <div v-click="2" self-center text-2xl op60>→</div>
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 <div text-lg>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
-<div mt-2 text-sm><code>async def app(scope, receive, send)</code></div>
-<div op80 text-sm mt-1>Same decoupling, <b>async events</b></div>
-<div op80 text-sm mt-1>WebSockets · streaming · long-lived connections</div>
+<div mt-2><code>async def app(scope, receive, send)</code></div>
+<div op80 mt-1>Same decoupling, <b>async events</b></div>
+<div op80 mt-1>WebSockets · streaming<br>long-lived connections</div>
 </div>
 
 </div>
@@ -367,7 +367,7 @@ clicks: 6
 
 # You don't even need a framework
 
-<div class="framework-grid" mt-3 :class="$clicks >= 5 ? 'revealed' : ''">
+<div class="framework-grid" mt-1 :class="$clicks >= 5 ? 'revealed' : ''">
 
 <div class="framework-cell framework-left">
 
@@ -458,7 +458,7 @@ clicks: 6
 
 <div class="post-cell post-left">
 
-<div text-sm mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
+<div mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
 
 <<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|7|8-9|11-13|*}{'data-id':'post-app'}
 
@@ -467,7 +467,7 @@ clicks: 6
 
 <div class="post-cell post-right">
 
-<div text-sm mb-1>…and the body comes back out the other side</div>
+<div mb-1>…and the body comes back out the other side</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -557,7 +557,7 @@ clicks: 3
 
 # So what does a framework give you?
 
-<div class="fw-grid" mt-3 :class="$clicks >= 2 ? 'revealed' : ''">
+<div class="fw-grid" mt-1 :class="$clicks >= 2 ? 'revealed' : ''">
 
 <div class="fw-cell fw-left">
 
@@ -664,23 +664,23 @@ clicks: 6
 <div v-click="1" text-center text-xl op60>→</div>
 <div v-click="1" text-xs op80><code>await app(scope, receive, send)</code><br><span op70>opens here — everything below is <b>inside</b> it</span></div>
 
-<div v-click="2" text-xs op80 text-right>the app wants the body</div>
+<div v-click="2" op80 text-right>the app wants the body</div>
 <div v-click="2" text-center text-xl op60>←</div>
 <div v-click="2" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>await receive()</code></div>
 
 <div v-click="3" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center><code>{"type": "http.request",</code><br><code>"body": b"…", "more_body": False}</code></div>
 <div v-click="3" text-center text-xl op60>→</div>
-<div v-click="3" text-xs op80>body delivered</div>
+<div v-click="3" op80>body delivered</div>
 
-<div v-click="4" text-xs op80 text-right>status + headers</div>
+<div v-click="4" op80 text-right>status + headers</div>
 <div v-click="4" text-center text-xl op60>←</div>
 <div v-click="4" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>send({"type": "http.response.start"…})</code></div>
 
-<div v-click="5" text-xs op80 text-right>bytes <span op70>(repeat while <code>more_body</code>)</span></div>
+<div v-click="5" op80 text-right>bytes <span op70>(repeat while <code>more_body</code>)</span></div>
 <div v-click="5" text-center text-xl op60>←</div>
 <div v-click="5" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>send({"type": "http.response.body"…})</code></div>
 
-<div v-click="6" text-xs op80 text-right>response complete</div>
+<div v-click="6" op80 text-right>response complete</div>
 <div v-click="6" text-center text-xl op60>←</div>
 <div v-click="6" border="~ gray/40 rounded-lg" p-2 bg-gray:8 text-center>the coroutine <b>returns</b><br><span text-xs op70>no "done" event — returning <i>is</i> the signal</span></div>
 
@@ -715,7 +715,7 @@ clicks: 2
 
 # Demo, step 1: the normal case
 
-<div class="demo-grid" mt-3 :class="$clicks >= 1 ? 'revealed' : ''">
+<div class="demo-grid" mt-1 :class="$clicks >= 1 ? 'revealed' : ''">
 
 <div class="demo-cell demo-left">
 
@@ -945,9 +945,9 @@ A server inside your browser
 
 <div v-click="4" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
 <div text-xs op70 mb-2>Browser tab</div>
-<div border="~ violet/40 rounded" p-2 bg-violet:5 text-sm>🐍 Pyodide<br><span text-xs op80>CPython on WASM</span></div>
+<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-xs op80>CPython on WASM</span></div>
 <div text-xl op50 my-1>⇅</div>
-<div border="~ sky/40 rounded" p-2 bg-sky:5 text-sm>🌐 JavaScript / DOM</div>
+<div border="~ sky/40 rounded" p-2 bg-sky:5>🌐 JavaScript / DOM</div>
 </div>
 
 </div>
@@ -962,11 +962,11 @@ Pyodide logo by the Pyodide project, CC BY 4.0
 
 # Python, called from JavaScript
 
-<div mt-1 text-sm>The whole boundary in one file — Python source as a <b>string</b>, the value comes back:</div>
+<div text-sm>The whole boundary in one file — Python source as a <b>string</b>, the value comes back:</div>
 
 <<< @/samples/pyodide-hello/hello.mjs js {*|1,3|5-9|11|*}
 
-<div v-click="4" mt-2>
+<div v-click="4" mt-1>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -1334,13 +1334,13 @@ The app just **reads** this — producing it is the **server's** side of the con
 
 # ④ Call it from JavaScript
 
-<div mt-1 text-sm><code>main.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
+<div><code>main.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-call js {*}
 
 <div v-click="1">
 
-<div mt-2 text-sm>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
+<div mt-1>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-fetch js {1-3,6,9-13|1,9-13|6|*}{at:2,'data-id':'dispatch-js'}
 
@@ -1505,11 +1505,11 @@ Streamlit in the browser
 
 # First: what is Streamlit?
 
-<div grid="~ cols-[1fr_1fr]" gap-6 mt-3 items-start>
+<div grid="~ cols-[1fr_1fr]" gap-6 mt-1 items-start>
 
 <div>
 
-<div text-sm mb-1>Pure Python — <b>no HTML, no JS, no frontend build</b>:</div>
+<div mb-1>Pure Python — <b>no frontend build</b>:</div>
 
 <<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'200px'}
 
@@ -1572,7 +1572,7 @@ Streamlit in the browser
 
 # What are these frameworks built on?
 
-<div mt-2 text-sm>
+<div mt-2>
 
 | Framework | Server stack |
 | --------- | ------------ |
@@ -1632,7 +1632,7 @@ clicks: 1
 
 Not just Streamlit — the same swap, done across the ecosystem:
 
-<div class="fw-table" mt-2 text-sm :class="$clicks >= 1 ? 'reveal' : ''">
+<div class="fw-table" mt-2 :class="$clicks >= 1 ? 'reveal' : ''">
 
 | Framework | In-browser version | What bridges it |
 | --------- | ------------------ | --------------- |
@@ -1998,7 +1998,7 @@ Python on the page's main thread **blocks rendering** while it runs. Production 
 
 </div>
 
-<div grid="~ cols-2" gap-6 mt-4 text-sm>
+<div grid="~ cols-2" gap-6 mt-4>
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2 — main thread</div>
@@ -2038,7 +2038,7 @@ The bridge sits *on* the [Pyodide FFI](https://pyodide.org/en/stable/usage/type-
 
 </div>
 
-<div grid="~ cols-2" gap-4 mt-4 text-sm>
+<div grid="~ cols-2" gap-4 mt-4>
 
 <div v-click="1" border="~ sky/40 rounded-lg" p-3 bg-sky:8>
 🟦→🐍 <b>Proxies, not values</b><br>
@@ -2080,7 +2080,7 @@ Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
 
 </div>
 
-<div grid="~ cols-3" gap-4 mt-6 text-sm>
+<div grid="~ cols-3" gap-4 mt-6>
 
 <div border="~ sky/40 rounded-lg" p-4 bg-sky:5>
 <div text-xl mb-1>🌐 <b><code>"http"</code></b></div>
@@ -2135,7 +2135,7 @@ async def run_lifespan(app):
 ```
 
 <div v-click="3">
-<div data-id="ann-lifespan" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg" text-sm>
+<div data-id="ann-lifespan" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ amber/60 rounded-lg">
 
 not awaited — **it runs for the whole app lifetime**
 
@@ -2180,7 +2180,7 @@ async def send(event):
 ```
 
 <div v-click="3">
-<div data-id="ann-more-body" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg" text-sm>
+<div data-id="ann-more-body" absolute top-64 right-4 w-52 bg-white dark:bg-black p-2 rounded border="~ emerald/50 rounded-lg">
 
 **keep the stream open** while `more_body`
 
@@ -2219,17 +2219,17 @@ class WebSocketSession:
         return await self._inbox.get()
 ```
 
-<div mt-8 grid="~ cols-2" gap-4 text-sm>
+<div grid="~ cols-2" gap-4>
 
 <div v-click="2">
-<div data-id="ann-js-push" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-js-push" border="~ violet/40 rounded-lg" px-2 py-1.5 bg-white dark:bg-black>
 🟦 called <b>from JavaScript</b> — <code>on_js_message</code> is <b>fire-and-forget</b>
 </div>
 <FancyArrow from="[data-id=ann-js-push] @ top" to="[data-id=ws-session] .line:nth-child(5) @ right" arc="0.2" />
 </div>
 
 <div v-click="3">
-<div data-id="ann-app-pull" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-app-pull" border="~ emerald/40 rounded-lg" px-2 py-1.5 bg-white dark:bg-black>
 🐍 awaited <b>by the app</b> — <code>await receive()</code> <b>suspends until JS pushes</b>
 </div>
 <FancyArrow from="[data-id=ann-app-pull] @ topleft" to="[data-id=ws-session] .line:nth-child(9) @ right" arc="-0.2" />
@@ -2256,25 +2256,25 @@ Same `receive` / `send` — **new event names**:
 
 </div>
 
-<div grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-4 text-sm items-center>
+<div grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-4 items-center>
 <div></div>
 <div text-center op70>📥 the app <b>receives</b></div>
 <div text-center op70>📤 the app <b>sends</b></div>
 </div>
 
-<div v-click="1" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div v-click="1" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 items-center>
 <div text-base>① <b>open</b></div>
 <div border="~ violet/40 rounded-lg" p-2><code>"websocket.connect"</code><br><span op70 text-xs>we enqueue it when JS opens</span></div>
 <div border="~ emerald/40 rounded-lg" p-2><code>"websocket.accept"</code><br><span op70 text-xs>we tell JS the socket is open</span></div>
 </div>
 
-<div v-click="2" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div v-click="2" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 items-center>
 <div text-base>② <b>message</b></div>
 <div border="~ violet/40 rounded-lg" p-2><code>"websocket.receive"</code><br><span op70 text-xs>one per message JS pushes</span></div>
 <div border="~ emerald/40 rounded-lg" p-2><code>"websocket.send"</code><br><span op70 text-xs>we post it back out to JS</span></div>
 </div>
 
-<div v-click="3" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 text-sm items-center>
+<div v-click="3" grid="~ cols-[6rem_1fr_1fr]" gap-4 mt-2 items-center>
 <div text-base>③ <b>close</b></div>
 <div border="~ violet/40 rounded-lg" p-2><code>"websocket.disconnect"</code><br><span op70 text-xs>JS closed it first</span></div>
 <div border="~ emerald/40 rounded-lg" p-2><code>"websocket.close"</code><br><span op70 text-xs>we close the JS socket</span></div>

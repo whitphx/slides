@@ -33,8 +33,9 @@ defineProps({
     <div class="text-center op60 my-0.5 mt-auto">⇅ HTTP + WebSocket over the network</div>
     <div class="border border-gray-400/40 rounded-xl p-1.5 bg-gray-400/5">
       <div class="text-center op60 mb-1">🌐 Browser</div>
-      <div class="border border-teal-400/40 rounded-lg p-1.5 bg-teal-400/10 text-center text-sm">
-        📄 <b>Streamlit frontend</b> <span class="text-xs op80">— the bundled React SPA</span>
+      <div class="border border-teal-400/40 rounded-lg p-1.5 bg-teal-400/10 text-center leading-tight">
+        📄 <span class="text-sm"><b>Streamlit frontend</b></span><br>
+        <span class="op80">the bundled React SPA</span>
       </div>
     </div>
   </div>

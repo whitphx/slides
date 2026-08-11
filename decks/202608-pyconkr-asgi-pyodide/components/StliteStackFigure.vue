@@ -26,8 +26,9 @@
            label) so the transport rows and frontend boxes land on the same lines. -->
       <div class="border border-transparent rounded-xl p-1.5">
         <div class="text-center op0 mb-1" aria-hidden="true">&nbsp;</div>
-        <div class="border border-teal-400/40 rounded-lg p-1.5 bg-teal-400/10 text-center text-sm">
-          📄 <b>Streamlit frontend</b> <span class="text-xs op80">— the same SPA</span>
+        <div class="border border-teal-400/40 rounded-lg p-1.5 bg-teal-400/10 text-center leading-tight">
+          📄 <span class="text-sm"><b>Streamlit frontend</b></span><br>
+          <span class="op80">the same SPA</span>
         </div>
       </div>
     </div>

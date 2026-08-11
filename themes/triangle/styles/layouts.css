@@ -70,6 +70,17 @@
   p {
     line-height: 2.0rem;
   }
+
+  /* Break on phrase boundaries rather than simply filling each line: headings
+     balance across the lines they take, and prose avoids a one-word last line.
+     Both degrade to normal wrapping where unsupported. */
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+
+  p, li {
+    text-wrap: pretty;
+  }
 }
 
 .slidev-layout.cover,

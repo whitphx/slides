@@ -55,6 +55,20 @@ These principles are the material you draft the plan from. The **information flo
 - **Slides that compare approaches should be fair.** Present both sides with concrete examples, not just bullet points of pros/cons. Show the audience *what it looks like* to use each approach, then let them see the tradeoff.
 - **When presenting an evolution/journey, use a consistent framing.** If you're showing how a project evolved through phases, keep the same set of problems visible across phases so the audience can track what improved (e.g., a table with "Changelog | Version bump | Package version" across phases).
 - **Code examples must be accurate.** If you show a workflow snippet, it should reflect what the tool actually does, not a plausible-looking approximation. When the actual code is too long, show the structure as pseudocode/comments but label it clearly (e.g., "concept: actual workflow is ~145 lines").
+- **Let the layout carry the mapping, not the reader.** In a figure of an exchange between two parties, the party names belong at the *ends* of the arrows, so each box reads across as sender, message, receiver:
+
+  ```html
+  <div flex items-center gap-4>
+  <span>🐍 app</span>
+  <div>
+  <div text-center>—— calls <code>receive()</code> ——▸</div>
+  <div text-center>◂—— return the body ——</div>
+  </div>
+  <span>🦄 server</span>
+  </div>
+  ```
+
+  Listing both names in a row above the arrows is tidier in the markup and worse on screen: the arrow already points somewhere, and a reader glancing at it has to pair each name with an end themselves. The same test applies to any figure that names things and relates them. If the reader has to hold a legend in their head to read the picture, the picture is doing too little of the work.
 - **Use the "Context" or "Case study" slide to set the stage**, not to showcase the project's features. The audience should understand *why this project is a good example* for the topic (e.g., many releases, external contributors, CI complexity), not what the project does as a product.
 - **Use emojis to make slides attractive and pull attention.** Emojis work well as visual markers in bullet lists (e.g., `- 🧪 **Test & Build**`, `- 🔒 **Security**`), section headers, and statement slides. They help the audience scan and remember key points. However, avoid overuse; not every bullet needs an emoji. Good use cases:
   - Section titles or agenda items: `🧪`, `📝`, `🔒`, `🧑‍💻`

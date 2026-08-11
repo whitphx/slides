@@ -322,6 +322,11 @@ The entire interface: **one coroutine, three arguments**
 
 </div>
 
+<div v-click="1" mt-3 text-center>
+<div text-xl>🤝 This signature is <b>the contract</b></div>
+<div mt-1 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
+</div>
+
 ```py {*}{'data-id':'asgi-signature'}
 async def app(scope, receive, send):
     ...
@@ -329,32 +334,27 @@ async def app(scope, receive, send):
 
 <div mt-24 grid="~ cols-3" gap-6 text-sm>
 
-<div v-click="1">
+<div v-click="2">
 <div data-id="ann-scope" border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
 📋 <b><code>scope</code></b><br><span op80>connection type · path · headers</span>
 </div>
 <FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="0.2" />
 </div>
 
-<div v-click="2">
+<div v-click="3">
 <div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
 📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b> — events from the client</span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="0.2" />
 </div>
 
-<div v-click="3">
+<div v-click="4">
 <div data-id="ann-send" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
 📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b> — events to the client</span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.2" />
 </div>
 
-</div>
-
-<div v-click="4" mt-10 text-center>
-<div text-xl>🤝 This signature is <b>the contract</b></div>
-<div mt-2 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
 </div>
 
 <style>
@@ -364,7 +364,7 @@ async def app(scope, receive, send):
 }
 </style>
 
-<!-- Here's the entire app-facing surface of ASGI. It's one async function taking three things. Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. And send is an async callable; you await it to push an event out — your response status, your headers, your body. That's it. Think of receive as an inbox and send as an outbox, both async. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. [click] And here is the word I want you to hold onto for the rest of the talk: contract. This signature is an agreement between two sides. Your app promises to be a coroutine taking these three arguments; whoever calls it promises to supply them. Neither side needs to know anything else about the other. Write a callable that satisfies it and any ASGI server will serve your app — you never picked a server, you satisfied a contract. That is the whole reason the rest of this talk is possible. -->
+<!-- Here's the entire app-facing surface of ASGI. It's one async function taking three arguments. [click] And here is the word I want you to hold onto for the rest of the talk: contract. This signature is an agreement between two sides. Your app promises to be a coroutine taking these three arguments; whoever calls it promises to supply them. Neither side needs to know anything else about the other. Write a callable that satisfies it and any ASGI server will serve your app — you never picked a server, you satisfied a contract. That is the whole reason the rest of this talk is possible. [click] So what are the three? Scope is a dict that describes the connection — what kind it is, the path, the headers, that sort of metadata. [click] receive is an async callable; you await it to pull the next event from the client — a chunk of request body, for example. Think of it as an inbox. [click] And send is an async callable; you await it to push an event out — your response status, your headers, your body. An outbox. That's it. A server's whole job is to build the scope and to implement receive and send. Remember that sentence. -->
 
 ---
 clicks: 6

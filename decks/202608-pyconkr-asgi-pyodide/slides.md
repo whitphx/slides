@@ -745,7 +745,7 @@ clicks: 2
 
 <div class="demo-cell demo-left">
 
-<div mb-1><code>main.py</code> <span op70>— the demo app (abridged)</span></div>
+<div mb-1><code>main.py</code> <span op70>— the demo app, shortened</span></div>
 
 ```py {*}
 app = FastAPI()

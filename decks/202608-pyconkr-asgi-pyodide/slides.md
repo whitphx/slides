@@ -868,6 +868,8 @@ INFO:  Uvicorn running on
 <!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And before we run it, the same check we ran on FastAPI a moment ago, now on the app we are actually about to demo: it is callable, and its parameters are scope, receive, send. This is an ASGI application — remember that, because in twenty minutes we are going to call it without a server. [click] But first, here it is in its natural habitat: uvicorn main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. All of this is in the slides repo, if you want it — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
 
 ---
+plainBackground: true
+---
 
 # What's actually running where — step 1
 
@@ -1433,6 +1435,7 @@ Responses made **inside the tab** — nothing leaves it.
 
 ---
 clicks: 1
+plainBackground: true
 ---
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">1</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">2</span></span></h1>
@@ -1612,6 +1615,7 @@ Underneath, every one of them is **an ASGI app + a server** 🤔
 
 ---
 clicks: 1
+plainBackground: true
 ---
 
 # Standard Streamlit vs. Stlite
@@ -1782,6 +1786,7 @@ The whole file — nothing left out:
 
 ---
 clicks: 2
+plainBackground: true
 ---
 
 <h1>What’s actually running where — step <span class="step-swap"><span :class="$clicks >= 1 ? 'op0' : ''">2</span><span class="step-two" :class="$clicks >= 1 ? '' : 'op0'">3</span></span></h1>
@@ -1822,6 +1827,7 @@ clicks: 2
 
 ---
 clicks: 2
+plainBackground: true
 ---
 
 # Stlite went to the edge, too

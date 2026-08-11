@@ -41,6 +41,7 @@ These principles are the material you draft the plan from. The **information flo
 - **Every technique needs motivation.** Before introducing a tool or methodology, explain the **problem** it solves. The audience must feel the pain before they can appreciate the cure. A slide that says "Use scriv for changelogs" without first showing why manual changelogs are painful will not land.
 - **Connect slides explicitly.** Each slide should flow into the next. End problem slides with a question or tension ("But who decides the version?") that the next slide resolves. Avoid abrupt topic jumps.
 - **Section headers can carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users, across every supported environment"). Use this when it helps orient the audience, but don't force it on every section.
+- **End on the fullest slide, not a sign-off.** The last slide is on screen far longer than any other: through Q&A, while the host wraps up, while people photograph it. Spending that on "Thank you! 🙏" and a tagline wastes the one slide the audience has time to read and copy. Put the takeaways there and reveal the links and QR code beneath them on a final click, so the summary lands first and the "where do I find this" arrives while it is still visible. Thanks are spoken, so they live in the presenter notes; a tagline worth keeping can be said out loud too. Give a thank-you slide its own place only when it carries content of its own.
 
 #### Accuracy and assumptions
 
@@ -346,6 +347,40 @@ layout: statement
 
 ## A bold statement or question
 ```
+
+**Closing slide** — the takeaways carry the links, rather than a separate thank-you slide:
+
+```html
+# Key takeaways
+
+<div mt-6 text-xl>
+
+<v-clicks>
+
+- 🧩 **First takeaway** — the short form
+- ⚡ **Second takeaway**
+
+</v-clicks>
+
+</div>
+
+<!-- Spoken: the takeaways one by one, then the thanks and the "come find me". -->
+
+<div v-click mt-10 grid="~ cols-[1fr_auto]" gap-8 items-center>
+
+<div text-base flex="~ col" gap-2>
+  <!-- repo / docs / spec links, then the social row -->
+</div>
+
+<div flex="~ col" items-center gap-2>
+<QRCode :width="140" :height="140" type="svg" data="https://slides.whitphx.info/<deck>/"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+
+</div>
+```
+
+The bare `v-click` (no index) places the link block after however many clicks the list above used, so adding a takeaway does not renumber it.
 
 #### Slide separators
 

@@ -1636,7 +1636,7 @@ Not just Streamlit — the same swap, done across the ecosystem:
 
 | Framework | In-browser version | What bridges it |
 | --------- | ------------------ | --------------- |
-| Streamlit | <img src="/stlite.svg" alt="Stlite" inline h-5 /> [Stlite](https://github.com/whitphx/stlite) (me) | `asgi-bridge.ts` — **`app(scope, receive, send)`** |
+| Streamlit | [Stlite](https://github.com/whitphx/stlite) (me) <img src="/stlite.svg" alt="Stlite" inline h-5 /> | `asgi-bridge.ts` — **`app(scope, receive, send)`** |
 | Shiny for Python | [Shinylive](https://github.com/posit-dev/shinylive) (Posit) | `messageporthttp.ts` — **`asgiFunc(scope, …)`** |
 | Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | `webworker/index.ts` — **`app(scope, rcv, snd)`** |
 

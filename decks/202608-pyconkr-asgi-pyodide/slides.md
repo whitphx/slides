@@ -580,8 +580,6 @@ async def receive():
 <!-- That app never touched receive, because a GET has no body to read. So here is the same eleven lines with the third argument doing its job. [click] This block is the whole difference: the request body is not a value sitting in scope, it is a stream you pull. [click] You await receive, and you get one event — and since everyone always wants to see the other side, that is what whoever calls the app hands in — the server, in the sense we just defined it: a plain async callable, closed over the request, returning one http.request event per call. Uvicorn's is fed by its HTTP parser as bytes come off the socket; ours, later in this talk, is fed by a JavaScript value. Same four lines either way. [click] And you keep going until an event comes back with more_body false, because a large upload arrives in pieces and the client is still typing while your handler is already running. That is why receive is an async callable and not a bytes attribute — the body may not exist yet when the app starts. [click] After that it is the send pair you already know, with the body echoed back. [click] Point Uvicorn at it, same as before. [click] POST some bytes, and they come back out. Everything a framework does with request.body or a parsed form starts here, in this loop. And this is the last piece of the contract: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
 
 ---
-clicks: 3
----
 
 # So what does a framework give you?
 
@@ -597,7 +595,7 @@ clicks: 3
 
 <div text-5 mb-1>…and inside FastAPI itself:</div>
 
-```py {*}
+```py
 class FastAPI(Starlette):
     ...
     async def __call__(
@@ -617,7 +615,7 @@ class FastAPI(Starlette):
 
 <div text-5 mb-1>…and <code>app</code> is <b>still just the callable</b></div>
 
-```py {*|1-2|*}
+```py {1-2|*} {at: 3}
 >>> callable(app)
 True
 
@@ -629,7 +627,7 @@ True
 ['scope', 'receive', 'send']
 ```
 
-<div v-click="3" mt-3 text-center text-lg leading-tight>
+<div v-click="4" mt-3 text-center text-lg leading-tight>
 
 🎁 A framework is a **nicer way to write the same callable**
 
@@ -774,7 +772,7 @@ async def runtime() -> str:
 
 <div text-5 mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
 
-```py {*|1-2|*}
+```py {*}
 >>> callable(app)
 True
 

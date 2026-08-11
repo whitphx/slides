@@ -229,7 +229,6 @@ Uvicorn: ***how* requests arrive**
 <div v-click="3" px-2 text-center data-id="asgi">
 <div text-2xl op60>⇄</div>
 <div text-2xl><b>ASGI</b></div>
-<div op70 text-sm mt-1><code>scope</code> · <code>receive</code> · <code>send</code></div>
 </div>
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5 data-id="servers">
@@ -246,7 +245,7 @@ Each side evolves **independently** — nobody coordinates 🤝
 
 </div>
 
-<!-- Between them sits ASGI — the standard interface between an async Python web app and whatever runs it. On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. On the other, the servers: Uvicorn, Hypercorn, Daphne, Granian. They talk through three things — scope, receive, and send — and we'll unpack those in a minute. But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. And by the way — this idea is much older than async Python. -->
+<!-- Between them sits ASGI — the standard interface between an async Python web app and whatever runs it. On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. On the other, the servers: Uvicorn, Hypercorn, Daphne, Granian. They talk through one small, fixed contract, and we'll open that up in a minute. But look at what this contract buys the ecosystem: each side evolves without asking the other's permission. Granian showed up, written in Rust, and every existing framework just ran on it. Litestar showed up, and every existing server could serve it. Nobody coordinated anything. That's what a good interface does. And by the way — this idea is much older than async Python. -->
 
 ---
 
@@ -305,10 +304,6 @@ layout: section
 ---
 
 # ⚡ ASGI in 90 seconds
-
-<div mt-4 op70>
-<code>scope</code>, <code>receive</code>, <code>send</code>
-</div>
 
 <!-- To answer it, we need to know exactly what the contract says. Ninety seconds, three words. If you know ASGI cold this is a refresher; if you don't, this is genuinely all you need for the rest of the talk. -->
 

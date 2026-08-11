@@ -804,11 +804,15 @@ INFO:  Uvicorn running on
 
 <WindowMockup title="http://127.0.0.1:8000" light>
 
+<LiveEmbed url="http://127.0.0.1:8000/" height="170px">
+
 <div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>
 <button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
 <div mt-2 font-mono text-sm>Python 3.12 on <b>darwin/arm64</b> 🖥️</div>
 </div>
+
+</LiveEmbed>
 
 </WindowMockup>
 
@@ -1538,15 +1542,15 @@ Streamlit in the browser
 
 # Streamlit
 
-<div grid="~ cols-[1fr_1fr]" gap-6 mt-1 items-start>
+<div class="st-grid" mt-1 :class="$clicks >= 1 ? 'revealed' : ''">
 
-<div>
+<div class="st-cell st-left">
 
 <div mb-1>Build web apps with <b>only Python</b>:</div>
 
 <<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'180px'}
 
-<div v-click="1" mt-1>
+<div mt-4>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -1558,31 +1562,43 @@ $ streamlit run app.py
 
 </div>
 
-<div v-click="2" mt-1>
+</div>
+
+<div class="st-cell st-right">
+
+<div class="st-stack" :class="$clicks >= 2 ? 'covered' : ''">
+
+<div class="st-layer st-app">
 
 <WindowMockup title="localhost:8501" padding="0.4rem">
 
-<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="dark:hidden" style="max-height: 95px; width: auto;" />
-<img src="/streamlit-demo-dark.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="hidden dark:block" style="max-height: 95px; width: auto;" />
+<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="dark:hidden" style="max-height: 300px; width: auto;" />
+<img src="/streamlit-demo-dark.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="hidden dark:block" style="max-height: 300px; width: auto;" />
 
 </WindowMockup>
 
 </div>
 
-</div>
-
-<div v-click="3" class="w-full text-sm">
+<div class="st-layer st-stackfig text-sm">
 
 <div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
 <div class="text-center text-xs op60 mb-1">🖥️ Server machine</div>
 <div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5">
 <div class="text-center text-xs op60 mb-1">🐍 CPython</div>
+<div class="grid grid-cols-2 gap-1">
 <div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
-🐍 <b>Your script</b><br><span class="text-xs op80">the code above</span>
+🐍 <b>Your script</b><br><span class="text-xs op80">written in Python</span>
 </div>
-<div class="text-center text-xs op60 my-0.5">⇅ runs your script</div>
+<div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
+📁 <b>Static assets</b><br><span class="text-xs op80">images, data files</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-1 text-center text-xs op60 my-0.5">
+<div>⇅ runs your script</div>
+<div>↓ serves</div>
+</div>
 <div class="border border-amber-400/40 rounded-lg p-2 bg-amber-400/10 text-center leading-tight">
-🎈 <b>Streamlit server</b><br><span class="text-xs op80">a Python HTTP server</span>
+🎈 <b>Streamlit runtime</b><br><span class="text-xs op80">ScriptRunner &amp; an HTTP server</span>
 </div>
 </div>
 </div>
@@ -1592,14 +1608,18 @@ $ streamlit run app.py
 <div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
 <div class="text-center text-xs op60 mb-1">🌐 Browser</div>
 <div class="border border-teal-400/40 rounded-lg p-2 bg-teal-400/10 text-center leading-tight">
-📄 <b>Bundled SPA</b><br><span class="text-xs op80">shipped inside the package</span>
+📄 <b>Frontend app</b><br><span class="text-xs op80">served from bundled static assets</span>
 </div>
 </div>
 
-<div v-click="4" mt-3 text-center text-lg>
+<div v-click="3" mt-2 text-center text-lg>
 
 `pip install streamlit` ships<br>**the server *and* its frontend**<br>
 <span text-base op80>the same shape as our demo app 👀</span>
+
+</div>
+
+</div>
 
 </div>
 
@@ -1612,9 +1632,61 @@ $ streamlit run app.py
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.5;
 }
+/* The script pane holds the whole slide, then gives up half of it as the app
+   arrives on the right; the architecture then replaces the app in place, so the
+   two right-hand panes read as one answer developing rather than two panels. */
+.st-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+.st-left {
+  width: calc(200% + 1.25rem);
+  transition: width 700ms ease;
+}
+.st-grid.revealed .st-left {
+  width: 100%;
+}
+.st-right {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.st-grid.revealed .st-right {
+  transform: translateX(0);
+  opacity: 1;
+}
+.st-stack {
+  display: grid;
+  align-items: start;
+}
+.st-layer {
+  grid-area: 1 / 1;
+}
+.st-app {
+  transition: opacity 300ms ease 400ms;
+}
+.st-stack.covered .st-app {
+  opacity: 0;
+}
+/* Travels in from the right like the panes on the demo slides, rather than
+   cross-fading in place, so the architecture reads as arriving over the app. */
+.st-stackfig {
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.st-stack.covered .st-stackfig {
+  transform: translateX(0);
+  opacity: 1;
+}
 </style>
 
-<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart. [click] Then you run it with one command: streamlit run app.py. [click] And you get this — an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. [click] So how does a script become a web page? That command starts an HTTP server, written in Python, running on CPython right there in your process — and your script runs inside it. That server hands the browser a JavaScript single-page app, and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, both inside CPython, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
+<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and run it with one command: streamlit run app.py. [click] And you get this — an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. Two files, no frontend work. [click] So how does a script become a web page? That command starts the Streamlit runtime on CPython right there in your process: it runs your script, keeps its state, serves your static files, and answers HTTP. That server hands the browser a JavaScript single-page app, and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, both inside CPython, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
 ---
 
 # What are these frameworks built on?
@@ -1670,7 +1742,7 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 }
 </style>
 
-<!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite runs Pyodide inside a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. [click] And there it is lit up: your script, Streamlit itself, and the interface between them and the server half — identical on both sides. Same swap as our forty-five-line demo, just carrying a whole framework. -->
+<!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit runtime running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit runtime, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite runs Pyodide inside a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. [click] And there it is lit up: your script, Streamlit itself, and the interface between them and the server half — identical on both sides. Same swap as our forty-five-line demo, just carrying a whole framework. -->
 
 ---
 clicks: 2
@@ -1847,7 +1919,7 @@ plainBackground: true
 clicks: 3
 ---
 
-# You've probably already done this
+# Adding to the family
 
 <div class="faas-table" mt-2 text-5 :class="$clicks >= 1 ? 'reveal' : ''">
 
@@ -1857,7 +1929,7 @@ clicks: 3
 | 🔷 **Azure Functions** | `func.AsgiFunctionApp(app)` <span op60>— in the SDK</span> |
 | ▲ **Vercel** | <span op60>nothing — it finds your `app`</span> |
 | ☁️ **Cloudflare Workers** | `asgi.fetch(app, …)` <span op60>— in the SDK</span> |
-| 🌐 **Your browser tab** | `bridge.py` <span op60>— 45 lines, ours</span> |
+| 🌐 **Your browser tab** | `bridge.py` <span op60>— our 45-line example</span> |
 
 </div>
 
@@ -1874,18 +1946,18 @@ Older than ASGI — WSGI had Zappa (2016) · `apig-wsgi` · `serverless-wsgi`
 </div>
 
 <style>
-/* The last row lands after the familiar ones, so our own bridge arrives as a
-   peer of the vendors' rather than as another item in a list. */
-.faas-table tbody tr:last-child {
+/* The two runtimes this talk added join a list the audience already knows, so
+   they arrive together, after it. */
+.faas-table tbody tr:nth-last-child(-n + 2) {
   opacity: 0;
   transition: opacity 500ms ease;
 }
-.faas-table.reveal tbody tr:last-child {
+.faas-table.reveal tbody tr:nth-last-child(-n + 2) {
   opacity: 1;
 }
 </style>
 
-<!-- That claim deserves evidence from outside my own demos, so here it is. And remember the servers list from the beginning of the talk — Uvicorn, Hypercorn, Granian, and one name that did not belong. Here it is. If you have ever deployed a FastAPI app to AWS Lambda, you have almost certainly used Mangum: one import, wrap your app, done. Azure ships the same thing inside their own SDK. Vercel does not even ask you to name it — it finds an object called app and calls it. And Cloudflare we just watched. [click] Now here is our forty-five lines, in the same list. [click] Because every one of these is the code we wrote together: build a scope, wire up receive and send, await the app. I went and read Mangum's source while putting this talk together, and it is uncanny — its receive is a get off a queue that was pre-loaded with the request body, its send captures response.start for the status and headers and buffers the body chunks, then it awaits the app and reshapes the result for Lambda. It even buffers instead of streaming, exactly the shortcut we took. My favourite detail: Mangum is maintained by Marcelo Trylesinski, who also maintains Uvicorn and Starlette. The same person maintains the thing that calls your app off a TCP socket and the thing that calls it off a Lambda event, and that is not a coincidence — that is what an interface is for. [click] And this is older than ASGI. Zappa was doing it for WSGI back in 2016, and apig-wsgi and serverless-wsgi are still doing it. So: the browser was the unusual one, but the technique is completely mainstream — most of you have already shipped it without thinking about what that import was doing. Now, one last look at what it bought me. -->
+<!-- None of this is new, and that is the point. If you have ever deployed a FastAPI app to AWS Lambda, you have almost certainly used Mangum: one import, wrap your app, done. Azure ships the same thing inside their own SDK. Vercel does not even ask you to name it — it finds an object called app and calls it. This is a family that already exists, and most of you are already in it. Oh, and remember the servers list from the beginning of the talk — Uvicorn, Hypercorn, Granian, and one name that did not belong? That was Mangum. [click] So here is what we did today: we added two more members. Cloudflare's edge, and a browser tab with forty-five lines in it. They are not exotic cousins of this list; they are the same thing. [click] Because every one of these is the code we wrote together: build a scope, wire up receive and send, await the app. I went and read Mangum's source while putting this talk together, and it is uncanny — its receive is a get off a queue that was pre-loaded with the request body, its send captures response.start for the status and headers and buffers the body chunks, then it awaits the app and reshapes the result for Lambda. It even buffers instead of streaming, exactly the shortcut we took. My favourite detail: Mangum is maintained by Marcelo Trylesinski, who also maintains Uvicorn and Starlette. The same person maintains the thing that calls your app off a TCP socket and the thing that calls it off a Lambda event, and that is not a coincidence — that is what an interface is for. [click] And this is older than ASGI. Zappa was doing it for WSGI back in 2016, and apig-wsgi and serverless-wsgi are still doing it. So: the browser was the unusual one, but the technique is completely mainstream — most of you have already shipped it without thinking about what that import was doing. Now, one last look at what it bought me. -->
 
 ---
 clicks: 2
@@ -1899,9 +1971,9 @@ plainBackground: true
   { key: 'stlite', label: 'Stlite — in the browser' },
   { key: 'edge', label: 'Stlite — on Cloudflare', hidden: $clicks < 1 },
 ]">
-  <template #streamlit><StreamlitStackFigure aligned /></template>
-  <template #stlite><StliteStackFigure /></template>
-  <template #edge><StliteEdgeStackFigure aligned /></template>
+  <template #streamlit><StreamlitStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #stlite><StliteStackFigure :highlight="$clicks >= 2" /></template>
+  <template #edge><StliteEdgeStackFigure aligned :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div v-click="2" mt-2 text-center text-xl>
@@ -1920,7 +1992,7 @@ plainBackground: true
 }
 </style>
 
-<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw, and read the rows across them one more time: your script, the Streamlit server, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again — but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again — but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the leftmost column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] Nothing from the bridge upward changed. Only the caller did. When your server half targets an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
+<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw, and read the rows across them one more time: your script, the Streamlit runtime, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again — but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again — but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the leftmost column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] And there it is lit up across all three: your script, Streamlit itself, and the interface between them and the server half — identical in every column. Nothing from the bridge upward changed. Only the caller did. When your server half targets an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
 
 ---
 layout: section

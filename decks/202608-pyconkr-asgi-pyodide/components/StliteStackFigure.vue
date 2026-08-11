@@ -14,23 +14,34 @@ defineProps({
         <div class="text-center op60 mb-1">⚙️ Web Worker</div>
         <div class="border border-violet-400/40 rounded-lg p-1.5 bg-violet-400/5">
           <div class="text-center op60 mb-1">🐍 Pyodide</div>
-          <div
-            class="rounded-lg p-1.5 text-center text-sm border transition-all duration-700 delay-[250ms]"
-            :class="highlight ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10'"
-          >
-            🐍 <b>Your app script</b>
+          <div class="grid grid-cols-2 gap-1">
+            <div
+              class="rounded-lg p-1.5 text-center text-sm border transition-all duration-700 delay-[250ms]"
+              :class="highlight ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10'"
+            >
+              🐍 <b>Your script</b>
+            </div>
+            <div
+              class="rounded-lg p-1.5 text-center text-sm border transition-all duration-700 delay-[250ms]"
+              :class="highlight ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10'"
+            >
+              📁 <b>Static assets</b>
+            </div>
           </div>
-          <div class="text-center op60 my-0.5">⇅ runs your script</div>
+          <div class="grid grid-cols-2 gap-1 text-center op60 my-0.5">
+            <div>⇅ runs your script</div>
+            <div>↓ serves</div>
+          </div>
           <div
             class="rounded-lg p-1.5 text-center leading-tight border transition-all duration-700 delay-[250ms]"
             :class="highlight ? 'border-amber-400 bg-amber-400/25 ring-4 ring-amber-400/30' : 'border-amber-400/40 bg-amber-400/10'"
           >
-            🎈 <span class="text-sm"><b>Streamlit server</b></span><br>
+            🎈 <span class="text-sm"><b>Streamlit runtime</b></span><br>
             <span class="op80">ScriptRunner &amp; app state</span>
           </div>
           <div
             class="text-center my-0.5 transition-all duration-700 delay-[250ms]"
-            :class="highlight ? 'op100 font-600 text-emerald-700 dark:text-emerald-300' : 'op60'"
+            :class="highlight ? 'op100 font-600 text-amber-700 dark:text-amber-300' : 'op60'"
           >⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
           <div class="border border-sky-400/40 rounded-lg p-1.5 bg-sky-400/10 text-center leading-tight">
             🌉 <span class="text-sm"><b>Stlite's ASGI bridge</b></span><br>

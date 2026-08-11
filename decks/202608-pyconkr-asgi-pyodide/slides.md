@@ -1503,22 +1503,34 @@ Streamlit in the browser
 
 ---
 
-# First: what is Streamlit?
+# Streamlit
 
 <div grid="~ cols-[1fr_1fr]" gap-6 mt-1 items-start>
 
 <div>
 
-<div mb-1>Pure Python — <b>no frontend build</b>:</div>
+<div mb-1>Build web apps with <b>only Python</b>:</div>
 
-<<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'200px'}
+<<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'180px'}
 
-<div v-click="1" mt-2>
+<div v-click="1" mt-1>
+
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+$ streamlit run app.py
+```
+
+</WindowMockup>
+
+</div>
+
+<div v-click="2" mt-1>
 
 <WindowMockup title="localhost:8501" padding="0.4rem">
 
-<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="dark:hidden" style="max-height: 168px; width: auto;" />
-<img src="/streamlit-demo-dark.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="hidden dark:block" style="max-height: 168px; width: auto;" />
+<img src="/streamlit-demo.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="dark:hidden" style="max-height: 95px; width: auto;" />
+<img src="/streamlit-demo-dark.png" alt="The demo app running: a Sales dashboard title, a Rows slider, and a line chart" class="hidden dark:block" style="max-height: 95px; width: auto;" />
 
 </WindowMockup>
 
@@ -1526,16 +1538,19 @@ Streamlit in the browser
 
 </div>
 
-<div v-click="2" class="w-full text-sm">
+<div v-click="3" class="w-full text-sm">
 
 <div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
-<div class="text-center text-xs op60 mb-1">🖥️ Server machine — CPython</div>
+<div class="text-center text-xs op60 mb-1">🖥️ Server machine</div>
+<div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5">
+<div class="text-center text-xs op60 mb-1">🐍 CPython</div>
 <div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
 🐍 <b>Your script</b><br><span class="text-xs op80">the code above</span>
 </div>
-<div class="text-center text-xs op60 my-0.5">⇅</div>
-<div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5 text-center leading-tight">
+<div class="text-center text-xs op60 my-0.5">⇅ runs your script</div>
+<div class="border border-amber-400/40 rounded-lg p-2 bg-amber-400/10 text-center leading-tight">
 🎈 <b>Streamlit server</b><br><span class="text-xs op80">a Python HTTP server</span>
+</div>
 </div>
 </div>
 
@@ -1548,7 +1563,7 @@ Streamlit in the browser
 </div>
 </div>
 
-<div v-click="3" mt-6 text-center text-lg>
+<div v-click="4" mt-3 text-center text-lg>
 
 `pip install streamlit` ships<br>**the server *and* its frontend**<br>
 <span text-base op80>the same shape as our demo app 👀</span>
@@ -1566,8 +1581,7 @@ Streamlit in the browser
 }
 </style>
 
-<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and [click] you get this — an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. [click] So how does a script become a web page? When you run streamlit run, it starts an HTTP server, written in Python, in your process. That server hands the browser a JavaScript single-page app — and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
-
+<!-- Before I show you Stlite, thirty seconds on what Streamlit actually is, because the architecture is the part that matters today. You write a plain Python script — that's it. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart. [click] Then you run it with one command: streamlit run app.py. [click] And you get this — an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. [click] So how does a script become a web page? That command starts an HTTP server, written in Python, running on CPython right there in your process — and your script runs inside it. That server hands the browser a JavaScript single-page app, and that frontend isn't something you built or fetched from a CDN, it's shipped inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That's the part I want you to hold onto: one Python package contains both halves of a web application — the server and the frontend it serves. And look at the picture — your code on top, a Python HTTP server under it, both inside CPython, a frontend page in the browser talking over the network. That's exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
 ---
 
 # What are these frameworks built on?

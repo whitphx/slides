@@ -85,6 +85,17 @@ function updateUser(id: number, update: Partial<User>) {
 ```
 
 ---
+plainBackground: true
+---
+
+# Plain background
+
+`plainBackground: true` fades the triangle tiles out for one slide, so figures
+with translucent boxes sit on a flat surface instead of on the animation.
+
+---
+
+---
 layout: center
 class: "text-center"
 ---

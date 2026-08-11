@@ -78,7 +78,16 @@ watch(
   { immediate: true },
 );
 
-const { currentSlideNo } = useNav();
+const { currentSlideNo, currentSlideRoute } = useNav();
+
+// Slides that draw their own layered figures can set `plainBackground: true` in
+// their frontmatter: the tiles otherwise show through the figures' translucent
+// boxes and compete with them.
+// Read through the route rather than useNav's `currentFrontmatter`, which only
+// exists in newer @slidev/client versions than some decks here pin.
+const plainBackground = computed(() =>
+  Boolean(currentSlideRoute.value?.meta?.slide?.frontmatter?.plainBackground),
+);
 
 // Animate the base image on slide changes
 watch(
@@ -169,7 +178,13 @@ const triangles = useTriangleTiles(
 </script>
 
 <template>
-  <div pointer-events-none z-index="-10" aria-hidden="true">
+  <div
+    class="tiles"
+    :class="{ 'tiles--plain': plainBackground }"
+    pointer-events-none
+    z-index="-10"
+    aria-hidden="true"
+  >
     <div
       v-for="(triangle, index) in triangles"
       :key="index"
@@ -183,6 +198,13 @@ const triangles = useTriangleTiles(
 </template>
 
 <style scoped>
+.tiles {
+  opacity: 1;
+  transition: opacity 700ms ease-in-out;
+}
+.tiles--plain {
+  opacity: 0;
+}
 .triangle {
   position: absolute;
   inset: 0;

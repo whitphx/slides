@@ -686,7 +686,7 @@ clicks: 6
 
 </div>
 
-<div v-click="1" absolute right-3 top-32 bottom-10 flex items-stretch gap-1 op60 text-xs>
+<div v-click="1" absolute right-12 top-32 bottom-10 flex items-stretch gap-1 op60 text-xs>
 <svg width="12" overflow-visible aria-hidden="true">
   <line x1="1" y1="1" x2="10" y2="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
   <line x1="10" y1="1" x2="10" y2="99%" stroke="currentColor" stroke-width="1.5" />

@@ -736,7 +736,7 @@ plainBackground: true
 <!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call. Watch the bracket on the right, because this is the bit that trips people up: that await is not a step at the top, it is the whole height of this slide. It opens here and does not return until the bottom, and every exchange you are about to see happens inside it — the app calls back into the server's receive and send while the caller sits at that one await. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
 
 ---
-clicks: 3
+clicks: 2
 ---
 
 # Demo, step 1: the normal case
@@ -763,7 +763,7 @@ async def runtime() -> str:
 
 <div class="demo-cell demo-right">
 
-<div class="demo-stack" :class="$clicks >= 3 ? 'covered' : ''">
+<div class="demo-stack" :class="$clicks >= 2 ? 'covered' : ''">
 
 <div class="demo-layer demo-repl">
 

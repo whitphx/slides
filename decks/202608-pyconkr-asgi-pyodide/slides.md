@@ -710,7 +710,7 @@ clicks: 6
 <!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call. Watch the bracket on the right, because this is the bit that trips people up: that await is not a step at the top, it is the whole height of this slide. It opens here and does not return until the bottom, and every exchange you are about to see happens inside it — the app calls back into the server's receive and send while the caller sits at that one await. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 # Demo, step 1: the normal case
@@ -737,6 +737,26 @@ async def runtime() -> str:
 
 <div class="demo-cell demo-right">
 
+<div class="demo-stack" :class="$clicks >= 2 ? 'covered' : ''">
+
+<div class="demo-layer demo-repl">
+
+<div text-sm mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
+
+```py {*}
+$ python
+
+>>> callable(app)
+True
+
+>>> list(inspect.signature(app).parameters)
+['scope', 'receive', 'send']
+```
+
+</div>
+
+<div class="demo-layer demo-run">
+
 <div text-sm mb-1>…run it, open the page, click the button</div>
 
 <WindowMockup title="Terminal" dark codeblock>
@@ -760,6 +780,10 @@ INFO:  Uvicorn running on
 </div>
 
 </WindowMockup>
+
+</div>
+
+</div>
 
 </div>
 
@@ -808,9 +832,40 @@ INFO:  Uvicorn running on
   transform: translateX(0);
   opacity: 1;
 }
+/* The two right-hand panes share one grid cell so the second slides in over
+   the first instead of displacing it, and so the row is already as tall as the
+   taller of them before either arrives. */
+.demo-stack {
+  display: grid;
+  align-items: start;
+}
+.demo-layer {
+  grid-area: 1 / 1;
+}
+.demo-repl, .demo-repl * {
+  --slidev-code-font-size: 15px;
+}
+/* Fades only once the incoming pane is most of the way across, so the overlap
+   is visible while it travels. */
+.demo-repl {
+  transition: opacity 300ms ease 400ms;
+}
+.demo-stack.covered .demo-repl {
+  opacity: 0;
+}
+.demo-run {
+  z-index: 1;
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.demo-stack.covered .demo-run {
+  transform: translateX(0);
+  opacity: 1;
+}
 </style>
 
-<!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And here it is in its natural habitat: uvicorn main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. All of this is in the slides repo, if you want it — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
+<!-- Here's the app itself — step one of three. It's a handful of FastAPI routes: one serves the page, one reports where Python is running, one bumps a counter so we have some in-process state to watch. Nothing you haven't written before. [click] And before we run it, the same check we ran on FastAPI a moment ago, now on the app we are actually about to demo: it is callable, and its parameters are scope, receive, send. This is an ASGI application — remember that, because in twenty minutes we are going to call it without a server. [click] But first, here it is in its natural habitat: uvicorn main:app, open localhost:8000, and there's a little page with a button. Click it, and the app answers: Python 3.12 on darwin arm64 — my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. All of this is in the slides repo, if you want it — one FastAPI app and the three ways we're going to run it today. Keep the button in mind. Its answer is about to get weird. -->
 
 ---
 

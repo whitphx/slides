@@ -5,7 +5,8 @@
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open",
-    "export": "slidev export"
+    "export": "slidev export",
+    "dev:live": "concurrently -k -n slides,uvicorn -c cyan,green 'slidev --open' 'cd samples/runtime-agnostic-asgi-app && uv run --frozen uvicorn main:app --port 8000'"
   },
   "dependencies": {
     "@iconify-json/ri": "^1.2.10",
@@ -13,5 +14,8 @@
     "slidev-addon-fancy-arrow": "^0.16.1",
     "slidev-addon-qrcode": "^1.0.2",
     "slidev-addon-window-mockup": "^0.3.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

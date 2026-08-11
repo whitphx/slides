@@ -73,6 +73,23 @@ These principles are the material you draft the plan from. The **information flo
 - When trimming an existing slide, confirm the removed explanation survives in the presenter notes; move it there if it doesn't.
 - The test: can the audience read the slide in ~3 seconds while still listening to the speaker? If reading competes with listening, cut further.
 
+#### Slide text sizing
+
+**Size text with the numeric scale, not the named one.** `text-4` is 16px, `text-5` is 20px, `text-6` is 24px. The slide body is already 24px, which means the whole named scale is a reduction: `text-xs` is 12px, `text-sm` 14px, `text-lg` 18px, `text-xl` 20px. Reaching for `text-lg` to make something bigger makes it *smaller* than the surrounding text.
+
+- **`text-4` is the floor** for anything the audience reads: box contents, captions above code panels, labels in a diagram, and the floating annotation boxes that arrows point into. Use `text-5` for a caption or label that carries real content, `text-6` for a bullet list that is the slide's main body.
+- Small type is for what nobody reads from the back of the room: the event/date line, citations and years, a URL under a QR code, a sample file path.
+- **Never set a floating annotation box in pixels.** A `.note { font-size: 13px }` in a slide's `<style>` block is a third of the body size and unreadable in a room. Let it inherit, or size it near the body.
+
+**When it does not fit, make room; do not shrink the text.** In order of preference:
+
+1. **Reflow the code**, so a wide line fits a narrow column at full size. Breaking `list(inspect.signature(app).parameters)` across four lines beats dropping the font two steps, and dead lines (a bare `$ python` above a REPL transcript) can go.
+2. **Scope `--slidev-code-font-size` to the pane that needs it** rather than the whole slide. A dense reference block on the left can be 15px while the punchline block on the right is 22px; setting one size on `*` forces the punchline down to the reference block's size. Put the variable on the container's class in the slide's `<style>` block.
+3. **Trim padding, margins, and image heights.**
+4. Only then reconsider the content itself: split the slide, or cut.
+
+**`<br>` is for semantic grouping, not for fixing a ragged wrap.** Break a line where the meaning breaks (label / detail), the way `async **inbox**<br>events from the client` does. If a line is wrapping in an ugly place, that is a sizing or width problem: fix the size or the container, because a hard break that solves today's wrap becomes a wrong break as soon as either changes.
+
 ### 3. Plan the talk before building it
 
 Settle the story before writing a single slide, and present that story for approval.
@@ -265,6 +282,8 @@ addons:
 - `../../themes/triangle` — the default choice for most presentations (generative triangle tessellation background)
 - `../../themes/alpha` — alternative with animated gradient background
 
+**Per-slide frontmatter the triangle theme understands:** `plainBackground: true` fades the tiles out for that slide. Set it on any slide built from layered translucent boxes — stack figures, sequence diagrams, anything with `bg-*:5`-style fills — because the tiles otherwise show through the boxes and compete with the figure.
+
 Only list addons in the frontmatter `addons:` field that are actually used in the slides. Use the short name (without `slidev-addon-` prefix) in the frontmatter, e.g., `anipres` not `slidev-addon-anipres`. The full package name with prefix is only used in `package.json` dependencies.
 
 #### Slide structure
@@ -353,5 +372,18 @@ layout: section
   - **Code blocks**: Always add `maxHeight` (e.g., `{maxHeight:'320px'}`) for blocks longer than ~10 lines.
   - **Stacked content**: When a slide has a title + description + code block + footer text, the total height can easily exceed the viewport. Reduce margins (`mt-2` instead of `mt-6`), padding (`p-3` instead of `p-4`), or trim content.
   - **Bullet lists with nested items**: Deep nesting or many items can push content off-screen.
-  - **Don't shrink text to fit**: Avoid using `text-sm` or `text-xs` to cram more content into a slide. This makes text unreadable for the audience. Instead, split the content across multiple slides or reduce the amount of content.
+  - **Don't shrink text to fit**: `text-sm` and `text-xs` are roughly half the slide's body size and unreadable from the back of a room. Reclaim the space some other way, in the order given under "Slide text sizing"; splitting the slide or cutting content is the last resort, not the first.
+  - **Measure rather than eyeball.** In the browser, compare each element's bottom edge against its slide's box across the whole deck at once:
+    ```js
+    [...document.querySelectorAll('.slidev-page')].map((s, i) => {
+      const r = s.getBoundingClientRect()
+      let max = -Infinity
+      for (const el of s.querySelectorAll('*')) {
+        const b = el.getBoundingClientRect()
+        if (b.height && b.width && b.bottom > max) max = b.bottom
+      }
+      return { slide: i + 1, overflowPx: Math.round(max - r.bottom) }
+    }).filter(x => x.overflowPx > 2)
+    ```
+    Run it on `/export` (every slide rendered at once, all clicks revealed). Take a baseline before a sweeping change, so a pre-existing overflow is not mistaken for one you introduced.
 - **Visually verify slides**: Overflow issues can only be reliably detected by viewing the rendered slides. If a Playwright MCP browser is available, use it to navigate to each content-heavy slide (at its final click state, e.g., `http://localhost:3030/{slide}?clicks=999`) and take screenshots to check for clipping. The `/export` route shows all slides rendered at once but is less precise for overflow detection than individual slide views.

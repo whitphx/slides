@@ -38,6 +38,8 @@ For nested lists with depth control: `<v-clicks depth="2">`.
 
 **Hide on click**: `v-click.hide="3"` hides the element at click 3.
 
+**Prefer `v-click` to hand-rolled `$clicks` comparisons.** `<div v-click="1">` says what it means and takes the directive's own transition; `:class="$clicks === 1 ? 'op100' : 'op0'"` reimplements it, and the `=== 1` form additionally hides the element again on the next click, which is rarely what was wanted. Reach for `$clicks` only when the state has to drive something a directive cannot express, such as a CSS class that animates a layout (`:class="$clicks >= 3 ? 'covered' : ''"`).
+
 **Text emphasis** — use `v-mark` directive for dynamic highlighting:
 
 ```html
@@ -134,7 +136,7 @@ await app(scope, receive, send);
 ````
 
 <div v-click="1">
-<div data-id="ann-app" absolute top-24 right-5 w-60 bg-white dark:bg-black p-2 rounded border="~ violet/50 rounded-lg" text-sm>
+<div data-id="ann-app" absolute top-24 right-5 w-100 bg-white dark:bg-black p-2 rounded border="~ violet/50 rounded-lg">
 
 the **`app`** object, now in JavaScript
 
@@ -151,7 +153,9 @@ Notes that save a round of fiddling:
 - Size a box so its text does not wrap to an orphaned last word. Besides reading badly, an orphan wrap has been observed to leave a stray fragment of the text painted in the slide's left margin, with no element there in the DOM to explain it; widening the box until the line fits cleared it.
 - Pair the arrows with a line-highlight sequence (`{*|1|3|*}`) so the highlighted line and the arrow appear on the same click.
 - Boxes need `bg-white dark:bg-black` and a border. They float over the code block's background, so a transparent box is unreadable.
-- Position boxes absolutely (`absolute top-24 right-5 w-60`) and check the rendered slide: stacked boxes collide easily, because a box grows downward as its text wraps. Leave a visible gap rather than computing one exactly.
+- Position boxes with utilities anchored to an edge (`absolute top-24 right-5 w-100`), never with inline pixel coordinates (`style="top: 214px; left: 712px"`). Pixel offsets are measured against one rendering of one slide and silently go wrong the moment the code block, font size, or click state changes; `right-*`/`bottom-*` keep a box pinned to the edge it belongs to. Check the rendered slide either way: stacked boxes collide easily, because a box grows downward as its text wraps. Leave a visible gap rather than computing one exactly.
+- Do not shrink a box's font to make it fit (see "Slide text sizing" in `SKILL.md`). These boxes carry the point of the slide, so they are read; widen the box, move it, or reflow the code under it.
+- Anchors take a side (`@ left`, `@ bottom`) or a point (`@ (38%, 0)`, `@ (20%, 100%)`). When an arrow from the obvious side would cross the code or another box, switch sides or aim at a percentage point instead of bending the arc further.
 - When two boxes on one side crowd the text below them, move the prose into `<div absolute bottom-20 inset-x-0>` so it is anchored to the bottom of the slide instead of flowing under the code.
 - Colour-code when the annotations mean different things (a neutral arrow for "here is what this is", `color="red"` for "here is the problem").
 - Screenshots taken right after navigation can miss the arrowheads: FancyArrow draws itself with an animation. Wait ~2s before capturing, or an arrow will look headless (or absent) when it is actually fine.
@@ -238,15 +242,19 @@ Use UnoCSS utility classes directly on HTML elements (Attributify mode):
 
 **Sizing:** `w-full`, `h-50`, `w="400px"`, `h="100%"`
 
-**Text:** `text-2xl`, `text-4xl`, `text-6xl`, `leading-18`, `op50`, `font-300`
+**Text:** `text-4` (16px), `text-5` (20px), `text-6` (24px, the slide's own body size), `text-2xl`, `text-4xl`, `leading-18`, `op50`, `font-300`
 
-**Positioning:** `absolute`, `top-20`, `right-0`, `bottom-10`, `left-12`
+Use the numeric scale for body text. The named classes below `text-2xl` all shrink text relative to the slide default (`text-xs` 12px, `text-sm` 14px, `text-lg` 18px, `text-xl` 20px), so they belong only on things nobody reads from the back of the room. `text-4` is the floor for readable text; see "Slide text sizing" in `SKILL.md`.
+
+**Positioning:** `absolute`, `top-20`, `right-0`, `bottom-10`, `left-12`, `w-100`
+
+Prefer these to an inline `style="top: …px; left: …px"`, which is measured against one rendering and breaks when anything around it moves.
 
 **Borders:** `border="~ sky/50 rounded-lg"`, `border-none!`
 
 **Background:** `bg-sky:10`, `backdrop-blur-md`, `rounded-lg`
 
-**Code font size** — adjust per slide via scoped style:
+**Code font size** — adjust via scoped style:
 
 ```html
 <style>
@@ -255,6 +263,19 @@ Use UnoCSS utility classes directly on HTML elements (Attributify mode):
 }
 </style>
 ```
+
+Scope the variable to the pane that needs it rather than to `*`, when one block on the slide is dense reference material and another is the punchline. Setting it on `*` drags the punchline down to the size the dense block needs:
+
+```html
+<style>
+/* the wide, dense listing */
+.fw-left { --slidev-code-font-size: 15px; }
+/* the two lines everyone is meant to read */
+.fw-right { --slidev-code-font-size: 22px; }
+</style>
+```
+
+Reflowing a snippet across more lines is usually better than dropping its size: breaking `list(inspect.signature(app).parameters)` into four lines keeps it legible in a narrow column.
 
 ## Code blocks
 

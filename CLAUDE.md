@@ -56,3 +56,5 @@ ESLint is configured with TypeScript and Vue support. Multi-word component names
 ## Slide Text Style
 
 Slides carry keywords, not prose: words, phrases, and taglines the audience can grasp at a glance, with the key information bolded. Full-sentence explanations go in the presenter notes (HTML comments), to be spoken aloud — never embedded in the slide body. `layout: statement` slides are the exception (their single line is the tagline). See "Slide text density" in `.claude/skills/slidev-deck/SKILL.md` for details.
+
+Size on-slide text with the numeric scale (`text-4` = 16px, `text-5` = 20px, `text-6` = 24px), not the named one. The slide body is already 24px, so every named class from `text-xs` (12px) through `text-xl` (20px) *shrinks* text; `text-4` is the floor for anything the audience reads, including floating annotation boxes. When content overflows, make room (reflow the code across more lines, scope `--slidev-code-font-size` to the pane that needs it, drop cosmetic `<br>`, trim padding) rather than shrinking the text. See "Slide text sizing" in the skill.

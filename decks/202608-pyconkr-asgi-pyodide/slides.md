@@ -1349,7 +1349,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 <div v-click="[2,3]">
 <div data-id="ann-sig" class="js-note" absolute style="top: 214px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ teal/60 rounded-lg">
 
-`fetch()`'s exact shape — **`Request` in, `Response` out**
+Mimics JavaScript's built-in **`fetch()` interface**
 
 </div>
 <FancyArrow from="[data-id=ann-sig] @ left" to="[data-id=dispatch-js] .line:nth-child(1) @ right" arc="-0.1" />
@@ -1359,7 +1359,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 <div v-click="4">
 <div data-id="ann-ffi" class="js-note" absolute style="top: 322px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
 
-**Pyodide's FFI** — values get converted <span op70>(→ appendix)</span>
+**Pyodide's FFI** — JS ↔ Python type conversion <span op70>(→ appendix)</span>
 
 </div>
 <FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="-0.2" color="red" />

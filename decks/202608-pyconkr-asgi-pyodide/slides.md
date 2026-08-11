@@ -322,9 +322,9 @@ The entire interface: **one coroutine, three arguments**
 
 </div>
 
-<div v-click="1" mt-3 text-center>
+<div v-click="1" mt-8 text-center>
 <div text-xl>🤝 This signature is <b>the contract</b></div>
-<div mt-1 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
+<div mt-4 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
 </div>
 
 ```py {*}{'data-id':'asgi-signature'}
@@ -332,27 +332,27 @@ async def app(scope, receive, send):
     ...
 ```
 
-<div mt-24 grid="~ cols-3" gap-6 text-sm>
+<div mt-8 grid="~ cols-3" gap-6 text-lg>
 
 <div v-click="2">
 <div data-id="ann-scope" border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
-📋 <b><code>scope</code></b><br><span op80>connection type · path · headers</span>
+📋 <b><code>scope</code></b><br><span op80>connection type<br>path · headers</span>
 </div>
-<FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="0.2" />
+<FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="-0.2" />
 </div>
 
 <div v-click="3">
 <div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
-📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b> — events from the client</span>
+📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b><br>events from the client</span>
 </div>
-<FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="0.2" />
+<FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
 
 <div v-click="4">
 <div data-id="ann-send" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
-📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b> — events to the client</span>
+📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b><br>events to the client</span>
 </div>
-<FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.2" />
+<FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.1" />
 </div>
 
 </div>

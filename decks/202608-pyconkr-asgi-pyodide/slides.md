@@ -1146,7 +1146,7 @@ Fill in the blanks and you have **a server** 🛠️
 
 <div mt-1 text-lg>
 
-From `bridge.py` — JS request → **the dict ASGI specifies**:
+JS request → **the dict ASGI specifies**:
 
 </div>
 
@@ -1172,7 +1172,10 @@ async def dispatch(app, request):
 </div>
 
 <div class="scope-spec">
-<div text-xs op70 mb-1>…every key is spelled out in the spec:</div>
+<div text-xs op70 mb-1 flex justify-between items-baseline gap-2>
+<span>…every key is spelled out in the spec:</span>
+<a href="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope" target="_blank" whitespace-nowrap>asgi.readthedocs.io ↗</a>
+</div>
 <iframe
   src="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope"
   title="ASGI specification — HTTP connection scope"
@@ -1185,7 +1188,7 @@ async def dispatch(app, request):
 
 <div v-click="6" mt-2 text-lg text-center>
 
-Filling this dict correctly **is** what "implementing the server" means
+The app just **reads** this — producing it is the **server's** side of the contract
 
 </div>
 
@@ -1233,7 +1236,7 @@ Filling this dict correctly **is** what "implementing the server" means
 }
 </style>
 
-<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict — they're a list of two-byte-string tuples, with the names lowercased. ASGI is picky about every one of these. [click] And none of this is folklore — here is the spec itself, the HTTP connection scope section, listing every key and its type. This is the document you actually work from when you write one of these. [click] And that pickiness is the point: filling this dict correctly is what implementing the server actually means. You never learn this from using FastAPI. You learn it the moment you stand on the other side of the contract. -->
+<!-- Step one: build the scope. JavaScript handed us a plain object — method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict — they're a list of two-byte-string tuples, with the names lowercased. ASGI is picky about every one of these. [click] And none of this is folklore — here is the spec itself, the HTTP connection scope section, listing every key and its type. This is the document you actually work from when you write one of these. [click] And that pickiness is the point. The app never builds any of this — it just reads it and trusts that whoever called it got the types right. Producing it is the server's side of the contract, and this is the first piece of that side we're writing ourselves. You never see it from FastAPI. You see it the moment you stand on the other side. -->
 
 ---
 

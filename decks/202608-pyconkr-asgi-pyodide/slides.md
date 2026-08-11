@@ -477,12 +477,10 @@ Hello, PyCon KR!
 <!-- To really demystify it, here's a complete ASGI application with no framework at all. It checks that the connection is HTTP, then sends two events: a response-start with the status and headers, and a response-body with the bytes. That is a whole working web app — and it is worth walking through, because every line is doing something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be handed HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, carrying the status and the headers. [click] And the second: response.body, carrying the bytes. Two sends, and the response is complete. [click] So let's run it: I point Uvicorn at it exactly the way I pointed it at FastAPI a few slides ago, and it starts up without complaint. [click] Now curl it — and there's a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One aside for the curious: Uvicorn also logs that the lifespan protocol appears unsupported, because our eleven lines ignore lifespan entirely — our bridge ignores it too, and there is an appendix slide on it if anyone asks. So Starlette and FastAPI, for all their routing and dependency injection and validation, ultimately compile down to exactly this: a callable that reads scope and talks through receive and send. And now flip it around, because this is the sentence the whole talk stands on: whoever calls this function — whoever builds the scope and passes in receive and send — that thing IS the server. By the way, this exact file lives in the slides repo with a test suite, so what you're reading is verified working code. -->
 
 ---
-clicks: 6
----
 
 # Now a POST — enter `receive`
 
-<div class="post-grid" mt-3 :class="$clicks >= 5 ? 'revealed' : ''">
+<div class="post-grid" mt-3 :class="$clicks >= 6 ? 'revealed' : ''">
 
 <div class="post-cell post-left">
 
@@ -523,8 +521,7 @@ You said: hello, PyCon KR
 
 </div>
 <div v-click="2">
-<div class="receive-impl" data-id="ann-receive-impl" absolute top-30 left-20 w-96 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
-<div text-sm op70 mb-1>whoever calls <code>app</code> hands this in:</div>
+<div class="receive-impl" data-id="ann-receive-impl" absolute top-26 left-20 w-96 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
 
 ```py
 async def receive():

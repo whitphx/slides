@@ -1796,9 +1796,9 @@ plainBackground: true
   { key: 'browser', label: '② Browser' },
   { key: 'edge', label: '③ Edge', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure aligned /></template>
-  <template #browser><BrowserStackFigure aligned /></template>
-  <template #edge><CloudflareStackFigure /></template>
+  <template #server><ServerStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #browser><BrowserStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #edge><CloudflareStackFigure :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div class="punchline-stack" mt-4 text-center text-xl>
@@ -1823,7 +1823,7 @@ plainBackground: true
 }
 </style>
 
-<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
+<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] And watch what lights up: the app, and the interface it is called through, in all three columns at once. That band is the constant. It is the same file and the same three arguments whether the caller is Uvicorn on a server, forty-five lines in a tab, or Cloudflare's SDK at the edge — you port the app by swapping the box underneath it and changing nothing inside it. Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
 
 ---
 clicks: 2

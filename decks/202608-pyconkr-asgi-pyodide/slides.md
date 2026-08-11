@@ -1867,7 +1867,7 @@ The whole file — nothing left out:
 
 </div>
 
-<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Two imports and a fetch handler. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the handler, one line: hand the app to asgi.fetch. [click] Now read that first import again, because this is the bit I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to prove it could be done. They wrote it as a supported product feature. If you had walked in here thinking the browser thing was a stunt, this is the slide where it stops being one. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
+<!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Two imports and a fetch handler. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the handler, one line: hand the app to asgi.fetch. [click] Now read that first import again, because this is the bit I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to prove it could be done. They wrote it as a supported product feature. If the browser demo still felt like a curiosity, this is the slide where it stops being one. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
@@ -2077,15 +2077,16 @@ In production: [Streamlit Playground](https://streamlit.io/playground) powered b
 
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
-- 🌉 **A server = anything that fulfills the contract** — Uvicorn · a tab · the edge
-- 🏭 **Shipping today** — Stlite · Shinylive · Gradio-Lite · the playgrounds
-- 🧠 **To understand an interface, implement the other side of it**
+- 🌉 **A server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
+- 🔁 **One app, unchanged, across all of them** — that's the portability
+- 🏭 **In production today** — `Mangum`, the vendors' SDKs, Stlite, the playgrounds
+- 🧠 **I learned ASGI by writing the other side of it**
 
 </v-clicks>
 
 </div>
 
-<!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Shinylive, Gradio-Lite, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
+<!-- Six things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills it — Uvicorn, a Lambda adapter, Cloudflare's edge, or forty-five lines of Python in a browser tab. Four, and this is the one the whole talk was built to earn: the same app ran on every one of them without changing a line. That is what cutting an interface buys you. Five: all of this is running in production right now — Mangum, the SDKs Azure and Cloudflare ship, Stlite, the official Streamlit and Gradio playgrounds. And if you have deployed FastAPI to Lambda, then you were already in this family before you walked in here. And six, the one I actually took away from building this: I learned ASGI by writing the other side of it. Reading the spec had never made it stick. -->
 
 <div v-click mt-10 grid="~ cols-[1fr_auto]" gap-8 items-center>
 

@@ -260,19 +260,19 @@ Same motivation, one standard earlier — **the synchronous era**:
 <div grid="~ cols-[1fr_auto_1fr]" gap-4 items-stretch mt-5>
 
 <div v-click="1" border="~ gray/40 rounded-lg" p-3 bg-gray:5>
-<div text-lg>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
-<div mt-2><code>def app(environ, start_response)</code></div>
-<div op80 mt-1>Flask · Django ⇄<br>Gunicorn · uWSGI</div>
-<div op80 mt-1><b>One sync call</b><br>request → response, done</div>
+<div text-4>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
+<div text-4 mt-2><code>def app(environ, start_response)</code></div>
+<div text-4 op80 mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
+<div text-4 op80 mt-1><b>One sync call</b> request → response, done</div>
 </div>
 
 <div v-click="2" self-center text-2xl op60>→</div>
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
-<div text-lg>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
-<div mt-2><code>async def app(scope, receive, send)</code></div>
-<div op80 mt-1>Same decoupling, <b>async events</b></div>
-<div op80 mt-1>WebSockets · streaming<br>long-lived connections</div>
+<div text-4>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
+<div text-4 mt-2><code>async def app(scope, receive, send)</code></div>
+<div text-4 op80 mt-1>Same decoupling, <b>async events</b></div>
+<div text-4 op80 mt-1>WebSockets · streaming long-lived connections</div>
 </div>
 
 </div>
@@ -317,9 +317,9 @@ The entire interface: **one coroutine, three arguments**
 
 </div>
 
-<div v-click="1" mt-8 text-center>
+<div v-click="1" mt-4 text-center>
 <div text-xl>🤝 This signature is <b>the contract</b></div>
-<div mt-4 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
+<div mt-4 mb-4 text-lg op80>Satisfy it → <b>any ASGI server can serve your app</b></div>
 </div>
 
 ```py {*}{'data-id':'asgi-signature'}
@@ -371,7 +371,7 @@ clicks: 6
 
 <div class="framework-cell framework-left">
 
-<div text-sm mb-1>A complete ASGI app — <b>no framework</b></div>
+<div text-5 mb-1>A complete ASGI app — <b>no framework</b></div>
 
 <<< @/samples/raw-asgi/raw_asgi.py py {*|1|2|3-7|8-11|*}
 
@@ -379,7 +379,7 @@ clicks: 6
 
 <div class="framework-cell framework-right">
 
-<div text-sm mb-1>…and Uvicorn serves it, no questions asked</div>
+<div text-5 mb-1>…and Uvicorn serves it, no questions asked</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -496,7 +496,7 @@ You said: hello, PyCon KR
 </div>
 <div v-click="2">
 <div class="receive-impl" data-id="ann-receive-impl" absolute top-30 left-20 w-96 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
-<div text-xs op70 mb-1>whoever calls <code>app</code> hands this in:</div>
+<div text-sm op70 mb-1>whoever calls <code>app</code> hands this in:</div>
 
 ```py
 async def receive():
@@ -561,13 +561,13 @@ clicks: 3
 
 <div class="fw-cell fw-left">
 
-<div text-sm mb-1>FastAPI — routing, validation, docs…</div>
+<div text-5 mb-1>FastAPI — routing, validation, docs…</div>
 
 <<< @/samples/fastapi-is-asgi/app.py py {*}
 
 <div v-click="1" mt-3>
 
-<div text-sm mb-1>…and inside FastAPI itself:</div>
+<div text-5 mb-1>…and inside FastAPI itself:</div>
 
 ```py {*}
 class FastAPI(Starlette):
@@ -587,15 +587,17 @@ class FastAPI(Starlette):
 
 <div class="fw-cell fw-right">
 
-<div text-sm mb-1>…and <code>app</code> is <b>still just the callable</b></div>
+<div text-5 mb-1>…and <code>app</code> is <b>still just the callable</b></div>
 
-```py {*}
-$ python
-
+```py {*|1-2|*}
 >>> callable(app)
 True
 
->>> list(inspect.signature(app).parameters)
+>>> list(
+...   inspect
+...   .signature(app)
+...   .parameters
+... )
 ['scope', 'receive', 'send']
 ```
 
@@ -611,7 +613,6 @@ True
 
 <style>
 * {
-  --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.5;
 }
 .fw-grid {
@@ -629,6 +630,7 @@ True
 .fw-left {
   width: calc(200% + 1.25rem);
   transition: width 700ms ease;
+  --slidev-code-font-size: 15px;
 }
 .fw-grid.revealed .fw-left {
   width: 100%;
@@ -639,6 +641,7 @@ True
   transform: translateX(calc(100% + 1.25rem));
   opacity: 0;
   transition: transform 700ms ease, opacity 350ms ease 250ms;
+  --slidev-code-font-size: 22px;
 }
 .fw-grid.revealed .fw-right {
   transform: translateX(0);
@@ -649,40 +652,40 @@ True
 <!-- So if eleven lines is a working app, what is FastAPI for? All the things you actually want: routing, request parsing, validation, dependency injection, generated docs. You write decorated functions instead of dictionaries. [click] And here is why, straight from FastAPI's own source: the class defines __call__ with the ASGI signature, and hands straight through to Starlette. [click] So the thing FastAPI gives you is not some special framework construct that a server has to know about. Ask inspect for its signature and you get exactly three parameters: scope, receive, send. It IS an ASGI application, in the same sense our eleven lines were. And you can go further than the signature: hand it a scope and a receive and a send of your own, and it runs, no server anywhere, returning None because the response goes out through send. I have kept that off the slide because it needs three variables you cannot see, but there is a test in the repo that does exactly it, if anyone wants the receipt. [click] So a framework is not a different kind of thing from what we just wrote. It is a much nicer way to write the same callable. Which means anything that can call our eleven lines can call FastAPI too — hold that thought. -->
 
 ---
-clicks: 6
+plainBackground: true
 ---
 
 # One `await` is the whole request
 
-<div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-2 pr-14 text-sm items-center>
+<div grid="~ cols-[1fr_auto_1fr]" gap-2 mt-6 pr-14 text-sm items-center>
 
-<div text-center text-xs op60 font-bold>🖥️ Server <span op70>(e.g. Uvicorn)</span></div>
+<div text-center text-5 op60 font-bold pb-4>🖥️ Server <span op70>(e.g. Uvicorn)</span></div>
 <div></div>
-<div text-center text-xs op60 font-bold>🐍 ASGI application</div>
+<div text-center text-5 op60 font-bold pb-4>🐍 ASGI application</div>
 
-<div v-click="1" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center>builds <code>scope</code><br><span text-xs op70><code>{"type": "http", …}</code></span></div>
+<div v-click="1" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center text-4>builds <code>scope</code><br><span text-xs op70><code>{"type": "http", …}</code></span></div>
 <div v-click="1" text-center text-xl op60>→</div>
-<div v-click="1" text-xs op80><code>await app(scope, receive, send)</code><br><span op70>opens here — everything below is <b>inside</b> it</span></div>
+<div v-click="1" text-4 op80><code>await app(scope, receive, send)</code><br><span op70>opens here — everything below is <b>inside</b> it</span></div>
 
-<div v-click="2" op80 text-right>the app wants the body</div>
+<div v-click="2" op80 text-right text-5>the app wants the body</div>
 <div v-click="2" text-center text-xl op60>←</div>
-<div v-click="2" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>await receive()</code></div>
+<div v-click="2" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center text-5><code>await receive()</code></div>
 
-<div v-click="3" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center><code>{"type": "http.request",</code><br><code>"body": b"…", "more_body": False}</code></div>
+<div v-click="3" border="~ sky/40 rounded-lg" p-2 bg-sky:8 text-center text-4><code>{"type": "http.request",</code><br><code>"body": b"…", "more_body": False}</code></div>
 <div v-click="3" text-center text-xl op60>→</div>
-<div v-click="3" op80>body delivered</div>
+<div v-click="3" op80 text-5>body delivered</div>
 
-<div v-click="4" op80 text-right>status + headers</div>
+<div v-click="4" op80 text-right text-5>status + headers</div>
 <div v-click="4" text-center text-xl op60>←</div>
-<div v-click="4" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>send({"type": "http.response.start"…})</code></div>
+<div v-click="4" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center text-4><code>send({"type": "http.response.start"…})</code></div>
 
-<div v-click="5" op80 text-right>bytes <span op70>(repeat while <code>more_body</code>)</span></div>
+<div v-click="5" op80 text-right text-5>bytes <span op70>(repeat while <code>more_body</code>)</span></div>
 <div v-click="5" text-center text-xl op60>←</div>
-<div v-click="5" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center><code>send({"type": "http.response.body"…})</code></div>
+<div v-click="5" border="~ emerald/40 rounded-lg" p-2 bg-emerald:8 text-center text-4><code>send({"type": "http.response.body"…})</code></div>
 
-<div v-click="6" op80 text-right>response complete</div>
+<div v-click="6" op80 text-right text-5>response complete</div>
 <div v-click="6" text-center text-xl op60>←</div>
-<div v-click="6" border="~ gray/40 rounded-lg" p-2 bg-gray:8 text-center>the coroutine <b>returns</b><br><span text-xs op70>no "done" event — returning <i>is</i> the signal</span></div>
+<div v-click="6" border="~ gray/40 rounded-lg" p-2 bg-gray:8 text-center text-5>the coroutine <b>returns</b><br><span text-4 op70>no "done" event — returning <i>is</i> the signal</span></div>
 
 </div>
 
@@ -710,7 +713,7 @@ clicks: 6
 <!-- Let's put the three pieces in order, because the sequence is the part people get wrong. The server builds the scope and makes one call. Watch the bracket on the right, because this is the bit that trips people up: that await is not a step at the top, it is the whole height of this slide. It opens here and does not return until the bottom, and every exchange you are about to see happens inside it — the app calls back into the server's receive and send while the caller sits at that one await. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes — that is where streaming happens, by keeping more_body true. [click] And here is the bit worth correcting if you have imagined this protocol: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember that, because it is what makes the second half of this talk possible: you can await the app and then simply read whatever it handed you. -->
 
 ---
-clicks: 2
+clicks: 3
 ---
 
 # Demo, step 1: the normal case
@@ -719,7 +722,7 @@ clicks: 2
 
 <div class="demo-cell demo-left">
 
-<div text-sm mb-1><code>main.py</code> <span op70>— the demo app (abridged)</span></div>
+<div mb-1><code>main.py</code> <span op70>— the demo app (abridged)</span></div>
 
 ```py {*}
 app = FastAPI()
@@ -737,19 +740,21 @@ async def runtime() -> str:
 
 <div class="demo-cell demo-right">
 
-<div class="demo-stack" :class="$clicks >= 2 ? 'covered' : ''">
+<div class="demo-stack" :class="$clicks >= 3 ? 'covered' : ''">
 
 <div class="demo-layer demo-repl">
 
-<div text-sm mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
+<div text-5 mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
 
-```py {*}
-$ python
-
+```py {*|1-2|*}
 >>> callable(app)
 True
 
->>> list(inspect.signature(app).parameters)
+>>> list(
+...   inspect
+...   .signature(app)
+...   .parameters
+... )
 ['scope', 'receive', 'send']
 ```
 
@@ -757,7 +762,7 @@ True
 
 <div class="demo-layer demo-run">
 
-<div text-sm mb-1>…run it, open the page, click the button</div>
+<div text-5 mb-1>…run it, open the page, click the button</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -841,9 +846,6 @@ INFO:  Uvicorn running on
 }
 .demo-layer {
   grid-area: 1 / 1;
-}
-.demo-repl, .demo-repl * {
-  --slidev-code-font-size: 15px;
 }
 /* Fades only once the incoming pane is most of the way across, so the overlap
    is visible while it travels. */
@@ -933,7 +935,7 @@ A server inside your browser
 
 <div grid="~ cols-[2fr_1fr]" gap-8 mt-6 items-center>
 
-<div>
+<div h-full>
 
 <v-clicks>
 
@@ -946,8 +948,8 @@ A server inside your browser
 </div>
 
 <div v-click="4" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
-<div text-xs op70 mb-2>Browser tab</div>
-<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-xs op80>CPython on WASM</span></div>
+<div text-5 op70 mb-2>Browser tab</div>
+<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-4 op80>CPython on WASM</span></div>
 <div text-xl op50 my-1>⇅</div>
 <div border="~ sky/40 rounded" p-2 bg-sky:5>🌐 JavaScript / DOM</div>
 </div>
@@ -1250,10 +1252,12 @@ The app just **reads** this — producing it is the **server's** side of the con
 
 </div>
 
-```py {*|1-3|5-11|*}{'data-id':'wire-up'}
+```py {*|1-3|7-13|*}{'data-id':'wire-up'}
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
+
+
 
     status, headers, chunks = None, [], []
     async def send(event):
@@ -1265,21 +1269,21 @@ The app just **reads** this — producing it is the **server's** side of the con
 ```
 
 <div v-click="1">
-<div data-id="ann-receive" class="wire-note" absolute style="top: 140px; left: 560px; width: 375px" border="~ violet/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-receive" class="wire-note" absolute top-20 right-20 border="~ violet/50 rounded-lg" px-8 py-2 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
 </div>
-<FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.15" />
+<FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.05" />
 </div>
 
 <div v-click="2">
-<div data-id="ann-send" class="wire-note" absolute style="top: 276px; left: 560px; width: 375px" border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
+<div data-id="ann-send" class="wire-note" absolute top-62 right-10 border="~ emerald/50 rounded-lg" px-2 py-1 bg-white dark:bg-black>
 <div flex justify-between op70 mb-0.5><span>🐍 app</span><span>🖥️ server</span></div>
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
-<FancyArrow from="[data-id=ann-send] @ left" to="[data-id=wire-up] .line:nth-child(6) @ right" arc="0.15" />
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=wire-up] .line:nth-child(8) @ right" arc="0.15" />
 </div>
 
 <style>
@@ -1290,7 +1294,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 /* Wide enough that no line inside a note wraps, which the code font size is
    traded down to make room for. */
 .wire-note {
-  font-size: 15px;
+  font-size: 20px;
   line-height: 1.4;
 }
 </style>
@@ -1336,20 +1340,20 @@ The app just **reads** this — producing it is the **server's** side of the con
 
 # ④ Call it from JavaScript
 
-<div><code>main.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
+<div text-5><code>main.js</code> — <code>pyimport</code> is Python's <code>import</code>, spelled in JavaScript:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-call js {*}
 
 <div v-click="1">
 
-<div mt-1>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
+<div text-5 mt-1>…and <b>our own <code>fetch</code></b>, which answers out of Pyodide instead of the network:</div>
 
 <<< @/samples/runtime-agnostic-asgi-app/step2-browser/main.js#slide-fetch js {1-3,6,9-13|1,9-13|6|*}{at:2,'data-id':'dispatch-js'}
 
 </div>
 
 <div v-click="[2,3]">
-<div data-id="ann-sig" class="js-note" absolute style="top: 214px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ teal/60 rounded-lg">
+<div data-id="ann-sig" class="js-note" absolute top-60 right-5 w-100 bg-white dark:bg-black px-2 py-1 border="~ teal/60 rounded-lg">
 
 Mimics JavaScript's built-in **`fetch()` interface**
 
@@ -1359,24 +1363,24 @@ Mimics JavaScript's built-in **`fetch()` interface**
 </div>
 
 <div v-click="4">
-<div data-id="ann-ffi" class="js-note" absolute style="top: 322px; left: 712px; width: 208px" bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
+<div data-id="ann-ffi" class="js-note" absolute top-74 right-5 w-100 bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
 
 **Pyodide's FFI** — JS ↔ Python type conversion <span op70>(→ appendix)</span>
 
 </div>
 <FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="-0.2" color="red" />
-<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(7) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-ffi] @ bottom" to="[data-id=dispatch-js] .line:nth-child(7) @ right" arc="0.2" color="red" />
 </div>
 
 <style>
 * {
-  --slidev-code-font-size: 15px;
+  --slidev-code-font-size: 16px;
   --slidev-code-line-height: 1.45;
 }
 /* The typography preset sizes `p` directly, so inheriting a smaller size on
    the box alone would not reach the markdown paragraph inside it. */
 .js-note, .js-note p {
-  font-size: 13px;
+  font-size: 24px;
   line-height: 1.45;
   margin: 0;
 }
@@ -1718,7 +1722,7 @@ The browser runtime, running someone's production traffic
 
 # Cloudflare Workers run Python — on Pyodide
 
-<div mt-8 text-xl leading-13>
+<div mt-8 text-6 leading-13>
 
 <v-clicks>
 
@@ -1742,24 +1746,24 @@ The whole file — nothing left out:
 
 </div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|1,4|7-9|1,9}{maxHeight:'320px','data-id':'entry'}
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|4|2,7-9|1,9}{maxHeight:'320px','data-id':'entry'}
 
-<div v-click="[1,2]">
-<div data-id="ann-symlink" class="entry-note" absolute style="top: 205px; left: 640px; width: 320px" bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
+<div v-click="1">
+<div data-id="ann-symlink" class="entry-note" absolute top-24 right-8 bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
 
 `src/main.py` is **a symlink to step 1's app**
 
 </div>
-<FancyArrow from="[data-id=ann-symlink] @ left" to="[data-id=entry] .line:nth-child(4) @ right" arc="0.15" />
+<FancyArrow from="[data-id=ann-symlink] @ (20%, 100%)" to="[data-id=entry] .line:nth-child(4) @ right" arc="0.15" />
 </div>
 
-<div v-click="[3,4]">
-<div data-id="ann-asgi" class="entry-note" absolute style="top: 392px; left: 600px; width: 360px" bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
+<div v-click="3">
+<div data-id="ann-asgi" class="entry-note" absolute top-60 right-8 bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
 
-🤯 Cloudflare **ships the bridge** — `asgi` does what we just wrote by hand
+🤯 Cloudflare **ships the bridge** <br /> `asgi` does what we just wrote by hand
 
 </div>
-<FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(9) @ right" arc="0.2" color="red" />
+<FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(9) @ (38%, 0)" arc="-0.2" color="red" />
 </div>
 
 <div v-click="4" mt-3 text-center>
@@ -1767,18 +1771,6 @@ The whole file — nothing left out:
 <a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a><br />→ `Python 3.13 on emscripten/wasm32` — **from the edge** 🌍
 
 </div>
-
-<style>
-* {
-  --slidev-code-font-size: 15px;
-  --slidev-code-line-height: 1.45;
-}
-.entry-note, .entry-note p {
-  font-size: 13px;
-  line-height: 1.45;
-  margin: 0;
-}
-</style>
 
 <!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Two imports and a fetch handler. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the handler, one line: hand the app to asgi.fetch. [click] Now read that first import again, because this is the bit I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to prove it could be done. They wrote it as a supported product feature. If you had walked in here thinking the browser thing was a stunt, this is the slide where it stops being one. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 
@@ -1802,8 +1794,8 @@ plainBackground: true
 </StackCompare>
 
 <div class="punchline-stack" mt-4 text-center text-xl>
-<div :class="$clicks === 1 ? 'op100' : 'op0'"><b>Same file</b> · 3 Pythons · 3 transports · <b>0 changes</b></div>
-<div :class="$clicks >= 2 ? 'op100' : 'op0'" font-bold text-sky-600>The interface holds — everything below it is swappable</div>
+<div v-click="1"><b>Same file</b> · 3 Pythons · 3 transports · <b>0 changes</b></div>
+<div v-click="2" font-bold text-sky-600>The interface holds — everything below it is swappable</div>
 </div>
 
 <style>
@@ -1898,7 +1890,7 @@ Practical uses — and honest limits
 
 <div v-click="5" mt-5 text-center text-lg>
 
-In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradio Playground](https://www.gradio.app/playground) 🚀
+In production: [Streamlit Playground](https://streamlit.io/playground) powered by Stlite
 
 </div>
 
@@ -1956,15 +1948,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) · [Gradi
 
 <!-- Five things to carry out of the room. One: ASGI cuts a clean interface — your app on one side, and whoever can call it on the other. Two: the entire contract is scope, receive, and send, and it never mentions sockets, ports, or machines. Three: because of that, a server is anything that fulfills the contract — Uvicorn, forty-five lines of Python in a browser tab, or Cloudflare's edge. Four: this is shipping today — Stlite, Shinylive, Gradio-Lite, and the official Streamlit and Gradio playgrounds all run on it. And five, the one to remember if you forget everything else: the best way to truly understand an interface is to implement the other side of it. -->
 
----
-
-<h1>Thank you! 🙏</h1>
-
-<div mt-6 text-2xl>
-One app. Any caller. 🌐🐍
-</div>
-
-<div mt-6 grid="~ cols-[1fr_auto]" gap-8 items-center>
+<div v-click mt-10 grid="~ cols-[1fr_auto]" gap-8 items-center>
 
 <div text-base flex="~ col" gap-2>
 

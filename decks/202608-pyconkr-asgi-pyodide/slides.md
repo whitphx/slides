@@ -1434,7 +1434,7 @@ Responses made **inside the tab** — nothing leaves it.
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
-clicks: 1
+clicks: 2
 plainBackground: true
 ---
 
@@ -1444,8 +1444,8 @@ plainBackground: true
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure :highlight="$clicks >= 1" /></template>
-  <template #browser><BrowserStackFigure :highlight="$clicks >= 1" /></template>
+  <template #server><ServerStackFigure :highlight="$clicks >= 2" /></template>
+  <template #browser><BrowserStackFigure :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
@@ -1476,7 +1476,7 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 }
 </style>
 
-<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. Watch what lights up as the second column lands — the app, and the interface it is called through, in both columns. That is what did not move. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
+<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. [click] And here is what did not move: the app, and the interface it is called through, lit in both columns. Same file, same three arguments, either side of the swap. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
 
 ---
 layout: statement

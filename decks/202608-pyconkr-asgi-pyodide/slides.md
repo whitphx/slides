@@ -1639,7 +1639,7 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 <!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite puts Pyodide in a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. Same swap as our forty-five-line demo, just carrying a whole framework. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 # Real frameworks, really in the browser
@@ -1648,11 +1648,11 @@ Not just Streamlit — the same swap, done across the ecosystem:
 
 <div class="fw-table" mt-2 :class="$clicks >= 1 ? 'reveal' : ''">
 
-| Framework | In-browser version | What bridges it |
-| --------- | ------------------ | --------------- |
-| Streamlit | [Stlite](https://github.com/whitphx/stlite) (me) <img src="/stlite.svg" alt="Stlite" inline h-5 /> | `asgi-bridge.ts` — **`app(scope, receive, send)`** |
-| Shiny for Python | [Shinylive](https://github.com/posit-dev/shinylive) (Posit) | `messageporthttp.ts` — **`asgiFunc(scope, …)`** |
-| Gradio | [Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span> | `webworker/index.ts` — **`app(scope, rcv, snd)`** |
+| Framework | Server stack | <span>In-browser version</span> |
+| --------- | ------------ | ------------------ |
+| Streamlit | Starlette — **ASGI** | <span>[Stlite](https://github.com/whitphx/stlite) (me) <img src="/stlite.svg" alt="Stlite" inline h-5 /></span> |
+| Shiny for Python | Starlette — **ASGI** | <span>[Shinylive](https://github.com/posit-dev/shinylive) (Posit)</span> |
+| Gradio | FastAPI — **ASGI** | <span>[Gradio-Lite](https://github.com/gradio-app/gradio-lite) <span op60>(me — now unmaintained)</span></span> |
 
 </div>
 
@@ -1663,18 +1663,26 @@ Each one needed a **server half** in the browser — **ASGI is the right shape**
 </div>
 
 <style>
-/* The bridging column is present from the start so the table never reflows;
-   it just is not visible until the click that makes it the point. */
+/* The in-browser column holds its space from the start so the table never
+   reflows; the cells slide in on the click that makes them the point. */
 .fw-table :is(th, td):nth-child(3) {
   opacity: 0;
   transition: opacity 600ms ease;
 }
+.fw-table :is(th, td):nth-child(3) > span {
+  display: inline-block;
+  transform: translateX(0.9rem);
+  transition: transform 600ms ease;
+}
 .fw-table.reveal :is(th, td):nth-child(3) {
   opacity: 1;
 }
+.fw-table.reveal :is(th, td):nth-child(3) > span {
+  transform: none;
+}
 </style>
 
-<!-- So it worked for Streamlit — and it is not just Streamlit. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. Three frameworks, three ports, three separate codebases. [click] Now the last column, which is the point: open any of them and you find the same call. And I should be straight about the order — Shinylive did it first, and Stlite's bridge is heavily inspired by theirs. So this is not three teams converging by accident; it is one good idea being picked up, which is the more useful story anyway. Nobody had to invent a protocol, because ASGI already was one. The server half was the only part anyone had to write, and once you have read one of these bridges you can read all of them. [click] That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
+<!-- So it worked for Streamlit — and it is not just Streamlit. Here are the same three frameworks with the ASGI stacks we just looked at. [click] And every one of them has a version that runs in the browser. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is unmaintained now — the WASM work moved into Gradio itself. And I should be straight about the order: Shinylive did it first, and Stlite's bridge is heavily inspired by theirs. So this is not three teams converging by accident; it is one good idea being picked up, which is the more useful story anyway. Three frameworks, three ports, three separate codebases — and what made each of them possible is the middle column. Because the framework already spoke ASGI, nobody had to invent a protocol; the server half was the only part anyone had to write. [click] That is the argument for the standard: target the interface, and the port is a bridge instead of a rewrite. -->
 
 ---
 layout: statement
@@ -1752,7 +1760,7 @@ The whole file — nothing left out:
 
 <div v-click="4" mt-3 text-center>
 
-<a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> → `Python 3.13 on emscripten/wasm32` — **from the edge** 🌍
+<a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a><br />→ `Python 3.13 on emscripten/wasm32` — **from the edge** 🌍
 
 </div>
 

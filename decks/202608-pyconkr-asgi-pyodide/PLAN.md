@@ -109,12 +109,13 @@ Beat 6 — The spectrum completed: Cloudflare Workers (6)
 38. Three runtimes, one app   stack figure    three columns side by side; app+framework layers identical, caller layer swapped — the thesis slide
 39. Stlite on Workers         screenshot      PR #2077; same story at product scale
 
-Beat 7 — What it buys, where it stops (5)
+Beat 7 — What it buys, where it stops (4)
 40. Section                   section         "🧭 When to reach for this"
 41. Practical applications    bullets         🔒 privacy · 📚 runnable docs · 🎓 education · 📦 static-hosted demos · scale-with-visitors
 42. Honest limits             bullets         package availability, download size, no threads, CORS, never ship secrets
-43. Key takeaways             bullets         the mental model: `scope`/`receive`/`send`; "a server is just a caller"
-44. Thank you & links         QR codes        demo repo, Stlite, slides URL
+43. Key takeaways + links     bullets + QR    the mental model, then links and the QR revealed on a final click
+                                              (no separate thank-you slide: the last slide stays up through Q&A,
+                                              so it carries the summary; the thanks are spoken)
 
 Appendix — not presented; Q&A backup (4)
 45. Appendix divider          section         "Appendix: Streaming & WebSockets over the bridge"

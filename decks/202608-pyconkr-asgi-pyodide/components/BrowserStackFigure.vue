@@ -3,6 +3,9 @@ defineProps({
   // Reserve the space the edge column spends on its Python Worker frame, so the
   // runtime frames line up when all three are shown side by side.
   aligned: { type: Boolean, default: false },
+  // Ring the two rows every column shares, the app and the interface it is called
+  // through, so the box that does change reads as the only one.
+  highlight: { type: Boolean, default: false },
 });
 </script>
 
@@ -14,11 +17,17 @@ defineProps({
         <div v-if="aligned" class="text-center text-xs op0 mb-1" aria-hidden="true">&nbsp;</div>
         <div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5">
           <div class="text-center text-xs op60 mb-1">🐍 Pyodide</div>
-          <div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight min-h-13">
+          <div
+            class="rounded-lg p-2 text-center leading-tight min-h-13 border transition-all duration-700 delay-[250ms]"
+            :class="highlight ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10'"
+          >
             🐍 <b><code>app</code></b> <span class="op70">in <code>main.py</code></span><br>
             <span class="text-xs op80">ASGI application (FastAPI)</span>
           </div>
-          <div class="text-center text-xs op60 my-0.5">⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
+          <div
+            class="text-center text-xs my-0.5 transition-all duration-700 delay-[250ms]"
+            :class="highlight ? 'op100 font-600 text-emerald-700 dark:text-emerald-300' : 'op60'"
+          >⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
           <div class="border border-sky-400/40 rounded-lg p-2 bg-sky-400/10 text-center leading-tight min-h-13">
             🌉 <b><code>bridge.py</code></b><br>
             <span class="text-xs op80"><code>fetch</code> from the page → <b>ASGI calls</b></span>

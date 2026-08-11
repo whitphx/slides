@@ -1466,7 +1466,7 @@ Responses made **inside the tab** — nothing leaves it.
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
-clicks: 1
+clicks: 2
 plainBackground: true
 ---
 
@@ -1476,8 +1476,8 @@ plainBackground: true
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure /></template>
-  <template #browser><BrowserStackFigure /></template>
+  <template #server><ServerStackFigure :highlight="$clicks >= 2" /></template>
+  <template #browser><BrowserStackFigure :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
@@ -1508,7 +1508,7 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 }
 </style>
 
-<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
+<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. [click] And here is what did not move: the app, and the interface it is called through, lit in both columns. Same file, same three arguments, either side of the swap. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
 
 ---
 layout: statement
@@ -1646,7 +1646,7 @@ Underneath, every one of them is **an ASGI app + a server** 🤔
 <!-- Before we go further, look at what these frameworks are actually built on. The right-hand column is the interesting one. Shiny sits on Starlette, Gradio on FastAPI, and Streamlit joined them in 1.57, when it swapped Tornado out for Starlette and Uvicorn. Not every Python app framework is ASGI — Panel, for one, is still on Bokeh's Tornado server — but these three are, and they are the three we will follow into the browser in a minute. [click] And these are heavyweight things — static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But structurally? An ASGI app with a server underneath it. Which is exactly the shape we just took apart. So the obvious question: if the server half is swappable for our forty-five lines, is it swappable for these too? -->
 
 ---
-clicks: 1
+clicks: 2
 plainBackground: true
 ---
 
@@ -1656,8 +1656,8 @@ plainBackground: true
   { key: 'streamlit', label: 'Standard Streamlit' },
   { key: 'stlite', label: 'Stlite', hidden: $clicks < 1 },
 ]">
-  <template #streamlit><StreamlitStackFigure aligned /></template>
-  <template #stlite><StliteStackFigure /></template>
+  <template #streamlit><StreamlitStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #stlite><StliteStackFigure :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div class="punchline" mt-2 text-center text-lg :class="$clicks >= 1 ? 'op100' : 'op0'">
@@ -1672,7 +1672,7 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 }
 </style>
 
-<!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite puts Pyodide in a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. Same swap as our forty-five-line demo, just carrying a whole framework. -->
+<!-- Same picture as the demo app, with a much bigger passenger on top. On the left, standard Streamlit: your script, the Streamlit server running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine — and the React frontend in the visitor's browser over the network. [click] And here's Stlite. Read the rows across. Your script: same. The Streamlit server, with its ScriptRunner and all its state: same — that's the whole point, it's the real Streamlit, not a reimplementation. scope, receive, send: same interface. The frontend at the bottom: the same bundled React SPA. What changed is the two layers we've been swapping all talk — Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite runs Pyodide inside a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. [click] And there it is lit up: your script, Streamlit itself, and the interface between them and the server half — identical on both sides. Same swap as our forty-five-line demo, just carrying a whole framework. -->
 
 ---
 clicks: 2
@@ -1816,9 +1816,9 @@ plainBackground: true
   { key: 'browser', label: '② Browser' },
   { key: 'edge', label: '③ Edge', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure aligned /></template>
-  <template #browser><BrowserStackFigure aligned /></template>
-  <template #edge><CloudflareStackFigure /></template>
+  <template #server><ServerStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #browser><BrowserStackFigure aligned :highlight="$clicks >= 2" /></template>
+  <template #edge><CloudflareStackFigure :highlight="$clicks >= 2" /></template>
 </StackCompare>
 
 <div class="punchline-stack" mt-4 text-center text-xl>
@@ -1843,7 +1843,7 @@ plainBackground: true
 }
 </style>
 
-<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
+<!-- Here are both stacks we've seen — server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that's the only thing that moves — Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I didn't write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, just in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects — and the file on top never changed; two of these load it and the third symlinks it. [click] And watch what lights up: the app, and the interface it is called through, in all three columns at once. That band is the constant. It is the same file and the same three arguments whether the caller is Uvicorn on a server, forty-five lines in a tab, or Cloudflare's SDK at the edge — you port the app by swapping the box underneath it and changing nothing inside it. Which is the whole talk in one sentence: the interface holds, and everything below it is swappable. Not a deployment trick — a property of the architecture. -->
 
 ---
 clicks: 3

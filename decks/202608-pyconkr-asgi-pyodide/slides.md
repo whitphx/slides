@@ -105,11 +105,11 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <div v-click="5" mt-8 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-xl text-center>
 
 **Cut a clean interface → run anywhere something can *call* you.**<br>
-<span op80>One FastAPI app · three runtimes · zero changes</span>
+<span op80>One FastAPI app · different runtimes · zero changes</span>
 
 </div>
 
-<!-- Here's the whole talk in one slide. When you write a FastAPI app, your code never actually touches the network. Uvicorn does that part, and between your app and Uvicorn there's an interface — ASGI. Now, because that interface is a real, well-specified contract, the two sides are decoupled. Frameworks evolve on one side, servers evolve on the other, and neither needs to know the other's internals. And the question I want to push on today is: how far can you stretch the server side? The answer turns out to be: much further than you'd think. Into a browser tab. And past it. So here's the key message to hold onto: cut a clean interface, and your app runs anywhere something can call it. To prove it, one FastAPI app is going to run on three wildly different runtimes today, without changing a line. -->
+<!-- Here's the whole talk in one slide. When you write a FastAPI app, your code never actually touches the network. Uvicorn does that part, and between your app and Uvicorn there's an interface — ASGI. Now, because that interface is a real, well-specified contract, the two sides are decoupled. Frameworks evolve on one side, servers evolve on the other, and neither needs to know the other's internals. And the question I want to push on today is: how far can you stretch the server side? The answer turns out to be: much further than you'd think. Into a browser tab. And past it. So here's the key message to hold onto: cut a clean interface, and your app runs anywhere something can call it. To prove it, one FastAPI app is going to run on wildly different runtimes today, without changing a line. -->
 
 ---
 layout: section

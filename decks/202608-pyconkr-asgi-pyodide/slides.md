@@ -401,7 +401,20 @@ clicks: 6
 
 <div text-5 mb-1>A complete ASGI app — <b>no framework</b></div>
 
-<<< @/samples/raw-asgi/raw_asgi.py py {*|1|2|3-7|8-11|*}
+<<< @/samples/raw-asgi/raw_asgi.py py {*|1|2|3-7|8-11|*}{'data-id':'raw-asgi-app'}
+
+<div v-click="[3,5]">
+<div data-id="ann-send" class="wire-note" absolute top-30 right-10 w-80 flex items-center border="~ emerald/50 rounded-lg" px-2 py-1 gap-4 bg-white dark:bg-black text-4>
+<span>🐍 app</span>
+<div>
+<div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
+<div text-center op60>◂—— <code>None</code> ——</div>
+</div>
+<span>🦄 server</span>
+</div>
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(3) @ right" arc="0.05" />
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(8) @ right" arc="0.15" />
+</div>
 
 </div>
 
@@ -520,8 +533,18 @@ You said: hello, PyCon KR
 </div>
 
 </div>
-<div v-click="2">
-<div class="receive-impl" data-id="ann-receive-impl" absolute top-26 left-20 w-96 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
+
+<div v-click="[2,5]">
+<div class="receive-impl" data-id="ann-receive-impl" absolute top-26 right-5 w-108 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
+
+<div flex items-center px-8 py-2 mx-auto gap-4 bg-white dark:bg-black text-4>
+<span>🐍 app</span>
+<div>
+<div text-center op60>—— calls <code>receive()</code> ——▸</div>
+<div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
+</div>
+<span>🦄 server</span>
+</div>
 
 ```py
 async def receive():
@@ -531,7 +554,8 @@ async def receive():
 ```
 
 </div>
-<FancyArrow from="[data-id=ann-receive-impl] @ bottomright" to="[data-id=post-app] .line:nth-child(6) span:nth-child(5) @ right" arc="0.35" />
+<FancyArrow from="[data-id=ann-receive-impl] @ bottomleft" to="[data-id=post-app] .line:nth-child(6) span:nth-child(5) @ right" arc="0.35" />
+<FancyArrow from="[data-id=ann-receive-impl] @ left" to="[data-id=post-app] .line:nth-child(0) @ right" arc="-0.2" />
 </div>
 
 <style>
@@ -1294,7 +1318,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 </div>
 
 <div v-click="2">
-<div data-id="ann-send" class="wire-note" absolute top-70 right-10 flex items-center border="~ emerald/50 rounded-lg" px-2 py-1 gap-4 bg-white dark:bg-black>
+<div data-id="ann-send" class="wire-note" absolute top-70 right-14 w-90 flex items-center border="~ emerald/50 rounded-lg" px-2 py-1 gap-4 bg-white dark:bg-black>
 <span>🐍 app</span>
 <div>
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>

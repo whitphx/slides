@@ -1871,6 +1871,8 @@ The browser runtime, running someone's production traffic
 <!-- Cloudflare Workers are serverless functions running on Cloudflare's edge network, on a runtime called workerd — it's built on V8, it speaks JavaScript and WebAssembly. And when Cloudflare added Python support, guess how they did it. Pyodide. The exact same WebAssembly CPython from our browser story — except now it's running server-side, on the edge. I love this because it rhymes with history: V8 took browser-born JavaScript and put it on the server, and now workerd is doing the same thing to the browser-born Python stack. Which is a lovely bit of symmetry on its own. But the part I actually want to show you is on the next slide, so let's just look at the code. -->
 
 ---
+clicks: 4
+---
 
 # Demo, step 3: the entire entrypoint
 
@@ -1880,7 +1882,41 @@ The whole file — nothing left out:
 
 </div>
 
-<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|4|2,7-9|1,9}{maxHeight:'320px','data-id':'entry'}
+<div class="edge-grid">
+
+<div class="edge-cell">
+
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|4|2,7-11|1,9-11}{maxHeight:'320px','data-id':'entry'}
+
+</div>
+
+<!-- The app lands in the space the annotations were floating in, so they leave as
+     it arrives rather than being covered by it. -->
+<div class="edge-cell edge-app" :class="$clicks >= 4 ? 'arrived' : ''">
+
+<LiveEmbed url="https://runtime-agnostic-asgi-app.whitphx.workers.dev" title="Cloudflare Workers" light height="240px" :zoom="0.55">
+
+<div text-center text-4 py-6>
+
+→ `Python 3.13 on emscripten/wasm32`<br />**from the edge** 🌍
+
+</div>
+
+</LiveEmbed>
+
+</div>
+
+</div>
+
+<!-- The frame's title bar cannot hold the whole host, and the address is the part
+     the audience writes down, so it gets its own line under both columns. -->
+<div class="edge-url" mt-2 text-center :class="$clicks >= 4 ? '' : 'op0'">
+
+<a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> — **live, right now** 🌍
+
+</div>
+
+<div class="entry-notes" :class="$clicks >= 4 ? 'op0' : ''">
 
 <div v-click="1">
 <div data-id="ann-symlink" class="entry-note" absolute top-24 right-8 bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
@@ -1900,11 +1936,33 @@ The whole file — nothing left out:
 <FancyArrow from="[data-id=ann-asgi] @ left" to="[data-id=entry] .line:nth-child(9) @ (38%, 0)" arc="-0.2" color="red" />
 </div>
 
-<div v-click="4" mt-3 text-center>
-
-<a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a><br />→ `Python 3.13 on emscripten/wasm32` — **from the edge** 🌍
-
 </div>
+
+<style>
+.edge-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+.edge-cell {
+  min-width: 0;
+}
+/* Slides in from the right, like the browser pane in the step-1 demo. */
+.edge-app {
+  transform: translateX(calc(100% + 1.25rem));
+  opacity: 0;
+  transition: transform 700ms ease, opacity 350ms ease 250ms;
+}
+.edge-app.arrived {
+  transform: translateX(0);
+  opacity: 1;
+}
+.entry-notes,
+.edge-url {
+  transition: opacity 200ms ease;
+}
+</style>
 
 <!-- Step three of the demo. This is the entire Cloudflare entrypoint — I'm not hiding anything, this is the whole file. Two imports and a fetch handler. Import the app — and note, src/main.py is literally a symlink to the same main.py from steps one and two. And in the handler, one line: hand the app to asgi.fetch. [click] Now read that first import again, because this is the bit I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to prove it could be done. They wrote it as a supported product feature. If the browser demo still felt like a curiosity, this is the slide where it stops being one. It's deployed, you can hit that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32 — answered from a Cloudflare data center near you. Same app. Third runtime. Zero changes.
 

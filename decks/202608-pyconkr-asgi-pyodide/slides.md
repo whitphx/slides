@@ -801,7 +801,7 @@ INFO:  Uvicorn running on
 
 <WindowMockup title="http://127.0.0.1:8000" light>
 
-<LiveEmbed url="http://127.0.0.1:8000/" height="170px">
+<LiveEmbed url="http://127.0.0.1:8000" height="170px">
 
 <div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>
@@ -1469,6 +1469,28 @@ Responses made **inside the tab** — nothing leaves it.
 <!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide right there on the page and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab — by the forty-five lines you just read. OK — back to slides.
 
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
+
+---
+
+# One simplification: the main thread
+
+<div mt-14 text-center>
+
+<div>⚠️ Our demo: Pyodide on the <b>main thread</b> — Python <b>blocks painting</b></div>
+
+<div mt-8>⚙️ Real apps: Pyodide in a <b>Web Worker</b> — what <b>Stlite ships</b></div>
+
+<div mt-8>✅ Same <code>bridge.py</code>, same ASGI call — <b>only the thread changes</b></div>
+
+</div>
+
+<div mt-12 text-center text-4 op70>
+
+Not today's topic · <code>step2b-browser-worker/</code> + appendix slide
+
+</div>
+
+<!-- One honest note before the picture. Our demo boots Pyodide on the page's main thread, because that keeps the call chain readable: asgiFetch calls dispatch, and there is nothing in between. The cost is that while Python is working, the tab cannot paint or respond. With three endpoints you will never notice; with a real app you absolutely will. So real deployments put Pyodide in a Web Worker and post a message across instead, and that is exactly what Stlite ships. The part that matters for this talk is what does not move: bridge.py, the scope dict, receive and send, and the app itself are byte-for-byte the same — only the thread changes. There is a worker version of the sample in the repo and an appendix slide with the detail, but we are not spending time on it today. -->
 
 ---
 clicks: 3

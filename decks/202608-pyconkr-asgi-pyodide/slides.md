@@ -22,7 +22,7 @@ ASGI on Pyodide
 </h1>
 
 <div mt-12 text-xl op80>
-Yuichiro Tachibana (橘 祐一郎) · @whitphx
+Yuichi / 유이치 (@whitphx)
 </div>
 
 <div absolute bottom-8 right-10 text-sm op60>
@@ -33,9 +33,7 @@ PyCon Korea 2026 · Aug 15
 
 ---
 
-<h1>Yuichiro Tachibana / 橘 祐一郎</h1>
-
-@whitphx
+<h1>Yuichi / 유이치 (@whitphx)</h1>
 
 <div mt-8>
 Software Artisan / Indie Dev / OSS Enthusiast
@@ -84,7 +82,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
   }
 </style>
 
-<!-- Quick intro. I'm Yuichiro Tachibana, whitphx online. I build and maintain open source projects in the Python ecosystem. The two that matter most for today are Stlite — Streamlit running entirely in the browser — and Gradio-Lite, the same idea for Gradio. Building those runtimes is exactly where this talk comes from. So this isn't a textbook tour of ASGI; it's a report from actually shipping Python web frameworks into unusual places. -->
+<!-- Quick intro. I'm Yuichi, whitphx online. I build and maintain open source projects in the Python ecosystem. The two that matter most for today are Stlite — Streamlit running entirely in the browser — and Gradio-Lite, the same idea for Gradio. Building those runtimes is exactly where this talk comes from. So this isn't a textbook tour of ASGI; it's a report from actually shipping Python web frameworks into unusual places. -->
 
 ---
 

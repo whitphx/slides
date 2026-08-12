@@ -177,23 +177,16 @@ onBeforeUnmount(() => {
           />
           <slot v-else />
         </WindowMockup>
+        <!-- One control in one place for both directions, so the way back is where
+             the way in was. -->
         <button
-          v-if="live && !expanded"
+          v-if="live"
           type="button"
-          class="live-embed__expand"
-          aria-label="Fill the slide with this app"
-          @click.stop="expand"
+          class="live-embed__control"
+          :aria-label="expanded ? 'Return this app to its place on the slide' : 'Fill the slide with this app'"
+          @click.stop="expanded ? collapse() : expand()"
         >
-          <div i-ri-fullscreen-line />
-        </button>
-        <button
-          v-else-if="expanded"
-          type="button"
-          class="live-embed__return"
-          @click.stop="collapse"
-        >
-          <div i-ri-arrow-go-back-line />
-          <span>Return</span>
+          <div :class="expanded ? 'i-ri-fullscreen-exit-line' : 'i-ri-fullscreen-line'" />
         </button>
       </div>
     </Teleport>
@@ -237,60 +230,44 @@ onBeforeUnmount(() => {
   border: none;
   display: block;
 }
-.live-embed__expand,
-.live-embed__return {
+/* Sits at the right end of the title bar, where it reads as a control of the
+   window rather than as a mark on the page. */
+.live-embed__control {
   position: absolute;
+  top: 4px;
+  right: 10px;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
   color: #1f2937;
   background: rgb(255 255 255 / 0.8);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
   backdrop-filter: blur(2px);
   cursor: pointer;
-}
-.live-embed__expand {
-  top: 4px;
-  right: 10px;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
   /* Sized against the title bar it sits on rather than the slide's body text. */
   font-size: 16px;
   /* Kept out of the way of the presentation until wanted. Revealed on focus too,
      and shown unconditionally where there is no cursor to hover with. */
   opacity: 0;
   /* Invisible must also mean inert, or a click aimed at the app underneath would
-     expand the widget instead. */
+     hit the control instead. */
   pointer-events: none;
   transition: opacity 150ms ease;
 }
-.live-embed:hover .live-embed__expand,
-.live-embed:focus-within .live-embed__expand {
+.live-embed:hover .live-embed__control,
+.live-embed:focus-within .live-embed__control {
   opacity: 1;
   pointer-events: auto;
 }
 @media (hover: none) {
-  .live-embed__expand {
+  .live-embed__control {
     opacity: 1;
     pointer-events: auto;
   }
 }
-/* Always visible: leaving is the one thing that must never be a guess. Sits on
-   the title bar, like the button it replaces, where both read as controls of the
-   window rather than as marks on the page. */
-.live-embed__return {
-  top: 4px;
-  right: 10px;
-  padding: 0.2rem 0.6rem;
-  border-radius: 0.5rem;
-  font-size: 16px;
-  line-height: 1.15;
-  font-weight: 600;
-}
-.live-embed__expand:hover,
-.live-embed__expand:focus-visible,
-.live-embed__return:hover,
-.live-embed__return:focus-visible {
+.live-embed__control:hover,
+.live-embed__control:focus-visible {
   background: rgb(255 255 255 / 0.97);
 }
 </style>

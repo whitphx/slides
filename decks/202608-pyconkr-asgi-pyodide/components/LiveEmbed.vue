@@ -12,8 +12,11 @@ const props = defineProps({
   // the app fits the space it is given. The filled window always shows it at
   // full size, which is the point of filling the slide.
   zoom: { type: Number, default: 1 },
-  // How long the port gets to answer before the slide falls back.
-  timeout: { type: Number, default: 600 },
+  // How long the url gets to answer before the slide settles for the fallback.
+  // Generous because the fallback is what shows while the probe is in flight, so
+  // waiting costs nothing, while being impatient costs the live app: a first
+  // request to a remote host pays DNS and TLS before it answers at all.
+  timeout: { type: Number, default: 2500 },
   // Shown in the title bar. Defaults to the url, which is what a browser would
   // show, but a url carrying query parameters reads badly on a slide.
   title: { type: String, default: "" },
@@ -139,9 +142,23 @@ function onKeydown(event) {
   if (event.key === "Escape") collapse();
 }
 
+// A page served from anywhere but the machine itself has no business reaching that
+// machine's ports: browsers now ask the viewer for permission first, so a deployed
+// deck would greet its readers with a loopback-access prompt for an app that is not
+// running anyway. The fallback is the right answer there.
+function reachable() {
+  const loopback = (hostname) =>
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "[::1]" ||
+    hostname.endsWith(".localhost");
+  return !loopback(new URL(props.url, location.href).hostname) || loopback(location.hostname);
+}
+
 onMounted(async () => {
   slideRoot.value = host.value?.closest(".slidev-page") ?? document.body;
   window.addEventListener("keydown", onKeydown);
+  if (!reachable()) return;
   try {
     // An opaque response is enough: this asks "is anything answering on that
     // port", not "what did it say". A dead port rejects.

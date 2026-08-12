@@ -14,6 +14,14 @@ const props = defineProps({
   zoom: { type: Number, default: 1 },
   // How long the port gets to answer before the slide falls back.
   timeout: { type: Number, default: 600 },
+  // Shown in the title bar. Defaults to the url, which is what a browser would
+  // show, but a url carrying query parameters reads badly on a slide.
+  title: { type: String, default: "" },
+  // Passed to the window: pin it white for a page that is white whatever the
+  // deck's theme, leave it off for an app that follows the theme too.
+  light: { type: Boolean, default: false },
+  // Passed to the window: the gutter between the frame and the page inside.
+  padding: { type: String, default: undefined },
 });
 
 // Long enough to read as the window lifting off the slide, short enough not to
@@ -167,7 +175,7 @@ onBeforeUnmount(() => {
         <!-- The window belongs to the widget rather than to the slide around it,
              so it comes along when the widget leaves for the slide root, and one
              iframe serves both places: expanding never reloads the demo. -->
-        <WindowMockup :title="url" light>
+        <WindowMockup :title="title || url" :light="light" :padding="padding">
           <iframe
             v-if="live"
             :src="url"

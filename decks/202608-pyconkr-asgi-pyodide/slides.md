@@ -1215,12 +1215,17 @@ async def dispatch(app, request):
 <span>…every key is spelled out in the spec:</span>
 <a href="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope" target="_blank" whitespace-nowrap>asgi.readthedocs.io ↗</a>
 </div>
-<iframe
-  src="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope"
-  title="ASGI specification — HTTP connection scope"
-  loading="lazy"
-  class="spec-frame"
-/>
+<LiveEmbed
+  url="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope"
+  title="asgi.readthedocs.io"
+  light
+  padding="0.4rem"
+  height="248px"
+>
+
+<div text-4 p-2>The spec's **HTTP connection scope** section lists every key, and its type.</div>
+
+</LiveEmbed>
 </div>
 
 </div>
@@ -1264,14 +1269,6 @@ The app just **reads** this — producing it is the **server's** side of the con
 .scope-grid.revealed .scope-spec {
   transform: translateX(0);
   opacity: 1;
-}
-.spec-frame {
-  flex: 1;
-  width: 100%;
-  min-height: 300px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  border-radius: 0.5rem;
-  background: white;
 }
 </style>
 

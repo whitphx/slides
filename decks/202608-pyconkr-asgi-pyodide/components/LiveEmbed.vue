@@ -41,7 +41,7 @@ const overlay = ref(null);
 // Expanding covers the slide rather than the screen, which keeps the deck's own
 // frame visible and makes the way back obvious. The slide root is the only
 // ancestor that is both positioned and the right size, and the window mockup in
-// between clips its overflow, so the widget teleports out to it.
+// between clips its overflow, so the widget moves out to it and back.
 const slideRoot = ref(null);
 // The box the window occupies, in slide coordinates. Animating it from its place
 // on the slide out to the whole slide is what makes the window appear to grow
@@ -113,12 +113,31 @@ function filledBox() {
   };
 }
 
+// Re-parenting an iframe reloads it, whatever the element's identity, which for a
+// demo that boots Pyodide means watching it boot again. An atomic move keeps the
+// document alive; where the browser has no such move, the reload is the old
+// behaviour rather than a new failure.
+function moveTo(parent) {
+  const el = overlay.value;
+  if (!el || el.parentElement === parent) return;
+  if (typeof parent.moveBefore === "function") {
+    try {
+      parent.moveBefore(el, null);
+      return;
+    } catch {
+      // Falls through to the reparenting move below.
+    }
+  }
+  parent.appendChild(el);
+}
+
 async function expand() {
   clearTimeout(collapseTimer);
   const home = homeBox();
   reserved.value = home.height;
   geometry.value = home;
   expanded.value = true;
+  moveTo(slideRoot.value);
   await nextTick();
   // Measure to settle the starting box before changing it, or the two land in
   // one style recalculation and the box jumps to full size without animating.
@@ -132,6 +151,7 @@ function collapse() {
   // Teleport back only once the window has shrunk onto the space held for it, so
   // the handover happens where the two positions coincide.
   collapseTimer = setTimeout(() => {
+    moveTo(host.value);
     expanded.value = false;
     geometry.value = null;
     reserved.value = null;
@@ -176,36 +196,50 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   cancelled = true;
   clearTimeout(collapseTimer);
+  // Hand the widget back before Vue tears the slide down, so it is unmounted from
+  // where it was rendered.
+  if (host.value) moveTo(host.value);
   window.removeEventListener("keydown", onKeydown);
 });
 </script>
 
 <template>
   <div ref="host" class="live-embed-host" :style="{ height: reserved ? `${reserved}px` : undefined }">
-    <Teleport :to="slideRoot" :disabled="!expanded">
-      <div
-        ref="overlay"
-        class="live-embed"
-        :class="{ 'live-embed--expanded': expanded }"
-        :style="expanded ? overlayStyle : undefined"
-      >
-        <!-- The window belongs to the widget rather than to the slide around it,
-             so it comes along when the widget leaves for the slide root, and one
-             iframe serves both places: expanding never reloads the demo. -->
-        <WindowMockup :title="title || url" :light="light" :padding="padding">
-          <iframe
-            v-if="live"
-            :src="url"
-            :title="url"
-            class="live-embed__frame"
-            :style="frameStyle"
-          />
-          <slot v-else />
-        </WindowMockup>
-        <!-- One control in one place for both directions, so the way back is where
-             the way in was. -->
-        <button
+    <div
+      ref="overlay"
+      class="live-embed"
+      :class="{ 'live-embed--expanded': expanded }"
+      :style="expanded ? overlayStyle : undefined"
+    >
+      <!-- The window belongs to the widget rather than to the slide around it,
+           so it comes along when the widget leaves for the slide root, and one
+           iframe serves both places: expanding never reloads the demo. -->
+      <WindowMockup :title="title || url" :light="light" :padding="padding">
+        <iframe
           v-if="live"
+          :src="url"
+          :title="url"
+          class="live-embed__frame"
+          :style="frameStyle"
+        />
+        <slot v-else />
+      </WindowMockup>
+      <div v-if="live" class="live-embed__controls">
+        <!-- For driving the app itself: a tab has a real address bar, devtools,
+             and survives leaving the slide. -->
+        <a
+          class="live-embed__control"
+          :href="url"
+          target="_blank"
+          rel="noopener"
+          aria-label="Open this app in a new tab"
+          @click.stop
+        >
+          <div i-ri-external-link-line />
+        </a>
+        <!-- One control in one place for both directions, so the way back is
+             where the way in was. -->
+        <button
           type="button"
           class="live-embed__control"
           :aria-label="expanded ? 'Return this app to its place on the slide' : 'Fill the slide with this app'"
@@ -214,7 +248,7 @@ onBeforeUnmount(() => {
           <div :class="expanded ? 'i-ri-fullscreen-exit-line' : 'i-ri-fullscreen-line'" />
         </button>
       </div>
-    </Teleport>
+    </div>
   </div>
 </template>
 
@@ -255,12 +289,38 @@ onBeforeUnmount(() => {
   border: none;
   display: block;
 }
-/* Sits at the right end of the title bar, where it reads as a control of the
-   window rather than as a mark on the page. */
-.live-embed__control {
+/* Sit at the right end of the title bar, where they read as controls of the
+   window rather than as marks on the page. */
+.live-embed__controls {
   position: absolute;
   top: 4px;
   right: 10px;
+  display: flex;
+  gap: 0.25rem;
+  /* Kept out of the way of the presentation until wanted. Revealed on focus too,
+     and shown unconditionally where there is no cursor to hover with. */
+  opacity: 0;
+  /* Invisible must also mean inert, or a click aimed at the app underneath would
+     hit a control instead. */
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+/* The title bar is the window's chrome, so that is where reaching for a control
+   belongs. Hovering the app itself does not raise them, which matters most when
+   the app fills the slide and every stray movement is over it. */
+.live-embed:has(.titlebar:hover) .live-embed__controls,
+.live-embed__controls:hover,
+.live-embed:focus-within .live-embed__controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (hover: none) {
+  .live-embed__controls {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+.live-embed__control {
   display: flex;
   align-items: center;
   padding: 0.25rem;
@@ -272,24 +332,9 @@ onBeforeUnmount(() => {
   cursor: pointer;
   /* Sized against the title bar it sits on rather than the slide's body text. */
   font-size: 16px;
-  /* Kept out of the way of the presentation until wanted. Revealed on focus too,
-     and shown unconditionally where there is no cursor to hover with. */
-  opacity: 0;
-  /* Invisible must also mean inert, or a click aimed at the app underneath would
-     hit the control instead. */
-  pointer-events: none;
-  transition: opacity 150ms ease;
-}
-.live-embed:hover .live-embed__control,
-.live-embed:focus-within .live-embed__control {
-  opacity: 1;
-  pointer-events: auto;
-}
-@media (hover: none) {
-  .live-embed__control {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  /* Links carry a dashed underline in this deck; a control should not. */
+  border: none;
+  text-decoration: none;
 }
 .live-embed__control:hover,
 .live-embed__control:focus-visible {

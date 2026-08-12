@@ -1,30 +1,119 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
   // The sample app's URL. Served over http from localhost, so present from
   // `pnpm dev` rather than the deployed https deck: browsers disagree about
   // whether an http://localhost iframe counts as mixed content.
   url: { type: String, required: true },
+  // Height of the page inside the window, not of the window itself.
   height: { type: String, default: "100%" },
   // How long the port gets to answer before the slide falls back.
   timeout: { type: Number, default: 600 },
 });
 
+// Long enough to read as the window lifting off the slide, short enough not to
+// hold up a demo. Drives both the CSS transition and the un-teleport below, so
+// the two cannot drift apart.
+const DURATION = 280;
+// How far the filled window stays clear of the slide's edges.
+const MARGIN = 8;
+
 const live = ref(false);
 const expanded = ref(false);
 const host = ref(null);
+const overlay = ref(null);
 // Expanding covers the slide rather than the screen, which keeps the deck's own
 // frame visible and makes the way back obvious. The slide root is the only
 // ancestor that is both positioned and the right size, and the window mockup in
 // between clips its overflow, so the widget teleports out to it.
 const slideRoot = ref(null);
+// The box the window occupies, in slide coordinates. Animating it from its place
+// on the slide out to the whole slide is what makes the window appear to grow
+// rather than to be replaced.
+const geometry = ref(null);
+// Height held open where the window came from: the slide has to keep its shape
+// while the window is away, or there would be nothing to shrink back onto.
+const reserved = ref(null);
+let collapseTimer = null;
 let cancelled = false;
 
-function onKeydown(event) {
-  if (event.key === "Escape" && expanded.value) {
+function motionDuration() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? 0
+    : DURATION;
+}
+
+const overlayStyle = computed(() => {
+  const box = geometry.value;
+  if (!box) return null;
+  return {
+    top: `${box.top}px`,
+    left: `${box.left}px`,
+    width: `${box.width}px`,
+    height: `${box.height}px`,
+    transitionDuration: `${motionDuration()}ms`,
+  };
+});
+
+// Slidev scales the slide to the window, so measured pixels have to be divided
+// back out before they can be written as slide coordinates.
+function slideScale(root, rootRect) {
+  return root.offsetWidth ? rootRect.width / root.offsetWidth : 1;
+}
+
+// Where the window sits when it is part of the slide. Measured from the host,
+// which stays behind holding the space, so it stays correct in both directions.
+function homeBox() {
+  const root = slideRoot.value;
+  const rootRect = root.getBoundingClientRect();
+  const scale = slideScale(root, rootRect);
+  const box = host.value.getBoundingClientRect();
+  return {
+    top: (box.top - rootRect.top) / scale,
+    left: (box.left - rootRect.left) / scale,
+    width: box.width / scale,
+    height: box.height / scale,
+  };
+}
+
+function filledBox() {
+  const root = slideRoot.value;
+  return {
+    top: MARGIN,
+    left: MARGIN,
+    width: root.offsetWidth - MARGIN * 2,
+    height: root.offsetHeight - MARGIN * 2,
+  };
+}
+
+async function expand() {
+  clearTimeout(collapseTimer);
+  const home = homeBox();
+  reserved.value = home.height;
+  geometry.value = home;
+  expanded.value = true;
+  await nextTick();
+  // Measure to settle the starting box before changing it, or the two land in
+  // one style recalculation and the box jumps to full size without animating.
+  overlay.value?.getBoundingClientRect();
+  geometry.value = filledBox();
+}
+
+function collapse() {
+  if (!expanded.value) return;
+  geometry.value = homeBox();
+  // Teleport back only once the window has shrunk onto the space held for it, so
+  // the handover happens where the two positions coincide.
+  collapseTimer = setTimeout(() => {
     expanded.value = false;
-  }
+    geometry.value = null;
+    reserved.value = null;
+  }, motionDuration());
+}
+
+function onKeydown(event) {
+  if (event.key === "Escape") collapse();
 }
 
 onMounted(async () => {
@@ -46,43 +135,53 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   cancelled = true;
+  clearTimeout(collapseTimer);
   window.removeEventListener("keydown", onKeydown);
 });
 </script>
 
 <template>
-  <div ref="host" class="live-embed-host" :style="{ height: live && !expanded ? height : undefined }">
-    <template v-if="live">
-      <Teleport :to="slideRoot" :disabled="!expanded">
-        <div class="live-embed" :class="{ 'live-embed--expanded': expanded }">
-          <!-- Expanding leaves the slide's own frame behind, so the overlay brings
-               its own: filling the slide should still look like a browser. -->
-          <WindowMockup v-if="expanded" :title="url" light padding="0">
-            <iframe :src="url" :title="url" class="live-embed__frame" />
-          </WindowMockup>
-          <iframe v-else :src="url" :title="url" class="live-embed__frame" />
-          <button
-            v-if="!expanded"
-            type="button"
-            class="live-embed__expand"
-            aria-label="Fill the slide with this app"
-            @click.stop="expanded = true"
-          >
-            <div i-ri-fullscreen-line />
-          </button>
-          <button
-            v-else
-            type="button"
-            class="live-embed__return"
-            @click.stop="expanded = false"
-          >
-            <div i-ri-arrow-go-back-line />
-            <span>Return</span>
-          </button>
-        </div>
-      </Teleport>
-    </template>
-    <slot v-else />
+  <div ref="host" class="live-embed-host" :style="{ height: reserved ? `${reserved}px` : undefined }">
+    <Teleport :to="slideRoot" :disabled="!expanded">
+      <div
+        ref="overlay"
+        class="live-embed"
+        :class="{ 'live-embed--expanded': expanded }"
+        :style="expanded ? overlayStyle : undefined"
+      >
+        <!-- The window belongs to the widget rather than to the slide around it,
+             so it comes along when the widget leaves for the slide root, and one
+             iframe serves both places: expanding never reloads the demo. -->
+        <WindowMockup :title="url" light>
+          <iframe
+            v-if="live"
+            :src="url"
+            :title="url"
+            class="live-embed__frame"
+            :style="{ height: expanded ? '100%' : height }"
+          />
+          <slot v-else />
+        </WindowMockup>
+        <button
+          v-if="live && !expanded"
+          type="button"
+          class="live-embed__expand"
+          aria-label="Fill the slide with this app"
+          @click.stop="expand"
+        >
+          <div i-ri-fullscreen-line />
+        </button>
+        <button
+          v-else-if="expanded"
+          type="button"
+          class="live-embed__return"
+          @click.stop="collapse"
+        >
+          <div i-ri-arrow-go-back-line />
+          <span>Return</span>
+        </button>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -93,21 +192,20 @@ onBeforeUnmount(() => {
 .live-embed {
   position: relative;
   width: 100%;
-  height: 100%;
-  /* The page inside is white, so it must not sit on the theme's dark ground. */
-  background: #fff;
+}
+/* The animation starts from the host's box, so the window has to fill it exactly
+   rather than float inside a margin. */
+.live-embed :deep(figure.wrap) {
+  margin: 0;
 }
 .live-embed--expanded {
   position: absolute;
-  inset: 0;
   z-index: 40;
-  /* The window frame carries its own ground, so the overlay does not need one,
-     and a small inset keeps the frame off the slide's edges. */
-  background: transparent;
-  padding: 0.5rem;
+  transition-property: top, left, width, height;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* The addon sizes itself to its content; filling the slide means stretching the
-   frame and letting its body take the remaining height. */
+   window and letting its body take the remaining height. */
 .live-embed--expanded :deep(figure.wrap) {
   height: 100%;
   margin: 0;
@@ -137,10 +235,12 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 .live-embed__expand {
-  top: 0.25rem;
-  right: 0.25rem;
+  top: 4px;
+  right: 10px;
   padding: 0.25rem;
   border-radius: 0.375rem;
+  /* Sized against the title bar it sits on rather than the slide's body text. */
+  font-size: 16px;
   /* Kept out of the way of the presentation until wanted. Revealed on focus too,
      and shown unconditionally where there is no cursor to hover with. */
   opacity: 0;
@@ -160,12 +260,12 @@ onBeforeUnmount(() => {
     pointer-events: auto;
   }
 }
-/* Always visible: leaving is the one thing that must never be a guess. Offset
-   past the overlay's own padding so it lands inside the window's title bar,
-   where it reads as one of that window's controls. */
+/* Always visible: leaving is the one thing that must never be a guess. Sits on
+   the title bar, like the button it replaces, where both read as controls of the
+   window rather than as marks on the page. */
 .live-embed__return {
-  top: 0.9rem;
-  right: 1.125rem;
+  top: 4px;
+  right: 10px;
   padding: 0.2rem 0.6rem;
   border-radius: 0.5rem;
   font-size: 16px;

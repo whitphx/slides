@@ -799,8 +799,6 @@ INFO:  Uvicorn running on
 
 <div mt-3>
 
-<WindowMockup title="http://127.0.0.1:8000" light>
-
 <LiveEmbed url="http://127.0.0.1:8000" height="170px">
 
 <div p-3 class="mock-page">
@@ -810,8 +808,6 @@ INFO:  Uvicorn running on
 </div>
 
 </LiveEmbed>
-
-</WindowMockup>
 
 </div>
 

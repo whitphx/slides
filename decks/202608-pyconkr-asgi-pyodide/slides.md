@@ -1457,28 +1457,6 @@ Responses made **inside the tab** — nothing leaves it.
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
 
 ---
-
-# One simplification: the main thread
-
-<div mt-14 text-center>
-
-<div>⚠️ Our demo: Pyodide on the <b>main thread</b> — Python <b>blocks painting</b></div>
-
-<div mt-8>⚙️ Real apps: Pyodide in a <b>Web Worker</b> — what <b>Stlite ships</b></div>
-
-<div mt-8>✅ Same <code>bridge.py</code>, same ASGI call — <b>only the thread changes</b></div>
-
-</div>
-
-<div mt-12 text-center text-4 op70>
-
-Not today's topic · <code>step2b-browser-worker/</code> + appendix slide
-
-</div>
-
-<!-- One honest note before the picture. Our demo boots Pyodide on the page's main thread, because that keeps the call chain readable: asgiFetch calls dispatch, and there is nothing in between. The cost is that while Python is working, the tab cannot paint or respond. With three endpoints you will never notice; with a real app you absolutely will. So real deployments put Pyodide in a Web Worker and post a message across instead, and that is exactly what Stlite ships. The part that matters for this talk is what does not move: bridge.py, the scope dict, receive and send, and the app itself are byte-for-byte the same — only the thread changes. There is a worker version of the sample in the repo and an appendix slide with the detail, but we are not spending time on it today. -->
-
----
 clicks: 4
 plainBackground: true
 ---

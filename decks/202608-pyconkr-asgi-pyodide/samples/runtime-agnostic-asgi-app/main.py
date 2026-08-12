@@ -73,7 +73,6 @@ async def runtime() -> str:
 @app.post("/api/greet")
 async def greet(name: Annotated[str, Form()]) -> str:
     return f"<p>Hello, {html.escape(name)}!</p>"
-# endregion slide-routes
 
 count = 0
 
@@ -82,3 +81,4 @@ async def increment() -> str:
     global count
     count += 1
     return f"<p>Count: {count}</p>"
+# endregion slide-routes

@@ -1307,7 +1307,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
 </div>
-<span>🦄 server</span>
+<span>🌉 server</span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.05" />
 </div>
@@ -1319,7 +1319,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
-<span>🦄 server</span>
+<span>🌉 server</span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=wire-up] .line:nth-child(8) @ right" arc="0.15" />
 </div>

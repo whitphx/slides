@@ -8,6 +8,10 @@ const props = defineProps({
   url: { type: String, required: true },
   // Height of the page inside the window, not of the window itself.
   height: { type: String, default: "100%" },
+  // How much to shrink the page while the window sits on the slide, so more of
+  // the app fits the space it is given. The filled window always shows it at
+  // full size, which is the point of filling the slide.
+  zoom: { type: Number, default: 1 },
   // How long the port gets to answer before the slide falls back.
   timeout: { type: Number, default: 600 },
 });
@@ -43,6 +47,17 @@ function motionDuration() {
     ? 0
     : DURATION;
 }
+
+// Zoom multiplies the lengths on the iframe as well as scaling the page inside
+// it, so the height has to be specified that much larger to end up the height it
+// was asked for. Its width is a percentage, which zoom leaves alone.
+const frameStyle = computed(() => {
+  const zoom = expanded.value ? 1 : props.zoom;
+  return {
+    zoom,
+    height: expanded.value ? "100%" : `calc(${props.height} / ${zoom})`,
+  };
+});
 
 const overlayStyle = computed(() => {
   const box = geometry.value;
@@ -158,7 +173,7 @@ onBeforeUnmount(() => {
             :src="url"
             :title="url"
             class="live-embed__frame"
-            :style="{ height: expanded ? '100%' : height }"
+            :style="frameStyle"
           />
           <slot v-else />
         </WindowMockup>

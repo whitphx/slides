@@ -799,7 +799,7 @@ INFO:  Uvicorn running on
 
 <div mt-3>
 
-<LiveEmbed url="http://127.0.0.1:8000" height="170px">
+<LiveEmbed url="http://127.0.0.1:8000" height="170px" :zoom="0.6">
 
 <div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>

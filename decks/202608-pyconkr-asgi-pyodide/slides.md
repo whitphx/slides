@@ -1479,7 +1479,7 @@ Not today's topic · <code>step2b-browser-worker/</code> + appendix slide
 <!-- One honest note before the picture. Our demo boots Pyodide on the page's main thread, because that keeps the call chain readable: asgiFetch calls dispatch, and there is nothing in between. The cost is that while Python is working, the tab cannot paint or respond. With three endpoints you will never notice; with a real app you absolutely will. So real deployments put Pyodide in a Web Worker and post a message across instead, and that is exactly what Stlite ships. The part that matters for this talk is what does not move: bridge.py, the scope dict, receive and send, and the app itself are byte-for-byte the same — only the thread changes. There is a worker version of the sample in the repo and an appendix slide with the detail, but we are not spending time on it today. -->
 
 ---
-clicks: 3
+clicks: 4
 plainBackground: true
 ---
 
@@ -1489,8 +1489,8 @@ plainBackground: true
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
-  <template #browser><BrowserStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
+  <template #server><ServerStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3" /></template>
+  <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3" :worker="$clicks >= 4" :worker-highlight="$clicks >= 4" /></template>
 </StackCompare>
 
 <div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
@@ -1521,7 +1521,7 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 }
 </style>
 
-<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. [click] And here is what did not move: the app, and the interface it is called through, lit in both columns. [click] Then the box that did: Uvicorn on the left, bridge.py on the right, with the runtime under each of them. Same file, same three arguments, either side of the swap. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
+<!-- Here's the step-one picture again — app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, top-down: the app — same file, unchanged, byte for byte. scope, receive, send — same interface. The page at the bottom — same UI, still issuing ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call… and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That's the whole trick — one box swapped, and the bridge is playing Uvicorn's role. [click] And here is what did not move: the app, and the interface it is called through, lit in both columns. [click] Then the box that did: Uvicorn on the left, bridge.py on the right, with the runtime under each of them. Same file, same three arguments, either side of the swap. [click] One honest correction to that picture for production: Python on the main thread blocks rendering, so a real browser app runs Pyodide in a Web Worker, and that plain function call becomes message passing. Everything above the worker is untouched — same app, same three arguments. Keep this top-down layering in mind; we'll see it again with Streamlit later. -->
 
 ---
 layout: statement
@@ -1898,7 +1898,7 @@ plainBackground: true
   { key: 'edge', label: '③ Edge', hidden: $clicks < 1 },
 ]">
   <template #server><ServerStackFigure aligned :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
-  <template #browser><BrowserStackFigure aligned :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
+  <template #browser><BrowserStackFigure aligned worker :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
   <template #edge><CloudflareStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
 </StackCompare>
 

@@ -1449,16 +1449,13 @@ Does it actually run? **Let's watch it.** 👀
 
 # Demo, step 2: the same app, no server
 
-<div mt-2 flex justify-center>
+<div class="demo2-grid" mt-4>
 
-<WindowMockup title="Live demo" w-160>
-
-<div p-5 text-lg>
+<div text-lg>
 
 <v-clicks>
 
 - 📄 Static page + Pyodide + **the same `main.py`**
-- 🖱️ "Where am I running?" → `Python 3.14 on emscripten/wasm32` 🤯
 - 🕵️ Network tab: **silent**
 - ✂️ Kill the file server → **still answering**
 
@@ -1466,19 +1463,45 @@ Does it actually run? **Let's watch it.** 👀
 
 </div>
 
-</WindowMockup>
+<div>
+
+<LiveEmbed url="http://localhost:8080/step2-browser/" title="localhost:8080/step2-browser/" light height="270px" :zoom="0.55">
+
+<div p-3 class="mock-page">
+<div text-base font-bold mb-2>Runtime</div>
+<button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
+<div mt-2 font-mono text-sm>Python 3.14 on <b>emscripten/wasm32</b> 🤯</div>
+</div>
+
+</LiveEmbed>
 
 </div>
 
-<div v-click="5" mt-4 text-center text-xl>
+</div>
+
+<div v-click="4" mt-4 text-center text-xl>
 
 Responses made **inside the tab** — nothing leaves it.
 
 </div>
 
+<style>
+.demo2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+/* `light` on the window pins the frame white but leaves slot content on the
+   theme's text colour, so the page being mocked has to pin its own. */
+.mock-page {
+  color: #1f2937;
+}
+</style>
+
 <!-- OK, live demo time — step two. [DEMO] I have a static page here, served by a dumb file server — no backend logic at all. It boots Pyodide right there on the page and loads the exact same main.py from step one. Same page appears. Now I click the button… and look at the answer: Python 3.14 on emscripten wasm32. That's the app telling us it's running inside the browser. Watch the Network tab while I click again — nothing. No request leaves the page. And for the finale: I kill the file server entirely… and the app keeps answering. There is no server anymore. The response is being produced by Python running right next to the JavaScript, in the same tab — by the forty-five lines you just read. OK — back to slides.
 
-[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. -->
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. `pnpm dev:live` serves it on port 8080, which is the embed on this slide; `pkill -f "http.server 8080"` is the kill for the last beat. -->
 
 ---
 clicks: 4

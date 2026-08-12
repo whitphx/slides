@@ -6,7 +6,7 @@
     "build": "slidev build",
     "dev": "slidev --open",
     "export": "slidev export",
-    "dev:live": "concurrently -k -n slides,uvicorn,streamlit -c cyan,green,magenta 'slidev --open' 'cd samples/runtime-agnostic-asgi-app && uv run --frozen uvicorn main:app --port 8000' 'cd samples/streamlit-demo && uv run --frozen streamlit run app.py --server.port 8501 --server.headless true'"
+    "dev:live": "concurrently -k -n slides,uvicorn,streamlit,static -c cyan,green,magenta,yellow 'slidev --open' 'cd samples/runtime-agnostic-asgi-app && uv run --frozen uvicorn main:app --port 8000' 'cd samples/streamlit-demo && uv run --frozen streamlit run app.py --server.port 8501 --server.headless true' 'cd samples/runtime-agnostic-asgi-app && python3 -m http.server 8080'"
   },
   "dependencies": {
     "@iconify-json/ri": "^1.2.10",

@@ -11,7 +11,7 @@ from typing import Annotated
 from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse
 
-app = FastAPI()
+app = FastAPI(default_response_class=HTMLResponse)
 
 PAGE = """\
 <!doctype html>
@@ -57,33 +57,27 @@ PAGE = """\
 </html>
 """
 
-
-@app.get("/", response_class=HTMLResponse)
+# region slide-routes
+@app.get("/")
 async def index() -> str:
     return PAGE
 
-
-# region slide-routes
-@app.get("/api/runtime", response_class=HTMLResponse)
+@app.get("/api/runtime")
 async def runtime() -> str:
     return (
         f"<p>Python {platform.python_version()} on "
-        f"<strong>{sys.platform}/{platform.machine()}</strong></p>"
+        f"<strong>{sys.platform}/{platform.machine()}"
+        "</strong></p>"
     )
 
-
-@app.post("/api/greet", response_class=HTMLResponse)
+@app.post("/api/greet")
 async def greet(name: Annotated[str, Form()]) -> str:
     return f"<p>Hello, {html.escape(name)}!</p>"
-
-
 # endregion slide-routes
-
 
 count = 0
 
-
-@app.post("/api/count", response_class=HTMLResponse)
+@app.post("/api/count")
 async def increment() -> str:
     global count
     count += 1

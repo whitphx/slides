@@ -747,17 +747,7 @@ clicks: 2
 
 <div mb-1><code>main.py</code> <span op70>— the demo app, shortened</span></div>
 
-```py {*}
-app = FastAPI()
-
-@app.get("/")
-async def index() -> str:
-    return PAGE
-
-@app.get("/api/runtime")
-async def runtime() -> str:
-    return f"Python {py} on {sys.platform}"
-```
+<<< @/samples/runtime-agnostic-asgi-app/main.py#slide-routes py {*}{maxHeight:'305px'}
 
 </div>
 

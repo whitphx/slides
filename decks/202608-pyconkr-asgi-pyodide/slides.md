@@ -122,7 +122,7 @@ layout: section
 <!-- Let's start with the thing you already do, probably every week. -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 # You deploy this pair every week
@@ -131,7 +131,7 @@ clicks: 1
 
 <div class="deploy-cell deploy-left">
 
-<div mb-1>Demo app — <b>ordinary FastAPI</b></div>
+<div mb-1>Demo app — ordinary <b><span v-mark="{ at: 2, color: '#a78bfa', type: 'circle' }">FastAPI</span></b></div>
 
 ```py {*}
 import platform, sys
@@ -149,7 +149,7 @@ async def runtime() -> str:
 
 <div class="deploy-cell deploy-right">
 
-<div mb-1>…and how everyone runs it</div>
+<div mb-1>…and how <b><span v-mark="{ at: 2, color: '#38bdf8', type: 'circle' }">Uvicorn</span></b> runs it</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -210,7 +210,7 @@ Uvicorn: ***how* requests arrive**
 }
 </style>
 
-<!-- This is an excerpt from the demo app we'll use all day. It has an endpoint that answers the question "where am I running?" — it reports the Python version and the platform. Completely ordinary FastAPI; if you've written any, this is muscle memory. And on the right, the way everyone runs it: uvicorn app dot main colon app. Done. But notice the division of labor here, because it's the whole talk. Your app defines what to answer. Uvicorn deals with how requests arrive — sockets, HTTP parsing, all of it. Your code and Uvicorn's code never actually touch. Something sits between them. -->
+<!-- This is an excerpt from the demo app we'll use all day. It has an endpoint that answers the question "where am I running?" — it reports the Python version and the platform. Completely ordinary FastAPI; if you've written any, this is muscle memory. And on the right, the way everyone runs it: uvicorn app dot main colon app. Done. But notice the division of labor here, because it's the whole talk. Your app defines what to answer. Uvicorn deals with how requests arrive — sockets, HTTP parsing, all of it. Your code and Uvicorn's code never actually touch. Something sits between them. [click] Keep these two names in mind — a framework on one side, a server on the other. -->
 
 ---
 

@@ -332,12 +332,15 @@ onBeforeUnmount(() => {
   cursor: pointer;
   /* Sized against the title bar it sits on rather than the slide's body text. */
   font-size: 16px;
-  /* Links carry a dashed underline in this deck; a control should not. */
-  border: none;
+  /* Links in this deck carry a dashed underline and turn primary on hover; a
+     control should do neither. Zero width rather than `border: none`, because the
+     theme restores the style on hover and a style alone can revive a border. */
+  border-width: 0;
   text-decoration: none;
 }
-.live-embed__control:hover,
-.live-embed__control:focus-visible {
+.live-embed .live-embed__control:hover,
+.live-embed .live-embed__control:focus-visible {
   background: rgb(255 255 255 / 0.97);
+  color: #1f2937;
 }
 </style>

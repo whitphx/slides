@@ -29,7 +29,7 @@ Yuichi / 유이치 (@whitphx)
 PyCon Korea 2026 · Aug 15
 </div>
 
-<!-- Hi everyone, thanks for coming. Today I want to talk about something that sounds strange the first time you hear it: running a web server inside a browser tab. No network, no Uvicorn, just Python running in the page. But this talk is not really about the browser. It is about what a clean interface gives you, and ASGI is that interface. The browser is only the most extreme place I have taken it. Let me show you. -->
+<!-- Hi everyone, thanks for coming. Today: running a web server inside a browser tab. No network, no Uvicorn, just Python in the page. But this talk is not really about the browser. It is about what a clean interface gives you, and ASGI is that interface. The browser is only the most extreme place I have taken it. -->
 
 ---
 
@@ -82,7 +82,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
   }
 </style>
 
-<!-- Quick intro. I'm Yuichi, whitphx online. I build and maintain open source Python projects. The two that matter today are Stlite, which is Streamlit running fully in the browser, and Gradio-Lite, the same idea for Gradio. This talk comes from building those. So it is not a textbook explanation of ASGI; it is what I learned by putting Python web frameworks in unusual places. -->
+<!-- I'm Yuichi, whitphx online. I maintain open source Python projects. The two that matter today are Stlite, Streamlit running fully in the browser, and Gradio-Lite, the same idea for Gradio. This talk comes from building those, so it is not a textbook explanation of ASGI. It is what I learned by putting Python web frameworks in unusual places. -->
 
 ---
 
@@ -107,7 +107,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 </div>
 
-<!-- Here is the whole talk in one slide. When you write a FastAPI app, your code never touches the network. Uvicorn does that part, and between your app and Uvicorn there is an interface: ASGI. Because that interface is a real, written contract, the two sides stay separate. Frameworks change on one side, servers change on the other, and neither has to know how the other works inside. So my question today is: how far can you stretch the server side? Much further than you would expect. Into a browser tab, and past it. The message to keep: with a clean interface, your app runs anywhere something can call it. To show that, one FastAPI app will run on very different runtimes today, without changing a line. -->
+<!-- The whole talk in one slide. When you write a FastAPI app, your code never touches the network. Uvicorn does that, and between them is an interface: ASGI. Because it is a real, written contract, the two sides stay separate: frameworks change on one side, servers on the other. So my question is: how far can you stretch the server side? Much further than you would expect. Into a browser tab, and past it. The message to keep: with a clean interface, your app runs anywhere something can call it. -->
 
 ---
 layout: section
@@ -210,7 +210,7 @@ Uvicorn: ***how* requests arrive**
 }
 </style>
 
-<!-- This is part of the demo app we use through the whole talk. It has one endpoint that answers "where am I running?" — it reports the Python version and the platform. Ordinary FastAPI; if you have written any, this is familiar. On the right, the way everyone runs it: uvicorn main colon app. Done. But look at how the work is split, because that split is the whole talk. Your app decides what to answer. Uvicorn deals with how requests arrive: sockets, HTTP parsing, all of it. Your code and Uvicorn's code never touch each other. Something sits between them. [click] Keep these two names in mind: a framework on one side, a server on the other. -->
+<!-- Part of the demo app we use through the whole talk. One endpoint answers "where am I running?" with the Python version and the platform. Ordinary FastAPI. On the right, the way everyone runs it: uvicorn main colon app. But look at how the work is split, because that split is the whole talk. Your app decides what to answer; Uvicorn deals with how requests arrive. The two never touch each other. Something sits between them. [click] Keep these two names in mind: a framework on one side, a server on the other. -->
 
 ---
 
@@ -271,7 +271,7 @@ Each side evolves **independently** — nobody coordinates 🤝
 }
 </style>
 
-<!-- [click] On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. [click] On the other, the servers: Uvicorn, Hypercorn, Granian, and Mangum, which is not like the others; remember it, we come back to it near the end. [click] Look at what these servers run on. Uvicorn wants a Linux machine and a port to listen on: a process sitting there, waiting. Mangum has neither. On AWS Lambda there is no port, and no process of yours between requests. These are not two versions of one environment; they are different worlds. [click] And between them sits ASGI, the standard interface between an async Python web app and whatever runs it. They talk through one small, fixed contract, and we open it up in a minute. [click] Look at what this contract gives the ecosystem: each side can change without asking the other. Granian arrived, written in Rust, and every framework already ran on it. Litestar arrived, and every server could already serve it. Nobody coordinated anything. That is what a good interface does. And this idea is much older than async Python. -->
+<!-- [click] On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. [click] On the other, the servers: Uvicorn, Hypercorn, Granian, and Mangum, which is not like the others. Remember it; we come back to it at the end. [click] Look at what these servers run on. Uvicorn wants a Linux machine and a port: a process sitting there, waiting. Mangum has neither: on AWS Lambda there is no port and no process of yours between requests. Different worlds. [click] And between them sits ASGI, the interface between an async Python web app and whatever runs it. [click] And look what that contract gives: each side can change without asking the other. Granian arrived, written in Rust, and every framework already ran on it. Litestar arrived, and every server could already serve it. Nobody coordinated anything. And the idea is older than async Python. -->
 
 ---
 
@@ -309,7 +309,7 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 </div>
 
-<!-- Because this is not a new idea. In 2003, PEP 333, Python standardized WSGI: the same kind of contract, for synchronous code. One function, environ and start_response, and that is why Flask runs on Gunicorn, on uWSGI, on anything. Twenty years of any framework on any server. But the shape of WSGI is one synchronous call per request: request in, response out, done. That shape cannot express a WebSocket, or a response that streams over time, or any long-lived connection. There is no place in the contract for "and then, later, another message". So when Django Channels needed exactly those things, ASGI grew out of that work as the async version of WSGI: the same separation, but the single call became a conversation of events. That is the contract we use today. I will not go deeper into WSGI. The point is only that this boundary has worked for twenty years. -->
+<!-- In 2003, PEP 333, Python standardized WSGI: the same kind of contract, for synchronous code. One function, environ and start_response, and that is why Flask runs on Gunicorn or uWSGI. Twenty years of any framework on any server. But WSGI is one synchronous call per request. That cannot express a WebSocket, or a response that streams over time; there is no place in it for "and then, later, another message". So when Django Channels needed those things, ASGI grew out of that work: the same separation, but the single call became a conversation of events. This boundary has worked for twenty years. -->
 
 ---
 layout: statement
@@ -323,7 +323,7 @@ layout: statement
 
 </div>
 
-<!-- And we take this for granted. You pick a server from a list, it works, and you never think about it again. But if the contract is really solid, if the app does not know or care who calls it, then an interesting question appears: how far can you stretch the server side before something breaks? That question is the rest of this talk. -->
+<!-- And we take this for granted. You pick a server from a list, it works, and you never think about it again. But if the app really does not care who calls it, an interesting question appears: how far can you stretch the server side before something breaks? That question is the rest of this talk. -->
 
 ---
 layout: section
@@ -385,7 +385,7 @@ async def app(scope, receive, send):
 }
 </style>
 
-<!-- This is everything ASGI asks of your app: one async function taking three arguments. [click] And here is the word to remember for the rest of the talk: contract. This signature is an agreement between two sides. Your app promises to be a coroutine that takes these three arguments; whoever calls it promises to provide them. Neither side needs to know anything else about the other. Write a callable that matches it, and any ASGI server will serve your app. You did not pick a server, you matched a contract. That is why the rest of this talk is possible. [click] So what are the three? Scope is a dict that describes the connection: what kind it is, the path, the headers, that kind of information. [click] receive is an async callable; you await it to get the next event from the client, for example a piece of the request body. Think of it as an inbox. [click] And send is an async callable; you await it to push an event out: your response status, your headers, your body. An outbox. That is all. The whole job of a server is to build the scope and to implement receive and send. Remember that sentence. -->
+<!-- Everything ASGI asks of your app: one async function taking three arguments. [click] And the word to remember: contract. Your app promises to be a coroutine taking these three arguments; whoever calls it promises to provide them. Neither side needs to know anything else. You did not pick a server, you matched a contract. [click] So what are the three? Scope is a dict describing the connection: what kind, the path, the headers. [click] receive is an async callable; you await it to get the next event from the client. An inbox. [click] And send is an async callable; you await it to push an event out. An outbox. So the whole job of a server is to build the scope and implement receive and send. Remember that sentence. -->
 
 ---
 clicks: 6
@@ -485,7 +485,7 @@ Hello, PyCon KR!
 }
 </style>
 
-<!-- To make this concrete, here is a complete ASGI application with no framework at all. That is a whole working web app, and it is worth reading line by line, because every line does something a server cares about. [click] The signature: one async callable, three arguments, exactly the contract we just learned. [click] It checks the connection type, because an ASGI app can be given HTTP, WebSocket, or lifespan. [click] Then the first event out: response.start, with the status and the headers. [click] And the second: response.body, with the bytes. Two sends, and the response is complete. [click] So let's run it. I point Uvicorn at it the same way I pointed it at FastAPI a few slides ago, and it starts with no problem. [click] Now curl it, and there is a real HTTP response, headers and all. Uvicorn cannot tell the difference; it never asks what framework this is, because there is no framework. It just calls the callable. One side note: Uvicorn also logs that the lifespan protocol looks unsupported, because our eleven lines ignore lifespan. Our bridge ignores it too, and there is an appendix slide if anyone asks. So Starlette and FastAPI, with all their routing and dependency injection and validation, come down to exactly this: a callable that reads scope and talks through receive and send. Now turn it around, because this is the sentence the whole talk stands on: whoever calls this function, whoever builds the scope and passes in receive and send, that thing IS the server. By the way, this file lives in the slides repo with tests, so what you are reading is working code. -->
+<!-- To make this concrete: a complete ASGI application, no framework. Every line does something a server cares about. [click] The signature: one async callable, three arguments. [click] It checks the connection type: HTTP, WebSocket, or lifespan. [click] The first event out: response.start, with status and headers. [click] And the second: response.body, with the bytes. Two sends, and the response is complete. [click] Let's run it, the same way I ran FastAPI. [click] Curl it: a real HTTP response, headers and all. Uvicorn cannot tell the difference. It never asks what framework this is, because there is none. It just calls the callable. One side note: Uvicorn logs that lifespan looks unsupported, because these eleven lines ignore it; there is an appendix slide if anyone asks. So FastAPI, with all its routing and validation, comes down to this. Now turn it around, because the whole talk stands on this sentence: whoever calls this function, and passes in receive and send, that thing IS the server. -->
 
 ---
 
@@ -596,7 +596,7 @@ async def receive():
 }
 </style>
 
-<!-- That app never used receive, because a GET has no body to read. So here are the same eleven lines with the third argument doing its job. [click] This block is the whole difference: the request body is not a value sitting in scope, it is a stream you pull from. [click] You await receive, and you get one event. And the other side is in the box beside it: that is what the caller passes in, the server in the sense we just defined. A plain async callable, holding the request, returning one http.request event per call. Uvicorn's version is fed by its HTTP parser as bytes come off the socket; ours, later in this talk, is fed by a JavaScript value. The same four lines either way. [click] And you keep going until an event comes back with more_body false, because a large upload arrives in pieces, and the client is still sending while your handler is already running. That is why receive is an async callable and not a bytes attribute: the body may not exist yet when the app starts. [click] After that it is the send pair you already know, with the body sent back. [click] Point Uvicorn at it, same as before. [click] POST some bytes, and they come back. Everything a framework does with request.body or a parsed form starts here, in this loop. And this is the last piece of the contract: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
+<!-- That app never used receive, because a GET has no body. The same eleven lines, now with the third argument doing its job. [click] This block is the difference: the body is not a value in scope, it is a stream you pull from. [click] You await receive and get one event. The box beside it shows the other side, what the caller passes in: a plain async callable, holding the request, returning one http.request event per call. Uvicorn's is fed by its HTTP parser; ours, later, by a JavaScript value. [click] And you keep going until more_body comes back false, because a large upload arrives in pieces while your handler runs. That is why receive is an async callable and not a bytes attribute. [click] Then the send pair you already know. [click] Point Uvicorn at it. [click] POST some bytes, and they come back. And that is the last piece: scope describes the connection, receive pulls from the client, send pushes back. That is all of ASGI. -->
 
 ---
 
@@ -694,7 +694,7 @@ True
 }
 </style>
 
-<!-- So if eleven lines is a working app, what is FastAPI for? All the things you actually want: routing, request parsing, validation, dependency injection, generated docs. You write decorated functions instead of dictionaries. [click] And here is why, from FastAPI's own source: the class defines __call__ with the ASGI signature, and passes straight through to Starlette. [click] So what FastAPI gives you is not a special framework thing that a server has to know about. Ask inspect for its signature and you get exactly three parameters: scope, receive, send. It IS an ASGI application, in the same way our eleven lines were. And you can go further than the signature: give it a scope, a receive and a send of your own, and it runs, with no server anywhere, returning None because the response goes out through send. I kept that off the slide because it needs three variables you cannot see, but there is a test in the repo that does exactly this, if anyone wants proof. [click] So a framework is not a different kind of thing from what we just wrote. It is a much nicer way to write the same callable. Which means anything that can call our eleven lines can call FastAPI too. Remember that. -->
+<!-- So if eleven lines is a working app, what is FastAPI for? Everything you actually want: routing, parsing, validation, dependency injection, generated docs. [click] And here is why, from FastAPI's own source: the class defines __call__ with the ASGI signature and passes straight through to Starlette. [click] Ask inspect for its signature: scope, receive, send. It IS an ASGI application, the same way our eleven lines were. Give it a scope, a receive and a send of your own and it runs with no server anywhere; there is a test in the repo. [click] So a framework is not a different kind of thing. It is a nicer way to write the same callable. So anything that can call our eleven lines can call FastAPI too. -->
 
 ---
 plainBackground: true
@@ -755,7 +755,7 @@ plainBackground: true
 </svg>
 </div>
 
-<!-- Let's put the three pieces in order, because the order is the part people get wrong. The server builds the scope and makes one call. Watch the bracket on the right, because this is the part people misread: that await is not a step at the top, it is the whole height of this slide. It opens here and does not return until the bottom, and every exchange you are about to see happens inside it. The app calls back into the server's receive and send while the caller waits at that one await. [click] Inside, the app awaits receive when it wants the body. [click] The server answers with an http.request event; more_body false means that is all of it. [click] Then the app pushes its response out through send, in pieces: first response.start with the status and headers. [click] Then one or more response.body events with the bytes. That is where streaming happens, by keeping more_body true. [click] And here is the part worth correcting if you imagined this protocol differently: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only completion signal there is. Remember it, because it is what makes the second half of this talk possible: you can await the app and then read whatever it gave you. -->
+<!-- The three pieces in order, because the order is what people get wrong. The server builds the scope and makes one call. Watch the bracket on the right: that await is not a step at the top, it is the whole height of the slide. It opens here and does not return until the bottom, and every exchange happens inside it. [click] The app awaits receive when it wants the body. [click] The server answers with http.request; more_body false means that is all of it. [click] Then the app pushes its response out through send: response.start, with status and headers. [click] Then one or more response.body events, which is where streaming happens, by keeping more_body true. [click] And the part worth correcting: there is no completion event, no "done" message. The response is finished when the last body event has more_body false, and the request is finished when the coroutine returns. That return is the only signal there is. Remember it, because it makes the second half possible: you can await the app and then read what it gave you. -->
 
 ---
 clicks: 2
@@ -902,7 +902,7 @@ INFO:  Uvicorn running on
 }
 </style>
 
-<!-- Here is the app itself, step one of three. It is a few FastAPI routes: one serves the page, one reports where Python is running, one increments a counter so we have some state in the process to watch. Nothing you have not written before. [click] And before we run it, the same check we ran on FastAPI a moment ago, now on the app we are about to demo: it is callable, and its parameters are scope, receive, send. This is an ASGI application. Remember that, because in twenty minutes we are going to call it without a server. [click] But first, here it is in its normal place: uvicorn main:app, open localhost:8000, and there is a small page with a button. Click it, and the app answers: Python 3.12 on darwin arm64, my laptop. A real HTTP request went over a real socket to a real server process. Nothing surprising. All of this is in the slides repo if you want it: one FastAPI app and the three ways we run it today. Keep the button in mind. Its answer is about to get strange. -->
+<!-- The app itself, step one of three. A few FastAPI routes: one serves the page, one reports where Python is running, one increments a counter so we have some state to watch. [click] Before we run it, the same check as before: callable, and its parameters are scope, receive, send. An ASGI application. Remember that, because in twenty minutes we call it without a server. [click] But first, its normal place: uvicorn main:app, localhost:8000, a page with a button. Click it: Python 3.12 on darwin arm64, my laptop. A real request over a real socket to a real server process. Keep the button in mind. Its answer is about to get strange. -->
 
 ---
 plainBackground: true
@@ -922,7 +922,7 @@ The server half = **Uvicorn**. Watch that box 👀
 
 </div>
 
-<!-- Before we change anything, let's map what just happened, from the top. At the top, your app: main.py. Below it, Uvicorn, doing the whole server half: it accepts TCP connections, parses the HTTP bytes, builds a scope, and calls the app with scope, receive and send, the interface we just learned. Both run in a CPython process on some machine. And at the bottom, the browser page, talking to it over the real network. Completely ordinary. But watch Uvicorn's box, the sky-blue one, because the rest of this talk is about what else can sit in it. -->
+<!-- Let's map what just happened, from the top. Your app, main.py. Below it, Uvicorn, doing the whole server half: it accepts TCP connections, parses the HTTP bytes, builds a scope, and calls the app. Both run in a CPython process on some machine. At the bottom, the browser page, over the real network. Completely ordinary. But watch Uvicorn's box, the sky-blue one, because the rest of this talk is about what else can sit in it. -->
 
 ---
 layout: statement
@@ -995,7 +995,7 @@ A server inside your browser
 Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
-<!-- One slide on the thing that makes this possible. Pyodide is CPython, the real one, compiled to WebAssembly, so it runs inside a browser tab. No backend, no install: it is a web page. Python and JavaScript can call each other directly, in both directions, and the whole demo depends on that. And micropip installs packages from PyPI into the page at runtime. There are real limits too, no threads and no raw sockets, but that is not what this slide is for. I have a slide about the limits near the end, and I would rather you first believe that this works at all. -->
+<!-- One slide on the thing that makes this possible. Pyodide is CPython, the real one, compiled to WebAssembly, so it runs inside a browser tab. No backend, no install: it is a web page. Python and JavaScript can call each other directly, both directions, and the whole demo depends on that. And micropip installs packages from PyPI at runtime. There are real limits too, no threads and no raw sockets; I have a slide about them near the end. -->
 
 ---
 
@@ -1025,7 +1025,7 @@ Python 3.13.2 on emscripten
 }
 </style>
 
-<!-- What does calling Python from JavaScript look like? This is the whole thing. Import loadPyodide and await it: that downloads the WebAssembly build and starts an interpreter. Then runPythonAsync takes Python source as a plain JavaScript string; here I import sys and evaluate an f-string. And the value of the last expression comes back as a JavaScript string, which I can log to the console. [click] Run it with node, and there it is: Python 3.13.2 on emscripten. Emscripten is the WebAssembly platform, so this is Python telling us it is not on your operating system any more. That is the whole trick the rest of this talk builds on: JavaScript can start Python, give it code, and get values back. -->
+<!-- Calling Python from JavaScript: this is the whole thing. Import loadPyodide and await it, which downloads the WebAssembly build and starts an interpreter. runPythonAsync takes Python source as a JavaScript string, and the value of the last expression comes back as a JavaScript string. [click] Run it with node: Python 3.13.2 on emscripten. Emscripten is the WebAssembly platform, so Python is telling us it is not on your operating system any more. That is the trick the rest of the talk builds on. -->
 
 ---
 clicks: 4
@@ -1094,7 +1094,7 @@ async function asgiFetch(url, options) {
 }
 </style>
 
-<!-- So let's line up what we have. [click] Pyodide gives us the app object: one pyimport, and the FastAPI app from step one is sitting in a JavaScript variable. [click] And the page already knows how to speak HTTP: fetch is right there, and every frontend uses it. [click] So put those together. Imagine our own fetch: same signature, same Request in, same Response out. But instead of going to the network, it calls our app the way ASGI says to call it. The frontend would not know the difference. That is the whole design. And you can see the hole in the middle: scope, receive and send do not exist yet. Nobody builds them. [click] So let me name the missing piece exactly, because it is the whole problem. On a server, a request arrives from the network as HTTP bytes, and something turns those bytes into an ASGI call: it builds the scope dict, implements receive and send, and awaits the app. That something is Uvicorn. To simplify a little, that translation layer is what does not exist in Pyodide. There is no Uvicorn in a browser tab, so nobody turns a request into an ASGI call. That, and only that, is what we are missing. -->
+<!-- Let's line up what we have. [click] Pyodide gives us the app object: one pyimport, and the app from step one is in a JavaScript variable. [click] And the page already speaks HTTP: fetch is right there. [click] So put those together. Imagine our own fetch: same signature, same Request in, same Response out, but instead of going to the network it calls our app the way ASGI says to. The frontend would not know the difference. And you can see the hole in the middle: scope, receive and send do not exist yet. [click] So, the missing piece. On a server, something turns HTTP bytes into an ASGI call: builds the scope, implements receive and send, awaits the app. That something is Uvicorn, and there is no Uvicorn in a browser tab. That, and only that, is what we are missing. -->
 
 ---
 layout: statement
@@ -1177,7 +1177,7 @@ Fill in the blanks and you have **a server** 🛠️
 }
 </style>
 
-<!-- So here is the shape of the thing we have to write, and it is one function. It takes the app and a request, and somewhere in the middle it makes the one ASGI call we spent the whole last section on: await app with scope, receive, send. [click] Two blanks. The first is the server's job: build the scope dict, and implement receive and send. The second is collecting what the app pushed out through send, and giving it back. [click] That is all a server is, once someone else handles the sockets. So let's fill in the blanks, in that order. -->
+<!-- The shape of the thing we have to write is one function. It takes the app and a request, and in the middle it makes the ASGI call: await app with scope, receive, send. [click] Two blanks. The first is the server's job: build the scope, implement receive and send. The second is collecting what the app pushed out through send. [click] That is all a server is, once someone else handles the sockets. Let's fill in the blanks. -->
 
 ---
 
@@ -1272,7 +1272,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 }
 </style>
 
-<!-- Step one: build the scope. JavaScript gave us a plain object: method, path, query, headers. Our job is to reshape it into the dict the spec describes. Most of it is mechanical: the type is the string http, and the method and path come straight across. But look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict; they are a list of tuples of two byte strings, with the names lowercased. ASGI is strict about every one of these. [click] And none of this is guesswork. Here is the spec itself, the HTTP connection scope section, listing every key and its type. This is the document you work from when you write one of these. [click] And that strictness is the point. The app never builds any of this. It just reads it, and trusts that whoever called it got the types right. Producing it is the server's side of the contract, and this is the first piece of that side we write ourselves. You never see it from FastAPI. You see it the moment you stand on the other side. -->
+<!-- Step one: build the scope. JavaScript gave us a plain object: method, path, query, headers. We reshape it into the dict the spec describes. Mostly mechanical, but look at the details, because this is where the spec stops being abstract. The path is a str while the query string is bytes. Headers are not a dict; they are a list of tuples of two byte strings, names lowercased. ASGI is strict about every one. [click] And none of it is guesswork: here is the spec, the HTTP connection scope section, every key and its type. [click] And that strictness is the point. The app never builds this; it reads it, and trusts the caller got the types right. You never see it from FastAPI. You see it the moment you stand on the other side. -->
 
 ---
 
@@ -1337,7 +1337,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 }
 </style>
 
-<!-- Step two: the two callables. receive is how the app asks for the request body. We give back one http.request event with the bytes JavaScript gave us, more_body false, and if the app asks again we tell it the client is gone. Notice the direction in the box beside it: the app calls receive, and the body comes back as the return value. Data moving from the server to the app. [click] send is the reverse in every way: the app sends its response in pieces, first http.response.start with the status and headers, then http.response.body events with the bytes. We do not interpret any of it; we just listen and store. And the direction flips: the data comes in as the argument, and nothing comes back. The same caller both times, opposite directions, and which side carries the data is the whole difference. [click] Two closures over a few local variables, and that is the whole server side of the contract. -->
+<!-- Step two: the two callables. receive is how the app asks for the body. We give back one http.request event with the bytes JavaScript gave us, more_body false, and if the app asks again we say the client is gone. Notice the direction in the box: the app calls receive, and the body comes back as the return value. [click] send is the reverse: the app sends its response in pieces, response.start with status and headers, then response.body events. We do not interpret any of it; we listen and store. And the direction flips: the data comes in as the argument, and nothing comes back. [click] Two closures over a few local variables, and that is the whole server side of the contract. -->
 
 ---
 
@@ -1372,7 +1372,7 @@ The app just **reads** this — producing it is the **server's** side of the con
 }
 </style>
 
-<!-- And here is the line the whole section was building towards, and it is one line. [click] Await the app, with our scope, our receive, our send. That is the call. Everything on the last three slides existed to make those three arguments. [click] When the coroutine returns, the response is already in the variables send filled in: status, headers, and the body pieces joined together. So we pack them up and give them back to JavaScript. [click] And that is the whole thing. A scope, a receive, a send, and one await. No sockets, no HTTP parsing, no port, no process. Just a function that satisfies a contract. -->
+<!-- And here is the line the whole section was building towards. [click] Await the app, with our scope, our receive, our send. Everything on the last three slides existed to make those three arguments. [click] When the coroutine returns, the response is already in the variables send filled in, so we pack them up and give them back to JavaScript. [click] And that is the whole thing. A scope, a receive, a send, and one await. No sockets, no HTTP parsing, no port, no process. Just a function that satisfies a contract. -->
 
 ---
 
@@ -1424,7 +1424,7 @@ Mimics JavaScript's built-in **`fetch()` interface**
 }
 </style>
 
-<!-- Fair question at this point: we have written Python, but who calls it? This is the JavaScript side, on the page itself. pyimport is the Python import statement, written in JavaScript: it gives back the module, and destructuring pulls out the app and our dispatch function as ordinary JavaScript values. And the thing we wrap them in is asgiFetch, the function we sketched before the section started. [click] Look at its two ends, because they are the whole design. It takes input and init, exactly what fetch takes, and it returns a Response, exactly what fetch returns. Anything on the page that can call fetch can call this instead and never notice. [click] In between is the line that matters, the only one on this slide I would ask you to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it like a Promise. [click] Now the two lines I made grey. Because we are on Pyodide's foreign function interface, values do not cross for free: toPy turns the JavaScript object into a Python one on the way in, and toJs turns the response dict back on the way out. There is an appendix slide on what that costs and where it hurts; ask me in Q&A. One production note: real apps move Python to a Web Worker, and there is a step-2b version in the repo. Stlite does that, as you will see in a minute. -->
+<!-- We have written Python, but who calls it? This is the JavaScript side, on the page. pyimport is the Python import statement written in JavaScript, and we pull out the app and our dispatch function as ordinary JavaScript values. We wrap them in asgiFetch. [click] Look at its two ends, because they are the whole design: it takes input and init, exactly what fetch takes, and returns a Response, exactly what fetch returns. Anything that can call fetch can call this and never notice. [click] In between is the one line to remember: dispatch(app, pyRequest). Calling Python is just calling a function, and because dispatch is a coroutine, JavaScript awaits it like a Promise. [click] The two grey lines are Pyodide's foreign function interface: values do not cross for free. There is an appendix slide on what that costs. One production note: real apps move Python to a Web Worker, and there is a step-2b version in the repo. -->
 
 ---
 layout: statement
@@ -1494,7 +1494,7 @@ Responses made **inside the tab** — nothing leaves it.
 }
 </style>
 
-<!-- OK, live demo time, step two. [DEMO] I have a static page here, served by a plain file server, with no backend logic at all. It starts Pyodide on the page and loads the same main.py from step one. The same page appears. Now I click the button, and look at the answer: Python 3.14 on emscripten wasm32. That is the app telling us it runs inside the browser. Watch the Network tab while I click again: nothing. No request leaves the page. And last, I stop the file server completely, and the app keeps answering. There is no server any more. The response is produced by Python running next to the JavaScript, in the same tab, by the forty-five lines you just read. OK, back to slides.
+<!-- Live demo, step two. [DEMO] A static page from a plain file server, no backend logic. It starts Pyodide and loads the same main.py from step one. The same page appears. I click the button: Python 3.14 on emscripten wasm32. The app is telling us it runs inside the browser. Watch the Network tab while I click again: nothing leaves the page. And last, I stop the file server, and the app keeps answering. There is no server any more. The response comes from Python next to the JavaScript, in the same tab, by the forty-five lines you just read.
 
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. `pnpm dev:live` serves it on port 8080, which is the embed on this slide; `pkill -f "http.server 8080"` is the kill for the last beat. -->
 
@@ -1541,7 +1541,7 @@ One box swapped — **the bridge plays Uvicorn's role** 🛠️
 }
 </style>
 
-<!-- Here is the step-one picture again: app on top, Uvicorn as the server half, the page at the bottom, over the network. Now watch. [click] The browser version fades in next to it. Compare them layer by layer, from the top. The app: same file, unchanged, byte for byte. scope, receive, send: same interface. The page at the bottom: same UI, still making ordinary requests. The differences: the machine became the browser tab running Pyodide, the network became a plain function call, and Uvicorn's sky-blue box now holds bridge.py, about forty-five lines of our code. That is the whole trick: one box swapped, and the bridge is doing Uvicorn's job. [click] And here is what did not move: the app, and the interface it is called through, lit in both columns. [click] Then the box that did move: Uvicorn on the left, bridge.py on the right, with the runtime under each of them. Same file, same three arguments, on both sides of the swap. [click] One correction for production: Python on the main thread blocks rendering, so a real browser app runs Pyodide in a Web Worker, and that plain function call becomes message passing. Everything above the worker stays the same: same app, same three arguments. Keep this layering in mind; we see it again with Streamlit later. -->
+<!-- The step-one picture again: app on top, Uvicorn as the server half, the page at the bottom over the network. [click] The browser version fades in next to it. Compare from the top. The app: same file, byte for byte. scope, receive, send: same interface. The page: same UI, ordinary requests. The differences: the machine became a browser tab running Pyodide, the network became a function call, and Uvicorn's box now holds bridge.py, forty-five lines of our code. One box swapped, and the bridge is doing Uvicorn's job. [click] What did not move: the app, and the interface it is called through, lit in both columns. [click] Then the box that did: Uvicorn on the left, bridge.py on the right, the runtime under each. [click] One correction for production: Python on the main thread blocks rendering, so a real browser app runs Pyodide in a Web Worker, and that function call becomes message passing. Everything above the worker stays the same. -->
 
 ---
 layout: statement
@@ -1717,7 +1717,7 @@ $ streamlit run app.py
 }
 </style>
 
-<!-- Before I show you Stlite, thirty seconds on what Streamlit is, because the architecture is the part that matters today. You write a plain Python script, and that is all. No HTML, no JavaScript, no frontend build step. Call st.title, st.slider, st.line_chart, and run it with one command: streamlit run app.py. [click] And you get this: an interactive dashboard, and dragging that slider re-runs the script and redraws the chart. Two files, no frontend work. [click] So how does a script become a web page? That command starts the Streamlit runtime on CPython in your process: it runs your script, keeps its state, serves your static files, and answers HTTP. That server gives the browser a JavaScript single-page app, and that frontend is not something you built or downloaded from a CDN; it ships inside the pip package. The SPA then talks back to the Python server over HTTP and a WebSocket. [click] That is the part to remember: one Python package contains both halves of a web application, the server and the frontend it serves. And look at the picture: your code on top, a Python HTTP server under it, both inside CPython, and a frontend page in the browser talking over the network. That is exactly the shape we spent the first half of this talk taking apart. Which raises the obvious question: if we could move our demo app's server into the browser, could we do it to this one? -->
+<!-- Thirty seconds on Streamlit, because the architecture is what matters. You write a plain Python script: no HTML, no JavaScript, no frontend build. st.title, st.slider, st.line_chart, then streamlit run app.py. [click] And you get an interactive dashboard; dragging the slider re-runs the script and redraws the chart. [click] So how does a script become a web page? That command starts the Streamlit runtime on CPython in your process: it runs your script, keeps its state, serves static files, answers HTTP. It gives the browser a single-page app, and that frontend ships inside the pip package. [click] So one Python package contains both halves, the server and the frontend it serves. And look at the picture: your code on top, a Python HTTP server under it, both inside CPython, a frontend page over the network. Exactly the shape we took apart in the first half. So could we move this one's server into the browser too? -->
 ---
 
 # What are these frameworks built on?
@@ -1744,7 +1744,7 @@ Underneath, every one of them is **an ASGI app + a server** 🤔
 
 </div>
 
-<!-- Before we go further, look at what these frameworks are built on. The right column is the interesting one. Shiny sits on Starlette, Gradio on FastAPI, and Streamlit joined them in 1.57, when it replaced Tornado with Starlette and Uvicorn. Not every Python app framework is ASGI; Panel, for example, is still on Bokeh's Tornado server. But these three are, and these three are the ones we follow into the browser in a minute. [click] And these are big systems: static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But in structure? An ASGI app with a server underneath it. Exactly the shape we just took apart. So the obvious question: if the server half can be swapped for our forty-five lines, can it be swapped for these too? -->
+<!-- Look at what these frameworks are built on. The right column is the interesting one. Shiny sits on Starlette, Gradio on FastAPI, and Streamlit joined them in 1.57, replacing Tornado with Starlette and Uvicorn. Not every framework is ASGI; Panel is still on Bokeh's Tornado server. But these three are. [click] And these are big systems: static assets, sessions, per-user state, realtime updates. Nothing like a three-endpoint demo. [click] But in structure? An ASGI app with a server underneath. Exactly the shape we took apart. So: if the server half can be swapped for our forty-five lines, can it be swapped for these? -->
 
 ---
 clicks: 3
@@ -1773,7 +1773,7 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 }
 </style>
 
-<!-- Same picture as the demo app, with something much bigger on top. On the left, standard Streamlit: your script, the Streamlit runtime running it, Uvicorn underneath turning HTTP into ASGI calls, all on CPython on some machine, and the React frontend in the visitor's browser over the network. [click] And here is Stlite. Read the rows across. Your script: same. The Streamlit runtime, with its ScriptRunner and all its state: same. That is the whole point: it is the real Streamlit, not a rewrite. scope, receive, send: same interface. The frontend at the bottom: the same React SPA. What changed is the two layers we have been swapping all talk: Uvicorn becomes Stlite's ASGI bridge, CPython becomes Pyodide, and the network becomes messages inside the page. And notice one difference from our demo: Stlite runs Pyodide inside a Web Worker. Ours ran on the main thread because that makes the call easy to see; production moves it off the main thread so Python cannot freeze the UI. The bridge is the same either way. [click] And there it is, lit up: your script, Streamlit itself, and the interface between them and the server half, identical on both sides. [click] And now the two rows that did move: the caller, and the Python runtime under it. That is the whole difference. The same swap as our forty-five-line demo, only carrying a whole framework. -->
+<!-- The same picture, with something much bigger on top. On the left, standard Streamlit: your script, the runtime running it, Uvicorn turning HTTP into ASGI calls, all on CPython, and the React frontend in the visitor's browser. [click] And here is Stlite. Read the rows across. Your script: same. The Streamlit runtime, with its ScriptRunner and all its state: same. The real Streamlit, not a rewrite. scope, receive, send: same. The frontend: the same React SPA. What changed is the two layers we have been swapping all talk: Uvicorn becomes Stlite's bridge, CPython becomes Pyodide, and the network becomes messages inside the page. One difference: Stlite runs Pyodide in a Web Worker, so Python cannot freeze the UI. [click] And there it is: your script, Streamlit itself, and the interface between them, identical on both sides. [click] And the two rows that moved: the caller, and the runtime under it. The same swap as our demo, carrying a whole framework. -->
 
 ---
 clicks: 2
@@ -1819,7 +1819,7 @@ Each one needed a **server half** in the browser — **ASGI is the right shape**
 }
 </style>
 
-<!-- So it worked for Streamlit, and it is not only Streamlit. Here are the same three frameworks with the ASGI stacks we just looked at. [click] And every one of them has a version that runs in the browser. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though that one is not maintained now; the WASM work moved into Gradio itself. And I should be clear about the order: Shinylive did it first, and Stlite's bridge is strongly inspired by theirs. So this is not three teams having the same idea by accident; it is one good idea being picked up, which is a more useful story anyway. Three frameworks, three ports, three separate codebases, and what made each of them possible is the middle column. Because the framework already spoke ASGI, nobody had to invent a protocol; the server half was the only part anyone had to write. [click] That is the argument for the standard: aim at the interface, and the port becomes a bridge instead of a rewrite. -->
+<!-- And it is not only Streamlit. The same three frameworks with the ASGI stacks we just saw. [click] Every one has a version that runs in the browser. Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, which is not maintained now. And to be clear about the order: Shinylive did it first, and Stlite's bridge is strongly inspired by theirs. Three frameworks, three ports, and what made each possible is the middle column: the framework already spoke ASGI, so nobody had to invent a protocol. The server half was the only part anyone had to write. [click] That is the argument for the standard: aim at the interface, and the port becomes a bridge instead of a rewrite. -->
 
 ---
 layout: statement
@@ -1863,7 +1863,7 @@ The browser runtime, running someone's production traffic
 
 </div>
 
-<!-- Cloudflare Workers are serverless functions running on Cloudflare's edge network, on a runtime called workerd, which is built on V8 and speaks JavaScript and WebAssembly. And when Cloudflare added Python support, guess how they did it. Pyodide. The same WebAssembly CPython from our browser story, except now it runs server-side, on the edge. I like this because it repeats history: V8 took JavaScript, which was born in the browser, and put it on the server, and now workerd is doing the same to the Python stack that was born in the browser. That is a nice symmetry by itself. But the part I really want to show you is on the next slide, so let's look at the code. -->
+<!-- Cloudflare Workers are serverless functions on Cloudflare's edge network, on a runtime called workerd, built on V8. And when Cloudflare added Python support, guess how they did it. Pyodide. The same WebAssembly CPython from our browser story, now running server-side. I like this because it repeats history: V8 took JavaScript out of the browser and put it on the server, and workerd is doing the same to the Python stack. But the part I really want to show you is on the next slide. -->
 
 ---
 clicks: 4
@@ -1959,7 +1959,7 @@ The whole file — nothing left out:
 }
 </style>
 
-<!-- Step three of the demo. This is the whole Cloudflare entrypoint; I am not hiding anything, this is the entire file. Two imports and a fetch handler. Import the app, and note that src/main.py is a symlink to the same main.py from steps one and two. And in the handler, one line: give the app to asgi.fetch. [click] Now read that first import again, because this is the part I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does exactly what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to show it could be done. They wrote it as a supported product feature. If the browser demo still felt like an experiment, this is the slide where it stops being one. It is deployed; you can open that URL right now. Click the button and it says: Python 3.13 on emscripten wasm32, answered from a Cloudflare data center near you. Same app. Third runtime. No changes.
+<!-- Step three. The whole Cloudflare entrypoint, the entire file: two imports and a fetch handler. Note that src/main.py is a symlink to the same main.py from steps one and two. In the handler, one line: give the app to asgi.fetch. [click] Now read that first import again, because this is the part I have been waiting to show you all talk. Cloudflare's SDK ships a module called asgi, and asgi.fetch does what we spent the last section building: it takes a JavaScript Request, builds the scope, wires up receive and send, and awaits the app. We wrote that in forty-five lines to show it could be done. They ship it as a product feature. If the browser demo still felt like an experiment, this is where it stops. Click the button: Python 3.13 on emscripten wasm32, from a data center near you. Same app. Third runtime. No changes.
 
 [DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. -->
 
@@ -2002,7 +2002,7 @@ plainBackground: true
 }
 </style>
 
-<!-- Here are both stacks we have seen: server on the left, browser in the middle. [click] And the edge joins them. Read across the top row: the same file, three times. Read the row below it: scope, receive, send, three times. Now read the sky-blue row, and that is the only thing that moves: Uvicorn, then our forty-five-line bridge, then Cloudflare's asgi module, which I did not write at all. Two more things worth noticing. The edge column's runtime frame says Pyodide, same as the browser: Cloudflare runs Python the same way a browser does, in a Python Worker on their machines instead of a tab on the visitor's. And the frontend went back outside over a real network, exactly like column one. It ran on Python 3.12, 3.14 and 3.13, over TCP sockets, a direct call, and JavaScript Request objects, and the file on top never changed; two of these load it and the third symlinks it. [click] And watch what lights up: the app, and the interface it is called through, in all three columns at once. That band is the constant. It is the same file and the same three arguments whether the caller is Uvicorn on a server, forty-five lines in a tab, or Cloudflare's SDK at the edge. You port the app by swapping the box underneath it and changing nothing inside it. [click] And there is the swap itself: the caller and the runtime, the only two boxes that differ between these columns. Not a deployment trick, but a property of the architecture. -->
+<!-- Both stacks we have seen: server on the left, browser in the middle. [click] And the edge joins them. The top row across: the same file, three times. Below it: scope, receive, send, three times. Now the sky-blue row, the only thing that moves: Uvicorn, our forty-five-line bridge, then Cloudflare's asgi module, which I did not write at all. Two details: the edge runtime says Pyodide, same as the browser, just in a Python Worker on their machines; and the frontend is back outside over a real network. Python 3.12, 3.14 and 3.13, and the file on top never changed. [click] Watch what lights up: the app, and the interface it is called through, in all three columns at once. That band is the constant. You port the app by swapping the box underneath it. [click] And there is the swap: the caller and the runtime, the only two boxes that differ. Not a deployment trick, but a property of the architecture. -->
 
 ---
 clicks: 3
@@ -2046,7 +2046,7 @@ Older than ASGI — WSGI had Zappa (2016) · `apig-wsgi` · `serverless-wsgi`
 }
 </style>
 
-<!-- None of this is new, and that is the point. If you have ever deployed a FastAPI app to AWS Lambda, you have almost certainly used Mangum: one import, wrap your app, done. Azure ships the same thing inside their own SDK. Vercel does not even ask you to name it; it finds an object called app and calls it. And remember the servers list from the beginning of the talk, Uvicorn, Hypercorn, Granian, and one name that did not belong? That was Mangum. [click] So here is what we did today: we added two more members. Cloudflare's edge, and a browser tab with forty-five lines in it. They are not strange relatives of this list; they are the same thing. [click] Because every one of these is the code we wrote together: build a scope, wire up receive and send, await the app. I read Mangum's source while preparing this talk, and it is strikingly similar. Its receive is a get from a queue that was filled with the request body, its send takes response.start for the status and headers and collects the body pieces, then it awaits the app and reshapes the result for Lambda. It even collects instead of streaming, exactly the shortcut we took. My favourite detail: Mangum is maintained by Marcelo Trylesinski, who also maintains Uvicorn and Starlette. The same person maintains the thing that calls your app from a TCP socket and the thing that calls it from a Lambda event. That is what an interface is for. [click] And this is older than ASGI. Zappa was doing it for WSGI in 2016, and apig-wsgi and serverless-wsgi still do it. So the browser was the unusual one, but the technique is completely normal; most of you have already shipped it without thinking about what that import was doing. Now, one last look at what it gave me. -->
+<!-- None of this is new, and that is the point. If you deployed FastAPI to AWS Lambda, you used Mangum: one import, wrap your app, done. Azure ships the same thing. Vercel does not even ask for a name; it finds an object called app and calls it. And remember the servers list from the beginning, with one name that did not belong? That was Mangum. [click] Today we added two more: Cloudflare's edge, and a browser tab with forty-five lines in it. [click] Because every one is the code we wrote together: build a scope, wire up receive and send, await the app. Mangum's source is strikingly similar, and it even collects the body instead of streaming, the same shortcut we took. My favourite detail: Mangum is maintained by Marcelo Trylesinski, who also maintains Uvicorn and Starlette. The same person maintains the thing that calls your app from a TCP socket and the thing that calls it from a Lambda event. That is what an interface is for. [click] And it is older than ASGI: Zappa did this for WSGI in 2016. So the browser was the unusual one, but the technique is normal. -->
 
 ---
 clicks: 3
@@ -2081,7 +2081,7 @@ plainBackground: true
 }
 </style>
 
-<!-- And of course, once I saw Cloudflare running Pyodide, I had to try it with Stlite. Here are the two columns you just saw. Read the rows across them one more time: your script, the Streamlit runtime, scope-receive-send, the same React frontend. [click] Now the third column: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again, but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's ASGI bridge again, but fed by edge requests instead of browser events. And the frontend goes back over a real network, like the first column. So the top three rows are identical in all three, and the bottom three have now been swapped twice. [click] And there it is, lit up across all three: your script, Streamlit itself, and the interface between them and the server half, identical in every column. [click] And now the rows that did move, in all three: the caller and the runtime under it, swapped twice. Nothing above the bridge changed. Only the caller did. When your server half aims at an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
+<!-- And once I saw Cloudflare running Pyodide, I had to try it with Stlite. The two columns you just saw, same rows across them. [click] Now the third: at-stlite-slash-cloudflare, PR 2077, experimental. Pyodide again, but in a Python Worker at the edge instead of a Web Worker in the tab. Stlite's bridge again, fed by edge requests instead of browser events. [click] And there it is across all three: your script, Streamlit itself, and the interface between them, identical in every column. [click] And the rows that moved: the caller and the runtime under it, swapped twice now. Nothing above the bridge changed. When your server half aims at an interface instead of an environment, moving to a new environment is configuration, not a rewrite. -->
 
 ---
 layout: section
@@ -2125,7 +2125,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) powered b
 
 </div>
 
-<!-- Four things I keep coming back to. Static hosting: ship a whole web app as files on GitHub Pages or a CDN, with no backend to run or pay for, and it scales with visitors because each visitor brings their own compute. Runnable documentation: live, editable examples inside the docs. Education: teach FastAPI or Streamlit to a room of beginners with no setup; it just runs in their tab. And privacy: everything is client-side, so the user's data never leaves their device, which is a real advantage for sensitive data. And this is not theoretical: the official Streamlit Playground and Gradio Playground use this exact architecture, in production, today. -->
+<!-- Four things I keep coming back to. Static hosting: ship a whole web app as files on GitHub Pages or a CDN, no backend to run or pay for, and it scales with visitors because each visitor brings their own compute. Runnable documentation: live, editable examples in the docs. Education: teach FastAPI or Streamlit with no setup; it runs in their tab. And privacy: everything is client-side, so the data never leaves the device. And this is not theoretical: the official Streamlit and Gradio playgrounds use this architecture in production today. -->
 
 ---
 
@@ -2157,7 +2157,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) powered b
 
 </div>
 
-<!-- And the honest part, because this is not magic. Dependencies: everything ships to the browser, and not everything is available. The good news is that the whole stack we have been using, FastAPI, Starlette, Pydantic, anyio, ships inside the Pyodide distribution, so it loads from the CDN with no trip to PyPI. But the demo still needed one extra install: python-multipart, which FastAPI needs to parse a form. It is pure Python, no C extension at all, and it is simply not in the distribution, so without micropip installing it that one endpoint returns a 500. That is the shape of this limit: it is not "no C extensions", it is "check the distribution, then check what micropip can add". It is single-threaded and sandboxed, and here is a concrete example: Starlette runs sync def endpoints in a thread pool, and WASM cannot start threads, so a sync endpoint that works fine under Uvicorn fails in the browser with "can't start new thread". Every endpoint in the demo app is async def for that reason. Secrets are impossible: anything in the page, the user can read. And there is no inbound networking; the tab has no public address, so no webhooks. So this works together with real servers, it does not replace them. Use it where its strengths fit. -->
+<!-- And the honest part, because this is not magic. Dependencies: everything ships to the browser, and not everything is available. Our whole stack, FastAPI, Starlette, Pydantic, anyio, is inside the Pyodide distribution, so it loads from the CDN with no trip to PyPI. But the demo needed one extra install: python-multipart, which FastAPI uses to parse a form. Pure Python, no C extension, simply not in the distribution, so without micropip that endpoint returns a 500. So the limit is not "no C extensions", it is "check the distribution, then check what micropip can add". Single-threaded and sandboxed: Starlette runs sync def endpoints in a thread pool, WASM cannot start threads, so a sync endpoint that works under Uvicorn fails with "can't start new thread". Every endpoint in the demo is async def for that reason. Secrets are impossible: anything in the page, the user can read. And no inbound networking, so no webhooks. This works together with real servers; it does not replace them. -->
 
 ---
 
@@ -2178,7 +2178,7 @@ In production: [Streamlit Playground](https://streamlit.io/playground) powered b
 
 </div>
 
-<!-- Six things to take away. One: ASGI cuts a clean interface, your app on one side and whoever can call it on the other. Two: the whole contract is scope, receive and send, and it never mentions sockets, ports or machines. Three: because of that, a server is anything that satisfies it: Uvicorn, a Lambda adapter, Cloudflare's edge, or forty-five lines of Python in a browser tab. Four, and this is the one the whole talk was built for: the same app ran on every one of them without changing a line. That is what a clean interface gives you. Five: all of this runs in production right now: Mangum, the SDKs Azure and Cloudflare ship, Stlite, the official Streamlit and Gradio playgrounds. And if you have deployed FastAPI to Lambda, you were already in this family before you walked in here. And six, the one I took away from building this: I learned ASGI by writing the other side of it. Reading the spec had never made it clear. -->
+<!-- Six things to take away. One: ASGI cuts a clean interface, your app on one side and whoever can call it on the other. Two: the whole contract is scope, receive and send, and it never mentions sockets, ports or machines. Three: so a server is anything that satisfies it, from Uvicorn to forty-five lines of Python in a browser tab. Four, the one the whole talk was built for: the same app ran on every one of them without changing a line. Five: all of it runs in production right now, and if you have deployed FastAPI to Lambda you were already in this family before you walked in. And six, the one I took away from building this: I learned ASGI by writing the other side of it. Reading the spec had never made it clear. -->
 
 <div v-click mt-10 grid="~ cols-[1fr_auto]" gap-8 items-center>
 
@@ -2270,7 +2270,7 @@ Same <code>bridge.py</code>, same ASGI call — **only the thread changes** 🧵
 
 </div>
 
-<!-- If someone asks why the demo ran Python on the main thread: because it makes the call visible — asgiFetch calls dispatch, one line, nothing in between. The cost is that while Python is working, the page cannot paint or respond, which for a three-endpoint demo you will never notice and for a real app you absolutely will. So production puts Pyodide in a Web Worker, and asgiFetch posts a message instead of calling dispatch directly, correlating replies by id. Everything below that — bridge.py, the scope dict, receive and send, the app — is byte-for-byte identical. The repo has both variants side by side if you want to diff them. -->
+<!-- Why the demo ran Python on the main thread: it makes the call visible, asgiFetch calls dispatch, nothing in between. The cost is that while Python works, the page cannot paint or respond. You never notice with three endpoints; you always notice with a real app. So production runs Pyodide in a Web Worker, and asgiFetch posts a message instead, matching replies by id. Everything below that, bridge.py, the scope, receive and send, the app, is identical. The repo has both versions side by side. -->
 
 ---
 
@@ -2312,7 +2312,7 @@ Uvicorn's network layer: sockets. **Ours: type conversion** 🔁
 
 </div>
 
-<!-- This is the appendix slide I promised when I made those two conversion lines grey. The bridge sits on one layer real servers do not have: the foreign function interface between JavaScript and Python. And from years of this, I can tell you the bugs live here. Four things to know. JS objects arrive in Python as proxies, not dicts, so convert them explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer, which matters when someone uploads a fifty-megabyte file. In the other direction, to_js turns a dict into a JavaScript Map by default, not a plain object; there is a dict_converter option, and every Pyodide developer hits this once. And one nice surprise: async works well across the boundary. JS can await a Python coroutine as a Promise, and the two event loops run together without problems. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. Different mechanics, same role in the stack. -->
+<!-- The appendix slide I promised for those two grey lines. The bridge sits on one layer real servers do not have: the foreign function interface between JavaScript and Python. From years of this, the bugs live here. JS objects arrive in Python as proxies, not dicts, so convert them explicitly. Binary bodies come as Uint8Arrays, and every conversion copies the buffer, which matters for a fifty-megabyte upload. Going back, to_js makes a JavaScript Map by default, not a plain object; there is a dict_converter option, and every Pyodide developer hits this once. And one nice surprise: JS can await a Python coroutine as a Promise. So if Uvicorn's network layer is sockets and parsers, ours is type conversion. -->
 
 ---
 
@@ -2352,7 +2352,7 @@ Only the **event names** differ — learn one, you can read all three ✅
 
 </div>
 
-<!-- The index for the rest of this appendix, if the question is "what about the other two?". ASGI carries three kinds of connection and the app reads scope type to find out which it has. The important part is that the call is identical for all three: same three arguments, same awaiting of receive, same calling of send. What changes is only the strings inside the events — websocket.receive instead of http.request, and so on. So everything in the main talk transfers; the next slides are just the event names. -->
+<!-- For "what about the other two?". ASGI carries three kinds of connection, and the app reads scope type to see which it has. The call is identical for all three: same three arguments, same receive, same send. Only the strings inside the events change: websocket.receive instead of http.request. So everything in the main talk transfers; the next slides are the event names. -->
 
 ---
 
@@ -2400,7 +2400,7 @@ not awaited — **it runs for the whole app lifetime**
 }
 </style>
 
-<!-- One more protocol, because skipping it is the classic bridge bug: lifespan. There is no client involved; it is how the app is told "you are starting up" and "you are shutting down". It is where FastAPI runs its lifespan handlers: opening database pools, loading models, warming caches. Uvicorn drives this when the process starts; our bridge has to drive it when the page loads. The same tools as before: a lifespan scope, a queue, receive and send. We push a startup event, wait for the app to answer startup-complete before serving any request, and keep the whole thing running as a background task until shutdown. If you forget this, everything looks fine, until someone's database pool is never initialized and they spend an afternoon finding out why. Do not skip lifespan. -->
+<!-- One more protocol, because skipping it is the classic bridge bug: lifespan. No client involved; it is how the app is told "you are starting up" and "you are shutting down". It is where FastAPI opens database pools, loads models, warms caches. Uvicorn drives it when the process starts; our bridge drives it when the page loads. Same tools: a lifespan scope, a queue, receive and send. We push a startup event, wait for startup-complete before serving any request, and keep it running as a background task until shutdown. If you forget this, everything looks fine until someone's database pool is never initialized. Do not skip lifespan. -->
 
 
 ---
@@ -2438,7 +2438,7 @@ Chunk → JS `ReadableStream` **as it's sent** — token streams work in-browser
 
 </div>
 
-<!-- The dispatch from the main talk collects the whole response and returns it at the end. That works, until the app uses StreamingResponse or server-sent events. Think of progress updates, or a chatbot sending tokens one at a time; Gradio's UI depends on this a lot. If you collect everything first, the user sees nothing until it is all done. The fix is to respect more_body. On response.start we open a JavaScript ReadableStream immediately. Each body event goes to JS right away, and when more_body becomes false we close the stream. The JS side reads it exactly like a real fetch, and streaming UIs just work, fully in the page. This slide is the simple version; the production ones also handle backpressure. -->
+<!-- Our dispatch collects the whole response and returns it at the end. That works until the app uses StreamingResponse or server-sent events: progress updates, or a chatbot sending tokens one at a time. If you collect everything first, the user sees nothing until it is done. The fix is to respect more_body. On response.start we open a JavaScript ReadableStream, each body event goes to JS right away, and when more_body becomes false we close the stream. The JS side reads it like a real fetch. Production also handles backpressure. -->
 
 ---
 
@@ -2488,7 +2488,7 @@ class WebSocketSession:
 }
 </style>
 
-<!-- WebSockets are harder because they are long-lived and the timing is reversed. JavaScript receives messages whenever they arrive: it is push-driven. But the ASGI app is pull-driven; it awaits receive and expects the next message to be given to it. So we connect a push world to a pull world, and the standard tool is an asyncio.Queue. JS adds events without awaiting; the app's receive awaits queue.get and waits until something arrives. The queue absorbs the timing difference, and this small buffer is the centre of in-browser WebSockets. -->
+<!-- WebSockets are harder because they are long-lived and the timing is reversed. JavaScript receives messages whenever they arrive: push-driven. The ASGI app is pull-driven; it awaits receive and expects the next message. So we connect a push world to a pull world, and the standard tool is an asyncio.Queue. JS adds events without awaiting; the app's receive awaits queue.get. That small buffer is the centre of in-browser WebSockets. -->
 
 ---
 
@@ -2530,4 +2530,4 @@ Same shape as HTTP — **only events & lifetime differ** 🔁
 
 </div>
 
-<!-- And the rest of the flow, through the same receive and send. On open we put websocket.connect in the queue; the app answers websocket.accept and we tell the JS socket it is open. For each message: the app receives websocket.receive, replies with websocket.send, and we post it out. Either side can end it: the app sends close, or JS disconnects and we give the app websocket.disconnect. The point is that this is the same receive and send loop as HTTP. Only the event names and the lifetime are different. One model covers both, which is why it fits in an appendix. -->
+<!-- The rest of the flow, through the same receive and send. On open we queue websocket.connect; the app answers websocket.accept and we tell the JS socket it is open. Each message: the app receives websocket.receive, replies with websocket.send, we post it out. Either side can end it. The point is that this is the same loop as HTTP; only the event names and the lifetime differ. One model covers both, which is why it fits in an appendix. -->

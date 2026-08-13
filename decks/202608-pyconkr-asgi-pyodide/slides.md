@@ -102,12 +102,12 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <div v-click="5" mt-8 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-xl text-center>
 
-**Cut a clean interface → run anywhere something can *call* you.**<br>
-<span op80>One FastAPI app · different runtimes · zero changes</span>
+**Decoupled by this contract → a flexible deploy target**<br>
+<span op80>today: one real example, from my own work</span>
 
 </div>
 
-<!-- The whole talk in one slide. When you write a FastAPI app, your code never touches the network. Uvicorn does that, and between them is an interface: ASGI. Because it is a real, written contract, the two sides stay separate: frameworks change on one side, servers on the other. So my question is: how far can you stretch the server side? Much further than you would expect. Into a browser tab, and past it. The message to keep: with a clean interface, your app runs anywhere something can call it. -->
+<!-- The whole talk in one slide. When you write a FastAPI app, your code never touches the network. Uvicorn does that, and between them is an interface: ASGI. Because it is a real, written contract, the two sides stay separate: frameworks change on one side, servers on the other. So my question is: how far can you stretch the server side? Much further than you would expect. Into a browser tab, and past it. And the practical point: because the two sides are separate, where you deploy stays flexible. I will show you one example of that, from work I actually shipped. -->
 
 ---
 layout: section

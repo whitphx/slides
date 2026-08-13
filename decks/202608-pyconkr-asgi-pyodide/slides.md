@@ -29,7 +29,9 @@ Yuichi / 유이치 (@whitphx)
 PyCon Korea 2026 · Aug 15
 </div>
 
-<!-- Hi everyone, thanks for coming. Today: running a web server inside a browser tab. No network, no Uvicorn, just Python in the page. But this talk is not really about the browser. It is about what a clean interface gives you, and ASGI is that interface. The browser is only the most extreme place I have taken it. -->
+<!--
+Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web server inside your browser.
+-->
 
 ---
 
@@ -82,7 +84,13 @@ Software Artisan / Indie Dev / OSS Enthusiast
   }
 </style>
 
-<!-- I'm Yuichi, whitphx online. I maintain open source Python projects. The two that matter today are Stlite, Streamlit running fully in the browser, and Gradio-Lite, the same idea for Gradio. This talk comes from building those, so it is not a textbook explanation of ASGI. It is what I learned by putting Python web frameworks in unusual places. -->
+<!--
+I'm Yuichi, a software developer who loves OSS activities and communities.
+I have been developing and maintaining multiple OSS projects, and contributing to several repositories as well including Streamlit and Gradio.
+Today's talk is largely built on top of what I learned through some of those projects actually.
+And I have attended and had several talks in PyCons all over the world, and this time, it's a great honor to me having this chance to have a talk in PyCon KR.
+You can find me on some social medias and GitHub as whitphx, so plz contact me if something in this talk interests you.
+-->
 
 ---
 
@@ -92,22 +100,20 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <v-clicks>
 
-- Your app ⇄ **ASGI** ⇄ Uvicorn
-- Solid contract → **either side swappable**
+- ASGI
+- Pyodide
+- Example: web server inside a web browser
 - How far can the *server* side stretch? <span v-click="4" font-bold text-sky-600>Into a browser tab — and beyond</span>
 
 </v-clicks>
 
 </div>
 
-<div v-click="5" mt-8 border="~ sky/50 rounded-lg" p-4 bg-sky:10 text-xl text-center>
-
-**Decoupled by this contract → a flexible deploy target**<br>
-<span op80>today: one real example, from my own work</span>
-
-</div>
-
-<!-- The whole talk in one slide. When you write a FastAPI app, your code never touches the network. Uvicorn does that, and between them is an interface: ASGI. Because it is a real, written contract, the two sides stay separate: frameworks change on one side, servers on the other. So my question is: how far can you stretch the server side? Much further than you would expect. Into a browser tab, and past it. And the practical point: because the two sides are separate, where you deploy stays flexible. I will show you one example of that, from work I actually shipped. -->
+<!--
+This talk is about ASGI.
+I will start with explaining what ASGI is, and what it brings to us when making a web server.
+Then, we will take a look interesting examples that we can achieve by making use of ASGI's advantages in combination with Pyodide, a Python runtime runnable inside a web browser. We will see our web application **server** runs inside a web browser, and even more unusual environment.
+-->
 
 ---
 layout: section
@@ -119,7 +125,9 @@ layout: section
 …without ever looking at it
 </div>
 
-<!-- Let's start with the thing you already do, probably every week. -->
+<!--
+Let's start with a very basic example that you may already benn familiar with.
+-->
 
 ---
 clicks: 2
@@ -160,12 +168,14 @@ INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
 
+<!-- TODO: Add `curl -i localhost:8000/api/runtime` command line and its result -->
+
 </WindowMockup>
 
 <div mt-4 text-lg>
 
-App: ***what* to answer**<br>
-Uvicorn: ***how* requests arrive**
+App: **Your logic**<br>
+Uvicorn: **HTTP handling, connected to socket**
 
 </div>
 
@@ -210,7 +220,16 @@ Uvicorn: ***how* requests arrive**
 }
 </style>
 
-<!-- Part of the demo app we use through the whole talk. One endpoint answers "where am I running?" with the Python version and the platform. Ordinary FastAPI. On the right, the way everyone runs it: uvicorn main colon app. But look at how the work is split, because that split is the whole talk. Your app decides what to answer; Uvicorn deals with how requests arrive. The two never touch each other. Something sits between them. [click] Keep these two names in mind: a framework on one side, a server on the other. -->
+<!--
+This is a very simple FastAPI application.
+It defines an API endpoint that returns the Python version and the platform where it's running. We will reuse this endpoint in the following parts of this talk by the way.
+[click]
+To run this app, we usually use something like `uvicorn`. In the case of uvicorn, it serves the defined application through HTTP by this command.
+[click]
+Now look at there two actors.
+One is your app backed by FastAPI that implements the logic.
+The other is Uvicorn, which is actually dealing with the HTTP communications through the socket.
+-->
 
 ---
 
@@ -271,7 +290,25 @@ Each side evolves **independently** — nobody coordinates 🤝
 }
 </style>
 
-<!-- [click] On one side, the app frameworks: FastAPI, Starlette, Django, Litestar, Quart. [click] On the other, the servers: Uvicorn, Hypercorn, Granian, and Mangum, which is not like the others. Remember it; we come back to it at the end. [click] Look at what these servers run on. Uvicorn wants a Linux machine and a port: a process sitting there, waiting. Mangum has neither: on AWS Lambda there is no port and no process of yours between requests. Different worlds. [click] And between them sits ASGI, the interface between an async Python web app and whatever runs it. [click] And look what that contract gives: each side can change without asking the other. Granian arrived, written in Rust, and every framework already ran on it. Litestar arrived, and every server could already serve it. Nobody coordinated anything. And the idea is older than async Python. -->
+<!--
+This decoupling is general.
+[click]
+One side is the app frameworks.
+[click]
+The other is the servers.
+
+And on each side, many different packages are developed,
+such as Fast API and Starlette as the app frameworks,
+and Uvicorn and Hypercorn as the servers.
+And different server packages are provided to support different environment or platforms. For example, we use Uvicorn in usual Linux environment, and when we want to deploy the app to AWS Lambda, we switch it to Mangum.
+
+[click]
+And the interface between these decoupled layers is ASGI.
+
+[click]
+By decoupling these two sides with the interface in between,
+we can develop and even switch a package on one side without caring the other side.
+-->
 
 ---
 
@@ -303,13 +340,14 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 </div>
 
-<div v-click="3" mt-6 text-xl op90 text-center>
-
-**One call → a conversation of events**
-
-</div>
-
-<!-- In 2003, PEP 333, Python standardized WSGI: the same kind of contract, for synchronous code. One function, environ and start_response, and that is why Flask runs on Gunicorn or uWSGI. Twenty years of any framework on any server. But WSGI is one synchronous call per request. That cannot express a WebSocket, or a response that streams over time; there is no place in it for "and then, later, another message". So when Django Channels needed those things, ASGI grew out of that work: the same separation, but the single call became a conversation of events. This boundary has worked for twenty years. -->
+<!--
+By the way, ASGI is not the first initiative to do it.
+[click]
+In 2003, PEP 333, Python standardized WSGI: the same kind of contract. Flask and Gunicorn are well-known examples of WSGI-compatible software.
+However it was only for synchronous code and had some limitations such as lack of support for WebSocket and long-lived streams.
+[click]
+So when Django Channels needed those things, ASGI grew out of that work
+-->
 
 ---
 layout: statement

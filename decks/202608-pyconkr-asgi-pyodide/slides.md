@@ -163,7 +163,7 @@ layout: section
 </div>
 
 <!--
-Let's start with a very basic example that you may already been familiar with.
+Let's start with a very basic example that you may already be familiar with.
 -->
 
 ---
@@ -479,7 +479,7 @@ async def app(scope, receive, send):
 
 <div v-click="3">
 <div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
-📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b><br></span>
+📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
@@ -1245,7 +1245,7 @@ Now let's look at the contract again.
 It's a dict and two async callables. It doesn't say anything about sockets, ports, or processes.
 
 [click]
-The spec calls this side a protocol server. Its job is to terminate sockets, and turn them into these events.
+The ASGI spec calls this side a protocol server. Its job is to terminate sockets, and turn them into ASGI events.
 But look at what the contract actually asks for. Supply `scope`, `receive` and `send`, and call the app.
 
 [click]
@@ -1284,7 +1284,7 @@ So let's take the server side to somewhere it doesn't belong at all. Inside a we
 
 <v-clicks>
 
-- **No backend** — a Python interpreter in the visitor's browser
+- **No backend** — a Python interpreter in the browser
 - Python ⇄ JavaScript, direct calls
 
 </v-clicks>
@@ -1316,7 +1316,7 @@ And Pyodide gives us an API across that boundary.
 From JavaScript, we can call into Python. And from Python, we can call back into JavaScript.
 
 [click]
-So now a browser tab has two runtimes in it. JavaScript, and Python on Pyodide.
+So now a browser tab has two runtimes in it. JavaScript, and Python, provided by Pyodide.
 -->
 
 ---
@@ -1360,9 +1360,10 @@ Then runPythonAsync takes Python source, as a JavaScript string.
 And the result comes back to JavaScript.
 
 [click]
-Let's run it with node. It says Python 3.13.2 on emscripten.
+Let's run it with Node.js.
+The result says `emscripten`, which is what `sys.platform` reports.
 Emscripten is the WebAssembly platform, so Python is telling us it's not on our operating system any more.
-I'm using node here just to keep it in a terminal. The same works in browser JavaScript.
+I'm using Node.js here just to keep it in a terminal. The same works in browser JavaScript.
 -->
 
 ---
@@ -1452,7 +1453,7 @@ Let's line up what we have.
 [click]
 We can put our `main.py` into the Pyodide runtime.
 And Pyodide has an API called `pyimport`, which imports a Python module from JavaScript.
-So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
+So we can take the `app` object out of the `main` module that we have written, and hold it in a JavaScript variable.
 
 [click]
 And on the other side, a web frontend talks to an HTTP API with `fetch`, JavaScript's built-in method for it.
@@ -1465,8 +1466,8 @@ And if our frontend use this our `fetch`, named `asgiFetch`, instead of the norm
 
 [click]
 But there's a hole in the middle.
-Something has to turn the HTTP request into an ASGI call. Build the `scope`, and prepare `receive` and `send`.
-On a server, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
+Something has to turn the HTTP request from JavaScript's `fetch` into an ASGI call. Build the `scope`, and prepare `receive` and `send`.
+In a normal Python environment, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
 -->
 
 ---
@@ -1482,7 +1483,7 @@ It's small enough to read in a talk ✍️
 </div>
 
 <!--
-So let's write that layer ourselves.
+So let's write that layer by ourselves.
 
 [click]
 And it is small enough to read here, so let's go through the whole thing.
@@ -1684,7 +1685,7 @@ the header,
 and so on.
 
 [click]
-And we're not guessing. Every key and its type is written in the spec.
+And we're not guessing. Every key and its type is defined in the spec.
 We need to implement this layer following what the spec defines.
 -->
 
@@ -1752,7 +1753,7 @@ We need to implement this layer following what the spec defines.
 </style>
 
 <!--
-The next blank is the two callables.
+The next blank is setting up the two callables.
 
 [click]
 receive is how the app asks for the request body.
@@ -1761,8 +1762,8 @@ Again, note that this `receive` function will be called from the `app`, and it r
 
 [click]
 send is the opposite.
-The app will call it to send the response in pieces.
-And in our `send`, we collect the response status, response header, and the response body sent from the `app`, so that we can get the full response at the end.
+The app will call it to send the response in chunks.
+And when our `send` is called, we collect the response status, response header, and the response body sent from the `app`, so that we can get the full response at the end.
 
 [click]
 So both of them are just closures over a few local variables.
@@ -1809,12 +1810,12 @@ We await the app, with our scope, our receive and our send.
 Everything on the last slides was to prepare these three arguments.
 
 [click]
-And when it returns, the response is already in the variables that send filled in.
+And when it returns, the response is already in the variables that the code in the `send` callable filled in.
 So we pack them up, and give them back to JavaScript.
 
 [click]
 So this is what a server is.
-No sockets, no HTTP parsing, no port and no process. Just a function that satisfies the contract.
+No sockets, no HTTP parsing, no port and no process. Just a function that satisfies the contract defined by ASGI.
 -->
 
 ---
@@ -1858,7 +1859,7 @@ Mimics JavaScript's built-in **`fetch()` interface**
 </style>
 
 <!--
-We wrote the `dispatch` Python function, so let's use it from JavaScript.
+We wrote the `dispatch` Python function, so let's use it from JavaScript through Pyodide.
 First, import it through `pyimport` along with `app`.
 
 [click]
@@ -1868,7 +1869,7 @@ And define our own fetch method, named `asgiFetch`.
 whose signature is same as JavaScript's native `fetch()`.
 
 [click]
-And in the middle, we call the `dispatch` function, with the imported `app` and the request object.
+And in the middle, we call the `dispatch` function, with the imported `app` and the JavaScript request object.
 -->
 
 ---
@@ -1952,8 +1953,8 @@ So let's see it running.
 [click]
 This is a static page, served by a plain file server.
 The frontend JavaScript loads Pyodide and runs the same main.py from step one, with the mechanism we made in the previous slides.
-The same page appears, and when I click the button, it says Python 3.14 on emscripten wasm32.
-The app is telling us it's running inside the browser.
+The same page appears, and when I click the button, it says the platform is emscripten.
+The app is telling us it's running inside the browser with WebAssembly.
 
 [click]
 And let's watch the Network tab while clicking it again. Nothing goes out.
@@ -2014,10 +2015,10 @@ And here is the browser version, next to it.
 Let's compare them from the top.
 
 [click]
-The app is the same file, and the interface it's called through is the same.
+The `main.py` and its `app` object are the same, and the interface it's called through is the same.
 
 [click]
-What changed is this box.
+What changed is this layer.
 In the normal server environment, on the left, we used CPython and Uvicorn worked on it as an ASGI server.
 For this layer, in the browser environment, on the right, Pyodide runs instead of normal CPython, and we use our own ASGI server implementation.
 
@@ -2200,23 +2201,23 @@ $ streamlit run app.py
 Streamlit is a popular Python framework to build interactive web applications only with Python.
 
 [click]
-We only write a Python script.
+To make an application with Streamlit, we only write a Python script.
 
 [click]
 And we run it with the streamlit command.
 
 [click]
-And we get a styled interactive dashboard.
+And we just get a styled interactive web app.
 
 So how does just a Python script become such a web app with rich frontend?
 
 [click]
 The framework itself is already a bundled full-stack web app including both Python server-side and the frontend pages.
-It runs Uvicorn, and its server-side application on it, and serves the frontend app.
+Streamlit runs Uvicorn, and its server-side application on it, and serves the frontend app.
 The user's Python script instructs the Streamlit "application" about how it should behave and what it should display.
 
 [click]
-So one package contains both sides.
+So one package contains both the Python server side and the frontend app.
 And it's the same shape as our demo app.
 -->
 ---
@@ -2334,7 +2335,7 @@ Streamlit runtime, resources served by it, and its ASGI interface are the same o
 
 [click]
 And these are the blocks that changed.
-The caller, ASGI server, is switched from Uvicorn to our own ASGI caller layer communicating the frontend UI within the browser tab.
+The caller, ASGI server, is switched from Uvicorn to our own ASGI caller layer, which bridges the request from the frontend UI to the ASGI calls to the `app` running on Pyodide within the browser tab.
 It's the same swap as our demo, but carrying a whole framework.
 -->
 
@@ -2405,7 +2406,7 @@ and I worked with the Gradio team on Gradio-Lite, though it is not maintained no
 All these are big frameworks or applications including many Python files and static assets,
 
 [click]
-but we can make them run on a different platform by switching the ASGI server outside their core interfaced by ASGI.
+but we can make them run in the browser by switching the ASGI server layer outside their core interfaced by ASGI.
 -->
 
 ---
@@ -2676,7 +2677,7 @@ Every one: build a `scope` · wire `receive` / `send` · **`await app(...)`**
 
 <!--
 And this pattern is already everywhere.
-Different platforms such as AWS Lambda, Azure and Vercel have different ASGI bridge implementations.
+Different platforms such as AWS Lambda, Azure and Vercel have different ASGI bridge implementations, even prior to Pyodide.
 
 [click]
 And today we added the last two.
@@ -2810,7 +2811,7 @@ And this is already in production. The Streamlit Playground runs on Stlite.
 </div>
 
 <div v-click="3" border="~ red/40 rounded-lg" p-4 bg-red:5>
-🔑 <b>No safe secrets (in browser)</b><br><span op80 text-base>the page is public — <b>no API keys</b></span>
+🔑 <b>No safe secrets (in browser)</b><br><span op80 text-base>the page ships to the client — <b>no API keys</b></span>
 </div>
 
 <div v-click="4" border="~ red/40 rounded-lg" p-4 bg-red:5>
@@ -2831,14 +2832,14 @@ And the honest part.
 There are some things that you have to take care of.
 
 [click]
-The Pyodide is not 100% compatible with the CPython we are used to.
+Pyodide is not 100% compatible with the CPython we are used to.
 It can't start threads, for example.
 
 [click]
 And there are some libraries that don't work on Pyodide, while the coverage is growing thanks to the large efforts by the maintainers.
 
 [click]
-The page is public, so no secrets.
+When the app runs in the browser, all data is loaded to the client side. You cannot put any secrets in the app.
 
 [click]
 And no public address, so no webhooks.
@@ -2933,22 +2934,23 @@ So this works together with real servers. It doesn't replace them.
 So, let me wrap up.
 
 [click]
-ASGI is a clean interface.
+ASGI is a clean interface that splits the application from the server.
 
 [click]
-The whole contract is scope, receive and send.
+ASGI's whole contract is scope, receive and send.
 
 [click]
 So a server is anything that satisfies it.
 
 [click]
-And the same app ran on all of them, without any change.
+And the same app can run on any server that implements ASGI, without any change.
 
 [click]
-And it's in production today. If you have deployed FastAPI to Lambda, you were already doing this.
+And it's already proven in production.
 
 [click]
-And this is what I got personally. I learned ASGI by writing the other side of it in the Stlite project.
+And this is what I got personally. I learned ASGI by writing the server side of ASGI, rather than the application side, in the Stlite project.
+It's an interesting way to go.
 
 [click]
 That's all from me. Thank you very much.

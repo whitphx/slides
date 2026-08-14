@@ -2184,15 +2184,15 @@ No server, no Python installed — **the same app, in the tab** 🎈
 So this is Stlite, the in-browser version of Streamlit that I built.
 
 [click]
-The app is a static HTML file. It loads the same `app.py` and `data.py` we just ran.
-And the Stlite runtime itself is one script tag, served from a CDN.
+The app is a static HTML file.
+It loads the same script originally written for Streamlit and serves it as a Streamlit app, but with a Streamlit server-side runtime running in your browser.
 
 [click]
-And that is the whole deployment. Open the file, and the same dashboard appears, with the same slider redrawing the same chart.
+And that is the whole deployment.
+Open the file, and the same dashboard works.
 
 [click]
-There is no server here, and the visitor has no Python installed.
-So how does the whole Streamlit run inside a tab?
+There is no server here, and the visitor has no Python installed on their machine.
 -->
 
 ---
@@ -2228,18 +2228,22 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 </style>
 
 <!--
-This is the same picture as before, with Streamlit on it.
-On the left, the standard one. Our script, the Streamlit runtime running it, Uvicorn under that, and the frontend in the browser.
+Even though the size of the package is much larger than our simple demo,
+what happens is basically the same.
+
+This is how Streamlit works in the ordinary server-client way, where Uvicorn handles HTTP connection on the server and Streamlit app built with Starlette runs on it.
+The frontend app communicates with it.
 
 [click]
 And this is Stlite, the in-browser version I built.
-Streamlit itself is the real one here, not a reimplementation. And it runs in a Web Worker, so Python doesn't freeze the UI.
 
 [click]
-Let's read the rows across. Our script, Streamlit, and the interface between them are the same on both sides.
+Streamlit itself is the real one here, not a reimplementation.
+Streamlit runtime, resources served by it, and its ASGI interface are the same on both sides.
 
 [click]
-And these are the rows that changed. The caller, and the runtime under it.
+And these are the blocks that changed.
+The caller, ASGI server, is switched from Uvicorn to our own ASGI caller layer communicating the frontend UI within the browser tab.
 It's the same swap as our demo, but carrying a whole framework.
 -->
 
@@ -2294,21 +2298,23 @@ Each one needed a **server half** in the browser — **ASGI is the right shape**
 </style>
 
 <!--
-And Streamlit is not the only one. Let's look at what these frameworks are built on.
-Shiny is on Starlette, and Gradio is on FastAPI. Streamlit joined them in version 1.57, replacing Tornado with Starlette and Uvicorn.
-Not every framework is ASGI-based. Panel is still on Tornado, for example. But these three are.
+And Streamlit is not the only one.
+There are similar types of frameworks in the Python ecosystem.
+And Shiny for Python is on Starlette, and Gradio is on FastAPI.
+So they can be made runnable inside the browser with the same trick,
 
 [click]
-Every one of them has a version that runs in the browser.
-Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though it is not maintained now.
-And about the order, Shinylive did it first, and Stlite's bridge is strongly inspired by theirs.
+and actually they are made.
+
+Posit built Shinylive.
+
+and I worked with the Gradio team on Gradio-Lite, though it is not maintained now.
 
 [click]
-And these are big applications. Static assets, sessions, per-user state, and realtime updates.
+All these are big frameworks or applications including many Python files and static assets,
 
 [click]
-What made all of them possible is the middle column.
-The frameworks already spoke ASGI, so nobody had to invent a protocol. Only the server half had to be written.
+but we can make them run on a different platform by switching the ASGI server outside their core interfaced by ASGI.
 -->
 
 ---
@@ -2324,7 +2330,7 @@ Then the browser can't be the only unusual caller… 😏
 </div>
 
 <!--
-So, the app doesn't care who calls it. Uvicorn, or our forty-five lines, it doesn't matter.
+So, the lesson is, the ASGI app doesn't care who calls it. Uvicorn, or our forty-five lines of code, it doesn't matter.
 
 [click]
 And then the browser can't be the only unusual caller.
@@ -2362,14 +2368,14 @@ So let me show you another one, which goes even further.
 
 <!--
 [click]
-Cloudflare Workers are serverless functions running on Cloudflare's edge network, on a runtime called workerd.
+Cloudflare Workers are serverless functions running on Cloudflare's edge network, utilizing JavaScript technology.
 
 [click]
-And when Cloudflare added Python support, they did it with Pyodide.
+And they added Python support by using Pyodide.
 It's the same WebAssembly CPython we just used in the browser, but running server-side now.
 
 [click]
-I like this because it repeats history. V8 took JavaScript out of the browser and brought it to the server, and workerd is doing the same to this Python stack.
+I like this because it repeats history. V8 took JavaScript out of the browser and brought it to the server, and they are doing the same to this Python stack.
 -->
 
 ---
@@ -2388,7 +2394,7 @@ The whole file — nothing left out:
 
 <div class="edge-cell">
 
-<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|4|2,7-11|1,9-11}{maxHeight:'320px','data-id':'entry'}
+<<< @/samples/runtime-agnostic-asgi-app/step3-cloudflare/src/entry.py py {*|4|2,7-8|1,9-11}{maxHeight:'320px','data-id':'entry'}
 
 </div>
 
@@ -2423,7 +2429,7 @@ The whole file — nothing left out:
 <div v-click="1">
 <div data-id="ann-symlink" class="entry-note" absolute top-24 right-8 bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
 
-`src/main.py` is **a symlink to step 1's app**
+`src/main.py` is **the same app as step 1**
 
 </div>
 <FancyArrow from="[data-id=ann-symlink] @ (20%, 100%)" to="[data-id=entry] .line:nth-child(4) @ right" arc="0.15" />
@@ -2469,11 +2475,14 @@ The whole file — nothing left out:
 <!--
 So this is what it takes to run our app there. The whole file, nothing left out.
 
+[DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm.
+
 [click]
-This import is our app. src/main.py is a symlink to the same main.py from steps one and two.
+This import is our app, the same one as steps one and two.
 
 [click]
 Then the entrypoint, with a fetch handler.
+This is Cloudflare Worker's contract.
 
 [click]
 And here is the part I wanted to show you.
@@ -2481,9 +2490,7 @@ Cloudflare's SDK ships a module called asgi, and asgi.fetch does what we spent t
 We wrote it by hand to see how it works. They ship it as a product feature.
 
 [click]
-And it's deployed. The same app, on a third runtime, with no changes.
-
-[DEMO SETUP] Deploy well before the talk and hit the URL once to warm it. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm.
+And it's deployed. The same app, on the Cloudflare Workers runtime, with no changes.
 -->
 
 ---
@@ -2504,8 +2511,8 @@ plainBackground: true
 </StackCompare>
 
 <div class="punchline-stack" mt-4 text-center text-xl>
-<div v-click="1"><b>Same file</b> · 3 Pythons · 3 transports · <b>0 changes</b></div>
-<div v-click="2" font-bold text-sky-600>The interface holds — everything below it is swappable</div>
+<div v-click="2"><b>Same file</b> · 3 Pythons · 3 transports · <b>0 changes</b></div>
+<div v-click="3" font-bold text-sky-600>The interface holds — everything below it is swappable</div>
 </div>
 
 <style>
@@ -2530,19 +2537,18 @@ Here are the two stacks we've seen. The server, and the browser.
 
 [click]
 And the edge joins them.
-The runtime there is Pyodide again, in a Python Worker on Cloudflare's machines. And the frontend is outside, over a real network again.
-Three runtimes, on Python 3.12, 3.14 and 3.13.
 
 [click]
-And this band is the same in all three columns. Our app, and the interface it's called through.
+And `app.py` is the same in all three columns, all three different deploy targets.
 
 [click]
-And these are the only boxes that differ. The caller, and the runtime under it.
-Uvicorn, our own bridge, and Cloudflare's asgi module, which I didn't write at all.
+And these are the layers that differ.
+The caller of ASGI app.
+Uvicorn, our own bridge, and Cloudflare's asgi module.
 -->
 
 ---
-clicks: 3
+clicks: 2
 ---
 
 # Adding to the family
@@ -2565,12 +2571,6 @@ Every one: build a `scope` · wire `receive` / `send` · **`await app(...)`**
 
 </div>
 
-<div v-click="3" mt-2 text-center text-5 op80>
-
-Older than ASGI — WSGI had Zappa (2016) · `apig-wsgi` · `serverless-wsgi`
-
-</div>
-
 <style>
 /* The two runtimes this talk added join a list the audience already knows, so
    they arrive together, after it. */
@@ -2585,18 +2585,14 @@ Older than ASGI — WSGI had Zappa (2016) · `apig-wsgi` · `serverless-wsgi`
 
 <!--
 And this pattern is already everywhere.
-We saw Mangum at the beginning, for AWS Lambda. Azure and Vercel do the same thing.
+Different platforms such as AWS Lambda, Azure and Vercel have different ASGI bridge implementations.
 
 [click]
 And today we added the last two.
 
 [click]
 All of them do what we wrote. Build a scope, prepare receive and send, and await the app.
-Mangum even collects the body instead of streaming, like ours did.
-And it's maintained by the same person who maintains Uvicorn and Starlette.
-
-[click]
-And it's older than ASGI. Zappa did this for WSGI, back in 2016.
+And one interesting fact is Mangum is maintained by the same person who maintains Uvicorn and Starlette.
 -->
 
 ---
@@ -2633,15 +2629,15 @@ plainBackground: true
 </style>
 
 <!--
-And once I saw Cloudflare running Pyodide, I had to try it with Stlite.
+And once I saw Cloudflare running Pyodide, I had to try it with Stlite, the in-browser version of Streamlit that I am maintaining.
 These are the two columns we just saw.
 
 [click]
-And this is Stlite on Cloudflare. It's experimental, and the PR is linked there.
-Pyodide again, but in a Python Worker at the edge, instead of a Web Worker in the tab.
+And this is Stlite on Cloudflare.
+Pyodide again, but in a Cloudflare Python Worker on their servers, instead of a Web Worker in the browser tab.
 
 [click]
-And again, our script, Streamlit, and the interface between them are identical in all three.
+And again, Streamlit core is identical in all three.
 
 [click]
 And the caller and the runtime are the parts that moved. Nothing above the bridge changed.
@@ -2693,13 +2689,13 @@ In production: [Streamlit Playground](https://streamlit.io/playground) powered b
 
 <!--
 [click]
-We can ship a whole web app as static files, on GitHub Pages or a CDN. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
+We can ship a whole web app as static files, on services such as Amazon S3, GitHub Pages or Cloudflare Pages. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
 
 [click]
 Documentation can have live, editable examples in the page.
 
 [click]
-And teaching needs no setup at all. It's just a web page.
+Similar to documentation, the no-setup nature can be useful in educational situations.
 
 [click]
 And everything runs on the device, so the data never leaves it.
@@ -2740,6 +2736,8 @@ And this is already in production. The Streamlit Playground runs on Stlite.
 
 <!--
 And the honest part.
+
+There are some things that you have to take care of.
 
 [click]
 Everything downloads to the browser, and not every package is in the Pyodide distribution.

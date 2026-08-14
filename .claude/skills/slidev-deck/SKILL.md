@@ -77,6 +77,26 @@ These principles are the material you draft the plan from. The **information flo
   - Emotional emphasis on statement slides: `Share it! 👍`
 - **Presenter notes should be written in spoken language tone**, not formal written style. Use contractions ("don't", "it's", "we'll"), filler phrases ("OK so", "alright", "honestly"), and conversational transitions ("let me show you", "here's the thing"). The notes are meant to be read aloud as a speaking script, not as documentation. Avoid overly polished or academic phrasing.
 
+#### Presenter notes: scope, connection, brevity
+
+A note is the script for *its own slide*. Three rules govern what belongs in one:
+
+- **Don't explain later material early.** If a topic has its own slide coming, the earlier slide must not pre-explain it — that spoils the payoff and explains something the audience cannot see yet. The title slide greets and reads the title; it carries no thesis. An agenda *names* the topics and their order, and stops there. Cut foreshadowing outright: "because that split is the whole talk", "Something sits between them", "Remember it; we come back to it at the end", "hold that thought".
+- **Never drop a concept in cold.** Open by tying back to what the audience already has: "This decoupling is general.", "By the way, ASGI is not the first initiative to do it.", "Let's start with a very basic example you may already be familiar with." A new name should arrive as an instance of something already introduced.
+- **Short sentences when the visual carries the point.** Walk the figure click by click in plain declaratives. Drop rhetorical flourishes and anecdote riffs ("a conversation of events", "Nobody coordinated anything", "Different worlds"). When the visual already makes the point, the on-slide summary line can often go with them.
+
+Write notes as a multi-line comment block with `[click]` alone on its own line and blank lines between beats, not as one long single-line comment:
+
+```html
+<!--
+This is a very simple FastAPI application.
+It defines an API endpoint that returns the Python version and the platform where it's running.
+
+[click]
+To run this app, we usually use something like `uvicorn`.
+-->
+```
+
 #### Slide text density
 
 **Slides carry keywords; the presenter notes carry sentences.** On-slide text is words, phrases, and taglines that let the audience grasp the point at a glance, with the key information bolded so one or two words draw the eye. Full-sentence explanations belong in the presenter notes, delivered orally; do not embed them in the slide body.

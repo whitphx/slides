@@ -844,6 +844,7 @@ And they makes it easier with useful features such as routing, parsing, validati
 
 ---
 plainBackground: true
+hide: true
 ---
 
 # One `await` is the whole request
@@ -1071,11 +1072,15 @@ INFO:  Uvicorn running on
 </style>
 
 <!--
-This is the demo app itself.
-Just a few FastAPI routes. One serves the page, one is the runtime endpoint we saw at the beginning, and one increments a counter so we have some state.
+Next, let me introduce a new demo app, but it's still a simple FastAPI app.
+
+One route serves the HTML page.
+Others are API routes.
+GET endpoint to print the server environment.
+POST endpoints including some server-side logic.
 
 [click]
-And the same check as the previous slide. It's callable, and its parameters are scope, receive and send.
+And let me say again, the `app` object of FastAPI is a callable, and its parameters are scope, receive and send.
 So this is an ASGI application too.
 
 [click]

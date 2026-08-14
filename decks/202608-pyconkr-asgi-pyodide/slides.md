@@ -1096,11 +1096,11 @@ plainBackground: true
 
 <div mt-6>
 
-<ServerStackFigure />
+<ServerStackFigure :step="$clicks" />
 
 </div>
 
-<div v-click="1" mt-4 text-center text-xl>
+<div v-click="5" mt-4 text-center text-xl>
 
 The server half = **Uvicorn**. Watch that box 👀
 
@@ -1108,8 +1108,18 @@ The server half = **Uvicorn**. Watch that box 👀
 
 <!--
 Let's map what we just ran, from the top.
-Our app, main.py. Below it, Uvicorn, which takes the HTTP request off the socket and calls the app.
-Both of them run on CPython, on a server machine.
+Everything on the server side runs in one CPython process, on a server machine.
+
+[click]
+At the top, our app. The `main.py` we just looked at.
+
+[click]
+And it's called through the ASGI interface. `scope`, `receive` and `send`.
+
+[click]
+Under it, Uvicorn. It takes the HTTP request off the TCP socket, and makes that call.
+
+[click]
 And at the bottom, the browser, talking to it over the network.
 
 [click]

@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
   // Reserve the space the other columns spend on an isolation frame (Web / Python
   // Worker), so the runtime frames line up when shown side by side.
   aligned: { type: Boolean, default: false },
@@ -9,7 +9,15 @@ defineProps({
   // Then hand the ring over to the two rows that do move, the ASGI caller and the
   // Python runtime under it: the shared rows go quiet so the swap reads alone.
   highlightSwapped: { type: Boolean, default: false },
+  // Walk the figure a block at a time while the speaker talks through it: 1 the
+  // app, 2 the interface, 3 Uvicorn, 4 the network and the browser. The frames
+  // are there from the start so the slide never looks empty. Left null, every
+  // block sits at full emphasis, which is what the comparison slides want.
+  step: { type: Number, default: null },
 });
+
+const reached = (n) => props.step === null || props.step >= n;
+const arriving = (n) => props.step === n;
 </script>
 
 <template>
@@ -24,19 +32,29 @@ defineProps({
         >
           <div class="text-center text-xs op60 mb-1">🐍 CPython</div>
           <div
-            class="rounded-lg p-2 text-center leading-tight min-h-13 border transition-all duration-700 delay-[250ms]"
-            :class="highlight && !highlightSwapped ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10'"
+            class="rounded-lg p-2 text-center leading-tight min-h-13 border transition-all duration-700"
+            :class="[
+              highlight && !highlightSwapped ? 'border-emerald-400 bg-emerald-400/25 ring-4 ring-emerald-400/30' : 'border-emerald-400/40 bg-emerald-400/10',
+              reached(1) ? '' : 'op15',
+              arriving(1) ? 'ring-4 ring-emerald-400/40' : '',
+            ]"
           >
             🐍 <b><code>app</code></b> <span class="op70">in <code>main.py</code></span><br>
             <span class="text-xs op80">ASGI application (FastAPI)</span>
           </div>
           <div
-            class="text-center text-xs my-0.5 transition-all duration-700 delay-[250ms]"
-            :class="highlight && !highlightSwapped ? 'op100 font-600 text-emerald-700 dark:text-emerald-300' : 'op60'"
+            class="text-center text-xs my-0.5 transition-all duration-700"
+            :class="[
+              (highlight && !highlightSwapped) || arriving(2) ? 'op100 font-600 text-emerald-700 dark:text-emerald-300' : (reached(2) ? 'op60' : 'op15'),
+            ]"
           >⇅ <code>scope</code> · <code>receive</code> · <code>send</code></div>
           <div
-            class="rounded-lg p-2 text-center leading-tight min-h-13 border transition-all duration-700 delay-[250ms]"
-            :class="highlightSwapped ? 'border-sky-400 bg-sky-400/30 ring-4 ring-sky-400/30' : 'border-sky-400/40 bg-sky-400/10'"
+            class="rounded-lg p-2 text-center leading-tight min-h-13 border transition-all duration-700"
+            :class="[
+              highlightSwapped ? 'border-sky-400 bg-sky-400/30 ring-4 ring-sky-400/30' : 'border-sky-400/40 bg-sky-400/10',
+              reached(3) ? '' : 'op15',
+              arriving(3) ? 'ring-4 ring-sky-400/40' : '',
+            ]"
           >
             🦄 <b>Uvicorn</b><br>
             <span class="text-xs op80">HTTP off a TCP socket → <b>ASGI calls</b></span>
@@ -44,8 +62,18 @@ defineProps({
         </div>
       </div>
     </div>
-    <div class="text-center text-xs op60 my-0.5 mt-auto">⇅ HTTP over the network</div>
-    <div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
+    <div
+      class="text-center text-xs my-0.5 mt-auto transition-all duration-700"
+      :class="reached(4) ? 'op60' : 'op15'"
+    >⇅ HTTP over the network</div>
+    <div
+      class="rounded-xl p-2 border transition-all duration-700"
+      :class="[
+        'border-gray-400/40 bg-gray-400/5',
+        reached(4) ? '' : 'op15',
+        arriving(4) ? 'ring-4 ring-teal-400/40' : '',
+      ]"
+    >
       <div class="text-center text-xs op60 mb-1">🌐 Browser</div>
       <div class="border border-teal-400/40 rounded-lg p-2 bg-teal-400/10 text-center leading-tight min-h-13">
         📄 <b>Frontend page</b><br>

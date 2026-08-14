@@ -130,7 +130,7 @@ Let's start with a very basic example that you may already benn familiar with.
 -->
 
 ---
-clicks: 2
+clicks: 3
 ---
 
 # You deploy this pair every week
@@ -139,7 +139,7 @@ clicks: 2
 
 <div class="deploy-cell deploy-left">
 
-<div mb-1>Demo app — ordinary <b><span v-mark="{ at: 2, color: '#a78bfa', type: 'circle' }">FastAPI</span></b></div>
+<div mb-1>Demo app — ordinary <b><span v-mark="{ at: 3, color: '#a78bfa', type: 'circle' }">FastAPI</span></b></div>
 
 ```py {*}
 import platform, sys
@@ -157,22 +157,32 @@ async def runtime() -> str:
 
 <div class="deploy-cell deploy-right">
 
-<div mb-1>…and how <b><span v-mark="{ at: 2, color: '#38bdf8', type: 'circle' }">Uvicorn</span></b> runs it</div>
+<div mb-1>…and how <b><span v-mark="{ at: 3, color: '#38bdf8', type: 'circle' }">Uvicorn</span></b> runs it</div>
 
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
 $ uvicorn main:app
-INFO:  Started server process
 INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
 
-<!-- TODO: Add `curl -i localhost:8000/api/runtime` command line and its result -->
+<div v-click="2">
+
+```shell
+$ curl -i localhost:8000/api/runtime
+HTTP/1.1 200 OK
+server: uvicorn
+content-type: application/json
+
+"Python 3.12.7 on darwin"
+```
+
+</div>
 
 </WindowMockup>
 
-<div mt-4 text-lg>
+<div mt-2 text-lg>
 
 App: **Your logic**<br>
 Uvicorn: **HTTP handling, connected to socket**
@@ -187,6 +197,13 @@ Uvicorn: **HTTP handling, connected to socket**
 * {
   --slidev-code-font-size: 24px;
   --slidev-code-line-height: 1.5;
+}
+/* The transcript is longer than the code beside it, and it is read as output
+   rather than studied line by line, so it runs a size below. */
+.deploy-right,
+.deploy-right * {
+  --slidev-code-font-size: 18px;
+  --slidev-code-line-height: 1.45;
 }
 .deploy-grid {
   display: grid;
@@ -225,6 +242,8 @@ This is a very simple FastAPI application.
 It defines an API endpoint that returns the Python version and the platform where it's running. We will reuse this endpoint in the following parts of this talk by the way.
 [click]
 To run this app, we usually use something like `uvicorn`. In the case of uvicorn, it serves the defined application through HTTP by this command.
+[click]
+And it's a normal HTTP server. If we call the endpoint with curl, we get a normal HTTP response back.
 [click]
 Now look at there two actors.
 One is your app backed by FastAPI that implements the logic.
@@ -1913,7 +1932,7 @@ For this layer, in the browser environment, on the right, Pyodide runs instead o
 
 [click]
 And one note for the production case.
-We usually run Pyodide in another Worker process in the browser to prevent the main UI thread from being blocked.
+We usually run Pyodide in another Worker thread in the browser to prevent the main UI thread from being blocked.
 
 [click]
 Anyway, note again, that everything above this box is untouched. The same app, called through the same interface. Only the ASGI server underneath changed.
@@ -1954,18 +1973,24 @@ It does. And I can say that because I've actually built it, with Streamlit.
 -->
 
 ---
+clicks: 5
+---
 
 # Streamlit
 
-<div class="st-grid" mt-1 :class="$clicks >= 1 ? 'revealed' : ''">
+<div class="st-grid" mt-1 :class="$clicks >= 3 ? 'revealed' : ''">
 
 <div class="st-cell st-left">
 
 <div mb-1>Build web apps with <b>only Python</b>:</div>
 
+<div v-click>
+
 <<< @/samples/streamlit-demo/app.py py {*}{maxHeight:'180px'}
 
-<div mt-4>
+</div>
+
+<div v-click mt-4>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -1981,7 +2006,7 @@ $ streamlit run app.py
 
 <div class="st-cell st-right">
 
-<div class="st-stack" :class="$clicks >= 2 ? 'covered' : ''">
+<div class="st-stack" :class="$clicks >= 4 ? 'covered' : ''">
 
 <div class="st-layer st-app">
 
@@ -1994,43 +2019,16 @@ $ streamlit run app.py
 
 </div>
 
-<div class="st-layer st-stackfig text-sm">
+<div class="st-layer st-stackfig">
 
-<div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
-<div class="text-center text-xs op60 mb-1">🖥️ Server machine</div>
-<div class="border border-violet-400/40 rounded-lg p-2 bg-violet-400/5">
-<div class="text-center text-xs op60 mb-1">🐍 CPython</div>
-<div class="grid grid-cols-2 gap-1">
-<div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
-🐍 <b>Your script</b><br><span class="text-xs op80">written in Python</span>
-</div>
-<div class="border border-emerald-400/40 rounded-lg p-2 bg-emerald-400/10 text-center leading-tight">
-📁 <b>Static assets</b><br><span class="text-xs op80">images, data files</span>
-</div>
-</div>
-<div class="grid grid-cols-2 gap-1 text-center text-xs op60 my-0.5">
-<div>⇅ runs your script</div>
-<div>↓ serves</div>
-</div>
-<div class="border border-amber-400/40 rounded-lg p-2 bg-amber-400/10 text-center leading-tight">
-🎈 <b>Streamlit runtime</b><br><span class="text-xs op80">ScriptRunner &amp; an HTTP server</span>
-</div>
-</div>
+<div class="st-fig">
+<StreamlitStackFigure />
 </div>
 
-<div class="text-center text-xs op60 my-0.5">⇅ HTTP + WebSocket</div>
+<div v-click="5" mt-1 text-center>
 
-<div class="border border-gray-400/40 rounded-xl p-2 bg-gray-400/5">
-<div class="text-center text-xs op60 mb-1">🌐 Browser</div>
-<div class="border border-teal-400/40 rounded-lg p-2 bg-teal-400/10 text-center leading-tight">
-📄 <b>Frontend app</b><br><span class="text-xs op80">served from bundled static assets</span>
-</div>
-</div>
-
-<div v-click="3" mt-2 text-center text-lg>
-
-`pip install streamlit` ships<br>**the server *and* its frontend**<br>
-<span text-base op80>the same shape as our demo app 👀</span>
+`streamlit` ships<br>**the server *and* its frontend**<br>
+<span text-sm op80>the same shape as our demo app 👀</span>
 
 </div>
 
@@ -2099,62 +2097,102 @@ $ streamlit run app.py
   transform: translateX(0);
   opacity: 1;
 }
+/* The shared figure is drawn for the side-by-side comparison later on. Alone in
+   one column it stands two rows taller than the screenshot it covers, so it is
+   scaled to the space rather than given a second, shorter variant. */
+.st-fig {
+  zoom: 0.88;
+}
 </style>
 
 <!--
 Streamlit is a popular Python framework to build interactive web applications only with Python.
-We write a plain script. No HTML, no JavaScript, and no frontend build.
+
+[click]
+We only write a Python script.
+
+[click]
 And we run it with the streamlit command.
 
 [click]
-And we get an interactive dashboard. Dragging the slider re-runs the script.
+And we get a styled interactive dashboard.
+
+So how does just a Python script become such a web app with rich frontend?
 
 [click]
-So how does it become a web page?
-That command starts the Streamlit runtime on CPython. It runs our script and answers HTTP.
-And the frontend it serves is shipped inside the pip package.
+The framework itself is already a bundled full-stack web app including both Python server-side and the frontend pages.
+It runs Uvicorn, and its server-side application on it, and serves the frontend app.
+The user's Python script instructs the Streamlit "application" about how it should behave and what it should display.
 
 [click]
-So one package contains both halves.
+So one package contains both sides.
 And it's the same shape as our demo app.
 -->
 ---
+clicks: 3
+---
 
-# What are these frameworks built on?
+# Stlite
 
-<div mt-2>
+<div grid="~ cols-[1.25fr_1fr]" gap-5 mt-1 items-start class="stlite-grid">
 
-| Framework | Server stack |
-| --------- | ------------ |
-| Streamlit | Starlette — **ASGI** <span op70>(since 1.57)</span> |
-| Shiny for Python | Starlette — **ASGI** |
-| Gradio | FastAPI — **ASGI** |
+<div>
+
+<div mb-1>One static HTML file — <b>the same two Python files inside</b>:</div>
+
+<<< @/samples/streamlit-demo/stlite.html#slide-mount html {*}
+
+<div v-click="1" mt-3 text-lg>
+
+…and one <code>&lt;script&gt;</code> tag for the runtime, **from a CDN**
+
+</div>
 
 </div>
 
-<div v-click="1" mt-4 text-lg>
+<div v-click="2">
 
-**Heavyweight** apps: static assets · sessions · state · realtime
+<WindowMockup title="sales-dashboard.html — opened from disk" light padding="0.4rem">
+
+<img src="/stlite-demo.png" alt="The same Sales dashboard, running from a static HTML file in the browser" style="width: 100%; height: auto;" />
+
+</WindowMockup>
+
+</div>
 
 </div>
 
-<div v-click="2" mt-2 text-xl>
+<div v-click="3" mt-3 text-center text-xl>
 
-Underneath, every one of them is **an ASGI app + a server** 🤔
+No server, no Python installed — **the same app, in the tab** 🎈
 
 </div>
+
+<style>
+* {
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.5;
+}
+/* A code block will not shrink below its longest line, and the CDN url is long
+   enough to widen the whole track and shove the window off the slide. */
+.stlite-grid > * {
+  min-width: 0;
+}
+</style>
 
 <!--
-And Streamlit is not the only one. Let's look at what these frameworks are built on.
-Shiny is on Starlette, and Gradio is on FastAPI. Streamlit joined them in version 1.57, replacing Tornado with Starlette and Uvicorn.
-Not every framework is ASGI-based. Panel is still on Tornado, for example. But these three are.
+So this is Stlite, the in-browser version of Streamlit that I built.
 
 [click]
-And they are big. Static assets, sessions, per-user state, and realtime updates.
+The app is a static HTML file. It loads the same `app.py` and `data.py` we just ran.
+And the Stlite runtime itself is one script tag, served from a CDN.
 
 [click]
-But underneath, each of them is an ASGI app with a server, which is the shape we already took apart.
-So, can we swap the server half of these too?
+And that is the whole deployment. Open the file, and the same dashboard appears, with the same slider redrawing the same chart.
+
+[click]
+There is no server here, and the visitor has no Python installed.
+So how does the whole Streamlit run inside a tab?
 -->
 
 ---
@@ -2164,7 +2202,7 @@ plainBackground: true
 
 # Standard Streamlit vs. Stlite
 
-<StackCompare mt-2 :columns="[
+<StackCompare mt-1 class="cmp-fit" :columns="[
   { key: 'streamlit', label: 'Standard Streamlit' },
   { key: 'stlite', label: 'Stlite', hidden: $clicks < 1 },
 ]">
@@ -2172,7 +2210,7 @@ plainBackground: true
   <template #stlite><StliteStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
 </StackCompare>
 
-<div class="punchline" mt-2 text-center text-lg :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="punchline" mt-1 text-center :class="$clicks >= 1 ? 'op100' : 'op0'">
 
 Same app, same Streamlit — **only the server half and the runtime change** 🎈
 
@@ -2181,6 +2219,11 @@ Same app, same Streamlit — **only the server half and the runtime change** �
 <style>
 .punchline {
   transition: opacity 700ms ease 250ms;
+}
+/* The runtime box gained a row for Starlette, which this two-column
+   comparison has no spare height for, so the pair scales to the slide. */
+.cmp-fit {
+  zoom: 0.95;
 }
 </style>
 
@@ -2201,7 +2244,7 @@ It's the same swap as our demo, but carrying a whole framework.
 -->
 
 ---
-clicks: 2
+clicks: 3
 ---
 
 # Real frameworks, really in the browser
@@ -2218,7 +2261,13 @@ Not just Streamlit — the same swap, done across the ecosystem:
 
 </div>
 
-<div v-click="2" mt-4 text-xl text-center>
+<div v-click="2" mt-3 text-lg text-center>
+
+**Heavyweight** apps: static assets · sessions · state · realtime
+
+</div>
+
+<div v-click="3" mt-2 text-xl text-center>
 
 Each one needed a **server half** in the browser — **ASGI is the right shape** 💡
 
@@ -2245,12 +2294,17 @@ Each one needed a **server half** in the browser — **ASGI is the right shape**
 </style>
 
 <!--
-And this is happening with the other frameworks too. Here are the same three, with the stacks we just saw.
+And Streamlit is not the only one. Let's look at what these frameworks are built on.
+Shiny is on Starlette, and Gradio is on FastAPI. Streamlit joined them in version 1.57, replacing Tornado with Starlette and Uvicorn.
+Not every framework is ASGI-based. Panel is still on Tornado, for example. But these three are.
 
 [click]
 Every one of them has a version that runs in the browser.
 Posit built Shinylive for Shiny, and I worked with the Gradio team on Gradio-Lite, though it is not maintained now.
 And about the order, Shinylive did it first, and Stlite's bridge is strongly inspired by theirs.
+
+[click]
+And these are big applications. Static assets, sessions, per-user state, and realtime updates.
 
 [click]
 What made all of them possible is the middle column.

@@ -44,6 +44,9 @@ defineProps({
           >
             🎈 <span class="text-sm"><b>Streamlit runtime</b></span><br>
             <span class="op80">ScriptRunner &amp; app state</span>
+            <div class="mt-0.5 rounded border border-amber-400/40 bg-amber-400/10 px-1 leading-snug">
+              on <b>Starlette</b> <span class="op80">— the ASGI app</span>
+            </div>
           </div>
           <div
             class="text-center my-0.5 transition-all duration-700 delay-[250ms]"

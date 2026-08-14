@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales dashboard — Stlite</title>
+    <!-- Pinned with SRI like the htmx tag in step2-browser/index.html. Note that
+         SRI covers this entry module only; the chunks it imports are not
+         covered, which is a limitation of SRI for ES modules, not an oversight. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.css"
+      integrity="sha384-e7ijfpSKNM6laUmmJSlukLq1V1s2E8pYgWkHXGLM2RqOnOZ/g0AZIS9O5kO3m5oL"
+      crossorigin="anonymous"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js"
+      integrity="sha384-697g15GgDx1ayRm7c2v6GhNVeKe5QoJLuKEIwH6jmmWdcXDxlTq+E4FuiDfr/mx2"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <!-- region slide-mount -->
+    <streamlit-app>
+      <app-file name="app.py" url="./app.py" entrypoint>
+      </app-file>
+      <app-file name="data.py" url="./data.py">
+      </app-file>
+    </streamlit-app>
+    <!-- endregion slide-mount -->
+  </body>
+</html>

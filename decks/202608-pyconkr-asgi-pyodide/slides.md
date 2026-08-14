@@ -29,6 +29,26 @@ Yuichi / 유이치 (@whitphx)
 PyCon Korea 2026 · Aug 15
 </div>
 
+<div absolute top-17 right-10 flex="~ col" items-center gap-2>
+<div class="qr-box" w-36 h-36>
+<QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202608-pyconkr-asgi-pyodide/"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+<div op70 text-sm text-center leading-tight>These slides</div>
+</div>
+
+<style>
+/* qr-code-styling floors the dot size to a whole pixel, so a width that is not
+   an exact multiple of the module count leaves the drawn code smaller than the
+   box it sits in. Feed it an exact multiple, then scale the SVG to the size we
+   actually want. */
+.qr-box :deep(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+</style>
+
 <!--
 Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web server inside your browser.
 -->
@@ -86,9 +106,16 @@ Software Artisan / Indie Dev / OSS Enthusiast
 
 <!--
 I'm Yuichi, a software developer who loves OSS activities and communities.
+
+[click]
 I have been developing and maintaining multiple OSS projects, and contributing to several repositories as well including Streamlit and Gradio.
 Today's talk is largely built on top of what I learned through some of those projects actually.
-And I have attended and had several talks in PyCons all over the world, and this time, it's a great honor to me having this chance to have a talk in PyCon KR.
+
+And I have attended and had several talks in PyCons all over the world, and this time,
+[click]
+it's a great honor to me having this chance to have a talk in PyCon KR.
+
+[click]
 You can find me on some social medias and GitHub as whitphx, so plz contact me if something in this talk interests you.
 -->
 
@@ -111,8 +138,18 @@ You can find me on some social medias and GitHub as whitphx, so plz contact me i
 
 <!--
 This talk is about ASGI.
+
+[click]
 I will start with explaining what ASGI is, and what it brings to us when making a web server.
-Then, we will take a look interesting examples that we can achieve by making use of ASGI's advantages in combination with Pyodide, a Python runtime runnable inside a web browser. We will see our web application **server** runs inside a web browser, and even more unusual environment.
+
+[click]
+Then, we will take a look interesting examples that we can achieve by making use of ASGI's advantages in combination with Pyodide, a Python runtime runnable inside a web browser, or on the client side.
+
+[click]
+We will see our web application **server** runs inside a web browser,
+
+[click]
+and even more unusual environment.
 -->
 
 ---
@@ -126,7 +163,7 @@ layout: section
 </div>
 
 <!--
-Let's start with a very basic example that you may already benn familiar with.
+Let's start with a very basic example that you may already been familiar with.
 -->
 
 ---
@@ -239,11 +276,14 @@ Uvicorn: **HTTP handling, connected to socket**
 
 <!--
 This is a very simple FastAPI application.
-It defines an API endpoint that returns the Python version and the platform where it's running. We will reuse this endpoint in the following parts of this talk by the way.
+It defines an API endpoint that returns the Python version and the platform info where it's running.
+
 [click]
 To run this app, we usually use something like `uvicorn`. In the case of uvicorn, it serves the defined application through HTTP by this command.
+
 [click]
 And it's a normal HTTP server. If we call the endpoint with curl, we get a normal HTTP response back.
+
 [click]
 Now look at there two actors.
 One is your app backed by FastAPI that implements the logic.
@@ -276,24 +316,26 @@ The other is Uvicorn, which is actually dealing with the HTTP communications thr
 </div>
 
 <div v-click="3">
-<div data-id="env-host" class="env-note" absolute top-74 right-64 w-46 bg-white dark:bg-black px-2 py-1 border="~ sky/60 rounded-lg">
+<div data-id="env-host" class="env-note" absolute top-74 right-64 w-46 bg-white dark:bg-black p-2 border="~ sky/60 rounded-lg">
 
-🖥️ **a Linux box**<br><span op70>a port to listen on</span>
+🖥️ a Linux box
 
 </div>
 <FancyArrow from="[data-id=env-host] @ (25%, 0)" to="[data-id=srv-uvicorn] @ left" arc="0.4" />
 </div>
 
 <div v-click="3">
-<div data-id="env-lambda" class="env-note" absolute top-74 right-12 w-46 bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
+<div data-id="env-lambda" class="env-note" absolute top-74 right-12 w-46 bg-white dark:bg-black p-2 border="~ amber/60 rounded-lg">
 
-☁️ **AWS Lambda**<br><span op70>no port at all</span>
+☁️ AWS Lambda
 
 </div>
 <FancyArrow from="[data-id=env-lambda] @ top" to="[data-id=srv-mangum] @ bottom" arc="0.1" color="red" />
 </div>
 
-<div v-click="5" mt-30 text-2xl op90 text-center>
+<div v-click="5" mt-20 text-5 op90 text-center italic>Asynchronous Server Gateway Interface</div>
+
+<div v-click="6" mt-10 text-2xl op90 text-center>
 
 Each side evolves **independently** — nobody coordinates 🤝
 
@@ -311,18 +353,25 @@ Each side evolves **independently** — nobody coordinates 🤝
 
 <!--
 This decoupling is general.
+
 [click]
 One side is the app frameworks.
+
 [click]
 The other is the servers.
 
 And on each side, many different packages are developed,
 such as Fast API and Starlette as the app frameworks,
 and Uvicorn and Hypercorn as the servers.
+
+[click]
 And different server packages are provided to support different environment or platforms. For example, we use Uvicorn in usual Linux environment, and when we want to deploy the app to AWS Lambda, we switch it to Mangum.
 
 [click]
 And the interface between these decoupled layers is ASGI.
+
+[click]
+or "Asynchronous Server Gateway Interface"
 
 [click]
 By decoupling these two sides with the interface in between,
@@ -343,7 +392,6 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 <div v-click="1" border="~ gray/40 rounded-lg" p-3 bg-gray:5>
 <div text-4>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
-<div text-4 mt-2><code>def app(environ, start_response)</code></div>
 <div text-4 op80 mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
 <div text-4 op80 mt-1><b>One sync call</b> request → response, done</div>
 </div>
@@ -352,7 +400,6 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 <div text-4>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
-<div text-4 mt-2><code>async def app(scope, receive, send)</code></div>
 <div text-4 op80 mt-1>Same decoupling, <b>async events</b></div>
 <div text-4 op80 mt-1>WebSockets · streaming long-lived connections</div>
 </div>
@@ -361,9 +408,11 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 <!--
 By the way, ASGI is not the first initiative to do it.
+
 [click]
 In 2003, PEP 333, Python standardized WSGI: the same kind of contract. Flask and Gunicorn are well-known examples of WSGI-compatible software.
 However it was only for synchronous code and had some limitations such as lack of support for WebSocket and long-lived streams.
+
 [click]
 So when Django Channels needed those things, ASGI grew out of that work
 -->
@@ -430,14 +479,14 @@ async def app(scope, receive, send):
 
 <div v-click="3">
 <div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
-📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b><br>events from the client</span>
+📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b><br></span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
 
 <div v-click="4">
 <div data-id="ann-send" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
-📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b><br>events to the client</span>
+📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.1" />
 </div>
@@ -452,22 +501,21 @@ async def app(scope, receive, send):
 </style>
 
 <!--
-This is the whole interface that ASGI defines on the app side.
+This is the whole interface that ASGI defines on the application side.
 One async function that takes three arguments.
 
 [click]
 And this signature is the contract.
 The app promises to take these three arguments, and the caller promises to pass them in.
-So any ASGI server can serve our app.
 
 [click]
-scope is a dict that describes the connection. Its type, the path, the headers.
+scope is a dict that describes the connection info, such as HTTP method, the path, the headers, and so on.
 
 [click]
-receive is an async callable. The app awaits it to get an event from the client.
+receive is an async callable. The app awaits it to get an incoming event.
 
 [click]
-And send is an async callable for the app to push an event out to the client.
+And send is an async callable for the app to push an outgoing event.
 -->
 
 ---
@@ -575,11 +623,11 @@ To understand it better, let's write a bare ASGI app by ourselves.
 The signature, the same as we just saw.
 
 [click]
-Here checks the connection type in scope.
+Here checks the connection type in scope is HTTP.
 
 [click]
-Then we call the `send()` with the first event, response start, with the status and the headers.
-`send()` pushes the event to the server such as Uvicorn.
+Then we call the `send()` callable passed as an argument,
+with the first event, `response.start`, with the status and the headers of the HTTP response.
 
 [click]
 Next `send` pushes response body.
@@ -594,7 +642,8 @@ You can pass this `app` object to Uvicorn like the FastAPI app we've done just b
 [click]
 And it just works.
 You can see it returns the HTTP response.
-Uvicorn doesn't care that there's no framework. It just calls the callable.
+Uvicorn doesn't care that there's no framework like FastAPI.
+It just calls the `app` callable.
 -->
 
 ---
@@ -706,8 +755,7 @@ async def receive():
 </style>
 
 <!--
-A GET request has no body, so that app never used receive.
-Let's make it accept a POST.
+Next, let's make this app accept a POST request using `receive`.
 
 [click]
 This part is the difference.
@@ -718,13 +766,16 @@ The app needs to pull it from the `receive` callable.
 Here, the app awaits `receive`, and gets one event.
 
 [click]
-`receive` works like this. It's passed from the server, and it returns the body.
+`receive` works like this.
+It returns the body.
+
+And it's passed from the server.
 
 [click]
-We add it to what we have.
+We add the returned body to a buffer.
 
 [click]
-And we repeat it until all body is received, because a large body arrives in pieces.
+And we repeat it until all body is received, because a large body arrives in a chunked manner.
 
 [click]
 Then it calls `send` to return the response, the same as before.
@@ -733,10 +784,10 @@ Then it calls `send` to return the response, the same as before.
 With this `app`,
 
 [click]
-Let's launch the server again,
+Let's launch `uvicorn` again,
 
 [click]
-And post some bytes.
+And post some data via `curl`.
 
 It works as expected, receiving the posted body and returns a response.
 
@@ -844,7 +895,8 @@ True
 So if such bare ASGI apps already work, what do frameworks like FastAPI give us?
 
 [click]
-And this is what it looks like inside FastAPI.
+Here is an answer.
+This is what the `FastAPI` class looks like.
 The class defines `__call__` with the ASGI signature.
 
 [click]
@@ -853,12 +905,12 @@ So an instance of the `FastAPI` class is callable.
 [click]
 And its parameters are scope, receive and send.
 
-So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we wrote.
+So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we wrote before.
 
 [click]
-So, ultimately, such ASGI frameworks are the way to create an ASGI callable.
+So, ultimately, such ASGI frameworks are just a way to create an ASGI callable.
 
-And they makes it easier with useful features such as routing, parsing, validation, and so on.
+And they provide useful features such as routing, parsing, validation, and so on, to make it easier.
 -->
 
 ---
@@ -946,24 +998,26 @@ There is no completion event. The return itself is the signal.
 -->
 
 ---
-clicks: 2
----
 
 # Demo, step 1: the normal case
 
-<div class="demo-grid" mt-1 :class="$clicks >= 1 ? 'revealed' : ''">
+<div class="demo-grid" mt-1 :class="$clicks >= 5 ? 'revealed' : ''">
 
 <div class="demo-cell demo-left">
 
 <div mb-1><code>main.py</code> <span op70>— the demo app, shortened</span></div>
 
-<<< @/samples/runtime-agnostic-asgi-app/main.py#slide-routes py {*}{maxHeight:'305px'}
+```py
+app = FastAPI()
+```
+
+<<< @/samples/runtime-agnostic-asgi-app/main.py#slide-routes py {*|1-3|5-11|13-23|*}{maxHeight:'356px'}
 
 </div>
 
 <div class="demo-cell demo-right">
 
-<div class="demo-stack" :class="$clicks >= 2 ? 'covered' : ''">
+<div class="demo-stack" :class="$clicks >= 6 ? 'covered' : ''">
 
 <div class="demo-layer demo-repl">
 
@@ -997,7 +1051,7 @@ INFO:  Uvicorn running on
 
 </WindowMockup>
 
-<div mt-3>
+<div mt-3 v-click="7">
 
 <LiveEmbed url="http://127.0.0.1:8000" light height="170px" :zoom="0.6">
 
@@ -1023,6 +1077,13 @@ INFO:  Uvicorn running on
 * {
   --slidev-code-font-size: 22px;
   --slidev-code-line-height: 1.5;
+}
+/* Slidev scrolls a highlighted range into the maxHeight window as one unit, so
+   the window has to fit the tallest range: the 11-line POST block. At 22px that
+   range is taller than the window and its last line stays clipped, and there is
+   no room left below to grow the window into. */
+.demo-left * {
+  --slidev-code-font-size: 20px;
 }
 /* WindowMockup's `light` pins the frame to white but leaves slot content on the
    theme's text colour, so this has to be pinned too or it vanishes in dark mode.
@@ -1093,18 +1154,32 @@ INFO:  Uvicorn running on
 <!--
 Next, let me introduce a new demo app, but it's still a simple FastAPI app.
 
+[click]
 One route serves the HTML page.
+
+[click]
 Others are API routes.
 GET endpoint to print the server environment.
+
+[click]
 POST endpoints including some server-side logic.
+
+[click]
+We have defined a FastAPI application like this.
 
 [click]
 And let me say again, the `app` object of FastAPI is a callable, and its parameters are scope, receive and send.
 So this is an ASGI application too.
 
 [click]
-Let's run it in the usual way, with uvicorn, and open the page.
+Let's run it in the usual way, with uvicorn,
+
+[click]
+and open the page.
+
 When we click the button, it says Python 3.12 on darwin arm64. That's my laptop.
+
+And POST endpoints are working.
 -->
 
 ---
@@ -1121,28 +1196,30 @@ plainBackground: true
 
 <div v-click="5" mt-4 text-center text-xl>
 
-The server half = **Uvicorn**. Watch that box 👀
+The ASGI server = **🦄 Uvicorn**.
 
 </div>
 
 <!--
-Let's map what we just ran, from the top.
-The app and Uvicorn both run on CPython, on a server machine.
+Let's review what we just ran.
+
+This time, we used CPython on a server machine that's my laptop.
 
 [click]
-At the top, our app. The `main.py` we just looked at.
+We wrote a Python script `main.py` including the FastAPI instance, an `app` object.
 
 [click]
-And it's called through the ASGI interface. `scope`, `receive` and `send`.
+And the `app` is called through the ASGI interface. `scope`, `receive` and `send`,
 
 [click]
-Under it, Uvicorn. It takes the HTTP request off the TCP socket, and makes that call.
+by Uvicorn.
+Uvicorn takes the HTTP request off the TCP socket, and makes that call.
 
 [click]
-And at the bottom, the browser, talking to it over the network.
+And the frontend application running on the browser communicates with the server-side app through HTTP over the network.
 
 [click]
-So the server half here is Uvicorn. Let's keep an eye on this box.
+So the server that calls ASGI app here is Uvicorn. Let's keep an eye on it.
 -->
 
 ---
@@ -1289,6 +1366,20 @@ I'm using node here just to keep it in a terminal. The same works in browser Jav
 -->
 
 ---
+layout: section
+---
+
+# 🐍 Back to our app
+
+<div mt-4 op70>
+Now that Python runs in the page
+</div>
+
+<!--
+So using these technologies, can we make the server-side Python application inside the web browser?
+-->
+
+---
 clicks: 4
 ---
 
@@ -1356,7 +1447,7 @@ async function asgiFetch(url, options) {
 </style>
 
 <!--
-So let's line up what we have.
+Let's line up what we have.
 
 [click]
 We can put our `main.py` into the Pyodide runtime.
@@ -2711,19 +2802,19 @@ And this is already in production. The Streamlit Playground runs on Stlite.
 <div mt-4 grid="~ cols-2" gap-4 text-lg>
 
 <div v-click="1" border="~ red/40 rounded-lg" p-4 bg-red:5>
-📦 <b>Dependencies</b><br><span op80 text-base>everything downloads · <b>not every package is in the Pyodide distribution</b></span>
+🧵 <b>Runtime compatibility</b><br><span op80 text-base>no threads → <b><code>async def</code> only</b> · no raw sockets</span>
 </div>
 
 <div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
-🧵 <b>Single thread, sandboxed</b><br><span op80 text-base>no threads → <b><code>async def</code> only</b> · no raw sockets</span>
+📦 <b>Library compatibility</b><br><span op80 text-base>Only pure-Python packages, or binaries compiled for WebAssembly</span>
 </div>
 
 <div v-click="3" border="~ red/40 rounded-lg" p-4 bg-red:5>
-🔑 <b>No safe secrets</b><br><span op80 text-base>the page is public — <b>no API keys</b></span>
+🔑 <b>No safe secrets (in browser)</b><br><span op80 text-base>the page is public — <b>no API keys</b></span>
 </div>
 
 <div v-click="4" border="~ red/40 rounded-lg" p-4 bg-red:5>
-📥 <b>No inbound requests</b><br><span op80 text-base>no public address — <b>no webhooks</b></span>
+📥 <b>No inbound requests (in browser)</b><br><span op80 text-base>no public address — <b>no webhooks</b></span>
 </div>
 
 </div>
@@ -2740,12 +2831,11 @@ And the honest part.
 There are some things that you have to take care of.
 
 [click]
-Everything downloads to the browser, and not every package is in the Pyodide distribution.
-Our stack is, but the demo needed python-multipart, so we install that one into the page at runtime, with micropip.
+The Pyodide is not 100% compatible with the CPython we are used to.
+It can't start threads, for example.
 
 [click]
-It's single-threaded. WebAssembly can't start threads, so sync endpoints fail here.
-That's why every endpoint in our demo is async def.
+And there are some libraries that don't work on Pyodide, while the coverage is growing thanks to the large efforts by the maintainers.
 
 [click]
 The page is public, so no secrets.
@@ -2769,14 +2859,14 @@ So this works together with real servers. It doesn't replace them.
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
 - 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
 - 🔁 **One app, unchanged, across all of them** — that's the portability
-- 🏭 **In production today** — `Mangum`, the vendors' SDKs, Stlite, the playgrounds
+- 🏭 **In production today** — Stlite · Streamlit Playground · Cloudflare Python Workers · `Mangum` …
 - 🧠 **I learned ASGI by writing the other side of it**
 
 </v-clicks>
 
 </div>
 
-<div v-click mt-10 grid="~ cols-[1fr_auto]" gap-8 items-center>
+<div v-click mt-6 grid="~ cols-[1fr_auto]" gap-8 items-center>
 
 <div text-base flex="~ col" gap-2>
 
@@ -2806,13 +2896,38 @@ So this works together with real servers. It doesn't replace them.
 
 </div>
 
+<div flex="~ gap-5" items-start>
+
 <div flex="~ col" items-center gap-2>
-<QRCode :width="140" :height="140" type="svg" data="https://slides.whitphx.info/202608-pyconkr-asgi-pyodide/"
+<div class="qr-box" w-33 h-33>
+<QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202608-pyconkr-asgi-pyodide/"
   :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
-<div op70 text-sm>slides.whitphx.info</div>
+</div>
+<div op70 text-sm text-center leading-tight>These slides</div>
+</div>
+
+<div flex="~ col" items-center gap-2>
+<div class="qr-box" w-33 h-33>
+<QRCode :width="135" :height="135" type="svg" data="https://github.com/whitphx/slides/tree/main/decks/202608-pyconkr-asgi-pyodide"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+<div op70 text-sm text-center leading-tight>Sources</div>
 </div>
 
 </div>
+
+</div>
+
+<style>
+/* The two codes carry URLs of different lengths, so they differ in module count
+   and each needs its own exact-multiple width to avoid qr-code-styling's dot
+   flooring. Scaling both SVGs to one box is what makes them the same size. */
+.qr-box :deep(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+</style>
 
 <!--
 So, let me wrap up.
@@ -2833,7 +2948,7 @@ And the same app ran on all of them, without any change.
 And it's in production today. If you have deployed FastAPI to Lambda, you were already doing this.
 
 [click]
-And this is what I got personally. I learned ASGI by writing the other side of it.
+And this is what I got personally. I learned ASGI by writing the other side of it in the Stlite project.
 
 [click]
 That's all from me. Thank you very much.

@@ -85,6 +85,14 @@ A note is the script for *its own slide*. Three rules govern what belongs in one
 - **Never drop a concept in cold.** Open by tying back to what the audience already has: "This decoupling is general.", "By the way, ASGI is not the first initiative to do it.", "Let's start with a very basic example you may already be familiar with." A new name should arrive as an instance of something already introduced.
 - **Short sentences when the visual carries the point.** Walk the figure click by click in plain declaratives. Drop rhetorical flourishes and anecdote riffs ("a conversation of events", "Nobody coordinated anything", "Different worlds"). When the visual already makes the point, the on-slide summary line can often go with them.
 
+Brevity is a consequence of those rules, not a goal of its own. **When a beat carries two ideas, split the click rather than compressing the sentence** — add a step to the code's click spec, or scope an annotation with `v-click="[a,b]"` so it appears only for its own step. Cut what the visual already says; never pack an explanation into fewer, denser lines. Related habits:
+
+- Keep sibling explanations parallel — if `receive` gets "is an async callable that…", so does `send`.
+- Name the function and who it talks to on the click where the code shows it, and backtick identifiers: `send()`, `scope`, `__call__`.
+- End a code slide with a plain statement of what the thing is, not an aphorism. "Such ASGI frameworks are the way to create an ASGI callable" beats "a framework is a nicer way to write the same callable."
+- Don't front-load the payoff: a feature list or conclusion belongs *after* the slide establishes its point, not in the opening line.
+- Orient the audience across transitions ("From now on, we will use FastAPI in our demo apps") and frame a demo by its purpose ("To understand it better, let's write a bare ASGI app by ourselves").
+
 Write notes as a multi-line comment block with `[click]` alone on its own line and blank lines between beats, not as one long single-line comment:
 
 ```html

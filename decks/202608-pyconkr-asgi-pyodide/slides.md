@@ -448,16 +448,16 @@ scope is a dict that describes the connection. Its type, the path, the headers.
 receive is an async callable. The app awaits it to get an event from the client.
 
 [click]
-And send pushes an event out to the client.
+And send is an async callable for the app to push an event out to the client.
 -->
 
 ---
-clicks: 6
+clicks: 7
 ---
 
 # You don't even need a framework
 
-<div class="framework-grid" mt-1 :class="$clicks >= 5 ? 'revealed' : ''">
+<div class="framework-grid" mt-1 :class="$clicks >= 6 ? 'revealed' : ''">
 
 <div class="framework-cell framework-left">
 
@@ -474,8 +474,8 @@ clicks: 6
 </div>
 <span>🦄 server</span>
 </div>
-<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(3) @ right" arc="0.05" />
-<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(8) @ right" arc="0.15" />
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(3) @ right" arc="0.05" v-click="[3,4]" />
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(8) @ right" arc="0.15" v-click="[4,5]" />
 </div>
 
 </div>
@@ -492,7 +492,7 @@ INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
 
-<div v-click="6">
+<div v-click="7">
 
 ```shell
 $ curl -i localhost:8000
@@ -550,41 +550,45 @@ Hello, PyCon KR!
 </style>
 
 <!--
-Because the interface is this simple, we can write an ASGI app without any framework.
+To understand it better, let's write a bare ASGI app by ourselves.
 
 [click]
 The signature, the same as we just saw.
 
 [click]
-It checks the connection type in scope.
+Here checks the connection type in scope.
 
 [click]
-Then the first event, response start, with the status and the headers.
+Then we call the `send()` with the first event, response start, with the status and the headers.
+`send()` pushes the event to the server such as Uvicorn.
 
 [click]
-And the second, response body, with the bytes.
+Next `send` pushes response body.
+
+[click]
 Two calls of send, and the response is done.
 
 [click]
 Let's run it with uvicorn.
+You can pass this `app` object to Uvicorn like the FastAPI app we've done just before.
 
 [click]
-And call it with curl. A normal HTTP response.
+And it just works.
+You can see it returns the HTTP response.
 Uvicorn doesn't care that there's no framework. It just calls the callable.
-So, whoever calls the app is the server.
 -->
 
 ---
 
 # Now a POST — enter `receive`
 
-<div class="post-grid" mt-3 :class="$clicks >= 6 ? 'revealed' : ''">
+<div class="post-grid" mt-3 :class="$clicks >= 8 ? 'revealed' : ''">
 
 <div class="post-cell post-left">
 
 <div mb-1>Same shape — plus the <b><code>receive</code></b> loop</div>
 
-<<< @/samples/raw-asgi/raw_asgi_post.py py {*|4-9|6|7|8-9|11-13|*}{'data-id':'post-app'}
+<<< @/samples/raw-asgi/raw_asgi_post.py py {*|1,4-9|6|6|7|5,8-9|11-13|*}{'data-id':'post-app'}
 
 </div>
 
@@ -601,7 +605,7 @@ INFO:  Uvicorn running on
        http://127.0.0.1:8000
 ```
 
-<div v-click="6">
+<div v-click="9">
 
 ```shell
 $ curl -X POST localhost:8000 \
@@ -613,13 +617,13 @@ You said: hello, PyCon KR
 
 </WindowMockup>
 
-<div v-click="6" mt-3 text-center text-lg leading-tight>📥 The body isn't in <code>scope</code> —<br>you <b><code>await</code></b> it, <b>in pieces</b></div>
+<div v-click="10" mt-3 text-center text-lg leading-tight>📋<code>scope</code> ·  📥<code>send</code> ·  📥<code>receive</code></div>
 
 </div>
 
 </div>
 
-<div v-click="[2,5]">
+<div v-click="[3,6]">
 <div class="receive-impl" data-id="ann-receive-impl" absolute top-26 right-5 w-108 bg-white dark:bg-black p-1.5 rounded border="~ violet/50 rounded-lg" shadow-lg>
 
 <div flex items-center px-8 py-2 mx-auto gap-4 bg-white dark:bg-black text-4>
@@ -640,7 +644,6 @@ async def receive():
 
 </div>
 <FancyArrow from="[data-id=ann-receive-impl] @ bottomleft" to="[data-id=post-app] .line:nth-child(6) span:nth-child(5) @ right" arc="0.35" />
-<FancyArrow from="[data-id=ann-receive-impl] @ left" to="[data-id=post-app] .line:nth-child(0) @ right" arc="-0.2" />
 </div>
 
 <style>
@@ -688,23 +691,37 @@ A GET request has no body, so that app never used receive.
 Let's make it accept a POST.
 
 [click]
-This part is the difference. The body is not in scope. We pull it from receive.
+This part is the difference.
+The body is not passed to `app` as an argument like `scope`.
+The app needs to pull it from the `receive` callable.
 
 [click]
-We await receive, and get one event.
-The box on the right is what the server passes in. An async callable that returns the body.
+Here, the app awaits `receive`, and gets one event.
+
+[click]
+`receive` works like this. It's passed from the server, and it returns the body.
 
 [click]
 We add it to what we have.
 
 [click]
-And we repeat while more_body is true, because a large body arrives in pieces.
+And we repeat it until all body is received, because a large body arrives in pieces.
 
 [click]
-Then send, the same as before.
+Then it calls `send` to return the response, the same as before.
 
 [click]
-Let's post some bytes. They come back.
+With this `app`,
+
+[click]
+Let's launch the server again,
+
+[click]
+And post some bytes.
+
+It works as expected, receiving the posted body and returns a response.
+
+[click]
 So, scope, receive and send. That's all of ASGI.
 -->
 
@@ -728,8 +745,8 @@ So, scope, receive and send. That's all of ASGI.
 class FastAPI(Starlette):
     ...
     async def __call__(
-        self, scope: Scope,
-        receive: Receive, send: Send,
+        self,
+        scope: Scope, receive: Receive, send: Send,
     ) -> None:
         ...
 ```
@@ -805,22 +822,24 @@ True
 </style>
 
 <!--
-So if those eleven lines already work, what does FastAPI give us?
-Everything we actually want. Routing, parsing, validation, and the generated docs.
+So if such bare ASGI apps already work, what do frameworks like FastAPI give us?
 
 [click]
 And this is what it looks like inside FastAPI.
-The class defines __call__ with the ASGI signature, and passes it to Starlette.
+The class defines `__call__` with the ASGI signature.
 
 [click]
-So let's look at the app object itself. It is callable.
+So an instance of the `FastAPI` class is callable.
 
 [click]
 And its parameters are scope, receive and send.
-A FastAPI app is an ASGI application, in the same way as our eleven lines.
+
+So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we wrote.
 
 [click]
-So a framework is a nicer way to write the same callable.
+So, ultimately, such ASGI frameworks are the way to create an ASGI callable.
+
+And they makes it easier with useful features such as routing, parsing, validation, and so on.
 -->
 
 ---

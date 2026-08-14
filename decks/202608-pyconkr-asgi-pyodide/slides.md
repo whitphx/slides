@@ -250,7 +250,7 @@ The other is Uvicorn, which is actually dealing with the HTTP communications thr
 
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5 data-id="servers">
 <div text-2xl>🖥️</div>
-<b>Servers</b><br>
+<b>ASGI servers</b><br>
 <span op70><span data-id="srv-uvicorn">Uvicorn</span> · Hypercorn<br>Granian · <span data-id="srv-mangum">Mangum</span> …</span>
 </div>
 
@@ -472,7 +472,7 @@ clicks: 7
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
-<span>🦄 server</span>
+<span>🦄 Uvicorn</span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(3) @ right" arc="0.05" v-click="[3,4]" />
 <FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=raw-asgi-app] .line:nth-child(8) @ right" arc="0.15" v-click="[4,5]" />
@@ -632,7 +632,7 @@ You said: hello, PyCon KR
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
 </div>
-<span>🦄 server</span>
+<span>🦄 Uvicorn</span>
 </div>
 
 ```py
@@ -1108,7 +1108,7 @@ The server half = **Uvicorn**. Watch that box 👀
 
 <!--
 Let's map what we just ran, from the top.
-Everything on the server side runs in one CPython process, on a server machine.
+The app and Uvicorn both run on CPython, on a server machine.
 
 [click]
 At the top, our app. The `main.py` we just looked at.
@@ -1136,9 +1136,9 @@ layout: statement
 
 <v-clicks>
 
-A **server** is anything that can build a `scope` and call the app.
+Being an **ASGI server**: supply `scope` · `receive` · `send` → **call the app**
 
-🤔 So… do we even need a server *machine*?
+🤔 So where does that have to *run*?
 
 </v-clicks>
 
@@ -1149,10 +1149,11 @@ Now let's look at the contract again.
 It's a dict and two async callables. It doesn't say anything about sockets, ports, or processes.
 
 [click]
-So a server is anything that can build a scope and call the app.
+The spec calls this side a protocol server. Its job is to terminate sockets, and turn them into these events.
+But look at what the contract actually asks for. Supply `scope`, `receive` and `send`, and call the app.
 
 [click]
-And then this question comes up. Do we even need a server machine?
+There are no sockets in that. So where does it have to run?
 -->
 
 ---
@@ -1187,15 +1188,14 @@ So let's take the server side to somewhere it doesn't belong at all. Inside a we
 
 <v-clicks>
 
-- No backend, no install — **just a web page**
+- **No backend** — a Python interpreter in the visitor's browser
 - Python ⇄ JavaScript, direct calls
-- **`micropip`** installs packages, in the page
 
 </v-clicks>
 
 </div>
 
-<div v-click="4" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
+<div v-click="3" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
 <div text-5 op70 mb-2>Browser tab</div>
 <div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-4 op80>CPython on WASM</span></div>
 <div text-xl op50 my-1>⇅</div>
@@ -1213,13 +1213,11 @@ Running Python in a browser is possible thanks to Pyodide.
 It is CPython compiled to WebAssembly, so it runs inside a browser tab.
 
 [click]
-There is no backend and nothing to install. It's just a web page.
+There's no backend here. It's a Python interpreter, running in the visitor's browser.
 
 [click]
-Python and JavaScript can call each other directly, in both directions.
-
-[click]
-And micropip installs packages from PyPI, inside the page.
+And Pyodide gives us an API across that boundary.
+From JavaScript, we can call into Python. And from Python, we can call back into JavaScript.
 
 [click]
 So now a browser tab has two runtimes in it. JavaScript, and Python on Pyodide.
@@ -1254,20 +1252,21 @@ Python 3.13.2 on emscripten
 </style>
 
 <!--
-This is how JavaScript calls Python. The whole thing is one file.
+This is how JavaScript calls Python. Here's a simple example.
 
 [click]
-We import loadPyodide and await it. This downloads the WebAssembly build and starts an interpreter.
+First, we import the Pyodide runtime.
 
 [click]
 Then runPythonAsync takes Python source, as a JavaScript string.
 
 [click]
-And the value of the last expression comes back to JavaScript.
+And the result comes back to JavaScript.
 
 [click]
 Let's run it with node. It says Python 3.13.2 on emscripten.
 Emscripten is the WebAssembly platform, so Python is telling us it's not on our operating system any more.
+I'm using node here just to keep it in a terminal. The same works in browser JavaScript.
 -->
 
 ---
@@ -1341,19 +1340,23 @@ async function asgiFetch(url, options) {
 So let's line up what we have.
 
 [click]
-Pyodide gives us the app object. One pyimport, and it's a JavaScript variable.
+We can put our `main.py` into the Pyodide runtime.
+And Pyodide has an API called `pyimport`, which imports a Python module from JavaScript.
+So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
 
 [click]
-And the page already speaks HTTP, with fetch.
+And on the other side, a web frontend talks to an HTTP API with `fetch`, JavaScript's built-in method for it.
+Our sample app does the same. This is our page calling the `/api/runtime` endpoint we saw at the beginning.
 
 [click]
-So let's put them together.
-Imagine our own fetch. The same signature, but instead of going to the network, it calls our app.
-The frontend wouldn't notice the difference.
-But look at the middle. We don't have scope, receive and send yet.
+So let's connect these two.
+We can write our own replacement of the `fetch` that takes the same arguments as the original one, but calls our own `app` on Pyodide.
+And if our frontend use this our `fetch`, named `asgiFetch`, instead of the normal `fetch`, the frontend can communicate with the `app` without anything going to the network.
 
 [click]
-On a server, that's Uvicorn. And there is no Uvicorn in a browser tab.
+But there's a hole in the middle.
+Something has to turn the HTTP request into an ASGI call. Build the `scope`, and prepare `receive` and `send`.
+On a server, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
 -->
 
 ---
@@ -1415,7 +1418,7 @@ async def dispatch(app, request):
 
 <div v-click="2" absolute bottom-12 inset-x-0 text-xl text-center>
 
-Fill in the blanks and you have **a server** 🛠️
+Fill in the blanks and you have **an ASGI server** 🛠️
 
 </div>
 
@@ -1445,8 +1448,8 @@ Fill in the blanks and you have **a server** 🛠️
 </style>
 
 <!--
-What we have to write is just one function.
-It takes the app and a request, and in the middle it makes the ASGI call. Await app, with scope, receive and send.
+What we have to write is just one Python function
+that takes the `app` object and a request from the JavaScript `fetch`, and in the middle it makes the ASGI call. Await app, with scope, receive and send.
 
 [click]
 And we have two blanks.
@@ -1607,7 +1610,7 @@ The app only reads this. Producing it is the server's side.
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
 <div text-center text-violet-600 dark:text-violet-400 font-bold>◂—— return the body ——</div>
 </div>
-<span>🌉 server</span>
+<span>🌉 bridge</span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.05" />
 </div>
@@ -1619,7 +1622,7 @@ The app only reads this. Producing it is the server's side.
 <div text-center text-emerald-600 dark:text-emerald-400 font-bold>— calls <code>send(event)</code> with the response —▸</div>
 <div text-center op60>◂—— <code>None</code> ——</div>
 </div>
-<span>🌉 server</span>
+<span>🌉 bridge</span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=wire-up] .line:nth-child(8) @ right" arc="0.15" />
 </div>
@@ -1674,7 +1677,7 @@ So both of them are just closures over a few local variables.
 <div v-click="3">
 <div data-id="ann-server" mt-10 w-max mx-auto text-xl text-center>
 
-`scope` + `receive` + `send` + `await app(...)` = **a server**
+`scope` + `receive` + `send` + `await app(...)` = **an ASGI server**
 
 </div>
 <FancyArrow from="[data-id=ann-server] @ topleft" to="[data-id=run-app] .line:nth-child(1) span:nth-child(2) @ bottom" arc="0.3" color="red" />
@@ -1755,7 +1758,7 @@ Mimics JavaScript's built-in **`fetch()` interface**
 
 <!--
 We wrote the Python side. Now, who calls it?
-pyimport is Python's import, written in JavaScript, so the app and dispatch become JavaScript values.
+The same `pyimport` as before, so our `app` and our `dispatch` function are both JavaScript values here.
 
 [click]
 And this is our own fetch.
@@ -2697,7 +2700,7 @@ And the honest part.
 
 [click]
 Everything downloads to the browser, and not every package is in the Pyodide distribution.
-Our stack is, but the demo needed python-multipart, so micropip installs it at runtime.
+Our stack is, but the demo needed python-multipart, so we install that one into the page at runtime, with micropip.
 
 [click]
 It's single-threaded. WebAssembly can't start threads, so sync endpoints fail here.
@@ -2723,7 +2726,7 @@ So this works together with real servers. It doesn't replace them.
 
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
-- 🌉 **A server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
+- 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
 - 🔁 **One app, unchanged, across all of them** — that's the portability
 - 🏭 **In production today** — `Mangum`, the vendors' SDKs, Stlite, the playgrounds
 - 🧠 **I learned ASGI by writing the other side of it**

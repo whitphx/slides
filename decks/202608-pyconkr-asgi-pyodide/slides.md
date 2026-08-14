@@ -1449,7 +1449,9 @@ Fill in the blanks and you have **an ASGI server** 🛠️
 
 <!--
 What we have to write is just one Python function
-that takes the `app` object and a request from the JavaScript `fetch`, and in the middle it makes the ASGI call. Await app, with scope, receive and send.
+that takes the `app` object and a request from the JavaScript `fetch`.
+And in the middle it makes the ASGI call to the `app` object,
+and finally returns the response to its caller.
 
 [click]
 And we have two blanks.
@@ -1461,6 +1463,8 @@ So let's fill in these blanks.
 -->
 
 ---
+clicks: 7
+---
 
 # ① Turn the request into a `scope`
 
@@ -1470,18 +1474,18 @@ JS request → **the dict ASGI specifies**:
 
 </div>
 
-<div class="scope-grid" :class="$clicks >= 5 ? 'revealed' : ''">
+<div class="scope-grid" :class="$clicks >= 7 ? 'revealed' : ''">
 
 <div class="scope-code">
 
-```py {*|3|6-8|10-11|*}
+```py {*|3|7|8|10|11|*}
 async def dispatch(app, request):
     scope = {
         "type": "http",
         "asgi": {"version": "3.0", "spec_version": "2.3"},
         "http_version": "1.1",
-        "method": request["method"],
         "scheme": "http",
+        "method": request["method"],  # GET, POST, ...
         "path": request["path"],
         "raw_path": request["path"].encode(),
         "query_string": request["query"].encode(),
@@ -1508,12 +1512,6 @@ async def dispatch(app, request):
 
 </LiveEmbed>
 </div>
-
-</div>
-
-<div v-click="6" mt-2 text-lg text-center>
-
-The app just **reads** this — producing it is the **server's** side of the contract
 
 </div>
 
@@ -1555,26 +1553,29 @@ The app just **reads** this — producing it is the **server's** side of the con
 
 <!--
 The first blank is the scope.
-JavaScript gives us a plain object, and we reshape it into the dict that ASGI defines.
+JavaScript gives us a request in its format, so we reshape it into the dict that ASGI defines.
 
 [click]
-The type tells the app which kind of connection this is.
+The `http` type tells the app this is an HTTP connection.
 
 [click]
-Then the method, the scheme and the path.
+Then we fill the fields such as method like GET/POST,
 
 [click]
-And these two are bytes, not str. Headers are a list of tuples of two byte strings, lowercased.
-ASGI is strict about these types.
+the path,
 
 [click]
-So this is the whole scope.
+the query string,
+
+[click]
+the header,
+
+[click]
+and so on.
 
 [click]
 And we're not guessing. Every key and its type is written in the spec.
-
-[click]
-The app only reads this. Producing it is the server's side.
+We need to implement this layer following what the spec defines.
 -->
 
 ---
@@ -1644,14 +1645,14 @@ The app only reads this. Producing it is the server's side.
 The next blank is the two callables.
 
 [click]
-receive is how the app asks for the body.
-We return one http.request event, with the bytes JavaScript gave us.
-Look at the direction in the box. The app calls receive, and the body comes back as the return value.
+receive is how the app asks for the request body.
+In this case, we return the request body passed from the JavaScript, with the http.request event type.
+Again, note that this `receive` function will be called from the `app`, and it returns the request body to the app.
 
 [click]
 send is the opposite.
-The app sends its response in pieces, and we just store them. The status and the headers first, then the body.
-And the direction flips. The data comes in as the argument, and nothing comes back.
+The app will call it to send the response in pieces.
+And in our `send`, we collect the response status, response header, and the response body sent from the `app`, so that we can get the full response at the end.
 
 [click]
 So both of them are just closures over a few local variables.
@@ -1732,16 +1733,6 @@ Mimics JavaScript's built-in **`fetch()` interface**
 <FancyArrow from="[data-id=ann-sig] @ bottom" to="[data-id=dispatch-js] .line:nth-child(9) @ right" arc="0.4" />
 </div>
 
-<div v-click="4">
-<div data-id="ann-ffi" class="js-note" absolute top-74 right-5 w-100 bg-white dark:bg-black px-2 py-1 border="~ amber/60 rounded-lg">
-
-**Pyodide's FFI** — JS ↔ Python type conversion <span op70>(→ appendix)</span>
-
-</div>
-<FancyArrow from="[data-id=ann-ffi] @ left" to="[data-id=dispatch-js] .line:nth-child(5) @ right" arc="-0.2" color="red" />
-<FancyArrow from="[data-id=ann-ffi] @ bottom" to="[data-id=dispatch-js] .line:nth-child(7) @ right" arc="0.2" color="red" />
-</div>
-
 <style>
 * {
   --slidev-code-font-size: 16px;
@@ -1757,22 +1748,17 @@ Mimics JavaScript's built-in **`fetch()` interface**
 </style>
 
 <!--
-We wrote the Python side. Now, who calls it?
-The same `pyimport` as before, so our `app` and our `dispatch` function are both JavaScript values here.
+We wrote the `dispatch` Python function, so let's use it from JavaScript.
+First, import it through `pyimport` along with `app`.
 
 [click]
-And this is our own fetch.
+And define our own fetch method, named `asgiFetch`.
 
 [click]
-Look at both ends. It takes the same arguments as fetch, and returns a Response.
-So anything that calls fetch can call this instead, without noticing.
+whose signature is same as JavaScript's native `fetch()`.
 
 [click]
-And in the middle, we call dispatch.
-Calling Python is just calling a function, and JavaScript awaits it like a Promise.
-
-[click]
-These two lines are Pyodide's FFI. The details are in the appendix.
+And in the middle, we call the `dispatch` function, with the imported `app` and the request object.
 -->
 
 ---
@@ -1781,7 +1767,7 @@ layout: statement
 
 ## `bridge.py`: ~45 lines.<br>The app **never noticed**.
 
-<div mt-8 text-2xl op80 v-click="1">
+<div mt-8 text-2xl op80 v-click>
 
 Does it actually run? **Let's watch it.** 👀
 
@@ -1806,8 +1792,7 @@ So let's actually run it.
 <v-clicks>
 
 - 📄 Static page + Pyodide + **the same `main.py`**
-- 🕵️ Network tab: **silent**
-- ✂️ Kill the file server → **still answering**
+- 🕵️ **Works offline**
 
 </v-clicks>
 
@@ -1829,7 +1814,7 @@ So let's actually run it.
 
 </div>
 
-<div v-click="4" mt-4 text-center text-xl>
+<div v-click mt-4 text-center text-xl>
 
 Responses made **inside the tab** — nothing leaves it.
 
@@ -1852,8 +1837,11 @@ Responses made **inside the tab** — nothing leaves it.
 <!--
 So let's see it running.
 
+[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. `pnpm dev:live` serves it on port 8080, which is the embed on this slide; `pkill -f "http.server 8080"` is the kill for the last beat.
+
 [click]
-This is a static page, served by a plain file server. It starts Pyodide and loads the same main.py from step one.
+This is a static page, served by a plain file server.
+The frontend JavaScript loads Pyodide and runs the same main.py from step one, with the mechanism we made in the previous slides.
 The same page appears, and when I click the button, it says Python 3.14 on emscripten wasm32.
 The app is telling us it's running inside the browser.
 
@@ -1861,16 +1849,12 @@ The app is telling us it's running inside the browser.
 And let's watch the Network tab while clicking it again. Nothing goes out.
 
 [click]
-And now let me stop the file server. The app still answers.
-
-[click]
-So the response is made by Python next to the JavaScript, in the same tab, through the forty-five lines we just read.
-
-[DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. `pnpm dev:live` serves it on port 8080, which is the embed on this slide; `pkill -f "http.server 8080"` is the kill for the last beat.
+So the response is made by Python, or Pyodide running in the browser tab, on the client side.
+And the forty-five lines we just read made it possible.
 -->
 
 ---
-clicks: 4
+clicks: 5
 plainBackground: true
 ---
 
@@ -1880,11 +1864,11 @@ plainBackground: true
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3" /></template>
-  <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3" :worker="$clicks >= 4" :worker-highlight="$clicks >= 4" /></template>
+  <template #server><ServerStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" /></template>
+  <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" :worker="$clicks >= 4" :worker-highlight="$clicks === 4" /></template>
 </StackCompare>
 
-<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 1 ? 'op100' : 'op0'">
+<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 5 ? 'op100' : 'op0'">
 
 One box swapped — **the bridge plays Uvicorn's role** 🛠️
 
@@ -1923,11 +1907,16 @@ Let's compare them from the top.
 The app is the same file, and the interface it's called through is the same.
 
 [click]
-What changed is this box. Uvicorn on the left, and our bridge on the right. And the runtime under each of them.
+What changed is this box.
+In the normal server environment, on the left, we used CPython and Uvicorn worked on it as an ASGI server.
+For this layer, in the browser environment, on the right, Pyodide runs instead of normal CPython, and we use our own ASGI server implementation.
 
 [click]
-One thing to add for production. Python on the main thread blocks rendering, so a real browser app runs Pyodide in a Web Worker.
-Then the function call becomes message passing, and everything above it stays the same.
+And one note for the production case.
+We usually run Pyodide in another Worker process in the browser to prevent the main UI thread from being blocked.
+
+[click]
+Anyway, note again, that everything above this box is untouched. The same app, called through the same interface. Only the ASGI server underneath changed.
 -->
 
 ---
@@ -2113,7 +2102,7 @@ $ streamlit run app.py
 </style>
 
 <!--
-Streamlit turns a Python script into a web app.
+Streamlit is a popular Python framework to build interactive web applications only with Python.
 We write a plain script. No HTML, no JavaScript, and no frontend build.
 And we run it with the streamlit command.
 

@@ -509,7 +509,7 @@ And send is an async callable for the app to push an outgoing event.
 -->
 
 ---
-clicks: 7
+clicks: 8
 ---
 
 # You don't even need a framework
@@ -563,7 +563,7 @@ Hello, PyCon KR!
 
 </WindowMockup>
 
-<div v-click="6" mt-3 text-center text-lg leading-tight>🖥️ <b>Whoever calls <code>app(...)</code> = the server</b></div>
+<div v-click="8" mt-1 text-center text-5 leading-tight>🐍 A callable taking <code>scope</code>·<code>receive</code>·<code>send</code><br><b>= an ASGI app</b></div>
 
 </div>
 
@@ -632,6 +632,8 @@ You can pass this `app` object to Uvicorn like the FastAPI app we've done just b
 [click]
 And it just works.
 You can see it returns the HTTP response.
+
+[click]
 Uvicorn doesn't care that there's no framework like FastAPI.
 It just calls the `app` callable.
 -->

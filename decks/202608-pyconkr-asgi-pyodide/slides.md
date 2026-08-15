@@ -420,7 +420,7 @@ layout: statement
 </div>
 
 <!--
-We usually take this decoupling for granted. We just pick a server, and it works.
+We usually take this decoupling for granted. We just pick a framework and server software, and it works.
 
 [click]
 But what is this contract actually made of?
@@ -628,7 +628,7 @@ Two calls of send, and the response is done.
 
 [click]
 Let's run it with uvicorn.
-You can pass this `app` callable object to Uvicorn like the FastAPI app we've done just before.
+You can pass this `app` callable object to Uvicorn like the FastAPI application we've done just before.
 
 [click]
 And it just works.
@@ -885,7 +885,7 @@ True
 </style>
 
 <!--
-So if such bare ASGI apps already work, what do frameworks like FastAPI give us?
+So if such bare ASGI applications already work, what do frameworks like FastAPI give us?
 
 [click]
 Here is an answer.
@@ -898,7 +898,7 @@ So an instance of the `FastAPI` class is callable.
 [click]
 And its parameters are scope, receive and send.
 
-So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we just wrote.
+So, a FastAPI application is an ASGI application, in the same way as the ASGI callable we just wrote.
 
 [click]
 So, ultimately, such ASGI frameworks are just a way to create an ASGI callable.
@@ -1145,10 +1145,10 @@ INFO:  Uvicorn running on
 </style>
 
 <!--
-Next, let me introduce a new demo app, but it's still a simple FastAPI app.
+Next, let me introduce a new demo app, but it's still a simple FastAPI application.
 
 [click]
-One route serves the HTML page.
+The index route serves the HTML page that has some JavaScript code to interact with the API endpoints.
 
 [click]
 Others are API routes.
@@ -1212,7 +1212,7 @@ Uvicorn takes the HTTP request off the TCP socket, and makes that call.
 And the frontend application running on the browser communicates with the server-side app through HTTP over the network.
 
 [click]
-So the server that calls ASGI app here is Uvicorn. Let's keep an eye on it.
+So the server that calls the ASGI application here is Uvicorn. Let's keep an eye on it.
 -->
 
 ---
@@ -1238,7 +1238,7 @@ Now let's look at the contract again.
 It's a dict and two async callables. It doesn't say anything about sockets, ports, or processes.
 
 [click]
-The ASGI spec calls this side a protocol server. Its job is to terminate sockets, and turn them into ASGI events.
+The ASGI spec calls software like Uvicorn a protocol server. Its job is to terminate sockets, and turn them into ASGI events.
 But look at what the contract actually asks for. Supply `scope`, `receive` and `send`, and call the app.
 
 [click]
@@ -1256,7 +1256,7 @@ A server inside your browser
 </div>
 
 <!--
-So let's take the server side to somewhere it doesn't belong at all. Inside a web browser.
+So let's take the app and its server somewhere different. Inside a web browser.
 -->
 
 ---
@@ -1305,7 +1305,7 @@ It is CPython compiled to WebAssembly, so it runs inside a browser tab.
 There's no backend here. It's a Python interpreter, running in the visitor's browser.
 
 [click]
-And Pyodide gives us an API across that boundary.
+And Pyodide gives us cross-language APIs.
 From JavaScript, we can call into Python. And from Python, we can call back into JavaScript.
 
 [click]
@@ -1444,7 +1444,7 @@ async function asgiFetch(url, options) {
 Let's line up what we have.
 
 [click]
-We can put our `main.py` into the Pyodide runtime.
+We can put our `main.py` that defines the FastAPI application into the Pyodide runtime.
 And Pyodide has an API called `pyimport`, which imports a Python module from JavaScript.
 So we can take the `app` object out of the `main` module that we have written, and hold it in a JavaScript variable.
 
@@ -1879,7 +1879,7 @@ Does it actually run? **Let's watch it.** 👀
 
 <!--
 So this is everything we wrote. About forty-five lines.
-And a FastAPI app should run on top of it, without noticing anything.
+And a FastAPI application should run on top of it, without noticing anything.
 
 [click]
 So let's actually run it.
@@ -2039,7 +2039,7 @@ But a tidy demo is not proof. 🧐<br>Does the contract survive a **real framewo
 So something in that tab is doing Uvicorn's job, and it was small enough to read here.
 
 [click]
-But this demo app has only three endpoints. Real frameworks are much bigger, with static files, sessions and state.
+But this demo app has only three endpoints. Real applications and frameworks are much bigger, with more Python files and static files for more features.
 So, does this work with them too?
 -->
 
@@ -2266,15 +2266,15 @@ No server, no install — **Python and Streamlit run in your browser** 🎈
 </style>
 
 <!--
-So this is Stlite, the in-browser version of Streamlit that I built.
+So this is Stlite, the in-browser version of Streamlit that I built using the same trick.
 
 [click]
-The app is a static HTML file.
-It loads the same script originally written for Streamlit and serves it as a Streamlit app, but with a Streamlit server-side runtime running in your browser.
+Everything you deploy is static files.
+The HTML page and JavaScript code load the Python script written for Streamlit and serve it as a Streamlit app, but with a Streamlit server-side runtime running in your browser.
 
 [click]
 And that is the whole deployment.
-Open the file, and the same dashboard works.
+Open the static page, and the same application works.
 
 [click]
 There is no server here, and the visitor has no Python installed on their machine.
@@ -2415,7 +2415,7 @@ Then the browser can't be the only unusual caller… 😏
 </div>
 
 <!--
-So, the lesson is, the ASGI app doesn't care who calls it. Uvicorn, or our forty-five lines of code, it doesn't matter.
+So, the lesson is, the ASGI application doesn't care who calls it. Uvicorn, or our forty-five lines of code, it doesn't matter.
 
 [click]
 And then the browser can't be the only unusual caller.
@@ -2445,7 +2445,6 @@ So let me show you another one, which goes even further.
 
 - ☁️ **Cloudflare Workers** — serverless at the edge, on **workerd** (JS/WASM)
 - 🐍 **Python Workers = Pyodide** — the same WASM CPython, now *server-side*
-- 🔁 **Full circle** — what V8 did for JS, workerd does for this Python stack
 
 </v-clicks>
 
@@ -2458,9 +2457,6 @@ Cloudflare Workers are serverless functions running on Cloudflare's edge network
 [click]
 And they added Python support by using Pyodide.
 It's the same WebAssembly CPython we just used in the browser, but running server-side now.
-
-[click]
-I like this because it repeats history. V8 took JavaScript out of the browser and brought it to the server, and they are doing the same to this Python stack.
 -->
 
 ---
@@ -2624,16 +2620,17 @@ Here are the two stacks we've seen. The server, and the browser.
 And the edge joins them.
 
 [click]
-And `app.py` is the same in all three columns, all three different deploy targets.
+And the `app` object in `main.py` is the same in all three columns, all three different deploy targets.
 
 [click]
 And these are the layers that differ.
-The caller of ASGI app.
+The caller of the ASGI application.
 Uvicorn, our own bridge, and Cloudflare's asgi module.
 -->
 
 ---
 clicks: 2
+hide: true
 ---
 
 # Adding to the family
@@ -2890,7 +2887,7 @@ So this works together with real servers. It doesn't replace them.
 
 </div>
 
-<div flex="~ gap-5" items-start>
+<div flex="~ gap-12" items-start>
 
 <div flex="~ col" items-center gap-2>
 <div class="qr-box" w-33 h-33>
@@ -3284,7 +3281,7 @@ class WebSocketSession:
 
 <!--
 WebSockets are harder, because they are long-lived and the timing is reversed.
-JavaScript receives messages whenever they arrive, so it pushes. But the ASGI app pulls. It awaits receive and expects the next message.
+JavaScript receives messages whenever they arrive, so it pushes. But the ASGI application pulls. It awaits receive and expects the next message.
 
 [click]
 So we put a queue between them.

@@ -1,0 +1,3 @@
+# Written by scripts/sync-demo-assets.mjs, which copies the pieces of
+# samples/streamlit-demo/ that the Stlite slide embeds live.
+public/stlite-demo/

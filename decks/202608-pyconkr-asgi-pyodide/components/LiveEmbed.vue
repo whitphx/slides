@@ -35,7 +35,23 @@ const DURATION = 280;
 const MARGIN = 8;
 
 const live = ref(false);
+// Lets the speaker fall back on purpose, for an app that loaded but is
+// misbehaving, or that is still booting when the slide is already being talked
+// about. The frame stays mounted underneath, so coming back costs nothing: an
+// app that boots Pyodide would otherwise start over.
+const showFallback = ref(false);
 const expanded = ref(false);
+
+// A url carrying a scheme is used as given. Anything else is a path into this
+// deck's own output, which is served under a base path once deployed, so the
+// site root is the wrong thing to resolve it against. The base arrives however
+// it was written on the build command line, with or without its trailing
+// slash, so both sides of the join are normalised rather than trusted.
+const resolvedUrl = computed(() =>
+  /^[a-z][a-z0-9+.-]*:/i.test(props.url)
+    ? props.url
+    : import.meta.env.BASE_URL.replace(/\/?$/, "/") + props.url.replace(/^\//, ""),
+);
 const host = ref(null);
 const overlay = ref(null);
 // Expanding covers the slide rather than the screen, which keeps the deck's own
@@ -172,7 +188,7 @@ function reachable() {
     hostname === "127.0.0.1" ||
     hostname === "[::1]" ||
     hostname.endsWith(".localhost");
-  return !loopback(new URL(props.url, location.href).hostname) || loopback(location.hostname);
+  return !loopback(new URL(resolvedUrl.value, location.href).hostname) || loopback(location.hostname);
 }
 
 onMounted(async () => {
@@ -180,14 +196,17 @@ onMounted(async () => {
   window.addEventListener("keydown", onKeydown);
   if (!reachable()) return;
   try {
-    // An opaque response is enough: this asks "is anything answering on that
-    // port", not "what did it say". A dead port rejects.
-    await fetch(props.url, {
+    // For a remote app this asks "is anything answering on that port", not
+    // "what did it say", and an opaque response is enough: a dead port rejects.
+    // A same-origin url answers readably though, and there a 404 means the file
+    // this deck meant to serve is missing, which is a fallback rather than a
+    // broken frame showing the server's error page.
+    const response = await fetch(resolvedUrl.value, {
       mode: "no-cors",
       cache: "no-store",
       signal: AbortSignal.timeout(props.timeout),
     });
-    if (!cancelled) live.value = true;
+    if (!cancelled && (response.type === "opaque" || response.ok)) live.value = true;
   } catch {
     // Leave `live` false and show the fallback slot.
   }
@@ -214,22 +233,38 @@ onBeforeUnmount(() => {
       <!-- The window belongs to the widget rather than to the slide around it,
            so it comes along when the widget leaves for the slide root, and one
            iframe serves both places: expanding never reloads the demo. -->
-      <WindowMockup :title="title || url" :light="light" :padding="padding">
+      <WindowMockup :title="title || resolvedUrl" :light="light" :padding="padding">
+        <!-- Hidden rather than unmounted while the fallback shows, so the app
+             keeps whatever state it has reached and switching back is instant. -->
         <iframe
           v-if="live"
-          :src="url"
-          :title="url"
+          v-show="!showFallback"
+          :src="resolvedUrl"
+          :title="resolvedUrl"
           class="live-embed__frame"
           :style="frameStyle"
         />
-        <slot v-else />
+        <slot v-if="!live || showFallback" />
       </WindowMockup>
       <div v-if="live" class="live-embed__controls">
+        <!-- The live app can boot slowly, or misbehave in front of an audience.
+             This is the way back to the still that always works, and the way
+             forward again once it is ready. -->
+        <button
+          v-if="$slots.default"
+          type="button"
+          class="live-embed__control"
+          :aria-label="showFallback ? 'Show the live app again' : 'Show the still image instead of the live app'"
+          :aria-pressed="showFallback"
+          @click.stop="showFallback = !showFallback"
+        >
+          <div :class="showFallback ? 'i-ri-flashlight-line' : 'i-ri-image-line'" />
+        </button>
         <!-- For driving the app itself: a tab has a real address bar, devtools,
              and survives leaving the slide. -->
         <a
           class="live-embed__control"
-          :href="url"
+          :href="resolvedUrl"
           target="_blank"
           rel="noopener"
           aria-label="Open this app in a new tab"

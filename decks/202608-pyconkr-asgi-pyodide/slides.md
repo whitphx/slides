@@ -378,20 +378,20 @@ Same motivation, one standard earlier — **the synchronous era**:
 
 </div>
 
-<div grid="~ cols-[1fr_auto_1fr]" gap-4 items-stretch mt-5>
+<div grid="~ cols-1" gap-1 mt-4>
 
-<div v-click="1" border="~ gray/40 rounded-lg" p-3 bg-gray:5>
-<div text-4>📜 <b>WSGI</b> <span op60 text-sm>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
-<div text-4 op80 mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
-<div text-4 op80 mt-1><b>One sync call</b> request → response, done</div>
+<div v-click="1" border="~ gray/40 rounded-lg" p-4 bg-gray:5>
+<div text-6>📜 <b>WSGI</b> <span op60 text-4>— <a href="https://peps.python.org/pep-0333/" target="_blank">PEP 333</a>, 2003</span></div>
+<div text-6 op80 mt-1>Flask · Django ⇄ Gunicorn · uWSGI</div>
+<div text-6 op80 mt-1><b>One sync call</b> request → response, done</div>
 </div>
 
-<div v-click="2" self-center text-2xl op60>→</div>
+<div v-click="2" text-center text-3xl op60 leading-none>↓</div>
 
-<div v-click="2" border="~ sky/40 rounded-lg" p-3 bg-sky:5>
-<div text-4>⚡ <b>ASGI</b> <span op60 text-sm>— 2016–, born from Django Channels</span></div>
-<div text-4 op80 mt-1>Same decoupling, <b>async events</b></div>
-<div text-4 op80 mt-1>WebSockets · streaming long-lived connections</div>
+<div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
+<div text-6>⚡ <b>ASGI</b> <span op60 text-4>— 2016–, born from Django Channels</span></div>
+<div text-6 op80 mt-1>Same decoupling, <b>async events</b></div>
+<div text-6 op80 mt-1>WebSockets · streaming long-lived connections</div>
 </div>
 
 </div>
@@ -2234,11 +2234,11 @@ clicks: 3
 
 <div v-click="2">
 
-<WindowMockup title="sales-dashboard.html — opened from disk" light padding="0.4rem">
+<LiveEmbed url="/stlite-demo/stlite.html" title="sales-dashboard.html" light padding="0.4rem" height="320px" :zoom="0.5">
 
 <img src="/stlite-demo.png" alt="The same Sales dashboard, running from a static HTML file in the browser" style="width: 100%; height: auto;" />
 
-</WindowMockup>
+</LiveEmbed>
 
 </div>
 

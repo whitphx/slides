@@ -143,13 +143,13 @@ This talk is about ASGI.
 I will start with explaining what ASGI is, and what it brings to us when making a web server.
 
 [click]
-Then, we will take a look interesting examples that we can achieve by making use of ASGI's advantages in combination with Pyodide, a Python runtime runnable inside a web browser, or on the client side.
+Then, we will take a look at interesting examples that we can achieve by making use of ASGI's advantages in combination with Pyodide, a Python runtime runnable inside a web browser, or on the client side.
 
 [click]
 We will see our web application **server** runs inside a web browser,
 
 [click]
-and even more unusual environment.
+and even more unusual environment, by extending the same idea.
 -->
 
 ---
@@ -272,7 +272,7 @@ It defines an API endpoint that returns the Python version and the platform info
 To run this app, we usually use something like `uvicorn`. In the case of uvicorn, it serves the defined application through HTTP by this command.
 
 [click]
-And it's a normal HTTP server. If we call the endpoint with curl, we get a normal HTTP response back.
+And it just works as an HTTP server as we expect. If we call the endpoint with curl, we get a normal HTTP response back.
 
 [click]
 Now look at there two actors.
@@ -461,21 +461,21 @@ async def app(scope, receive, send):
 <div mt-8 grid="~ cols-3" gap-6 text-lg>
 
 <div v-click="2">
-<div data-id="ann-scope" border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-scope" text-6 border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
 📋 <b><code>scope</code></b><br><span op80>connection type<br>path · headers</span>
 </div>
 <FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="-0.2" />
 </div>
 
 <div v-click="3">
-<div data-id="ann-receive" border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-receive" text-6 border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
 📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
 
 <div v-click="4">
-<div data-id="ann-send" border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-send" text-6 border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
 📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.1" />
@@ -499,7 +499,7 @@ And this signature is the contract.
 The app promises to take these three arguments, and the caller promises to pass them in.
 
 [click]
-scope is a dict that describes the connection info, such as HTTP method, the path, the headers, and so on.
+scope is a dictionary that describes the connection info, such as HTTP method, the path, the headers, and so on.
 
 [click]
 receive is an async callable. The app awaits it to get an incoming event.
@@ -607,27 +607,28 @@ Hello, PyCon KR!
 </style>
 
 <!--
-To understand it better, let's write a bare ASGI app by ourselves.
+To understand it better, let's write a bare ASGI application by ourselves.
 
 [click]
-The signature, the same as we just saw.
+Again, it's an async callable with three arguments.
+The signature is the same as we just saw.
 
 [click]
-Here checks the connection type in scope is HTTP.
+Here we check the connection type specified in the passed `scope` is HTTP.
 
 [click]
 Then we call the `send()` callable passed as an argument,
-with the first event, `response.start`, with the status and the headers of the HTTP response.
+passing the first event with the `http.response.start` type and the HTTP status and the headers of the response.
 
 [click]
-Next `send` pushes response body.
+Next `send` call pushes the response body.
 
 [click]
 Two calls of send, and the response is done.
 
 [click]
 Let's run it with uvicorn.
-You can pass this `app` object to Uvicorn like the FastAPI app we've done just before.
+You can pass this `app` callable object to Uvicorn like the FastAPI app we've done just before.
 
 [click]
 And it just works.
@@ -747,19 +748,19 @@ async def receive():
 </style>
 
 <!--
-Next, let's make this app accept a POST request using `receive`.
+Next, let's make this app accept a POST request using the `receive` function passed as the second argument to the `app` function.
 
 [click]
 This part is the difference.
 The body is not passed to `app` as an argument like `scope`.
-The app needs to pull it from the `receive` callable.
+The app needs to pull it from the `receive` function.
 
 [click]
 Here, the app awaits `receive`, and gets one event.
 
 [click]
 `receive` works like this.
-It returns the body.
+It returns the request body.
 
 And it's passed from the server.
 
@@ -767,10 +768,10 @@ And it's passed from the server.
 We add the returned body to a buffer.
 
 [click]
-And we repeat it until all body is received, because a large body arrives in a chunked manner.
+And we repeat it until the whole request body is received, because a large body can arrive in a chunked manner.
 
 [click]
-Then it calls `send` to return the response, the same as before.
+Then we call the `send` function to return the response, the same as before.
 
 [click]
 With this `app`,
@@ -897,7 +898,7 @@ So an instance of the `FastAPI` class is callable.
 [click]
 And its parameters are scope, receive and send.
 
-So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we wrote before.
+So, a FastAPI app is an ASGI application, in the same way as the ASGI callable we just wrote.
 
 [click]
 So, ultimately, such ASGI frameworks are just a way to create an ASGI callable.

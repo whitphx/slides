@@ -178,17 +178,7 @@ clicks: 3
 
 <div mb-1>Demo app — ordinary <b><span v-mark="{ at: 3, color: '#a78bfa', type: 'circle' }">FastAPI</span></b></div>
 
-```py {*}
-import platform, sys
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/api/runtime")
-async def runtime() -> str:
-    py = platform.python_version()
-    return f"Python {py} on {sys.platform}"
-```
+<<< @/samples/first-fastapi-sample/main.py py {*}
 
 </div>
 
@@ -219,7 +209,7 @@ content-type: application/json
 
 </WindowMockup>
 
-<div mt-2 text-lg>
+<div v-click="3" mt-2 text-lg>
 
 App: **Your logic**<br>
 Uvicorn: **HTTP handling, connected to socket**
@@ -441,7 +431,7 @@ Let's look under the hood.
 layout: section
 ---
 
-# ⚡ ASGI in 90 seconds
+# ⚡ ASGI 101
 
 <!--
 So, this is what ASGI actually looks like.
@@ -2230,7 +2220,7 @@ clicks: 3
 
 <div>
 
-<div mb-1>One static HTML file — <b>the same two Python files inside</b>:</div>
+<div mb-1><b>Static files only</b> — an HTML page, and the Python scripts it fetches:</div>
 
 <<< @/samples/streamlit-demo/stlite.html#slide-mount html {*}
 
@@ -2256,7 +2246,7 @@ clicks: 3
 
 <div v-click="3" mt-3 text-center text-xl>
 
-No server, no Python installed — **the same app, in the tab** 🎈
+No server, no install — **Python and Streamlit run in your browser** 🎈
 
 </div>
 

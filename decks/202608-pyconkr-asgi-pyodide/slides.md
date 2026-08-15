@@ -272,7 +272,7 @@ It defines an API endpoint that returns the Python version and the platform info
 To run this app, we usually use something like `uvicorn`. In the case of uvicorn, it serves the defined application through HTTP by this command.
 
 [click]
-And it just works as an HTTP server as we expect. If we call the endpoint with curl, we get a normal HTTP response back.
+And it just works as an HTTP server, as we'd expect. If we call the endpoint with curl, we get a normal HTTP response back.
 
 [click]
 Now look at there two actors.
@@ -1860,6 +1860,9 @@ And define our own fetch method, named `asgiFetch`.
 
 [click]
 whose signature is same as JavaScript's native `fetch()`.
+
+[click]
+And it returns a `Response` object, the same as the native one.
 
 [click]
 And in the middle, we call the `dispatch` function, with the imported `app` and the JavaScript request object.

@@ -194,3 +194,11 @@ The Stage 2 list above keeps its working titles. The shipped ones differ for the
 
 Verification: `pnpm build` passes, and a Playwright pass over `/export` reports zero vertical overflow, zero
 horizontal overflow, and no code block whose content is wider or taller than its own container.
+
+### Dependency versions
+
+Pinned to match `decks/202608-pyconkr-asgi-pyodide` rather than the newest published releases.
+Asking for `@slidev/cli ^52.19.1` pulled `@slidev/client` to 52.19.1, and since the anipres decks share
+that peer, pnpm re-resolved `slidev-addon-anipres` across the whole workspace and dragged
+`packages/index` from `vite@6` to `vite@8` with it. The Vercel deploy failed on that commit.
+Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as on `main`.

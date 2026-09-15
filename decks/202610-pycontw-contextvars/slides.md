@@ -116,7 +116,6 @@ I'm Yuichiro Tachibana, whitphx online.
 [click]
 I build and maintain open source projects in the Python ecosystem.
 The one that matters for today is Stlite, which is Streamlit running entirely in the browser.
-We'll come back to it in the second half.
 
 [click]
 And you can find me in all the usual places.
@@ -245,7 +244,7 @@ The current runtime, whatever "runtime" means in your system.
 [click]
 Notice that none of these show up in a function signature. They're ambient. They're just around, and every layer of your code reaches for them.
 
-Keep an eye on the colours, by the way. The blue ones are values you declare yourself. The orange ones belong to the operating system. That difference is going to matter a lot later.
+Keep an eye on the colours, by the way. The blue ones are values you declare yourself. The orange ones belong to the operating system.
 -->
 
 ---
@@ -434,17 +433,15 @@ That's exactly what contextvars is.
 
 # `ContextVar`: declare, set, get
 
-```py {*|3-5|7|8|10}{'data-id':'cv'}{maxHeight:'300px'}
+```py {*|3-5|7|8}{'data-id':'cv'}{maxHeight:'300px'}
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar(
+request_id_var: ContextVar[str] = ContextVar(
     "request_id", default="-"
 )
 
-request_id.set("A")
-request_id.get()
-
-request_id.get()
+request_id_var.set("A")
+request_id_var.get()
 ```
 
 <div v-click="2">
@@ -494,7 +491,7 @@ async def handle(request_id):
 ```
 
 ```py
-request_id_var: ContextVar[str] = ContextVar("request_id")
+request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
 
 async def handle(request_id):
     request_id_var.set(request_id)
@@ -598,7 +595,7 @@ do_some_work()
 request_id_var.reset(token)
 ```
 
-<div v-click="4" mt-6 text-5>
+<div mt-6 text-5>
 
 <v-clicks at="4">
 
@@ -622,13 +619,10 @@ You do your work.
 And then reset puts back exactly what was there.
 
 [click]
-Why do you care?
-
-[click]
 Because it makes nesting work. If two pieces of middleware both set the same variable, each one restores what it found, and they don't clobber each other.
 
 [click]
-And it's how a library borrows a context variable without permanently changing it for the application that called it. This pattern is going to come back in the case study, in a bigger form.
+And it's how a library borrows a context variable without permanently changing it for the application that called it.
 -->
 
 ---
@@ -799,16 +793,33 @@ The fix is to swap two lines. And that's the whole point: the ordering matters b
 
 # The edges: leaving the event loop
 
-```py {*|1-2|4-5|7-8}{maxHeight:'300px'}
-# ✅ context is copied for you
+<div mt-6 grid="~ cols-[1.15fr_1fr]" gap-6>
+
+<div>
+
+```py {*|1|3|5-7}{'data-id':'edges'}{maxHeight:'300px'}
 await asyncio.to_thread(work)
 
-# ❌ no context — work() sees the defaults
 await loop.run_in_executor(None, work)
 
-# ✅ carry it across yourself
-await loop.run_in_executor(None, copy_context().run, work)
+await loop.run_in_executor(
+    None, copy_context().run, work
+)
 ```
+
+</div>
+
+<div flex="~ col" gap-3 text-4>
+<div data-id="e1" v-click="1" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5>✅ <b>copies the context</b> for you</div>
+<div data-id="e2" v-click="2" border="~ rose/50 rounded-lg" p-3 bg-rose:5>❌ <b>no context</b> — <code>work()</code> sees the defaults</div>
+<div data-id="e3" v-click="3" border="~ sky/50 rounded-lg" p-3 bg-sky:5>✅ carry it across <b>yourself</b></div>
+</div>
+
+</div>
+
+<FancyArrow v-click="1" from="[data-id=e1] @ left" to="[data-id=edges] .line:nth-child(1) @ right" arc="0.15" />
+<FancyArrow v-click="2" from="[data-id=e2] @ left" to="[data-id=edges] .line:nth-child(3) @ right" arc="0.15" />
+<FancyArrow v-click="3" from="[data-id=e3] @ left" to="[data-id=edges] .line:nth-child(5) @ right" arc="0.15" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1009,17 +1020,31 @@ And each app has its own home directory, because each app has its own files.
 
 # Each app wants its own directory
 
-```py {*|1-3|5-7|9}{maxHeight:'280px'}
-# App A's script runs here
+<div mt-6 grid="~ cols-[1.3fr_1fr]" gap-6>
+
+<div>
+
+```py {*|1-2|4-5|7}{'data-id':'dirs'}{maxHeight:'280px'}
 os.chdir("/home/app-a")
 os.environ["HOME"] = "/home/app-a"
 
-# App B's script runs here
 os.chdir("/home/app-b")
 os.environ["HOME"] = "/home/app-b"
 
 pd.read_csv("data.csv")
 ```
+
+</div>
+
+<div flex="~ col" gap-6 text-4 mt-1>
+<div data-id="d-a" v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-center><b>App A's</b> script</div>
+<div data-id="d-b" v-click="2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center><b>App B's</b> script</div>
+</div>
+
+</div>
+
+<FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(1) @ right" arc="0.15" />
+<FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1106,12 +1131,19 @@ This is the same shape as the threading dot local bug from the first half. Somet
 
 # Step 1: remember *which*
 
-```py {*|1|4}{maxHeight:'230px'}
-home_dir_contextvar: ContextVar[str | None] = ContextVar("home_dir", default=None)
+```py {*|1-3|5}{maxHeight:'230px'}
+home_dir_contextvar: ContextVar[str | None] = ContextVar(
+    "home_dir", default=None
+)
 
-# at every entry point from JavaScript into Python
 home_dir_contextvar.set(app_home_dir)
 ```
+
+<div v-click="2" mt-4 text-5>
+
+Bound at **every entry point** where JavaScript calls into Python. 🚪
+
+</div>
 
 <div v-click="3" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 
@@ -1344,19 +1376,19 @@ plainBackground: true
 
 <div mt-8 grid="~ cols-3" gap-4 text-4>
 
-<div border="~ sky/40 rounded-lg" p-4 bg-sky:5>
+<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
 <div text-5 mb-2>🧠 <b>logical execution</b></div>
 <div op80>a task, a request, an app</div>
 <div mt-2 op70>partitioned by <b><code>contextvars</code></b></div>
 </div>
 
-<div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div v-click="2" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 <div text-5 mb-2>🧵 <b>the thread</b></div>
 <div op80>an OS thread</div>
 <div mt-2 op70>partitioned by <b><code>threading.local</code></b></div>
 </div>
 
-<div v-click="2" border="~ rose/40 rounded-lg" p-4 bg-rose:5>
+<div v-click="3" border="~ rose/40 rounded-lg" p-4 bg-rose:5>
 <div text-5 mb-2>🌍 <b>the process</b></div>
 <div op80><code>cwd</code> · <code>environ</code> · signals</div>
 <div mt-2 op70>partitioned by <b>nothing</b></div>
@@ -1364,13 +1396,13 @@ plainBackground: true
 
 </div>
 
-<div v-click="3" mt-8 text-5>
+<div v-click="4" mt-8 text-5>
 
 Free-threading makes these **three different axes** impossible to keep confusing. 🔪
 
 </div>
 
-<div v-click="4" mt-4 text-5>
+<div v-click="5" mt-4 text-5>
 
 And it makes the third column **worse** — real parallel writers to one `os.chdir()`. ⚠️
 

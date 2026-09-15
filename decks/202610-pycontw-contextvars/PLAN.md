@@ -162,3 +162,35 @@ Code shown in slides 27-31 is simplified from the real implementation and cited 
 
 `pnpm lint` reports 3 pre-existing `vue/multi-word-component-names` errors in other decks' `Modal.vue` files.
 This deck adds no Vue components.
+
+### Slide titles that changed during writing
+
+The Stage 2 list above keeps its working titles. The shipped ones differ for these slides:
+
+| # | planned | shipped |
+|---|---|---|
+| 8 | One thread, many requests | Then we went async |
+| 9 | Where it breaks | Watch it break |
+| 10 | Following the call chain | Following the `await` |
+| 16 | "So it's a logging tool?" | Every example you've ever seen is a logging filter |
+| 19 | The edges | The edges: leaving the event loop |
+| 24 | The unusual setup | Many apps, one Python |
+| 26 | The bug | So here's the bug |
+| 31 | Putting it together | Two tasks, one directory, no collisions |
+| 33 | Four pitfalls | Four things that will bite you |
+| 35 | The core lesson | `contextvars` tells *you* which context you're in |
+
+### Second pass (pre-flight review)
+
+- **Slides 19 and 25** were rewritten from code comments to `FancyArrow` + floating boxes. The first drafts put the
+  slide's whole point inside `#` comments, which `references/slidev-syntax.md` bans outright.
+- **Slide 12** was missing `default="-"` on its `ContextVar`, which made slide 18's printed `-` a lie: as written it
+  would have raised `LookupError`. The variable is now named `request_id_var` from slide 11 onward, one name
+  throughout.
+- **Slides 14 and 34** had more `[click]` beats in their notes than the slides had clicks, so every beat after the
+  mismatch was spoken one click early.
+- **Slide 27's** declaration was clipped at the right edge and is now reflowed.
+- Three foreshadowing sentences were cut from the notes per the skill's rule against explaining later material early.
+
+Verification: `pnpm build` passes, and a Playwright pass over `/export` reports zero vertical overflow, zero
+horizontal overflow, and no code block whose content is wider or taller than its own container.

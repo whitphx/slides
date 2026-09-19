@@ -41,6 +41,7 @@ These principles are the material you draft the plan from. The **information flo
 - **Every technique needs motivation.** Before introducing a tool or methodology, explain the **problem** it solves. The audience must feel the pain before they can appreciate the cure. A slide that says "Use scriv for changelogs" without first showing why manual changelogs are painful will not land.
 - **Connect slides explicitly.** Each slide should flow into the next. End problem slides with a question or tension ("But who decides the version?") that the next slide resolves. Avoid abrupt topic jumps.
 - **Section headers can carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users, across every supported environment"). Use this when it helps orient the audience, but don't force it on every section.
+- **A story-shaped talk does not want an agenda slide.** When the deck is built as one chain of tension and release, an up-front list of sections works against it. Each item has to be phrased abstractly enough to cover a whole section, so the audience reads five vague noun phrases that mean nothing yet, and the first beat's tension is spoiled by announcing where it leads. Open on the problem instead and let the section headers mark the turns as they arrive. Reach for an agenda only when the talk really is a set of loosely coupled parts the audience benefits from navigating (a survey, a tutorial with independent exercises, a report covering several unrelated topics). Watch too for an agenda that merely restates a "what you'll learn" slide next to it; if both exist, the concrete one stays.
 - **End on the fullest slide, not a sign-off.** The last slide is on screen far longer than any other: through Q&A, while the host wraps up, while people photograph it. Spending that on "Thank you! 🙏" and a tagline wastes the one slide the audience has time to read and copy. Put the takeaways there and reveal the links and QR code beneath them on a final click, so the summary lands first and the "where do I find this" arrives while it is still visible. Thanks are spoken, so they live in the presenter notes; a tagline worth keeping can be said out loud too. Give a thank-you slide its own place only when it carries content of its own.
 
 #### Accuracy and assumptions
@@ -87,6 +88,7 @@ A note is the script for *its own slide*. Three rules govern what belongs in one
 
 Brevity is a consequence of those rules, not a goal of its own. **When a beat carries two ideas, split the click rather than compressing the sentence** — add a step to the code's click spec, or scope an annotation with `v-click="[a,b]"` so it appears only for its own step. Cut what the visual already says; never pack an explanation into fewer, denser lines. Related habits:
 
+- **Name the mechanism; don't gesture at it.** A note is spoken once and cannot be re-read, so a phrase that only hints at the point lands as vague. "state that nobody passed in" leaves the audience assembling the meaning themselves; "values that were never passed to it as arguments" says it. The tell is a vague pronoun or an indefinite subject ("nobody", "something", "things", "it") standing where a concrete noun belongs. Prefer plain words over near-technical ones the audience has to translate: "changes from request to request" over "varies", "limit" or "boundary" over "where it stops".
 - Keep sibling explanations parallel — if `receive` gets "is an async callable that…", so does `send`.
 - Name the function and who it talks to on the click where the code shows it, and backtick identifiers: `send()`, `scope`, `__call__`.
 - End a code slide with a plain statement of what the thing is, not an aphorism. "Such ASGI frameworks are the way to create an ASGI callable" beats "a framework is a nicer way to write the same callable."
@@ -296,7 +298,7 @@ After creating package.json, run `pnpm install` in the deck directory.
 
 ### 5. Write slides.md
 
-Read `references/slidev-syntax.md` before writing or editing `slides.md`. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
+Read `references/slidev-syntax.md` before writing or editing `slides.md`. When the slides are done, section 6 runs the `audience-reviewer` pass over them. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
 
 This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
@@ -434,7 +436,24 @@ layout: section
 ---
 ```
 
-### 6. Important notes
+### 6. Review the deck as its audience
+
+Once `slides.md` is written, or substantially revised, launch the `audience-reviewer` subagent and wait for its report. Tell it the deck directory and the assumed knowledge level; it reads the deck once, in order, as someone at that level with no other context, and reports where the explanation loses them.
+
+It exists because of a failure that is invisible from the inside. Having built the deck, you know what every name means and which slide answers which question, so you read straight past a helper the audience has never seen, or an answer that arrives five slides after the question that raised it. The author will catch these on their first read-through and send them back one at a time. A pass that catches them first is cheaper for everyone.
+
+What it looks for: terms and functions used before anything introduces them, questions a slide provokes and never answers, answers separated from their question by intervening material, API detail presented before the audience wants it, and claims wider than the deck demonstrates. It reads presenter notes too, since the spoken track can introduce something the slide leaves bare.
+
+Act on the report before handing the deck over:
+
+- **Used before introduced** and **dangling code** are always worth fixing. Give the thing a sentence in the notes, or show it in a floating box.
+- **Answer arrives late** usually means resequencing, not new content. Move the answer next to the question it settles.
+- **Detail before motivation** is the same fix pointed the other way: push the detail past the beat that makes the audience want it.
+- **Claim wider than the evidence** is a rewording.
+
+Tell the user about anything you decide not to fix, and why. When the report and the author disagree, the author wins — but say that the report raised it.
+
+### 7. Important notes
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)

@@ -15,13 +15,15 @@ addons:
   - qrcode
 ---
 
-<h1 text-5xl leading-16>
+<h1 text-5xl leading-14 mt-52>
 The hidden current context
-<br>
-<small text-3xl op80>Understanding <code>contextvars</code> through<br>real-world runtime problems</small>
 </h1>
 
-<div mt-12 text-xl op80>
+<div text-3xl op80 leading-10 mt-3 text-center>
+Understanding <code>contextvars</code> through<br>real-world runtime problems
+</div>
+
+<div mt-6 text-xl op80>
 Yuichiro Tachibana (橘 祐一郎) · @whitphx
 </div>
 
@@ -131,7 +133,7 @@ And you can find me in all the usual places.
 
 - 🎯 **What `contextvars` actually solves** — and when `threading.local()` stops being enough
 - 🔀 **How a value travels** — across `await`, across tasks, across threads
-- 🧱 **Where it stops** — the line between *knowing* your context and being *safe*
+- 🧱 **Where its limits are** — `contextvars` answers *which* context, not *is it safe*
 
 </v-clicks>
 
@@ -147,40 +149,7 @@ First, what problem this module actually solves. It's a small API, but the probl
 Second, how a value moves around. Across an await, into a new task, into a thread. This is where the surprises live.
 
 [click]
-And third, where it stops. There's a line, and I found it the hard way in a real project. That's the second half of the talk.
--->
-
----
-
-# Agenda
-
-<div mt-10 text-6>
-
-<v-clicks>
-
-- 🧩 **Everything is "current"** — the state you never pass as an argument
-- 🧠 **Following the `await`** — `ContextVar`, `Context`, and how values propagate
-- 🔬 **Case study: Stlite** — many apps, one Python, one thread
-- ⚠️ **Drawing the boundary** — the pitfalls, and the design lesson
-
-</v-clicks>
-
-</div>
-
-<!--
-Here's the plan.
-
-[click]
-We start with the problem. This invisible "current" state that's everywhere in Python.
-
-[click]
-Then the mental model. The three pieces of the API and how values propagate.
-
-[click]
-Then the case study, Stlite, where many apps share one Python environment and one thread.
-
-[click]
-And we finish with the pitfalls and the design lesson I took away.
+And third, where its limits are. There is a point where this module stops helping, and I found it the hard way in a real project. That's the second half of the talk.
 -->
 
 ---
@@ -221,7 +190,7 @@ None of these are function arguments. **They're just… around.** 👻
 </div>
 
 <!--
-Think about how much of your code depends on state that nobody passed in.
+Think about how much of your code reads values that were never passed to it as arguments.
 
 [click]
 The current request.
@@ -242,7 +211,7 @@ The current environment variables.
 The current runtime, whatever "runtime" means in your system.
 
 [click]
-Notice that none of these show up in a function signature. They're ambient. They're just around, and every layer of your code reaches for them.
+Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
 
 Keep an eye on the colours, by the way. The blue ones are values you declare yourself. The orange ones belong to the operating system.
 -->
@@ -257,7 +226,7 @@ One process, one value — or one value **per thread**:
 
 </div>
 
-```py {*|1-2|4-8|10-12}{maxHeight:'300px'}
+```py {*|1-2|4-9|12-13|*}{maxHeight:'300px'}
 # one value for the whole process
 DEFAULT_TIMEOUT = 30
 
@@ -286,7 +255,7 @@ So how do we handle that in normal synchronous Python?
 Sometimes a module-level global is genuinely fine. A default timeout doesn't vary per request.
 
 [click]
-But when it does vary, the classic answer is threading dot local. You stash the request id on this object at the start of the request.
+But when the value does change from request to request, the classic answer is threading dot local. You stash the request id on this object at the start of the request.
 
 [click]
 And then any code, anywhere, at any depth, can read it back out without you threading it through twenty function signatures.
@@ -301,56 +270,56 @@ plainBackground: true
 
 # Then we went async
 
-<div mt-6 grid="~ cols-2" gap-10>
+<div mt-5 grid="~ cols-2 rows-[auto_1fr_auto]" gap-x-10 gap-y-3>
 
-<div>
-<div text-5 mb-3 text-center><b>thread-per-request</b> 🧵</div>
+<div text-5 text-center><b>thread-per-request</b> 🧵</div>
+<div v-click="1" text-5 text-center><b>one event loop</b> ⚡</div>
 
-<div flex="~ col" gap-3>
-<div data-id="t1" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4><b>Thread 1</b> → request A</div>
-<div data-id="t2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4><b>Thread 2</b> → request B</div>
-<div data-id="t3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4><b>Thread 3</b> → request C</div>
+<div border="~ gray/40 rounded-lg" p-3>
+<div text-4 op60 mb-2>one process</div>
+<div flex="~ col" gap-2>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 1</b> → request A</div>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 2</b> → request B</div>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 3</b> → request C</div>
+</div>
 </div>
 
-<div mt-4 text-4 text-center op80>one thread = one request ✅</div>
-</div>
-
-<div v-click="1">
-<div text-5 mb-3 text-center><b>one event loop</b> ⚡</div>
-
-<div data-id="loop" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
+<div v-click="1" border="~ gray/40 rounded-lg" p-3>
+<div text-4 op60 mb-2>one process</div>
+<div border="~ rose/50 rounded" p-2 bg-rose:5>
 <div text-4 mb-2><b>Thread 1</b></div>
 <div flex="~ col" gap-2>
-<div data-id="k1" border="~ rose/40 rounded" p-2 text-4>Task A</div>
-<div data-id="k2" border="~ rose/40 rounded" p-2 text-4>Task B</div>
-<div data-id="k3" border="~ rose/40 rounded" p-2 text-4>Task C</div>
+<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task A</div>
+<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task B</div>
+<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task C</div>
 </div>
 </div>
-
-<div v-click="2" mt-4 text-4 text-center op80>one thread = <b>many</b> requests ❓</div>
 </div>
 
+<div text-4 text-center op80>one thread = one request ✅</div>
+<div v-click="2" text-4 text-center op80>one thread = <b>many</b> requests ❓</div>
+
 </div>
 
-<div v-click="3" absolute bottom-8 inset-x-0 text-center text-5>
+<div v-click="3" absolute bottom-10 inset-x-0 text-center text-5>
 
-`threading.local()` still works perfectly. It just stopped meaning what you wanted. 💥
+In async code, `threading.local()` **no longer means per-request**. 💥
 
 </div>
 
 <!--
-Here's what changed.
+That code is correct, as long as one thread handles one request. But once we go async, that stops being true.
 
-On the left is the world that threading dot local was designed for. Three threads, three requests, one each. Per-thread storage is per-request storage.
-
-[click]
-And on the right is asyncio. One thread. Three tasks. They take turns on the same thread, interleaving at every await.
+On the left is the world threading dot local was designed for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
 [click]
-So now one thread is handling many requests at once.
+And on the right is asyncio. Same one process, but now one thread, and three tasks taking turns on it, interleaving at every await.
 
 [click]
-And here's the thing I want to be precise about. threading dot local did not break. It still does exactly what it says: it gives you one value per thread. It's just that "per thread" is no longer the same thing as "per request". The tool is fine. The mapping underneath it is gone.
+So one thread is serving many requests at once.
+
+[click]
+And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
 -->
 
 ---
@@ -361,7 +330,7 @@ And here's the thing I want to be precise about. threading dot local did not bre
 
 <div>
 
-```py {*|4|5|6}{maxHeight:'290px'}
+```py {*|4|5|6|*}{maxHeight:'290px'}
 _local = threading.local()
 
 async def handle(request_id):

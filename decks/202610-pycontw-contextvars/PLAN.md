@@ -1,6 +1,8 @@
 # The hidden current context — PyCon TW 2026
 
-**Status:** both stages approved and built. `slides.md` has all 37 slides with presenter notes; `pnpm build` passes and the deck measures zero overflow on both axes.
+**Status:** built and under review as [PR #16](https://github.com/whitphx/slides/pull/16); first round of review feedback applied.
+
+**Earlier:** both stages approved and built. `slides.md` has all 37 slides with presenter notes; `pnpm build` passes and the deck measures zero overflow on both axes.
 
 **Source:** `whitphx/pycon-proposals` → `proposal.2026.tw.md`
 **Slot:** 30 min (~25 min content + 5 min Q&A) · English · intermediate
@@ -202,3 +204,19 @@ Asking for `@slidev/cli ^52.19.1` pulled `@slidev/client` to 52.19.1, and since 
 that peer, pnpm re-resolved `slidev-addon-anipres` across the whole workspace and dragged
 `packages/index` from `vite@6` to `vite@8` with it. The Vercel deploy failed on that commit.
 Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as on `main`.
+
+### Review round 1 (author, 2026-09-19)
+
+- **Agenda slide cut.** The talk is one chain of tension and release, so an up-front list of sections reads as five
+  abstract noun phrases and spoils the first beat. It also overlapped "What you'll leave with", which stays because
+  it is the concrete one. Deck is now 36 slides. The rule went into the skill's narrative-structure section.
+- **Title slide** collided with the QR code: the heading's right edge sat 27px inside the QR block. The heading now
+  starts below it, and the subtitle moved out of the `<h1>` so it can carry its own line height (`leading-10` on a
+  `<small>` inside an `<h1>` is overridden by the heading's leading).
+- **Click specs on "The sync answer" and "Watch it break"** did not match their spoken beats. The first pointed at
+  `do_the_work()` and `def log(` where the note was describing the read; both now end with a trailing `|*` so the
+  code returns to full highlight when the payoff lands instead of staying dimmed through it.
+- **"Then we went async"** now draws a process frame on both sides, with the two `Thread 1` blocks and the two
+  captions on matching baselines, and states the consequence directly rather than as a turn of phrase.
+- **Presenter-note phrasing**: vague stand-ins replaced with the thing itself ("nobody passed in" → "never passed to
+  it as arguments", "vary" → "changes from request to request"). Also in the skill, under presenter notes.

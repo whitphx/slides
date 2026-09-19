@@ -319,3 +319,33 @@ The `audience-reviewer` pass raised 14 findings. Nine were fixed:
 Four were left for the author, being changes to decisions already made: the "safe" framing across four slides, the
 task slide's closing line and placement, moving `ctx.run` off the `Context` slide, and splitting "Each app wants its
 own directory" into two visibly separate programs.
+
+### Review round 5 (author, 2026-09-19) — tasks before contexts
+
+"What is a task?" moved out of the mental-model section and up to **slide 8**, directly after "Then we went async".
+That slide's right-hand frame already draws the units, so the definition now explains a picture the audience is
+looking at instead of arriving cold four slides later. The order through the first half is now:
+
+```
+ 7  Then we went async        the picture: one thread, three requests
+ 8  What is a task?           what those units are, and who starts them
+ 9  Watch it break            the collision, with `gather` now a known thing
+10  🧠 Following the `await`
+11  ContextVar: declare, set, get
+12  Same program, correct answer
+13  Context: what a task carries
+14  The rule behind most surprises
+```
+
+Execution model first, `contextvars` second, the copy rule last — so the rule lands on a model the audience already
+holds rather than building both at once.
+
+The slide now leads with **who starts a task** (your code via `create_task`/`gather`, or a framework per request),
+and the note tells the audience to hold onto that, because the copy rule pays it off: the context copied into a task
+is *the caller's*, snapshotted at the moment they called. The rule slide's boxes say "the **caller's** context" and
+"the **task's** context" rather than "parent" and "child", which also lines up with the Stlite slide where the
+caller is the JavaScript bridge rather than the setup code.
+
+Its closing line was the audience-reviewer's complaint that the slide spent the copy rule's punchline two slides
+early. In its new position it hands off to the breakage instead: "three requests, three tasks, one thread — taking
+turns."

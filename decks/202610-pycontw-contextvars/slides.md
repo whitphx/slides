@@ -57,6 +57,7 @@ The title of this talk is "The hidden current context", and it's about the conte
 
 The slides are behind that QR code if you want to follow along.
 -->
+
 ---
 
 <h1>Yuichiro Tachibana / 橘 祐一郎</h1>
@@ -120,6 +121,7 @@ The one that matters for today is Stlite, which is Streamlit running entirely in
 [click]
 And you can find me in all the usual places.
 -->
+
 ---
 
 # What you'll leave with
@@ -148,6 +150,7 @@ Second, how a value moves around. Across an await, into a new task, into a threa
 [click]
 And third, where its limits are. There is a point where this module stops helping, and I found it the hard way in a real project. That's the second half of the talk.
 -->
+
 ---
 layout: section
 ---
@@ -161,6 +164,7 @@ Every layer reads them. Nobody hands them over.
 <!--
 Let's start with the problem.
 -->
+
 ---
 plainBackground: true
 ---
@@ -210,6 +214,7 @@ Notice that none of these appear in a function signature. No caller hands them o
 
 Keep an eye on the colours, by the way. The blue ones are values you declare yourself. The orange ones belong to the operating system.
 -->
+
 ---
 
 # The sync answer
@@ -254,6 +259,7 @@ And down here, several frames deeper, the logging code reads it straight back ou
 [click]
 And I want to be clear: this is not bad code. In a thread-per-request server, this is exactly right. One thread is handling one request, so per-thread storage really does mean per-request storage.
 -->
+
 ---
 plainBackground: true
 ---
@@ -319,7 +325,63 @@ So one thread is serving many requests at once.
 
 [click]
 And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
+
+And before we fix it, we should be precise about those boxes on the right.
 -->
+
+---
+plainBackground: true
+---
+
+# What is a task?
+
+<div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-start>
+
+<div text-5>
+
+<v-clicks>
+
+- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; a web framework does it per request
+- 📦 **It wraps one coroutine** — the caller carries on; the task is its own unit of work
+- 🔁 **The loop owns them all** — one thread, switching at every `await`
+
+</v-clicks>
+
+</div>
+
+<div v-click="1" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
+<div text-4 mb-2><b>the event loop</b></div>
+<div flex="~ col" gap-2>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request A</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request B</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request C</div>
+</div>
+</div>
+
+</div>
+
+<div v-click="4" mt-8 text-5 text-center>
+
+Three requests, three tasks, **one thread** — taking turns. 🔁
+
+</div>
+
+<!--
+Those three boxes on the right of the last slide have a name: they are tasks. Let me be precise about what one is, because the rest of the talk leans on it.
+
+[click]
+A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
+
+[click]
+What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.
+
+[click]
+And the event loop owns the whole pile. One thread, running one task at a time, switching between them every time one of them hits an await.
+
+[click]
+So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.
+-->
+
 ---
 
 # Watch it break
@@ -380,6 +442,7 @@ And A thinks it's request B. Both lines say B.
 [click]
 Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service this is the bug where your logs are confidently attributed to the wrong user, and you spend a day not believing your own log file.
 -->
+
 ---
 layout: section
 ---
@@ -394,6 +457,7 @@ State that belongs to the execution, not to the thread
 So we need storage that follows the logical execution instead of the thread.
 That's exactly what contextvars is.
 -->
+
 ---
 
 # `ContextVar`: declare, set, get
@@ -441,6 +505,7 @@ And you get it back.
 [click]
 The shape is the same as the threading dot local version. Declare in one place, read from anywhere, no passing it through every function. What changes is the thing it's attached to.
 -->
+
 ---
 
 # Same program, correct answer
@@ -506,58 +571,7 @@ And now each task reads back its own value, across the await. Same interleaving,
 
 That's the whole pitch of the module. Now let's look at what's actually underneath it, because the mechanism is what tells you where it stops working.
 -->
----
-plainBackground: true
----
 
-# What is a task?
-
-<div mt-6 grid="~ cols-[1.3fr_1fr]" gap-8 items-start>
-
-<div text-5>
-
-<v-clicks>
-
-- 📦 **A coroutine handed to the loop** — via `create_task()` or `gather()`
-- 🧵 **Not a thread** — no parallelism, nothing from the OS
-- 🔁 **Many on one thread** — the loop switches at every `await`
-
-</v-clicks>
-
-</div>
-
-<div v-click="1" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
-<div text-4 mb-2><b>the event loop</b></div>
-<div flex="~ col" gap-2>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request A</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request B</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request C</div>
-</div>
-</div>
-
-</div>
-
-<div v-click="4" mt-8 text-5 text-center>
-
-The unit the loop **schedules** — and the unit that **carries a context**. 🎯
-
-</div>
-
-<!--
-Before we go further, let me pin down one word I have been using loosely: task.
-
-[click]
-A task is a coroutine you have handed to the event loop to run. You make one with create_task, or gather makes them for you, which is exactly what happened on the slide where our example broke.
-
-[click]
-It is not a thread. There is no parallelism here and the operating system is not involved at all. This is bookkeeping inside Python.
-
-[click]
-The loop holds a pile of them and runs them on one thread, switching between them every time one hits an await.
-
-[click]
-So a task is the unit the event loop schedules. And that is the unit that matters for us, because a task is also the thing that carries a context.
--->
 ---
 plainBackground: true
 ---
@@ -636,6 +650,7 @@ So when I said set binds in "the current context", this box is the thing it mean
 
 Which leaves exactly one question. When a new task starts, where does its context come from?
 -->
+
 ---
 plainBackground: true
 ---
@@ -645,7 +660,7 @@ plainBackground: true
 <div mt-6 flex="~" items-center justify-center gap-8>
 
 <div data-id="parent" border="~ sky/50 rounded-lg" p-4 bg-sky:5 w-64>
-<div text-4 op70 mb-2>parent context</div>
+<div text-4 op70 mb-2>the <b>caller's</b> context</div>
 <div text-5><code>request_id</code> = <b>"A"</b></div>
 </div>
 
@@ -655,7 +670,7 @@ plainBackground: true
 </div>
 
 <div v-click="2" data-id="child" border="~ violet/50 rounded-lg" p-4 bg-violet:5 w-64>
-<div text-4 op70 mb-2>task's own context</div>
+<div text-4 op70 mb-2>the <b>task's</b> context</div>
 <div text-5><code>request_id</code> = <b>"A"</b></div>
 </div>
 
@@ -676,13 +691,13 @@ plainBackground: true
 </div>
 
 <!--
-So let's look at how a value gets from here to there, because one rule explains almost every surprise people hit.
+So now put the two together. We have tasks, and we have contexts. One rule connects them, and it explains almost every surprise people hit.
 
 [click]
 When you create a task,
 
 [click]
-the task gets a copy of the context. A snapshot, taken at the moment of creation.
+the task gets a copy of that context. Not the program's context, not some global one: a snapshot of whoever called create_task, taken at the moment they called it. That is why I made you hold onto who starts a task.
 
 [click]
 Which means the task inherits everything you had set before you spawned it. That's the part people expect.
@@ -692,6 +707,7 @@ And it means anything the task sets stays inside the task. It never propagates b
 
 Copy, not share. Say it once and most of the confusion goes away.
 -->
+
 ---
 
 # Set it before you spawn it
@@ -747,6 +763,7 @@ So the worker prints the default. The set happened in our context, after the tas
 [click]
 The fix is to swap two lines. And that's the whole point: the ordering matters because the copy happens at create_task, not when the task first runs. Set first, then spawn.
 -->
+
 ---
 
 # The edges: leaving the event loop
@@ -800,6 +817,7 @@ If you need it, you copy the context yourself and hand run the function. A bit u
 [click]
 I'm not asking you to memorise which function does which. I'm asking you to treat every hop off the event loop — a thread pool, a sync callback, a C extension that calls you back — as a boundary you go and check. Because the failure is silent. You get the default, not an exception.
 -->
+
 ---
 
 # `Token`: putting it back
@@ -841,6 +859,7 @@ Because it makes nesting work. If two pieces of middleware both set the same var
 [click]
 And it's how a library borrows a context variable without permanently changing it for the application that called it.
 -->
+
 ---
 
 # Where you've already met it
@@ -875,6 +894,7 @@ And web frameworks use it for request-local state.
 
 So it's already load-bearing in your stack.
 -->
+
 ---
 layout: statement
 ---
@@ -890,6 +910,7 @@ And that's a fine example. It's just a small one. It leaves you thinking context
 
 It isn't. It's a way to model logical execution, and the rest of this talk is about what that buys you and where it runs out.
 -->
+
 ---
 layout: statement
 ---
@@ -907,6 +928,7 @@ Knowing the answer is not the same as anything being safe. And the difference be
 
 Let me show you that project.
 -->
+
 ---
 layout: section
 ---
@@ -920,6 +942,7 @@ Streamlit in the browser, and one very global variable
 <!--
 This is Stlite. It's the project where I hit the wall I just described.
 -->
+
 ---
 
 # What is Stlite?
@@ -960,6 +983,7 @@ And the key word is no server. There's no backend anywhere. The Python interpret
 [click]
 So the entire runtime — the framework, the interpreter, your script — ships as a static web page.
 -->
+
 ---
 
 # No backend, just a tab
@@ -1009,6 +1033,7 @@ And the only thing worth noticing is what isn't there. No API calls, no backend,
 
 That's the product. Now let me show you the part that made my life hard.
 -->
+
 ---
 plainBackground: true
 ---
@@ -1058,6 +1083,7 @@ So from Python's point of view these are three logical runtimes, but there is ex
 
 And each app has its own home directory, because each app has its own files.
 -->
+
 ---
 
 # Each app wants its own directory
@@ -1109,6 +1135,7 @@ And this line is why it matters. A user writes read_csv with a relative path, li
 [click]
 And here's the wall. There is exactly one current working directory per process. The OS has no concept of "the current directory for this task". You cannot have one per app, because it isn't yours to partition.
 -->
+
 ---
 
 # So here's the bug
@@ -1167,6 +1194,7 @@ And gets App B's directory. A file-not-found for a file that exists, in a direct
 [click]
 This is the same shape as the threading dot local bug from the first half. Something got overwritten across an await. But this time I can't fix it by choosing a better storage class, because the thing being overwritten belongs to the operating system.
 -->
+
 ---
 
 # Step 1: remember *which*
@@ -1214,6 +1242,7 @@ And now the question "which directory should this task be in" has a correct answ
 [click]
 This is real code, it's in the repo if you want to read it.
 -->
+
 ---
 layout: statement
 ---
@@ -1229,6 +1258,7 @@ And the process is still sitting in the wrong directory, because nothing I've wr
 
 Knowing is not applying. contextvars did its job completely, and I still have the bug.
 -->
+
 ---
 
 # Step 2: apply it, then put it back
@@ -1270,6 +1300,7 @@ And there's one subtlety I want to call out, because it took me a while.
 
 On the way out, before restoring, it saves the current directory again. Why? Because the app's own code might have called chdir while it was running. That's a legitimate thing for a user script to do. If we just restored blindly, we'd throw away the app's own change, and next time we resume we'd put it back in the wrong place. So the app's move has to survive being suspended.
 -->
+
 ---
 
 # Around every resume
@@ -1321,6 +1352,7 @@ So by wrapping send in the directory context manager, every single step of that 
 
 The real class does the same for throw and close, so exceptions and cancellation are covered too.
 -->
+
 ---
 plainBackground: true
 ---
@@ -1362,6 +1394,7 @@ And when A comes back for its next step, the proxy moves the process into A's di
 [click]
 So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the operating system only gives you one.
 -->
+
 ---
 layout: section
 ---
@@ -1375,6 +1408,7 @@ The pitfalls, and the one lesson worth taking home
 <!--
 Let's pull back out and generalise.
 -->
+
 ---
 
 # Four things that will bite you
@@ -1407,6 +1441,7 @@ And these failures are silent. You don't get an exception, you get the default v
 [click]
 And the fourth one is the Stlite lesson. Global side effects stay global. The current directory, environment variables, signal handlers, locale. Perfect context handling does not touch any of them.
 -->
+
 ---
 plainBackground: true
 ---
@@ -1467,6 +1502,7 @@ Free-threading is the build with no GIL, where Python threads finally run in par
 [click]
 And it makes the third column strictly worse. Under the GIL, two tasks fighting over the current directory were at least taking turns. With real parallelism, you have genuinely concurrent writers to a single global. The borrowing trick I showed you gets harder, not easier.
 -->
+
 ---
 layout: statement
 ---
@@ -1482,6 +1518,7 @@ It is not a mechanism for making anything safe. It doesn't protect global state,
 
 Everything you do with that answer is still your design problem.
 -->
+
 ---
 
 # Hidden context, or just a parameter?
@@ -1517,6 +1554,7 @@ And look at the bottom row, because I think it's the deciding one. An explicit p
 [click]
 So treat ambient state as a tax. It's worth paying sometimes. Just notice that you're paying it.
 -->
+
 ---
 
 # Key takeaways
@@ -1621,3 +1659,4 @@ That's all from me. Thank you very much.
 The slides are behind the first QR code, and Stlite is behind the second.
 Please come and find me afterwards, I'd love to hear what you're building.
 -->
+

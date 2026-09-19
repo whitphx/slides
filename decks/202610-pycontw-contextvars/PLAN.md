@@ -220,3 +220,17 @@ Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as 
   captions on matching baselines, and states the consequence directly rather than as a turn of phrase.
 - **Presenter-note phrasing**: vague stand-ins replaced with the thing itself ("nobody passed in" → "never passed to
   it as arguments", "vary" → "changes from request to request"). Also in the skill, under presenter notes.
+
+### Review round 2 (author, 2026-09-19)
+
+- **`ContextVar`: declare, set, get** — the note now introduces the type before touring its API, tying it back to
+  `threading.local()` rather than dropping the name in cold.
+- **Type annotations dropped** from the two teaching slides. `request_id_var: ContextVar[str] = …` is inferable and
+  reads as clutter on screen. The declaration stays wrapped across three lines on the declare slide, though: at full
+  width it runs under the floating annotation box. The one surviving annotation is on "Step 1: remember *which*",
+  where the code is quoted from Stlite and should match upstream.
+- **`Context`: a snapshot** — rebuilt. `handler` was an undefined name the audience would stop to wonder about, so
+  its body now sits in a floating box with an arrow into `ctx.run(handler)`. Beside it, the `Context` itself is drawn
+  as the mapping it is (three `ContextVar → value` rows) with a chip showing that `handler()` runs inside it. The
+  handler box sits in the right column rather than under the code: from below, the arrow crossed the
+  `ctx[request_id_var]` line on its way up.

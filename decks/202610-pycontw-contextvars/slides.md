@@ -405,7 +405,7 @@ That's exactly what contextvars is.
 ```py {*|3-5|7|8}{'data-id':'cv'}{maxHeight:'300px'}
 from contextvars import ContextVar
 
-request_id_var: ContextVar[str] = ContextVar(
+request_id_var = ContextVar(
     "request_id", default="-"
 )
 
@@ -429,6 +429,8 @@ Declared **once**, at module level. Read from **anywhere**, at any depth. 🪄
 </div>
 
 <!--
+So this is what the standard library gives us instead. A ContextVar is like threading dot local, except the value follows the logical execution rather than the thread. Same idea, right scope.
+
 The API is small. There are three things.
 
 [click]
@@ -460,7 +462,7 @@ async def handle(request_id):
 ```
 
 ```py
-request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
+request_id_var = ContextVar("request_id", default="-")
 
 async def handle(request_id):
     request_id_var.set(request_id)
@@ -511,16 +513,16 @@ That's the whole pitch of the module. Now let's look at what's actually undernea
 -->
 
 ---
+plainBackground: true
+---
 
 # `Context`: a snapshot of every var
 
-<div mt-4 text-5>
+<div mt-4 grid="~ cols-[1.05fr_1fr]" gap-8>
 
-A `Context` is a **mapping** from every `ContextVar` to its value — and code always runs *inside* one.
+<div>
 
-</div>
-
-```py {*|3|5|7}{maxHeight:'250px'}
+```py {*|3|5|7}{'data-id':'ctxcode'}{maxHeight:'220px'}
 from contextvars import copy_context
 
 ctx = copy_context()
@@ -530,26 +532,61 @@ ctx.run(handler)
 ctx[request_id_var]
 ```
 
-<div v-click="4" mt-5 text-5>
+</div>
 
-`set()` writes into **whichever context is running right now**. That's the whole trick. 🎯
+<div flex="~ col" gap-4>
+
+<div border="~ sky/50 rounded-lg" p-4 bg-sky:5>
+
+<div text-4 op70 mb-3>one <code>Context</code></div>
+
+<div flex="~ col" gap-2 text-4>
+<div><code>request_id_var</code> <span op50>→</span> <b>"A"</b></div>
+<div><code>current_user</code> <span op50>→</span> <b>alice</b></div>
+<div><code>db_session</code> <span op50>→</span> <b>&lt;Session&gt;</b></div>
+</div>
+
+<div v-click="2" mt-3 border="~ violet/50 rounded" p-2 bg-violet:5 text-4 text-center>
+<code>handler()</code> runs <b>in here</b>
+</div>
+
+</div>
+
+<div v-click="2" data-id="handler-def" bg-white dark:bg-black border="~ violet/50 rounded-lg" p-2>
+
+```py
+def handler():
+    print(request_id_var.get())
+```
+
+</div>
+
+</div>
+
+</div>
+
+<FancyArrow v-click="2" from="[data-id=handler-def] @ left" to="[data-id=ctxcode] .line:nth-child(5) @ right" arc="0.2" />
+
+<div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
+
+`set()` writes into **whichever context is running right now**. 🎯
 
 </div>
 
 <!--
-The second concept is the Context itself.
+The second concept is the Context itself. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
 
 [click]
-copy_context gives you a snapshot of every context variable and its current value, right now, as one object.
+copy_context takes a snapshot of that whole mapping and hands it back to you as one object.
 
 [click]
-And you can run a function inside that snapshot. While the handler runs, every get call sees the values from the snapshot.
+And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the request id. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.
 
 [click]
-You can also just read a variable out of it, like a dictionary.
+You can also read a variable straight out of the snapshot, like a dictionary lookup.
 
 [click]
-So when I said set binds in "the current context", this is the thing it means. There's always a context running, set writes into that one, and get reads from that one. Everything else in this talk follows from that sentence.
+So when I said set binds in "the current context", this box is the thing it means. There is always one of these running. set writes into that one, get reads from that one. Everything else in this talk follows from that sentence.
 -->
 
 ---

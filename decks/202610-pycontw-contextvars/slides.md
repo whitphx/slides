@@ -15,7 +15,7 @@ addons:
   - qrcode
 ---
 
-<h1 text-5xl leading-14 mt-52>
+<h1 text-5xl leading-14 mt-44>
 The hidden current context
 </h1>
 
@@ -36,7 +36,6 @@ PyCon Taiwan 2026
 <QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202610-pycontw-contextvars/"
   :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
 </div>
-<div op70 text-sm text-center leading-tight>These slides</div>
 </div>
 
 <style>
@@ -156,10 +155,10 @@ And third, where its limits are. There is a point where this module stops helpin
 layout: section
 ---
 
-# 🧩 Everything is "current"
+# 🧩 The invisible arguments
 
 <div mt-4 op70 text-5>
-The state you never pass as an argument
+Every layer reads them. Nobody hands them over.
 </div>
 
 <!--
@@ -220,29 +219,23 @@ Keep an eye on the colours, by the way. The blue ones are values you declare you
 
 # The sync answer
 
-<div mt-4 text-5>
-
-One process, one value — or one value **per thread**:
-
-</div>
-
-```py {*|1-2|4-9|12-13|*}{maxHeight:'300px'}
-# one value for the whole process
+```py {*|1|3|5-7|9-13|*}{maxHeight:'340px'}
 DEFAULT_TIMEOUT = 30
 
-# one value per thread
-import threading
 _local = threading.local()
 
 def handle(request):
     _local.request_id = request.id
     do_the_work()
 
+def do_the_work():
+    log("saving order")
+
 def log(message):
     print(f"[{_local.request_id}] {message}")
 ```
 
-<div v-click="4" mt-4 text-5>
+<div v-click="5" mt-4 text-5>
 
 In a **thread-per-request** server, this is correct. One thread *is* one request. ✅
 
@@ -252,13 +245,16 @@ In a **thread-per-request** server, this is correct. One thread *is* one request
 So how do we handle that in normal synchronous Python?
 
 [click]
-Sometimes a module-level global is genuinely fine. A default timeout doesn't vary per request.
+Sometimes a module-level global is genuinely fine. A default timeout doesn't change from request to request.
 
 [click]
-But when the value does change from request to request, the classic answer is threading dot local. You stash the request id on this object at the start of the request.
+But when the value does change per request, the classic answer is threading dot local.
 
 [click]
-And then any code, anywhere, at any depth, can read it back out without you threading it through twenty function signatures.
+You stash the request id on it at the top of the request, and then get on with the actual work.
+
+[click]
+And down here, several frames deeper, the logging code reads it straight back out. Look at what is not happening: do_the_work never mentions a request id, and log never takes one as an argument. Nobody passed it down. It was just there.
 
 [click]
 And I want to be clear: this is not bad code. In a thread-per-request server, this is exactly right. One thread is handling one request, so per-thread storage really does mean per-request storage.
@@ -270,28 +266,37 @@ plainBackground: true
 
 # Then we went async
 
-<div mt-5 grid="~ cols-2 rows-[auto_1fr_auto]" gap-x-10 gap-y-3>
+<div mt-4 grid="~ cols-2 rows-[auto_1fr_auto]" gap-x-10 gap-y-2>
 
 <div text-5 text-center><b>thread-per-request</b> 🧵</div>
 <div v-click="1" text-5 text-center><b>one event loop</b> ⚡</div>
 
-<div border="~ gray/40 rounded-lg" p-3>
-<div text-4 op60 mb-2>one process</div>
-<div flex="~ col" gap-2>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 1</b> → request A</div>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 2</b> → request B</div>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5 text-4><b>Thread 3</b> → request C</div>
+<div border="~ gray/40 rounded-lg" p-2>
+<div text-4 op60 mb-1>one process</div>
+<div flex="~ col" gap-1>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request A</div>
+</div>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div text-4 mb-1><b>Thread 2</b></div>
+<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request B</div>
+</div>
+<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div text-4 mb-1><b>Thread 3</b></div>
+<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request C</div>
+</div>
 </div>
 </div>
 
-<div v-click="1" border="~ gray/40 rounded-lg" p-3>
-<div text-4 op60 mb-2>one process</div>
+<div v-click="1" border="~ gray/40 rounded-lg" p-2>
+<div text-4 op60 mb-1>one process</div>
 <div border="~ rose/50 rounded" p-2 bg-rose:5>
-<div text-4 mb-2><b>Thread 1</b></div>
-<div flex="~ col" gap-2>
-<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task A</div>
-<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task B</div>
-<div border="~ rose/40 rounded" p-2 bg-white dark:bg-black text-4>Task C</div>
+<div text-4 mb-1><b>Thread 1</b></div>
+<div flex="~ col" gap-1>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request A</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request B</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request C</div>
 </div>
 </div>
 </div>
@@ -301,7 +306,7 @@ plainBackground: true
 
 </div>
 
-<div v-click="3" absolute bottom-10 inset-x-0 text-center text-5>
+<div v-click="3" mt-4 text-center text-5>
 
 In async code, `threading.local()` **no longer means per-request**. 💥
 
@@ -313,7 +318,7 @@ That code is correct, as long as one thread handles one request. But once we go 
 On the left is the world threading dot local was designed for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
 [click]
-And on the right is asyncio. Same one process, but now one thread, and three tasks taking turns on it, interleaving at every await.
+And on the right is asyncio. Same one process, the same three requests, but now they all sit on one thread as asyncio tasks, taking turns and interleaving at every await.
 
 [click]
 So one thread is serving many requests at once.

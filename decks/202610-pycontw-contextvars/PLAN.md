@@ -234,3 +234,18 @@ Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as 
   as the mapping it is (three `ContextVar → value` rows) with a chip showing that `handler()` runs inside it. The
   handler box sits in the right column rather than under the code: from below, the arrow crossed the
   `ctx[request_id_var]` line on its way up.
+
+### Review round 3 (author, 2026-09-19)
+
+- **Title slide** — "These slides" caption removed, and the heading raised into the space that frees. It now clears
+  the QR by roughly 20px rather than sitting near the bottom of the slide.
+- **Section 1 renamed** to "🧩 The invisible arguments". "Everything is 'current'" overstated the claim, and it also
+  echoed the very next slide, "Python is full of 'current'". The subtitle changed with it, since "the state you
+  never pass as an argument" would have restated the new title.
+- **The sync answer** — the call chain was broken: `do_the_work()` was undefined and `log()` was never called, so
+  the slide asked the audience to imagine two functions. The block now runs `handle` → `do_the_work` → `log`, which
+  makes the point concrete: `do_the_work` never mentions a request id and `log` never takes one, yet the id reaches
+  the log line. Five click steps now, five spoken beats. The framing sentence above the code went, for room.
+- **Then we went async** — the two frames were structurally different, one naming requests and the other tasks.
+  Both now nest identically (process → thread → request A/B/C), so the only visible difference is the thing the
+  slide is about: how many requests sit on a thread.

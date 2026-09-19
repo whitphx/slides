@@ -640,7 +640,7 @@ Which leaves exactly one question. When a new task starts, where does its contex
 plainBackground: true
 ---
 
-# The rule behind every surprise
+# The rule behind most surprises
 
 <div mt-6 flex="~" items-center justify-center gap-8>
 
@@ -700,12 +700,12 @@ Copy, not share. Say it once and most of the confusion goes away.
 
 <div>
 
-```py {*|1|2|5}{maxHeight:'270px'}
-task = asyncio.create_task(worker())
-request_id_var.set("A")
-
+```py {*|4|5|2}{maxHeight:'270px'}
 async def worker():
     print(request_id_var.get())
+
+task = asyncio.create_task(worker())
+request_id_var.set("A")
 ```
 
 </div>
@@ -879,12 +879,12 @@ So it's already load-bearing in your stack.
 layout: statement
 ---
 
-## Every example you've ever seen is a logging filter. 🪵
+## Every example you were *taught* with is a logging filter. 🪵
 
 <!--
 But here's what bugs me about how this module gets taught.
 
-Every tutorial, every blog post, every conference talk — including the first half of this one — reaches for the same example. Request IDs in logs.
+Look at that last slide again: three of those four have nothing to do with logging. And yet every tutorial, every blog post, every conference talk — including the first half of this one — teaches the thing with the same example. Request IDs in logs.
 
 And that's a fine example. It's just a small one. It leaves you thinking contextvars is a logging convenience.
 
@@ -1048,7 +1048,7 @@ Each app is a separate logical runtime. **They all share one interpreter.** 😬
 <!--
 Here's the setup.
 
-A page can host more than one Stlite app, and in the SharedWorker setup they all live together.
+A page can host more than one Stlite app, and when they share one browser worker they all live together.
 
 [click]
 And they share everything. One Python environment. One thread, because the browser gives you one. One event loop. And critically, one current working directory and one set of environment variables, because those belong to the interpreter, not to your app.
@@ -1206,7 +1206,7 @@ One context variable holding the home directory this task belongs to.
 [click]
 And it gets set at every entry point where JavaScript calls into Python. Every browser event that starts Python work binds it first.
 
-That's deliberate, by the way. Each call from JavaScript lands in a fresh asyncio task, and a fresh task does not inherit the bindings from whatever set things up earlier. So we re-bind on entry, every time.
+That's deliberate, and it is the copy-at-creation rule rather than an exception to it. A task copies the context of whoever called create_task, and here that caller is the JavaScript bridge, not the code that configured the app. So there is nothing of ours in the parent context to inherit, and we re-bind on entry, every time.
 
 [click]
 And now the question "which directory should this task be in" has a correct answer, available anywhere, at any depth, for free.
@@ -1233,8 +1233,11 @@ Knowing is not applying. contextvars did its job completely, and I still have th
 
 # Step 2: apply it, then put it back
 
-```py {*|3-4|5|7-9}{maxHeight:'300px'}
+```py {*|2-3|6-7|10-11|*}{maxHeight:'340px'}
 class TaskSpecificDirectoryConfig:
+    def __init__(self, home):
+        self.wanted = DirectoryConfig(cwd=home, home_dir=home)
+
     def __enter__(self):
         self.saved = DirectoryConfig(os.getcwd(), os.environ.get("HOME"))
         self._apply(self.wanted)
@@ -1244,7 +1247,7 @@ class TaskSpecificDirectoryConfig:
         self._apply(self.saved)
 ```
 
-<div v-click="3" mt-5 text-5 border="~ amber/40 rounded-lg" p-4 bg-amber:5>
+<div v-click="4" mt-3 text-5 border="~ amber/40 rounded-lg" p-3 bg-amber:5>
 
 `__exit__` **saves before it restores** — the app may have called `os.chdir()` itself, and that has to survive. 🔁
 
@@ -1252,6 +1255,9 @@ class TaskSpecificDirectoryConfig:
 
 <!--
 So step two. A context manager that does the applying.
+
+[click]
+It is built with the directory this task wants, which is exactly the value step one put into the context variable. That is where the two halves join up.
 
 [click]
 On the way in, it writes down where the process currently is, and then moves it to where this task wants to be.
@@ -1294,9 +1300,9 @@ class DirectorySyncCoroutineProxy(Coroutine):
 
 ````
 
-<div v-click="2" mt-5 text-5 border="~ sky/40 rounded-lg" p-4 bg-sky:5>
+<div v-click="2" mt-3 text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 
-`send()` is what the **event loop** calls to resume a coroutine. Wrap that, and every step runs in the right place. 🎯
+`send()` is what the **event loop** calls to resume a coroutine. Every entry point hands the loop a `DirectorySyncCoroutineProxy(coro)` rather than the bare coroutine — so every step runs in the right place. 🎯
 
 </div>
 
@@ -1378,8 +1384,8 @@ Let's pull back out and generalise.
 <v-clicks>
 
 - 📸 **Copied at task creation** — set the value *before* `create_task()`, or the task never sees it
-- 🧵 **Threads don't inherit** — a new thread starts with an **empty** context; `run_in_executor` drops it
-- 🔌 **Sync ↔ async hops are silent** — you get the *default*, not an exception
+- 🧵 **Threads inherit nothing** — `run_in_executor` drops it; `asyncio.to_thread` copies it for you
+- 🔇 **The failure is silent** — you get the *default*, not an exception
 - 🌍 **Global side effects stay global** — `cwd`, `os.environ`, signal handlers, `locale`
 
 </v-clicks>
@@ -1393,7 +1399,7 @@ Four pitfalls. Three of them we've seen.
 The copy happens at task creation, so ordering matters. Set, then spawn.
 
 [click]
-Threads don't inherit. A brand new thread starts with a completely empty context, and run_in_executor gives you one of those.
+Threads inherit nothing on their own. A brand new thread starts with a completely empty context, which is what run_in_executor hands you. to_thread is the exception, and only because it copies the context across for you explicitly.
 
 [click]
 And these failures are silent. You don't get an exception, you get the default value. Which means the bug shows up later, somewhere else, as wrong data rather than a crash.
@@ -1421,7 +1427,7 @@ plainBackground: true
 <div mt-2 op70>partitioned by <b><code>threading.local</code></b></div>
 </div>
 
-<div v-click="3" border="~ rose/40 rounded-lg" p-4 bg-rose:5>
+<div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
 <div text-5 mb-2>🌍 <b>the process</b></div>
 <div op80><code>cwd</code> · <code>environ</code> · signals</div>
 <div mt-2 op70>partitioned by <b>nothing</b></div>
@@ -1456,7 +1462,7 @@ There's the OS thread. threading dot local partitions that. And for years these 
 And then there's the process. The current directory, the environment, signal handlers. And nothing partitions those. There is no per-thread current directory, and there's no per-context one either.
 
 [click]
-Free-threading is what makes it impossible to keep conflating the first two. Threads now run genuinely in parallel, so "which thread am I on" and "which request am I serving" drift apart in a way you can actually observe.
+Free-threading is the build with no GIL, where Python threads finally run in parallel on separate cores. And it is what makes it impossible to keep conflating the first two. Threads now run genuinely in parallel, so "which thread am I on" and "which request am I serving" drift apart in a way you can actually observe.
 
 [click]
 And it makes the third column strictly worse. Under the GIL, two tasks fighting over the current directory were at least taking turns. With real parallelism, you have genuinely concurrent writers to a single global. The borrowing trick I showed you gets harder, not easier.

@@ -289,3 +289,33 @@ and reports terms used before introduction, questions raised and not answered, a
 detail arriving before motivation, and overstated claims. The slidev-deck skill runs it as step 6, after `slides.md`
 is written and before the deck goes to the author. Most of this deck's review rounds were findings of exactly that
 shape, caught by the author rather than before.
+
+### Audience review, round 1 findings (2026-09-19)
+
+The `audience-reviewer` pass raised 14 findings. Nine were fixed:
+
+- **"Set it before you spawn it" called `worker()` on line 1 and defined it on line 4.** As written the snippet
+  raises `NameError`, not the `-` the terminal shows — on the one slide whose entire subject is which line comes
+  first, so the audience reads the ordering with maximum suspicion and finds the wrong problem. Reordered.
+- **`self.wanted` was applied with no visible origin.** An `__init__` now shows it coming from the directory the
+  task wants, which also joins step 1 to step 2 on screen. The old click spec highlighted a blank line; retargeted.
+- **The step 1 note contradicted the copy-at-creation rule** the deck asks the audience to memorise: "a fresh task
+  does not inherit the bindings". Both statements were true but the deck never reconciled them. The note now says
+  why — the copy comes from whoever called `create_task`, and here that is the JS bridge, not the setup code.
+- **The proxy slide never showed who installs the proxy**, leaving the payoff looking like magic. The callout now
+  says the loop is handed `DirectorySyncCoroutineProxy(coro)` rather than the bare coroutine.
+- **"Threads don't inherit" read as a reversal** of the `asyncio.to_thread` tick given three slides earlier. Now
+  "Threads inherit nothing — `run_in_executor` drops it; `asyncio.to_thread` copies it for you". The bullet below
+  it, which named a category the deck never demonstrated, became "The failure is silent".
+- **Free-threading was the reason for its slide but was defined after the conclusion drawn from it.** Definition
+  first now. The process column on that slide also went back to amber, restoring the blue/orange mapping slide 5's
+  note asks the audience to hold.
+- **"SharedWorker"** was unexplained browser jargon; now "when they share one browser worker".
+- **"Every example you've ever seen is a logging filter"** was contradicted by the previous slide, which lists four
+  uses, three of them not logging. Narrowed to the claim that survives: "Every example you were *taught* with".
+- **"The rule behind every surprise"** overstated what the deck shows; the note and the takeaway already said
+  "most". Title matched to them.
+
+Four were left for the author, being changes to decisions already made: the "safe" framing across four slides, the
+task slide's closing line and placement, moving `ctx.run` off the `Context` slide, and splitting "Each app wants its
+own directory" into two visibly separate programs.

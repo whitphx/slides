@@ -349,3 +349,15 @@ caller is the JavaScript bridge rather than the setup code.
 Its closing line was the audience-reviewer's complaint that the slide spent the copy rule's punchline two slides
 early. In its new position it hands off to the breakage instead: "three requests, three tasks, one thread — taking
 turns."
+
+### Review round 6 (author, 2026-09-19)
+
+- **"Watch it break" → "Watch `threading.local()` break".** With the task slide now sitting between the async
+  diagram and the breakage, "it" had two plausible referents. The title names the subject instead.
+- **The async slide's right frame gained the `Task` layer.** It now nests `one process → Thread 1 → Task 1/2/3 →
+  request A/B/C` against the left's `one process → Thread 1/2/3 → request A/B/C`, so the two sides correspond
+  frame for frame and the async side visibly sits one level deeper. That layer is the whole difference the slide
+  is about, and it was the one thing the picture left implicit.
+
+The word `task` now appears on the diagram that raises it and is defined on the very next slide, which is the
+sequence the author asked for two rounds ago: the picture poses the question, the next slide answers it.

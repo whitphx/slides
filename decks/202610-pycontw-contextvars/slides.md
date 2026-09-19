@@ -294,9 +294,18 @@ plainBackground: true
 <div border="~ rose/50 rounded" p-2 bg-rose:5>
 <div text-4 mb-1><b>Thread 1</b></div>
 <div flex="~ col" gap-1>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request A</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request B</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request C</div>
+<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 1</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request A</div>
+</div>
+<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 2</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request B</div>
+</div>
+<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 3</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request C</div>
+</div>
 </div>
 </div>
 </div>
@@ -318,7 +327,7 @@ That code is correct, as long as one thread handles one request. But once we go 
 On the left is the world threading dot local was designed for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests, but now they all sit on one thread as asyncio tasks, taking turns and interleaving at every await.
+And on the right is asyncio. Same one process, the same three requests. But notice the picture has one more layer: the requests are not sitting directly on a thread any more. Each one is wrapped in something called a task, and all three tasks share the single thread, taking turns and interleaving at every await.
 
 [click]
 So one thread is serving many requests at once.
@@ -326,7 +335,7 @@ So one thread is serving many requests at once.
 [click]
 And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
 
-And before we fix it, we should be precise about those boxes on the right.
+And before we fix it, we should be precise about that new word on the right: task.
 -->
 
 ---
@@ -367,7 +376,7 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-Those three boxes on the right of the last slide have a name: they are tasks. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. That is the extra layer you just saw on the right of the last slide. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
 A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
@@ -384,7 +393,7 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 ---
 
-# Watch it break
+# Watch `threading.local()` break
 
 <div mt-4 grid="~ cols-[1.15fr_1fr]" gap-5>
 

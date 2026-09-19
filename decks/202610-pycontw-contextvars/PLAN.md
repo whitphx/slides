@@ -249,3 +249,43 @@ Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as 
 - **Then we went async** — the two frames were structurally different, one naming requests and the other tasks.
   Both now nest identically (process → thread → request A/B/C), so the only visible difference is the thing the
   slide is about: how many requests sit on a thread.
+
+### Review round 4 (author, 2026-09-19) — mental-model section resequenced
+
+The author's diagnosis: after "Same program, correct answer" proves `ContextVar` works, the audience wants to know
+what the context object is and when it switches. The deck answered that on "The rule behind every surprise", five
+slides later, with the `Context` and `Token` APIs in between. Worse, two of those intervening slides ("Where you've
+already met it" and the logging-filter statement) are a tension pair whose job is to push *out* of the mental model
+and into Stlite, so they split the explanation in half and handed it back.
+
+The section now runs **model → consequences → placement → handoff**:
+
+| new | slide | was |
+|---|---|---|
+| 11 | `ContextVar`: declare, set, get | 11 |
+| 12 | Same program, correct answer | 12 |
+| 13 | **What is a task?** | new |
+| 14 | `Context`: what a task carries | 13 |
+| 15 | The rule behind every surprise | 17 |
+| 16 | Set it before you spawn it | 18 |
+| 17 | The edges: leaving the event loop | 19 |
+| 18 | `Token`: putting it back | 14 |
+| 19 | Where you've already met it | 15 |
+| 20 | "Every example is a logging filter" | 16 |
+| 21 | "You know *which*. Nothing is safe yet." | 20 |
+
+The answer now lands three slides after the question instead of five, with nothing off-topic in the gap. `Token` sits
+with the other "using it well" concerns rather than in the API tour, and closer to the Stlite section that calls back
+to it. **What is a task?** is new: the deck had used the word since the async slide without defining it, and the copy
+rule leans on it. It stays high-level deliberately — the unit, not the `Task` API. The `Context` slide keeps its
+round-2 shape; only its title and closing line changed, to hand off to the copy rule.
+
+Deck is 37 slides.
+
+### Audience review pass
+
+`.claude/agents/audience-reviewer.md` reads a finished deck once, in order, as someone at the stated knowledge level,
+and reports terms used before introduction, questions raised and not answered, answers separated from their question,
+detail arriving before motivation, and overstated claims. The slidev-deck skill runs it as step 6, after `slides.md`
+is written and before the deck goes to the author. Most of this deck's review rounds were findings of exactly that
+shape, caught by the author rather than before.

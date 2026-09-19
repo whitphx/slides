@@ -298,7 +298,7 @@ After creating package.json, run `pnpm install` in the deck directory.
 
 ### 5. Write slides.md
 
-Read `references/slidev-syntax.md` before writing or editing `slides.md`. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
+Read `references/slidev-syntax.md` before writing or editing `slides.md`. When the slides are done, section 6 runs the `audience-reviewer` pass over them. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
 
 This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
@@ -436,7 +436,24 @@ layout: section
 ---
 ```
 
-### 6. Important notes
+### 6. Review the deck as its audience
+
+Once `slides.md` is written, or substantially revised, launch the `audience-reviewer` subagent and wait for its report. Tell it the deck directory and the assumed knowledge level; it reads the deck once, in order, as someone at that level with no other context, and reports where the explanation loses them.
+
+It exists because of a failure that is invisible from the inside. Having built the deck, you know what every name means and which slide answers which question, so you read straight past a helper the audience has never seen, or an answer that arrives five slides after the question that raised it. The author will catch these on their first read-through and send them back one at a time. A pass that catches them first is cheaper for everyone.
+
+What it looks for: terms and functions used before anything introduces them, questions a slide provokes and never answers, answers separated from their question by intervening material, API detail presented before the audience wants it, and claims wider than the deck demonstrates. It reads presenter notes too, since the spoken track can introduce something the slide leaves bare.
+
+Act on the report before handing the deck over:
+
+- **Used before introduced** and **dangling code** are always worth fixing. Give the thing a sentence in the notes, or show it in a floating box.
+- **Answer arrives late** usually means resequencing, not new content. Move the answer next to the question it settles.
+- **Detail before motivation** is the same fix pointed the other way: push the detail past the beat that makes the audience want it.
+- **Claim wider than the evidence** is a rewording.
+
+Tell the user about anything you decide not to fix, and why. When the report and the author disagree, the author wins — but say that the report raised it.
+
+### 7. Important notes
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)

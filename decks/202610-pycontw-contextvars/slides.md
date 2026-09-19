@@ -273,18 +273,19 @@ plainBackground: true
 
 <div border="~ gray/40 rounded-lg" p-2>
 <div text-4 op60 mb-1>one process</div>
+<div class="row-offset"></div>
 <div flex="~ col" gap-1>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div data-id="t1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 1</b></div>
-<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request A</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request A</div>
 </div>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div data-id="t2" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 2</b></div>
-<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request B</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request B</div>
 </div>
-<div border="~ emerald/50 rounded" p-2 bg-emerald:5>
+<div data-id="t3" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 3</b></div>
-<div border="~ emerald/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>request C</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request C</div>
 </div>
 </div>
 </div>
@@ -294,15 +295,15 @@ plainBackground: true
 <div border="~ rose/50 rounded" p-2 bg-rose:5>
 <div text-4 mb-1><b>Thread 1</b></div>
 <div flex="~ col" gap-1>
-<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 1</b></div>
 <div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request A</div>
 </div>
-<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 2</b></div>
 <div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request B</div>
 </div>
-<div border="~ violet/50 rounded" p-1 bg-violet:5>
+<div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 3</b></div>
 <div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request C</div>
 </div>
@@ -315,11 +316,15 @@ plainBackground: true
 
 </div>
 
-<div v-click="3" mt-4 text-center text-5>
+<div v-click="3" mt-2 text-center text-5>
 
 In async code, `threading.local()` **no longer means per-request**. 💥
 
 </div>
+
+<style>
+.row-offset { height: 36px; }
+</style>
 
 <!--
 That code is correct, as long as one thread handles one request. But once we go async, that stops being true.

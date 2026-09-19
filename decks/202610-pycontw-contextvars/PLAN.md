@@ -361,3 +361,13 @@ turns."
 
 The word `task` now appears on the diagram that raises it and is defined on the very next slide, which is the
 sequence the author asked for two rounds ago: the picture poses the question, the next slide answers it.
+
+### Review round 7 (author, 2026-09-19)
+
+The async slide's per-request rows now line up across the two columns: `Thread 1/2/3` on the left sit level with
+`Task 1/2/3` on the right, so the eye reads each request straight across while the right column still nests one
+frame deeper. Two things were needed. The two box types were given identical structure and padding, so all three
+rows share a height rather than only the first lining up; and a `.row-offset` spacer in the left column reserves
+the height of the right column's `Thread 1` header, which the left has no equivalent for. Padding on both sides
+came down a step to pay for the extra nesting: the grid's `1fr` middle row absorbs margin changes, so height had
+to come out of the diagram itself rather than the space around it.

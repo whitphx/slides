@@ -135,3 +135,6 @@ dist
 
 # Claude Code session worktrees
 .claude/worktrees/
+
+# Wrangler local state
+.wrangler/

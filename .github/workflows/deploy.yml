@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: ${{ github.event_name == 'pull_request' && format('preview-{0}', github.ref) || 'production' }}
   cancel-in-progress: true
 
 permissions:
@@ -43,9 +43,9 @@ jobs:
         run: |
           if [ -n "$PR_NUMBER" ]; then
             pnpm dlx wrangler@4.129.0 versions upload --preview-alias "pr-$PR_NUMBER"
-            url=$(jq -r 'select(.type == "version-upload") | .preview_alias_url' "$WRANGLER_OUTPUT_FILE_PATH")
+            url=$(jq -er 'select(.type == "version-upload") | .preview_alias_url' "$WRANGLER_OUTPUT_FILE_PATH")
           else
             pnpm dlx wrangler@4.129.0 deploy
-            url=$(jq -r 'select(.type == "deploy") | .targets[0]' "$WRANGLER_OUTPUT_FILE_PATH")
+            url=$(jq -er 'select(.type == "deploy") | .targets[0]' "$WRANGLER_OUTPUT_FILE_PATH")
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"

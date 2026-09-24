@@ -1,0 +1,373 @@
+# The hidden current context — PyCon TW 2026
+
+**Status:** built and under review as [PR #16](https://github.com/whitphx/slides/pull/16); first round of review feedback applied.
+
+**Earlier:** both stages approved and built. `slides.md` has all 37 slides with presenter notes; `pnpm build` passes and the deck measures zero overflow on both axes.
+
+**Source:** `whitphx/pycon-proposals` → `proposal.2026.tw.md`
+**Slot:** 30 min (~25 min content + 5 min Q&A) · English · intermediate
+**Relationship to `decks/202606-pyconkr-contextvars`:** same talk, same proposal lineage. This deck is written fresh against the arc below; the KR deck is a style and content reference only, not a fork.
+
+---
+
+## Stage 1: Narrative arc
+
+### 1. Where we start: the "current" state you already write
+Globals, `threading.local()`, the current request / user / transaction. In a thread-per-request server this genuinely works, and the audience has shipped it.
+
+**Pain:** async puts many logical executions on one thread. `threading.local()` collapses them into a single bucket, and the request ID in your log line now belongs to somebody else's request.
+
+### 2. `contextvars`: state that follows the call chain, not the thread
+`ContextVar`, `Context`, `Token`. A value that survives `await` and stays attached to the logical execution rather than the OS thread.
+
+**Pain:** it works, and the canonical demo (request IDs in logs) makes it look like a logging utility. That framing undersells the mechanism and hides where it stops working.
+
+### 3. The rule that actually governs it: context is *copied* at task creation
+Not shared, copied. So propagation has an edge, and the edge is where the bugs are: setting a value after you already spawned the task, hopping into a thread pool, crossing a sync/async boundary.
+
+**Pain:** even with propagation perfectly understood, all you have is an answer to "which logical execution am I in?" Nothing has been made safe yet.
+
+### 4. Stlite: where that gap turns into a real bug
+Multiple logical Streamlit servers sharing one Python environment and one thread, in the browser. `contextvars` correctly reports which app is running. `os.chdir()` is still process-wide, so that correct answer doesn't help on its own.
+
+**Pain:** knowing the right directory is not the same as applying it. Between two awaits another task runs and moves the cwd out from under you.
+
+### 5. Step 2: apply and restore around every resume
+The coroutine proxy: wrap each step of the coroutine, set the global state on entry, restore it on exit.
+
+**Payoff:** two mechanisms with a clean split. `contextvars` models the logical execution; the proxy reconciles that model with a global API that knows nothing about it.
+
+### 6. The generalized lesson
+`contextvars` is a language-level tool for modeling logical execution context, not a fix for global state. Build a framework, runtime, or async library and you have to define your context boundary, then decide what happens at every global API it touches. Free-threading (3.13+) sharpens it: thread identity and logical execution context are now unmistakably different things.
+
+---
+
+## What I want decided
+
+1. **How much of the talk is Stlite?** The proposal gives the case study 8 of ~25 minutes, the largest single block. You spoke on stlite at PyCon TW 2023, so some of this audience already knows what it is, which would let beat 4 skip the introduction and land on the bug faster. Worth trading that time into beats 2 and 3? *(Blocking: it changes the weight of half the talk.)*
+2. **Does free-threading stay?** It's in the proposal's outline but absent from the KR deck, so it is new material to write and verify. It earns its place in beat 6 as the sharpest statement of the thesis, but it is also the easiest thing to cut if the run is long.
+3. **Full portfolio bio?** You left this to the topic. The talk's case study *is* your project, so my read is yes, full portfolio bio.
+
+## What I assumed
+
+- The audience writes async Python, knows `await` and `asyncio.Task`, and has reached for `threading.local()` or a module-level global. They do not know `contextvars`.
+- **Reordered from the proposal:** "common use cases and patterns" is not a standalone section. Request IDs, tracing, and transaction context appear inside beat 2 as the familiar framing, and "when explicit parameters are better" moves to beat 6 where it is a design lesson rather than a list item.
+- **Also reordered:** "context is copied at task creation" moves *before* the case study (beat 3). The Stlite bug is an instance of the propagation-edge problem, so the audience needs the rule in hand to feel the bug. The remaining pitfalls (thread pools, sync/async hops, free-threading) stay at the end.
+- Beat 4 introduces Stlite as a case study, not as a product, so it gets only what the bug needs.
+- Q&A is inside the 30, leaving ~25 minutes of content.
+
+---
+
+## Stage 2: Slide list (37 slides, ~25 min)
+
+**Decisions carried in:** Stlite keeps its full ~8 min with a proper introduction · free-threading stays · full portfolio bio.
+
+### Opening (4)
+```
+ 1. The hidden current context      title        + subtitle "Understanding `contextvars` through real-world runtime problems"
+ 2. Hi 👋                           bio          full portfolio (projects, contributions, past talks)
+ 3. What you'll leave with          bullets      v-clicks: the problem it solves · how values propagate · where it stops working
+ 4. Agenda                          bullets      🧩 🧠 🔬 ⚠️ — the four sections
+```
+
+### Beat 1 — the "current" state you already write (5) · ~3 min
+```
+ 5. 🧩 Everything is "current"      section      + subtitle: the state you never pass as an argument
+ 6. Python is full of "current"     bullets      emoji grid: request · user · transaction · cwd · runtime
+ 7. The sync answer                 code         module global, then `threading.local()` in a thread-per-request server
+ 8. One thread, many requests       FancyArrow   thread-per-request vs. one event loop; plainBackground
+ 9. Where it breaks                 code+output  two tasks, one `threading.local()`, the wrong request ID on screen
+```
+
+### Beat 2 — a variable that follows the `await` (7) · ~6 min
+```
+10. 🧠 Following the call chain     section
+11. `ContextVar`: declare/set/get   code         click spec walks the three lines
+12. Same program, right answer      magic-move   morph slide 9's broken code into the `ContextVar` version
+13. `Context`: a snapshot           code         `copy_context()`, `ctx.run()`
+14. `Token` and `reset()`           code         set returns a token; reset restores the previous value
+15. Where you've already met it     bullets      request IDs in logs · OpenTelemetry spans · DB session/transaction
+16. "So it's a logging tool?"       statement    the tension: every example you've seen is a logging filter
+```
+
+### Beat 3 — the rule that explains the surprises (4) · part of the 6 min above
+```
+17. Context is *copied* at creation FancyArrow   parent context → snapshot at `create_task`; plainBackground
+18. Set before you spawn            code+output   the classic bug: set after `create_task`, task never sees it
+19. The edges                       code         `run_in_executor` drops it; `copy_context()` carries it across
+20. What you have now               statement    you know *which* execution you're in. Nothing is safe yet.
+```
+
+### Beat 4 — Stlite, and one very global variable (6) · ~4 min of the 8
+```
+21. 🔬 Case study: Stlite           section      + subtitle: Streamlit in the browser
+22. What is Stlite?                 bullets+img  Streamlit on Pyodide/WASM, no server; public/stlite.svg
+23. Seeing it run                   WindowMockup browser frame, an app running with no backend
+24. The unusual setup               FancyArrow   N logical servers · one Python · one thread; plainBackground
+25. Each app wants its own dir      code         app A at /app-a, app B at /app-b — and `os.getcwd()` is process-wide
+26. The bug                         code+output  task A chdirs, task B resumes in A's directory
+```
+
+### Beat 5 — the two-step fix (5) · ~4 min of the 8
+```
+27. Step 1: remember *which*        code         the `ContextVar` holding each task's runtime info (real task_context.py)
+28. Knowing ≠ applying              statement    contextvars gave us the answer. Nobody told the OS.
+29. Step 2: apply and restore       code         the context manager: chdir in, chdir back out
+30. Around every resume             magic-move   morph into the coroutine proxy wrapping `send`/`throw`
+31. Putting it together             FancyArrow   two tasks interleaving, each resuming in its own dir; plainBackground
+```
+
+### Beat 6 — where the boundary is yours to draw (5) · ~5 min
+```
+32. ⚠️ Drawing the boundary         section
+33. Four pitfalls                   bullets      v-clicks: copy-at-creation · thread pools · sync/async hops · global side effects
+34. 3.13: thread ≠ logical context  FancyArrow   free-threading finally separates the two; plainBackground
+35. The core lesson                 statement    `contextvars` tells *you* which. It never tells the OS.
+36. Hidden context or a parameter?  table        the rule to take home: when each one is right
+```
+
+### Closing (1)
+```
+37. Key takeaways                   bullets      v-clicks, then a final v-click reveals links + QRCode underneath
+```
+
+---
+
+## Notes on the build
+
+- **Addons:** `fancy-arrow`, `window-mockup`, `qrcode`. No `anipres` — the propagation diagrams are static figures with click reveals.
+- **Assets to copy** from `decks/202606-pyconkr-contextvars/public/`: `portfolio/*`, `github_whitphx.png`, `stlite.svg`.
+- **Accuracy dependency:** slides 27-31 must be written against the real implementation, not a plausible approximation —
+  `stlite/packages/kernel/py/stlite-lib/stlite_lib/server/task_context.py`. Read it before writing that block.
+- **Format balance:** 11 code slides, 4 diagrams, 4 statements, 4 sections, 2 WindowMockups, 1 table. The KR deck was
+  almost entirely bullets and code; the diagrams are the main structural change.
+- **Section emojis** match the agenda on slide 4, so the audience can track position.
+
+---
+
+## Build notes (what actually shipped)
+
+Deviations from the Stage 2 list, all found while rendering:
+
+- **Slide 23** is a hand-built HTML mock of a Streamlit app inside `WindowMockup`, not a screenshot — there was no
+  screenshot asset to use. Swap in a real one if you'd rather. Verified in both light and dark themes.
+- **Slide 31** became a 3-column grid (thread owner / `os.getcwd()` per time slice) rather than a free-form timeline.
+  The spacer-based version ran off the right edge of the slide.
+- **Slide 24's** three arrows converged on one anchor and rendered as a scribble; they now aim at separate
+  percentage points on the target's left edge.
+- **Slide 17** carries `create_task()` + "copies the context" as a label block; the arrow is unlabelled, because the
+  arrow's own label collided with it.
+
+Code shown in slides 27-31 is simplified from the real implementation and cited on slide 27. The originals live in
+`stlite_lib/server/task_context.py`: `home_dir_contextvar`, `TaskSpecificDirectoryConfig`, and
+`DirectorySyncCoroutineProxy`, which wraps `send`/`throw`/`close`. The slide shows `send` only.
+
+`pnpm lint` reports 3 pre-existing `vue/multi-word-component-names` errors in other decks' `Modal.vue` files.
+This deck adds no Vue components.
+
+### Slide titles that changed during writing
+
+The Stage 2 list above keeps its working titles. The shipped ones differ for these slides:
+
+| # | planned | shipped |
+|---|---|---|
+| 8 | One thread, many requests | Then we went async |
+| 9 | Where it breaks | Watch it break |
+| 10 | Following the call chain | Following the `await` |
+| 16 | "So it's a logging tool?" | Every example you've ever seen is a logging filter |
+| 19 | The edges | The edges: leaving the event loop |
+| 24 | The unusual setup | Many apps, one Python |
+| 26 | The bug | So here's the bug |
+| 31 | Putting it together | Two tasks, one directory, no collisions |
+| 33 | Four pitfalls | Four things that will bite you |
+| 35 | The core lesson | `contextvars` tells *you* which context you're in |
+
+### Second pass (pre-flight review)
+
+- **Slides 19 and 25** were rewritten from code comments to `FancyArrow` + floating boxes. The first drafts put the
+  slide's whole point inside `#` comments, which `references/slidev-syntax.md` bans outright.
+- **Slide 12** was missing `default="-"` on its `ContextVar`, which made slide 18's printed `-` a lie: as written it
+  would have raised `LookupError`. The variable is now named `request_id_var` from slide 11 onward, one name
+  throughout.
+- **Slides 14 and 34** had more `[click]` beats in their notes than the slides had clicks, so every beat after the
+  mismatch was spoken one click early.
+- **Slide 27's** declaration was clipped at the right edge and is now reflowed.
+- Three foreshadowing sentences were cut from the notes per the skill's rule against explaining later material early.
+
+Verification: `pnpm build` passes, and a Playwright pass over `/export` reports zero vertical overflow, zero
+horizontal overflow, and no code block whose content is wider or taller than its own container.
+
+### Dependency versions
+
+Pinned to match `decks/202608-pyconkr-asgi-pyodide` rather than the newest published releases.
+Asking for `@slidev/cli ^52.19.1` pulled `@slidev/client` to 52.19.1, and since the anipres decks share
+that peer, pnpm re-resolved `slidev-addon-anipres` across the whole workspace and dragged
+`packages/index` from `vite@6` to `vite@8` with it. The Vercel deploy failed on that commit.
+Matching the sibling deck keeps `@slidev/client` at 52.19.0 and `vite` at 6, as on `main`.
+
+### Review round 1 (author, 2026-09-19)
+
+- **Agenda slide cut.** The talk is one chain of tension and release, so an up-front list of sections reads as five
+  abstract noun phrases and spoils the first beat. It also overlapped "What you'll leave with", which stays because
+  it is the concrete one. Deck is now 36 slides. The rule went into the skill's narrative-structure section.
+- **Title slide** collided with the QR code: the heading's right edge sat 27px inside the QR block. The heading now
+  starts below it, and the subtitle moved out of the `<h1>` so it can carry its own line height (`leading-10` on a
+  `<small>` inside an `<h1>` is overridden by the heading's leading).
+- **Click specs on "The sync answer" and "Watch it break"** did not match their spoken beats. The first pointed at
+  `do_the_work()` and `def log(` where the note was describing the read; both now end with a trailing `|*` so the
+  code returns to full highlight when the payoff lands instead of staying dimmed through it.
+- **"Then we went async"** now draws a process frame on both sides, with the two `Thread 1` blocks and the two
+  captions on matching baselines, and states the consequence directly rather than as a turn of phrase.
+- **Presenter-note phrasing**: vague stand-ins replaced with the thing itself ("nobody passed in" → "never passed to
+  it as arguments", "vary" → "changes from request to request"). Also in the skill, under presenter notes.
+
+### Review round 2 (author, 2026-09-19)
+
+- **`ContextVar`: declare, set, get** — the note now introduces the type before touring its API, tying it back to
+  `threading.local()` rather than dropping the name in cold.
+- **Type annotations dropped** from the two teaching slides. `request_id_var: ContextVar[str] = …` is inferable and
+  reads as clutter on screen. The declaration stays wrapped across three lines on the declare slide, though: at full
+  width it runs under the floating annotation box. The one surviving annotation is on "Step 1: remember *which*",
+  where the code is quoted from Stlite and should match upstream.
+- **`Context`: a snapshot** — rebuilt. `handler` was an undefined name the audience would stop to wonder about, so
+  its body now sits in a floating box with an arrow into `ctx.run(handler)`. Beside it, the `Context` itself is drawn
+  as the mapping it is (three `ContextVar → value` rows) with a chip showing that `handler()` runs inside it. The
+  handler box sits in the right column rather than under the code: from below, the arrow crossed the
+  `ctx[request_id_var]` line on its way up.
+
+### Review round 3 (author, 2026-09-19)
+
+- **Title slide** — "These slides" caption removed, and the heading raised into the space that frees. It now clears
+  the QR by roughly 20px rather than sitting near the bottom of the slide.
+- **Section 1 renamed** to "🧩 The invisible arguments". "Everything is 'current'" overstated the claim, and it also
+  echoed the very next slide, "Python is full of 'current'". The subtitle changed with it, since "the state you
+  never pass as an argument" would have restated the new title.
+- **The sync answer** — the call chain was broken: `do_the_work()` was undefined and `log()` was never called, so
+  the slide asked the audience to imagine two functions. The block now runs `handle` → `do_the_work` → `log`, which
+  makes the point concrete: `do_the_work` never mentions a request id and `log` never takes one, yet the id reaches
+  the log line. Five click steps now, five spoken beats. The framing sentence above the code went, for room.
+- **Then we went async** — the two frames were structurally different, one naming requests and the other tasks.
+  Both now nest identically (process → thread → request A/B/C), so the only visible difference is the thing the
+  slide is about: how many requests sit on a thread.
+
+### Review round 4 (author, 2026-09-19) — mental-model section resequenced
+
+The author's diagnosis: after "Same program, correct answer" proves `ContextVar` works, the audience wants to know
+what the context object is and when it switches. The deck answered that on "The rule behind every surprise", five
+slides later, with the `Context` and `Token` APIs in between. Worse, two of those intervening slides ("Where you've
+already met it" and the logging-filter statement) are a tension pair whose job is to push *out* of the mental model
+and into Stlite, so they split the explanation in half and handed it back.
+
+The section now runs **model → consequences → placement → handoff**:
+
+| new | slide | was |
+|---|---|---|
+| 11 | `ContextVar`: declare, set, get | 11 |
+| 12 | Same program, correct answer | 12 |
+| 13 | **What is a task?** | new |
+| 14 | `Context`: what a task carries | 13 |
+| 15 | The rule behind every surprise | 17 |
+| 16 | Set it before you spawn it | 18 |
+| 17 | The edges: leaving the event loop | 19 |
+| 18 | `Token`: putting it back | 14 |
+| 19 | Where you've already met it | 15 |
+| 20 | "Every example is a logging filter" | 16 |
+| 21 | "You know *which*. Nothing is safe yet." | 20 |
+
+The answer now lands three slides after the question instead of five, with nothing off-topic in the gap. `Token` sits
+with the other "using it well" concerns rather than in the API tour, and closer to the Stlite section that calls back
+to it. **What is a task?** is new: the deck had used the word since the async slide without defining it, and the copy
+rule leans on it. It stays high-level deliberately — the unit, not the `Task` API. The `Context` slide keeps its
+round-2 shape; only its title and closing line changed, to hand off to the copy rule.
+
+Deck is 37 slides.
+
+### Audience review pass
+
+`.claude/agents/audience-reviewer.md` reads a finished deck once, in order, as someone at the stated knowledge level,
+and reports terms used before introduction, questions raised and not answered, answers separated from their question,
+detail arriving before motivation, and overstated claims. The slidev-deck skill runs it as step 6, after `slides.md`
+is written and before the deck goes to the author. Most of this deck's review rounds were findings of exactly that
+shape, caught by the author rather than before.
+
+### Audience review, round 1 findings (2026-09-19)
+
+The `audience-reviewer` pass raised 14 findings. Nine were fixed:
+
+- **"Set it before you spawn it" called `worker()` on line 1 and defined it on line 4.** As written the snippet
+  raises `NameError`, not the `-` the terminal shows — on the one slide whose entire subject is which line comes
+  first, so the audience reads the ordering with maximum suspicion and finds the wrong problem. Reordered.
+- **`self.wanted` was applied with no visible origin.** An `__init__` now shows it coming from the directory the
+  task wants, which also joins step 1 to step 2 on screen. The old click spec highlighted a blank line; retargeted.
+- **The step 1 note contradicted the copy-at-creation rule** the deck asks the audience to memorise: "a fresh task
+  does not inherit the bindings". Both statements were true but the deck never reconciled them. The note now says
+  why — the copy comes from whoever called `create_task`, and here that is the JS bridge, not the setup code.
+- **The proxy slide never showed who installs the proxy**, leaving the payoff looking like magic. The callout now
+  says the loop is handed `DirectorySyncCoroutineProxy(coro)` rather than the bare coroutine.
+- **"Threads don't inherit" read as a reversal** of the `asyncio.to_thread` tick given three slides earlier. Now
+  "Threads inherit nothing — `run_in_executor` drops it; `asyncio.to_thread` copies it for you". The bullet below
+  it, which named a category the deck never demonstrated, became "The failure is silent".
+- **Free-threading was the reason for its slide but was defined after the conclusion drawn from it.** Definition
+  first now. The process column on that slide also went back to amber, restoring the blue/orange mapping slide 5's
+  note asks the audience to hold.
+- **"SharedWorker"** was unexplained browser jargon; now "when they share one browser worker".
+- **"Every example you've ever seen is a logging filter"** was contradicted by the previous slide, which lists four
+  uses, three of them not logging. Narrowed to the claim that survives: "Every example you were *taught* with".
+- **"The rule behind every surprise"** overstated what the deck shows; the note and the takeaway already said
+  "most". Title matched to them.
+
+Four were left for the author, being changes to decisions already made: the "safe" framing across four slides, the
+task slide's closing line and placement, moving `ctx.run` off the `Context` slide, and splitting "Each app wants its
+own directory" into two visibly separate programs.
+
+### Review round 5 (author, 2026-09-19) — tasks before contexts
+
+"What is a task?" moved out of the mental-model section and up to **slide 8**, directly after "Then we went async".
+That slide's right-hand frame already draws the units, so the definition now explains a picture the audience is
+looking at instead of arriving cold four slides later. The order through the first half is now:
+
+```
+ 7  Then we went async        the picture: one thread, three requests
+ 8  What is a task?           what those units are, and who starts them
+ 9  Watch it break            the collision, with `gather` now a known thing
+10  🧠 Following the `await`
+11  ContextVar: declare, set, get
+12  Same program, correct answer
+13  Context: what a task carries
+14  The rule behind most surprises
+```
+
+Execution model first, `contextvars` second, the copy rule last — so the rule lands on a model the audience already
+holds rather than building both at once.
+
+The slide now leads with **who starts a task** (your code via `create_task`/`gather`, or a framework per request),
+and the note tells the audience to hold onto that, because the copy rule pays it off: the context copied into a task
+is *the caller's*, snapshotted at the moment they called. The rule slide's boxes say "the **caller's** context" and
+"the **task's** context" rather than "parent" and "child", which also lines up with the Stlite slide where the
+caller is the JavaScript bridge rather than the setup code.
+
+Its closing line was the audience-reviewer's complaint that the slide spent the copy rule's punchline two slides
+early. In its new position it hands off to the breakage instead: "three requests, three tasks, one thread — taking
+turns."
+
+### Review round 6 (author, 2026-09-19)
+
+- **"Watch it break" → "Watch `threading.local()` break".** With the task slide now sitting between the async
+  diagram and the breakage, "it" had two plausible referents. The title names the subject instead.
+- **The async slide's right frame gained the `Task` layer.** It now nests `one process → Thread 1 → Task 1/2/3 →
+  request A/B/C` against the left's `one process → Thread 1/2/3 → request A/B/C`, so the two sides correspond
+  frame for frame and the async side visibly sits one level deeper. That layer is the whole difference the slide
+  is about, and it was the one thing the picture left implicit.
+
+The word `task` now appears on the diagram that raises it and is defined on the very next slide, which is the
+sequence the author asked for two rounds ago: the picture poses the question, the next slide answers it.
+
+### Review round 7 (author, 2026-09-19)
+
+The async slide's per-request rows now line up across the two columns: `Thread 1/2/3` on the left sit level with
+`Task 1/2/3` on the right, so the eye reads each request straight across while the right column still nests one
+frame deeper. Two things were needed. The two box types were given identical structure and padding, so all three
+rows share a height rather than only the first lining up; and a `.row-offset` spacer in the left column reserves
+the height of the right column's `Thread 1` header, which the left has no equivalent for. Padding on both sides
+came down a step to pay for the extra nesting: the grid's `1fr` middle row absorbs margin changes, so height had
+to come out of the diagram itself rather than the space around it.

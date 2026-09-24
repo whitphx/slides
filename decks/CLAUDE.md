@@ -7,3 +7,7 @@ Size on-slide text with the numeric scale (`text-4` = 16px, `text-5` = 20px, `te
 ## Closing Slide
 
 The final slide is on screen longer than any other — through Q&A, while the host wraps up, while people photograph it — so it should be the fullest slide in the deck, not a sign-off. End on the takeaways, and reveal the links and QR code as a last click underneath them. "Thank you" is spoken, so it belongs in the presenter notes. A dedicated thank-you slide is fine only when it carries content of its own.
+
+## Asset Size
+
+The site is served from Cloudflare Workers static assets, which rejects any file over 25 MiB and fails the whole deploy. That covers built chunks as well as files in `public/`: anipres embeds its images in `timeline.json` as base64, and Slidev bundles the snapshot into a single JS chunk. Downscale or re-encode large videos and images (e.g. WebP, max 2560px long edge) before adding them.

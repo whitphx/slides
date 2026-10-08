@@ -1,6 +1,6 @@
 # The hidden current context — PyCon TW 2026
 
-**Status:** built and under review as [PR #16](https://github.com/whitphx/slides/pull/16); first round of review feedback applied.
+**Status:** built and merged in [PR #16](https://github.com/whitphx/slides/pull/16). One slide added since, on the boundary where JavaScript calls back into Python (see "Addition: called from outside Python" below); 38 slides.
 
 **Earlier:** both stages approved and built. `slides.md` has all 37 slides with presenter notes; `pnpm build` passes and the deck measures zero overflow on both axes.
 
@@ -95,6 +95,7 @@ The coroutine proxy: wrap each step of the coroutine, set the global state on en
 17. Context is *copied* at creation FancyArrow   parent context → snapshot at `create_task`; plainBackground
 18. Set before you spawn            code+output   the classic bug: set after `create_task`, task never sees it
 19. The edges                       code         `run_in_executor` drops it; `copy_context()` carries it across
+19b. The edges: called from outside Python  magic-move  JS-invoked `create_proxy` callback lands in the root context; snapshot at the handoff
 20. What you have now               statement    you know *which* execution you're in. Nothing is safe yet.
 ```
 
@@ -371,3 +372,13 @@ rows share a height rather than only the first lining up; and a `.row-offset` sp
 the height of the right column's `Thread 1` header, which the left has no equivalent for. Padding on both sides
 came down a step to pay for the extra nesting: the grid's `1fr` middle row absorbs margin changes, so height had
 to come out of the diagram itself rather than the space around it.
+
+### Addition: called from outside Python (2026-10-08)
+
+New slide after "The edges: leaving the event loop", from whitphx/stlite#2129. Every boundary the deck already named has a Python caller to copy from; this one has none. A `create_proxy` callback that JavaScript fires from `setTimeout` is entered in the thread's root context, so a value set inside the request's task is gone. The fix takes `copy_context()` when the callback is handed over and runs each call in a fresh `.copy()` of it, since `Context.run` refuses to re-enter a running context. The example sets the request id inside `handle()`, which runs as a task: set at the top level, the value would itself land in the root context and the "before" output would be wrong.
+
+The two notes that touched this case were adjusted so the slide is said once. "Step 1: remember *which*" now points back to it instead of re-deriving the JS-caller case, and "Where you've already met it" gained the `ScriptRunContext` migration: upstream Streamlit keeps it as an attribute on the script's thread (with `add_script_run_ctx()` to attach it elsewhere by hand), and Stlite's fork moved it onto the asyncio task and then into a `ContextVar`.
+
+The audience review of this addition changed several notes. The edges slide no longer lists callbacks among the hops *off* the loop, so the new slide can own the other direction. The new slide carries an on-slide Pyodide label, uses "top-level context" (glossed in the note as where module-level code runs) instead of "root"/"parent", explains `.copy()` when the code first shows it, and sets up the session-in-a-context-variable fact before the bug story that depends on it. The re-entrancy and `async def` details were cut from the spoken track as unmotivated for this audience. "Step 1: remember *which*" now says why the snapshot trick does not apply to Stlite's server entry points: JavaScript grabs them once at startup through `pyodide.pyimport`, before any app exists, so each call is re-bound on entry (`stlite_lib/asgi_app.py`). The recap note before the case study and the Pyodide introduction in "What is Stlite?" now refer back to the new slide.
+
+Raised by the review and left as built: moving the new slide after "`Token`" so the three API pieces stay together (the author placed it after the edges slide), and widening "Four things that will bite you" to cover foreign callbacks (the author chose a slide over bullets).

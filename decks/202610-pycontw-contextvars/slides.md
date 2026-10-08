@@ -937,7 +937,7 @@ Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh
 [click]
 So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
 
-And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and in Stlite that session lives in a context variable, just like our request id. So a JavaScript callback that landed in the top-level context couldn't find it, and every Streamlit call failed. Stlite now wraps `create_proxy()` exactly like this, for every callback an app hands to JavaScript.
+And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and Stlite looked it up from the running task. A JavaScript callback runs in no task, so every Streamlit call from it failed, unless the app attached the session by hand. The fix put the session in a context variable, just like our request id, and wraps `create_proxy()` like this. So every callback an app wraps with it runs in the snapshot.
 -->
 
 ---
@@ -1358,7 +1358,7 @@ One context variable holding the home directory this task belongs to.
 [click]
 And it gets set at every entry point where JavaScript calls into Python. Every browser event that starts Python work binds it first.
 
-That's the edge from earlier: when JavaScript calls Python, there's no Python caller to copy from. And the snapshot trick doesn't help here. JavaScript grabs these entry points once, at startup, before any app exists, so a snapshot taken then would have nothing in it. Each call lands in a fresh task with the top-level context, so we bind on entry, every time.
+That's the edge from earlier: when JavaScript calls Python, there's no Python caller to copy from. These entry points aren't callbacks we wrap with `create_proxy()`. JavaScript calls them directly, and each call lands in a fresh task with the top-level context, so we bind on entry, every time.
 
 [click]
 And now the question "which directory should this task be in" has a correct answer, available anywhere, at any depth, for free.

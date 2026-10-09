@@ -829,7 +829,115 @@ run_in_executor does not. Same idea, different function, opposite behaviour. You
 If you need it, you copy the context yourself and hand run the function. A bit ugly, but explicit.
 
 [click]
-I'm not asking you to memorise which function does which. I'm asking you to treat every hop off the event loop — a thread pool, a sync callback, a C extension that calls you back — as a boundary you go and check. Because the failure is silent. You get the default, not an exception.
+I'm not asking you to memorise which function does which. I'm asking you to treat every hop off the event loop as a boundary you go and check. Because the failure is silent. You get the default, not an exception.
+-->
+
+---
+plainBackground: true
+---
+
+# The edges: called from outside Python
+
+<div mt-1 text-4 op70>🌐 Pyodide: Python in the browser, called back by <b>JavaScript</b></div>
+
+<div mt-2 grid="~ cols-[1.6fr_1fr]" gap-5>
+
+<div>
+
+````md magic-move {at:2}
+
+```py
+async def handle(request_id):
+    request_id_var.set(request_id)
+
+    def on_timeout():
+        print(request_id_var.get())
+
+    setTimeout(create_proxy(on_timeout), 1000)
+```
+
+```py
+async def handle(request_id):
+    request_id_var.set(request_id)
+
+    def on_timeout():
+        print(request_id_var.get())
+
+    snapshot = copy_context()
+    def in_snapshot():
+        return snapshot.copy().run(on_timeout)
+
+    setTimeout(create_proxy(in_snapshot), 1000)
+```
+
+````
+
+</div>
+
+<div flex="~ col" gap-3>
+
+<div v-click="1">
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+-
+```
+
+</WindowMockup>
+<div mt-1 text-4 op70>no caller to copy: the <b>top-level</b> context</div>
+</div>
+
+<div v-click="3">
+<WindowMockup title="Terminal" dark codeblock>
+
+```shell
+A
+```
+
+</WindowMockup>
+<div mt-1 text-4 op70>inside the <b>snapshot</b></div>
+</div>
+
+</div>
+
+</div>
+
+<div mt-4 grid="~ cols-2" gap-4 text-4>
+<div v-click="3" border="~ emerald/50 rounded-lg" p-2 bg-emerald:5>📸 copied at the <b>handoff</b>, not the call</div>
+<div v-click="4" border="~ sky/50 rounded-lg" p-2 bg-sky:5>🔁 a fresh <code>.copy()</code> <b>per call</b></div>
+</div>
+
+<div v-click="5" mt-4 text-5>
+
+Every **entry point** back into Python is a boundary too. 🚪
+
+</div>
+
+<div v-click="5" absolute bottom-4 right-10 text-sm op60>Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/pyodide_proxy_context.py" target="_blank">stlite-lib/stlite_lib/pyodide_proxy_context.py</a></div>
+
+<!--
+There's a second kind of edge: something outside Python calling back in. The edges so far all had a Python caller. A thread pool, to_thread, create_task: something in Python made the call, so there was a context to copy, or to forget to copy.
+
+This is Pyodide, which is CPython compiled to WebAssembly and running in the browser. It's what powers the project in the case study coming up.
+
+Same `handle()` as before, running as its own task, one per request. It sets the request id, defines a callback, and hands it to JavaScript. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
+
+[click]
+And it prints the default. When JavaScript calls back in, no task is being created and there's no Python caller to copy from. Pyodide just runs the function in whatever context is current at that moment, which is the thread's top-level context. That's the one your module-level code runs in, not the task's copy. The request id was set in the task's copy, so it was never in there.
+
+[click]
+So we take the copy ourselves. `copy_context()` runs while `handle()` is still handing the callback over, and every call runs inside that snapshot. `.copy()` on a context just makes another one with the same values.
+
+[click]
+Now it prints the request id. And notice when the copy happened: at the handoff, not when JavaScript calls. By the time JavaScript calls, there's nothing left to copy.
+
+[click]
+Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
+
+[click]
+So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
+
+And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and Stlite looked it up from the running task. A JavaScript callback runs in no task, so every Streamlit call from it failed, unless the app attached the session by hand. The fix put the session in a context variable, just like our request id, and wraps `create_proxy()` like this. So every callback an app wraps with it runs in the snapshot.
 -->
 
 ---
@@ -906,6 +1014,8 @@ Async database sessions. SQLAlchemy can scope a session to the context, so "the 
 [click]
 And web frameworks use it for request-local state.
 
+And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
+
 So it's already load-bearing in your stack.
 -->
 
@@ -934,7 +1044,7 @@ layout: statement
 <!--
 OK. So at this point we have a working mental model.
 
-Values follow the logical execution. They're copied into tasks. There are edges at thread boundaries.
+Values follow the logical execution. They're copied into tasks. There are edges where you leave the event loop, and where outside code calls back in.
 
 But notice what we actually have. We can answer a question: which logical execution is this? That's it. It's an answer.
 
@@ -989,7 +1099,7 @@ Quick introduction, because the architecture is the reason this talk exists.
 Streamlit is a Python framework for building data apps. You write a script, it becomes a web app.
 
 [click]
-Stlite is Streamlit running in the browser, on Pyodide, which is CPython compiled to WebAssembly.
+Stlite is Streamlit running in the browser, on Pyodide, which you met on the edges slide: CPython compiled to WebAssembly.
 
 [click]
 And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.
@@ -1248,7 +1358,7 @@ One context variable holding the home directory this task belongs to.
 [click]
 And it gets set at every entry point where JavaScript calls into Python. Every browser event that starts Python work binds it first.
 
-That's deliberate, and it is the copy-at-creation rule rather than an exception to it. A task copies the context of whoever called create_task, and here that caller is the JavaScript bridge, not the code that configured the app. So there is nothing of ours in the parent context to inherit, and we re-bind on entry, every time.
+That's the edge from earlier: when JavaScript calls Python, there's no Python caller to copy from. These entry points aren't callbacks we wrap with `create_proxy()`. JavaScript calls them directly, and each call lands in a fresh task with the top-level context, so we bind on entry, every time.
 
 [click]
 And now the question "which directory should this task be in" has a correct answer, available anywhere, at any depth, for free.

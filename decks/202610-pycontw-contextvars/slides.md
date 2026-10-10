@@ -239,7 +239,7 @@ plainBackground: true
 
 <div mt-8 grid="~ cols-3" gap-4 text-5>
 
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>who is asking</span></div>
+<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
 <div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
 <div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
@@ -278,7 +278,7 @@ The current environment variables.
 [click]
 Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
 
-Keep an eye on the colours, by the way. The blue ones are values your own code sets, and they change from request to request. The orange ones belong to the operating system.
+Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the operating system.
 -->
 
 ---
@@ -370,7 +370,7 @@ At the top of each request, you stash the user on it, and then call the view.
 `current_user()` reads it straight back out.
 
 [click]
-And the view is our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
+And the view is a stripped-down version of our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
@@ -456,6 +456,8 @@ So one thread is serving many requests at once.
 [click]
 And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
 
+If you're wondering about your own apps: Flask on its threaded server is the picture on the left. An async framework like FastAPI or Starlette, with `async def` handlers, is the picture on the right.
+
 And before we fix it, we should be precise about that new word on the right: task.
 -->
 
@@ -520,13 +522,16 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 <div>
 
-```py {*|4|5|6|*}{maxHeight:'290px'}
+```py {*|8|4|5|*}{maxHeight:'330px'}
 _local = threading.local()
+
+async def index():
+    await asyncio.sleep(0.01)
+    return f"Hello, {_local.user}!"
 
 async def handle(user):
     _local.user = user
-    await asyncio.sleep(0.01)
-    print(f"{user} sees: Hello, {_local.user}!")
+    print(f"{user} sees: {await index()}")
 
 await asyncio.gather(handle("alice"), handle("bob"))
 ```
@@ -558,13 +563,16 @@ bob sees: Hello, bob!
 Let me show you the failure, because it's short.
 
 [click]
-Two requests come in, one from alice and one from bob. Alice's task stores her name.
+Here's the same app, made async. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
 
 [click]
-Then it awaits. And that's the moment it hands the thread over to bob's task, which sets the same attribute on the same object.
+Alice's task stores her name.
 
 [click]
-Then alice's task resumes and reads it back.
+Then `index()` awaits. And that's the moment it hands the thread over to bob's task, which stores his name in the same slot.
+
+[click]
+Then alice's task resumes and reads the slot.
 
 [click]
 And alice gets greeted as bob. Both lines say bob.
@@ -645,19 +653,25 @@ The shape is the same as the threading dot local version. Declare in one place, 
 ```py
 _local = threading.local()
 
+async def index():
+    await asyncio.sleep(0.01)
+    return f"Hello, {_local.user}!"
+
 async def handle(user):
     _local.user = user
-    await asyncio.sleep(0.01)
-    print(f"{user} sees: Hello, {_local.user}!")
+    print(f"{user} sees: {await index()}")
 ```
 
 ```py
 user_var = ContextVar("user", default="anonymous")
 
+async def index():
+    await asyncio.sleep(0.01)
+    return f"Hello, {user_var.get()}!"
+
 async def handle(user):
     user_var.set(user)
-    await asyncio.sleep(0.01)
-    print(f"{user} sees: Hello, {user_var.get()}!")
+    print(f"{user} sees: {await index()}")
 ```
 
 ````
@@ -694,7 +708,7 @@ bob sees: Hello, bob!
 So here's the same program again.
 
 [click]
-Two lines change. The declaration, and set and get instead of attribute assignment.
+Three lines change: the declaration, the set, and the get.
 
 [click]
 And now each task reads back its own value, across the await. Same interleaving, same single thread, right answer.
@@ -764,7 +778,7 @@ def handler():
 </div>
 
 <!--
-The second concept is the Context itself. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
+The second concept is the Context itself, the thing every task carries around. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
 
 [click]
 copy_context takes a snapshot of that whole mapping and hands it back to you as one object.
@@ -791,7 +805,7 @@ plainBackground: true
 
 <div data-id="parent" border="~ sky/50 rounded-lg" p-4 bg-sky:5 w-64>
 <div text-4 op70 mb-2>the <b>caller's</b> context</div>
-<div text-5><code>user</code> = <b>"alice"</b></div>
+<div text-5><code>user_var</code> = <b>"alice"</b></div>
 </div>
 
 <div v-click="1" data-id="mid" text-center op80 w-44>
@@ -801,7 +815,7 @@ plainBackground: true
 
 <div v-click="2" data-id="child" border="~ violet/50 rounded-lg" p-4 bg-violet:5 w-64>
 <div text-4 op70 mb-2>the <b>task's</b> context</div>
-<div text-5><code>user</code> = <b>"alice"</b></div>
+<div text-5><code>user_var</code> = <b>"alice"</b></div>
 </div>
 
 </div>
@@ -834,6 +848,8 @@ Which means the task inherits everything you had set before you spawned it. That
 
 [click]
 And it means anything the task sets stays inside the task. It never propagates back out to you. That's the part that surprises people.
+
+That's also why alice and bob each kept their own user a few slides ago. `gather` made a task for each of them, and each task got its own copy.
 
 Copy, not share. Say it once and most of the confusion goes away.
 -->
@@ -963,26 +979,23 @@ plainBackground: true
 ````md magic-move {at:2}
 
 ```py
+def on_timeout():
+    print(user_var.get())
+
 async def handle(user):
     user_var.set(user)
-
-    def on_timeout():
-        print(user_var.get())
-
     setTimeout(create_proxy(on_timeout), 1000)
 ```
 
 ```py
+def on_timeout():
+    print(user_var.get())
+
 async def handle(user):
     user_var.set(user)
-
-    def on_timeout():
-        print(user_var.get())
-
     snapshot = copy_context()
     def in_snapshot():
         return snapshot.copy().run(on_timeout)
-
     setTimeout(create_proxy(in_snapshot), 1000)
 ```
 
@@ -1036,7 +1049,7 @@ There's a second kind of edge: something outside Python calling back in. The edg
 
 This is Pyodide, which is CPython compiled to WebAssembly and running in the browser. It's what powers the project in the case study coming up.
 
-Same `handle()` as before, running as its own task, one per request. It sets the user, defines a callback, and hands it to JavaScript. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
+Same `handle()` as before, running as its own task. It sets the user and hands a callback to JavaScript. The callback lives at module level, like our `index()`, so nobody gives it the user. It reads the variable. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
 
 [click]
 And it prints the default. When JavaScript calls back in, no task is being created and there's no Python caller to copy from. Pyodide just runs the function in whatever context is current at that moment, which is the thread's top-level context. That's the one your module-level code runs in, not the task's copy. The user was set in the task's copy, so it was never in there.
@@ -1061,9 +1074,9 @@ And this one was a real bug. Streamlit, the data-app framework, needs its sessio
 # `Token`: putting it back
 
 ```py {*|1|3|5}{maxHeight:'220px'}
-token = user_var.set("alice")
+token = user_var.set("admin")
 
-do_some_work()
+run_admin_job()
 
 user_var.reset(token)
 ```
@@ -1072,7 +1085,7 @@ user_var.reset(token)
 
 <v-clicks at="4">
 
-- 🔁 **Nesting works** — middleware inside middleware, each one restores what it found
+- 🔁 **Same task, no copy** — so you put the old value back yourself
 - 🧹 **Libraries stay polite** — borrow the variable, hand it back
 
 </v-clicks>
@@ -1080,19 +1093,19 @@ user_var.reset(token)
 </div>
 
 <!--
-The third piece is the Token.
+One more piece of the API: the Token. Say alice's request has to run one job as admin.
 
 [click]
-set doesn't just return None. It gives you back a token, which remembers what the value was before you touched it.
+set doesn't just return None. It gives you back a token, which remembers what the value was before you touched it. Here, that's alice.
 
 [click]
-You do your work.
+The admin job runs.
 
 [click]
-And then reset puts back exactly what was there.
+And reset puts alice back.
 
 [click]
-Because it makes nesting work. If two pieces of middleware both set the same variable, each one restores what it found, and they don't clobber each other.
+Why do you need this, if tasks get their own copy? Because there's no copy here. This is all one task, alice's task, so nothing protects her value except you putting it back.
 
 [click]
 And it's how a library borrows a context variable without permanently changing it for the application that called it.
@@ -1109,7 +1122,7 @@ And it's how a library borrows a context variable without permanently changing i
 - 🪵 **Request IDs in logs** — a logging filter that calls `.get()`
 - 🔭 **Tracing** — `opentelemetry.context` is `contextvars` underneath; the current span follows your `await`
 - 💾 **Async DB sessions** — SQLAlchemy's `async_scoped_session` is scoped to a context
-- 🌐 **Web frameworks** — request-local state without a global request object
+- 🌐 **Web frameworks** — Flask's `request`, and the `current_user` from our first view
 
 </v-clicks>
 
@@ -1128,7 +1141,7 @@ Distributed tracing. OpenTelemetry's context API is contextvars underneath. That
 Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
 
 [click]
-And web frameworks use it for request-local state.
+And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` reads through it. So the `current_user` in our very first view was sitting on this all along.
 
 And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
 
@@ -1144,7 +1157,7 @@ layout: statement
 <!--
 But here's what bugs me about how this module gets taught.
 
-Look at that last slide again: three of those four have nothing to do with logging. And yet every tutorial, every blog post, every conference talk — including the first half of this one — teaches the thing with the same example. Request IDs in logs.
+Look at that last slide again: three of those four have nothing to do with logging. And yet every tutorial, every blog post, every conference talk teaches the thing with the same example. Request IDs in logs.
 
 And that's a fine example. It's just a small one. It leaves you thinking contextvars is a logging convenience.
 
@@ -1370,7 +1383,7 @@ Because a Streamlit script is ordinary Python. It opens files with relative path
 So App B needs a different one.
 
 [click]
-And this line is why it matters. A user writes read_csv with a relative path, like anyone would. Which file that resolves to depends entirely on the current directory at that instant.
+And this line is why it matters. Remember `open("greeting.txt")` in our very first view? Same thing. A user writes read_csv with a relative path, like anyone would. Which file that resolves to depends entirely on the current directory at that instant.
 
 [click]
 And here's the wall. There is exactly one current working directory per process. The OS has no concept of "the current directory for this task". You cannot have one per app, because it isn't yours to partition.
@@ -1785,7 +1798,7 @@ So when should you actually reach for this?
 
 The honest answer is: less often than it's fun to.
 
-Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that.
+Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that. Our very first view is the textbook case: Flask calls `index()` for you, and you don't own that call, so the user can't arrive as an argument.
 
 But if the value is part of what the function does — this function loads this user's orders — pass it. Just pass it. Same kind of value, different job.
 

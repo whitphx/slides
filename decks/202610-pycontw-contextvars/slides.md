@@ -499,7 +499,7 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. That is the extra layer you just saw on the right of the last slide. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. In the async picture, there was a new layer between the thread and the requests: tasks. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
 A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
@@ -1060,7 +1060,7 @@ So we take the copy ourselves. `copy_context()` runs while `handle()` is still h
 Now it prints the user. And notice when the copy happened: at the handoff, not when JavaScript calls. By the time JavaScript calls, there's nothing left to copy.
 
 [click]
-Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
+Why the extra `.copy()`? When we handed work to a thread pool, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
 
 [click]
 So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
@@ -1127,6 +1127,12 @@ And it's how a library borrows a context variable without permanently changing i
 
 </div>
 
+<div v-click="5" absolute bottom-10 inset-x-0 text-center text-5>
+
+Tutorials only show 🪵 **logs**. It's **not just for logging**.
+
+</div>
+
 <!--
 And you've almost certainly used this already, without writing any of it yourself.
 
@@ -1144,23 +1150,12 @@ And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variab
 
 And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
 
-So it's already load-bearing in your stack.
--->
+So your stack already depends on it.
 
----
-layout: statement
----
+[click]
+But most tutorials and blog posts show only one of these four: request IDs in logs. It's a good example, but a small one. It can make you think contextvars is just a logging tool.
 
-## Every example you were *taught* with is a logging filter. 🪵
-
-<!--
-But here's what bugs me about how this module gets taught.
-
-Look at that last slide again: three of those four have nothing to do with logging. And yet every tutorial, every blog post, every conference talk teaches the thing with the same example. Request IDs in logs.
-
-And that's a fine example. It's just a small one. It leaves you thinking contextvars is a logging convenience.
-
-It isn't. It's a way to model logical execution, and the rest of this talk is about what that buys you and where it runs out.
+It is not. Three of these four have nothing to do with logging. contextvars is much more general than that.
 -->
 
 ---
@@ -1169,14 +1164,22 @@ layout: statement
 
 ## You know *which* execution you're in.<br>Nothing is safe yet. 🔓
 
+<div mt-8 op70 text-5>
+
+🧠 **logical execution**: one unit of work (a request, a task, a callback), **on any thread**
+
+</div>
+
 <!--
-OK. So at this point we have a working mental model.
+OK. Let's give a name to what we have seen so far.
 
-Values follow the logical execution. They're copied into tasks. There are edges where you leave the event loop, and where outside code calls back in.
+Alice's request. A task on the event loop. Work sent to a thread pool. A callback from JavaScript. Each time, the code needed to know one thing: whose work am I doing right now? Each of these units of work is what I call a logical execution. It is the unit your code thinks in. It is not the thread. One thread can run many of them, and one of them can move to another thread.
 
-But notice what we actually have. We can answer a question: which logical execution is this? That's it. It's an answer.
+And contextvars follows the logical execution. Values are copied into new tasks. At the edges, where we leave the event loop or where outside code calls back in, we carry the context across ourselves.
 
-Knowing the answer is not the same as anything being safe. And the difference between those two things is where I spent a genuinely unpleasant amount of time in a real project.
+But notice what this gives us. We can answer one question: which logical execution is this? That's all.
+
+Knowing the answer does not make anything safe. I learned this in a real project, and it took me a long time.
 
 Let me show you that project.
 -->
@@ -1227,7 +1230,7 @@ Quick introduction, because the architecture is the reason this talk exists.
 Streamlit is a Python framework for building data apps. You write a script, it becomes a web app.
 
 [click]
-Stlite is Streamlit running in the browser, on Pyodide, which you met on the edges slide: CPython compiled to WebAssembly.
+Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly, the same runtime as in the JavaScript callback example.
 
 [click]
 And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.

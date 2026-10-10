@@ -278,7 +278,7 @@ The current environment variables.
 [click]
 Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
 
-Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the operating system.
+Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the whole Python process. There is only one of each, shared by everything that runs in it.
 -->
 
 ---
@@ -319,7 +319,7 @@ plainBackground: true
 </div>
 
 <style>
-.row-offset { height: 36px; }
+.row-offset { height: 67px; }
 </style>
 
 <!--
@@ -408,8 +408,10 @@ plainBackground: true
 
 <div v-click="1" border="~ gray/40 rounded-lg" p-2>
 <div text-4 op60 mb-1>one process</div>
-<div border="~ rose/50 rounded" p-2 bg-rose:5>
+<div border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ rose/50 rounded" p-1 bg-rose:5>
+<div text-4 mb-1><b>⚡ Event loop</b></div>
 <div flex="~ col" gap-1>
 <div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 1</b></div>
@@ -422,6 +424,7 @@ plainBackground: true
 <div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 3</b></div>
 <div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
+</div>
 </div>
 </div>
 </div>
@@ -439,7 +442,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </div>
 
 <style>
-.row-offset { height: 36px; }
+.row-offset { height: 67px; }
 </style>
 
 <!--
@@ -448,7 +451,7 @@ Here's the same picture again, on the left: the thread-per-request server our co
 But once we go async, that stops being true.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests. But notice the picture has one more layer: the requests are not sitting directly on a thread any more. Each one is wrapped in something called a task, and all three tasks share the single thread, taking turns and interleaving at every await.
+And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request is wrapped in something called a task. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
 
 [click]
 So one thread is serving many requests at once.
@@ -481,12 +484,24 @@ plainBackground: true
 
 </div>
 
-<div v-click="1" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
-<div text-4 mb-2><b>the event loop</b></div>
-<div flex="~ col" gap-2>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · alice's request</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · bob's request</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · carol's request</div>
+<div v-click="1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ rose/50 rounded" p-1 bg-rose:5>
+<div text-4 mb-1><b>⚡ Event loop</b></div>
+<div flex="~ col" gap-1>
+<div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 1</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
+</div>
+<div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 2</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
+</div>
+<div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 3</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -499,7 +514,7 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. That is the extra layer you just saw on the right of the last slide. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. In asyncio, the event loop wraps each request in a task. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
 A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
@@ -1060,7 +1075,7 @@ So we take the copy ourselves. `copy_context()` runs while `handle()` is still h
 Now it prints the user. And notice when the copy happened: at the handoff, not when JavaScript calls. By the time JavaScript calls, there's nothing left to copy.
 
 [click]
-Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
+Why the extra `.copy()`? When we handed work to a thread pool, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
 
 [click]
 So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
@@ -1127,6 +1142,12 @@ And it's how a library borrows a context variable without permanently changing i
 
 </div>
 
+<div v-click="5" absolute bottom-10 inset-x-0 text-center text-5>
+
+Tutorials only show 🪵 **logs**. It's **not just for logging**.
+
+</div>
+
 <!--
 And you've almost certainly used this already, without writing any of it yourself.
 
@@ -1144,39 +1165,36 @@ And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variab
 
 And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
 
-So it's already load-bearing in your stack.
+So your stack already depends on it.
+
+[click]
+But most tutorials and blog posts show only one of these four: request IDs in logs. It's a good example, but a small one. It can make you think contextvars is just a logging tool.
+
+It is not. Three of these four have nothing to do with logging. contextvars is much more general than that.
 -->
 
 ---
 layout: statement
 ---
 
-## Every example you were *taught* with is a logging filter. 🪵
+## Now you know which logical execution you're in.<br>That alone does not fix anything. 🔓
+
+<div mt-8 op70 text-5>
+
+🧠 **logical execution**: one unit of work (a request, a task, a callback), **on any thread**
+
+</div>
 
 <!--
-But here's what bugs me about how this module gets taught.
+OK. Let's give a name to what we have seen so far.
 
-Look at that last slide again: three of those four have nothing to do with logging. And yet every tutorial, every blog post, every conference talk teaches the thing with the same example. Request IDs in logs.
+Alice's request. A task on the event loop. Work sent to a thread pool. A callback from JavaScript. Each time, the code needed to know one thing: whose work am I doing right now? Each of these units of work is what I call a logical execution. It is the unit your code thinks in. It is not the thread. One thread can run many of them, and one of them can move to another thread.
 
-And that's a fine example. It's just a small one. It leaves you thinking contextvars is a logging convenience.
+And contextvars follows the logical execution. Values are copied into new tasks. At the edges, where we leave the event loop or where outside code calls back in, we carry the context across ourselves.
 
-It isn't. It's a way to model logical execution, and the rest of this talk is about what that buys you and where it runs out.
--->
+But notice what this gives us. We can answer one question: which logical execution is this? That's all.
 
----
-layout: statement
----
-
-## You know *which* execution you're in.<br>Nothing is safe yet. 🔓
-
-<!--
-OK. So at this point we have a working mental model.
-
-Values follow the logical execution. They're copied into tasks. There are edges where you leave the event loop, and where outside code calls back in.
-
-But notice what we actually have. We can answer a question: which logical execution is this? That's it. It's an answer.
-
-Knowing the answer is not the same as anything being safe. And the difference between those two things is where I spent a genuinely unpleasant amount of time in a real project.
+Knowing the answer does not make anything safe. I learned this in a real project, and it took me a long time.
 
 Let me show you that project.
 -->
@@ -1227,7 +1245,7 @@ Quick introduction, because the architecture is the reason this talk exists.
 Streamlit is a Python framework for building data apps. You write a script, it becomes a web app.
 
 [click]
-Stlite is Streamlit running in the browser, on Pyodide, which you met on the edges slide: CPython compiled to WebAssembly.
+Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly, the same runtime as in the JavaScript callback example.
 
 [click]
 And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.
@@ -1240,50 +1258,114 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 
 # No backend, just a tab
 
-<WindowMockup title="https://example.com/my-app.html" light>
+<div grid="~ cols-[1.15fr_1fr]" gap-5 mt-0 items-start class="stlite-grid">
 
-<div p-4 class="mock-page" flex="~ col" gap-3>
-<div text-5 font-bold>🎈 Sales dashboard</div>
-<div text-4 op70>Move the slider to filter</div>
-<div flex="~" items-center gap-3>
-  <div text-4>Threshold</div>
-  <div w-60 h-1 bg-gray-300 rounded relative>
-    <div absolute left-30 top--1 w-3 h-3 rounded-full class="mock-knob"></div>
-  </div>
-  <div text-4>42</div>
-</div>
-<div flex="~ gap-2" items-end h-24>
-  <div w-8 h-16 class="mock-bar"></div>
-  <div w-8 h-24 class="mock-bar"></div>
-  <div w-8 h-10 class="mock-bar"></div>
-  <div w-8 h-20 class="mock-bar"></div>
-  <div w-8 h-14 class="mock-bar"></div>
-</div>
+<div>
+
+<div text-4 mb-1>📄 <b>app.py</b>: a Streamlit script</div>
+
+<<< @/samples/stlite-demo/app.py py
+
+<div text-4 mt-2 mb-1>🌐 <b>stlite.html</b>: a static page (+ Stlite's <code>&lt;script&gt;</code>)</div>
+
+<<< @/samples/stlite-demo/stlite.html#slide-mount html
+
 </div>
 
-</WindowMockup>
+<div>
 
-<div v-click="1" mt-5 text-5 text-center>
+<LiveEmbed url="/stlite-demo/stlite.html" title="stlite.html" light padding="0.4rem" height="280px" :zoom="0.5">
 
-The Python that renders this is running **in the page**. There is nothing behind it. 🪄
+<img src="/stlite-demo.png" alt="The Sales dashboard, running from a static HTML file in the browser" style="width: 100%; height: auto;" />
+
+</LiveEmbed>
+
+<div v-click="1" mt-4 text-5 text-center>
+
+**Static files only.**<br>The Python runs **in the page**. 🪄
+
+</div>
+
+</div>
 
 </div>
 
 <style>
-/* `light` pins the frame to white but leaves slot content on the theme's
-   text colour: white-on-white in dark mode without this. */
-.mock-page { color: #1f2937; }
-.mock-bar { background: #36709E; border-radius: 3px 3px 0 0; }
-.mock-knob { background: #36709E; }
+* {
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.5;
+}
+/* A code block will not shrink below its longest line, which would widen its
+   track and push the window off the slide. */
+.stlite-grid > * {
+  min-width: 0;
+}
 </style>
 
 <!--
-This is roughly what that looks like. An ordinary web page with an ordinary Streamlit app in it.
+Here is a real Stlite app. On the left is all of its source code. `app.py` is an ordinary Streamlit script: a title, a slider, and a line chart. Below it is `stlite.html`, a static HTML page. It loads Stlite from a CDN and points it at `app.py`.
+
+On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
 
 [click]
-And the only thing worth noticing is what isn't there. No API calls, no backend, no deployment. You move the slider, and Python runs in the tab to re-render the chart.
+And notice what is not there. The whole app is two static files. There is no backend, and no API calls. When I move the slider, Python runs in this tab and draws the chart again.
 
 That's the product. Now let me show you the part that made my life hard.
+-->
+
+---
+clicks: 3
+---
+
+# Who runs your script?
+
+<div mt-4 mx-auto max-w-180 text-4>
+
+<div rounded-xl p-3 border transition-all duration-500 :class="$clicks >= 1 ? 'border-amber-400/60 bg-amber-400/10' : 'border-transparent'">
+
+<div text-center mb-2 transition-opacity duration-500 :class="$clicks >= 1 ? 'op100' : 'op0'">🎈 <b>The Streamlit runtime</b>: the host. <span op70>It runs your script again on every interaction.</span></div>
+
+<div v-click="2" mb-2 rounded-lg p-2 border="~ amber-400/60" bg-white dark:bg-black>
+<div op70 mb-1>Before each run, the host sets up the app's world:</div>
+
+```py
+os.chdir("/home/app-a")
+os.environ["HOME"] = "/home/app-a"
+```
+
+</div>
+
+<div rounded-lg p-2 border="~ emerald-400/60" bg-emerald-400:10>
+<div mb-1>📄 <b>app.py</b>: your script</div>
+
+```py
+rows = st.slider("Rows", 10, 100, 60)
+df = pd.read_csv("data.csv")
+```
+
+</div>
+
+</div>
+
+</div>
+
+<div v-click="3" mt-4 text-5 text-center>
+
+The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
+
+</div>
+
+<!--
+`app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
+
+[click]
+The Streamlit runtime does. Your script is not the program. The runtime is the program, and it is the host. It runs your script from top to bottom, and it runs it again every time the user does something, like moving the slider. It runs it in the same Python interpreter. Not in a separate process.
+
+[click]
+And before each run, the host prepares the world your script runs in. In Stlite, that means moving to the app's own directory, and setting `HOME` for it.
+
+[click]
+So there are two sides. The host calls `os.chdir()`. Your script does not know about any of that. It just opens files with relative paths, like `data.csv`, and expects them to be in its own directory.
 -->
 
 ---
@@ -1292,48 +1374,60 @@ plainBackground: true
 
 # Many apps, one Python
 
-<div mt-6 flex="~" items-center justify-center gap-24>
+<div mt-4 mx-auto max-w-200 text-4 class="nest">
 
-<div flex="~ col" gap-3>
-<div data-id="appA" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App A</b><br><span op70>/home/app-a</span></div>
-<div data-id="appB" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App B</b><br><span op70>/home/app-b</span></div>
-<div data-id="appC" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App C</b><br><span op70>/home/app-c</span></div>
+<div border="~ gray-400/50 rounded-xl" p-2 bg-gray-400:5>
+<div text-center op70 mb-1>🌐 <b>Browser</b>: one JavaScript thread (a Web Worker)</div>
+
+<div border="~ violet-400/50 rounded-lg" p-2 bg-violet-400:5>
+<div text-center op70 mb-1>🐍 <b>Pyodide</b>: one Python interpreter, on WebAssembly</div>
+
+<div border="~ sky-400/50 rounded-lg" p-2 bg-sky-400:5>
+<div text-center op70 mb-1>🧵 <b>one thread</b></div>
+
+<div border="~ rose-400/50 rounded-lg" p-2 bg-rose-400:5>
+<div text-center op70 mb-2>⚡ <b>one event loop</b></div>
+
+<div grid="~ cols-3" gap-2>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App A</b><br><span op70><code>/home/app-a</code></span></div>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App B</b><br><span op70><code>/home/app-b</code></span></div>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App C</b><br><span op70><code>/home/app-c</code></span></div>
 </div>
 
-<div v-click="1" data-id="env" border="~ amber/50 rounded-lg" p-5 bg-amber:5 w-80>
-<div text-5 mb-2><b>one Python environment</b></div>
-<div text-4 op80 flex="~ col" gap-1>
-<div>🧵 one thread</div>
-<div>⚡ one event loop</div>
-<div>📁 one <code>os.getcwd()</code></div>
-<div>🌍 one <code>os.environ</code></div>
 </div>
 </div>
 
+<div v-click="1" mt-2 border="~ amber-400/60 rounded-lg" p-2 bg-amber-400:10 text-center>
+📁 one <code>os.getcwd()</code> · 🌍 one <code>os.environ</code> — <b>shared by every app</b>
 </div>
 
-<FancyArrow v-click="1" from="[data-id=appA] @ right" to="[data-id=env] @ (0%, 25%)" arc="0.1" />
-<FancyArrow v-click="1" from="[data-id=appB] @ right" to="[data-id=env] @ (0%, 50%)" arc="0.1" />
-<FancyArrow v-click="1" from="[data-id=appC] @ right" to="[data-id=env] @ (0%, 75%)" arc="0.1" />
+</div>
+</div>
 
-<div v-click="2" mt-8 text-5 text-center>
+</div>
 
-Each app is a separate logical runtime. **They all share one interpreter.** 😬
+<div v-click="2" mt-4 text-5 text-center>
+
+Three apps, but **they all share one interpreter.** 😬
 
 </div>
 
 <!--
-Here's the setup.
+Here's the setup. Let's go from the outside in.
 
-A page can host more than one Stlite app, and when they share one browser worker they all live together.
+Everything runs in the browser. Stlite runs in a Web Worker, and that worker has one JavaScript thread.
+
+Inside it is Pyodide: one Python interpreter, compiled to WebAssembly.
+
+That interpreter has one thread, because the browser gives it one. On that thread there is one event loop.
+
+And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
 
 [click]
-And they share everything. One Python environment. One thread, because the browser gives you one. One event loop. And critically, one current working directory and one set of environment variables, because those belong to the interpreter, not to your app.
+But some things belong to the interpreter, not to an app. There is one current working directory, and one set of environment variables. Every app shares them.
 
 [click]
-So from Python's point of view these are three logical runtimes, but there is exactly one of every global thing they need.
-
-And each app has its own home directory, because each app has its own files.
+So from Python's point of view these are three separate apps, but there is exactly one of every global thing they need.
 -->
 
 ---
@@ -1357,14 +1451,16 @@ pd.read_csv("data.csv")
 </div>
 
 <div flex="~ col" gap-6 text-4 mt-1>
-<div data-id="d-a" v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-center><b>App A's</b> script</div>
-<div data-id="d-b" v-click="2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center><b>App B's</b> script</div>
+<div data-id="d-a" v-click="1" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App A</b></div>
+<div data-id="d-b" v-click="2" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App B</b></div>
+<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center>📄 <b>App A's</b> script</div>
 </div>
 
 </div>
 
 <FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(1) @ right" arc="0.15" />
 <FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
+<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0.15" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1373,83 +1469,106 @@ pd.read_csv("data.csv")
 </div>
 
 <!--
-Why does the directory matter at all?
+Now put the two pictures together: one interpreter, many apps, and a host that moves to each app's directory before it runs that app's script.
 
 [click]
-Because a Streamlit script is ordinary Python. It opens files with relative paths. App A's files live in app A's directory.
+Before it runs App A's script, the host moves to App A's directory. App A's files live there.
 
 [click]
-So App B needs a different one.
+Before it runs App B's script, the host moves to App B's directory.
 
 [click]
-And this line is why it matters. Remember `open("greeting.txt")` in our very first view? Same thing. A user writes read_csv with a relative path, like anyone would. Which file that resolves to depends entirely on the current directory at that instant.
+And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask view at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
-And here's the wall. There is exactly one current working directory per process. The OS has no concept of "the current directory for this task". You cannot have one per app, because it isn't yours to partition.
+And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
 -->
 
 ---
 
 # So here's the bug
 
-<div mt-4 grid="~ cols-[1.1fr_1fr]" gap-5>
+<div mt-2 grid="~ cols-[1fr_1fr]" gap-5>
 
 <div>
 
-```py {*|2|3|4}{maxHeight:'280px'}
-async def run_app(home):
-    os.chdir(home)
-    await render()
-    return open("data.csv").read()
+<div text-4 mb-1>🎈 <b>The host</b> <span op70>(pseudocode)</span></div>
+
+```py {*|2|3|*}
+async def run_script(app):
+    os.chdir(app.home)
+    await exec_script(app.code)
+```
+
+<div v-click="3" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
+
+⏸️ App A's script **awaits**. The loop runs **App B**, and the host calls `os.chdir("/home/app-b")`.
+
+</div>
+
+</div>
+
+<div>
+
+<div v-click="2">
+
+<div text-4 mb-1>📄 <b>App A's</b> <code>app.py</code></div>
+
+```py
+resp = await pyfetch(url)
+df = pd.read_csv("data.csv")
 ```
 
 </div>
 
-<div v-click="4">
+<div v-click="4" mt-3>
 
-<WindowMockup title="Terminal" dark codeblock>
+<WindowMockup title="App A" dark codeblock>
 
 ```shell
-FileNotFoundError:
-  '/home/app-b/data.csv'
+FileNotFoundError: [Errno 44]
+  No such file or directory: 'data.csv'
 ```
 
 </WindowMockup>
 
-<div mt-3 text-4 op70>…raised by <b>App A</b></div>
+<div mt-2 text-4 op70>…because the process is now in <code>/home/app-b</code></div>
 
 </div>
 
 </div>
 
-<div v-click="5" mt-6 text-5>
+</div>
 
-App A moved to its directory, **awaited**, and App B moved the whole process somewhere else. 💥
+<div v-click="5" mt-4 text-5>
+
+The host moved to App A's directory. App A **awaited**. The host moved to App B's. 💥
 
 </div>
 
 <!--
-And this is what it looks like when it goes wrong.
+This is what happens when it goes wrong. The code on the left is pseudocode. It is not Streamlit's real code, but it does the same thing: it is how the host runs one app's script.
 
 [click]
-App A sets the directory it needs.
+First, the host moves to App A's directory.
 
 [click]
-Then it awaits. Which hands the thread to App B, which calls chdir for its own directory.
+Then it runs App A's script, the user's `app.py`, and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+
+Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path.
 
 [click]
-And when App A resumes, it opens a relative path.
+While App A's script waits for the network, the event loop runs another task. That task is App B's script. So the host calls `os.chdir()` again, for App B.
 
 [click]
-And gets App B's directory. A file-not-found for a file that exists, in a directory that app never asked about.
+Then App A's script resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found. The file exists. It is just in a different directory.
 
 [click]
-This is the same shape as the threading dot local bug from the first half. Something got overwritten across an await. But this time I can't fix it by choosing a better storage class, because the thing being overwritten belongs to the operating system.
+This is the same shape as the `threading.local()` bug from the first half. A value was overwritten during an `await`. But this time a better storage class does not help, because the current directory is shared by the whole process.
 -->
-
 ---
 
-# Step 1: remember *which*
+# Step 1: store each app's directory in a `ContextVar`
 
 ```py {*|1-3|5}{maxHeight:'230px'}
 home_dir_contextvar: ContextVar[str | None] = ContextVar(
@@ -1461,13 +1580,13 @@ home_dir_contextvar.set(app_home_dir)
 
 <div v-click="2" mt-4 text-5>
 
-Bound at **every entry point** where JavaScript calls into Python. 🚪
+Set at **every entry point** where JavaScript calls Python. 🚪
 
 </div>
 
 <div v-click="3" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 
-Any code, at any depth, can now ask: **which directory should this task be in?** ✅
+Now any code can get **the directory this task should use**. ✅
 
 </div>
 
@@ -1478,42 +1597,42 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So step one is the part contextvars handles beautifully.
+So how do we fix it? Step one: store each app's directory in a context variable.
 
 [click]
-One context variable holding the home directory this task belongs to.
+Here is the context variable. It holds the home directory of the app that this task belongs to.
 
 [click]
-And it gets set at every entry point where JavaScript calls into Python. Every browser event that starts Python work binds it first.
+We set it at every entry point where JavaScript calls Python. Every browser event that starts Python work sets it first.
 
-That's the edge from earlier: when JavaScript calls Python, there's no Python caller to copy from. These entry points aren't callbacks we wrap with `create_proxy()`. JavaScript calls them directly, and each call lands in a fresh task with the top-level context, so we bind on entry, every time.
-
-[click]
-And now the question "which directory should this task be in" has a correct answer, available anywhere, at any depth, for free.
+Why at every entry point? When JavaScript calls Python, there is no Python caller to copy a context from. JavaScript calls these entry points directly, and each call starts a new task with the top-level context. So we set the value each time.
 
 [click]
-This is real code, it's in the repo if you want to read it.
+Now any code, in any function, can get the directory that this task should use.
+
+[click]
+This is real code from Stlite. The link is here if you want to read it.
 -->
 
 ---
 layout: statement
 ---
 
-## `contextvars` gave us the answer.<br>Nobody told the OS. 🤷
+## The `ContextVar` knows the right directory.<br>But `os.getcwd()` is still wrong. 🤷
 
 <!--
-And this is the exact moment the talk turns.
+But this does not fix the bug yet.
 
-I have a perfect, reliable answer to "which directory should I be in". I can ask for it from anywhere.
+The context variable knows the right directory for each task. Any code can read it.
 
-And the process is still sitting in the wrong directory, because nothing I've written actually calls chdir.
+But the process is still in the wrong directory. Nothing we have written so far calls `os.chdir()`.
 
-Knowing is not applying. contextvars did its job completely, and I still have the bug.
+Knowing the right directory is not the same as being in it. contextvars did its job, and we still have the bug.
 -->
 
 ---
 
-# Step 2: apply it, then put it back
+# Step 2: change the directory, then change it back
 
 ```py {*|2-3|6-7|10-11|*}{maxHeight:'340px'}
 class TaskSpecificDirectoryConfig:
@@ -1545,7 +1664,7 @@ It is built with the directory this task wants, which is exactly the value step 
 On the way in, it writes down where the process currently is, and then moves it to where this task wants to be.
 
 [click]
-On the way out, it puts back what it found. This is the Token pattern from the first half, except the thing being saved and restored is the operating system's state rather than a context variable.
+On the way out, it puts back what it found. This is the Token pattern from the first half, except the thing being saved and restored is process-wide state, not a context variable.
 
 [click]
 And there's one subtlety I want to call out, because it took me a while.
@@ -1555,7 +1674,7 @@ On the way out, before restoring, it saves the current directory again. Why? Bec
 
 ---
 
-# Around every resume
+# Step 3: do it every time the task resumes
 
 ````md magic-move {at:1}
 
@@ -1585,7 +1704,7 @@ class DirectorySyncCoroutineProxy(Coroutine):
 
 <div v-click="2" mt-3 text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 
-`send()` is what the **event loop** calls to resume a coroutine. Every entry point hands the loop a `DirectorySyncCoroutineProxy(coro)` rather than the bare coroutine — so every step runs in the right place. 🎯
+`send()` is what the **event loop** calls to resume a coroutine. Streamlit's `ScriptRunner` wraps its coroutine in this proxy before `create_task()`, so **every step** runs in the right directory. 🎯
 
 </div>
 
@@ -1644,7 +1763,7 @@ Then A hits an await, the directory goes back, and B gets its turn in its own di
 And when A comes back for its next step, the proxy moves the process into A's directory again.
 
 [click]
-So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the operating system only gives you one.
+So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the process only has one.
 -->
 
 ---
@@ -1663,7 +1782,7 @@ Let's pull back out and generalise.
 
 ---
 
-# Four things that will bite you
+# Four common mistakes
 
 <div mt-6 text-6>
 
@@ -1695,71 +1814,10 @@ And the fourth one is the Stlite lesson. Global side effects stay global. The cu
 -->
 
 ---
-plainBackground: true
----
-
-# Python 3.13+: thread ≠ logical execution
-
-<div mt-8 grid="~ cols-3" gap-4 text-4>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
-<div text-5 mb-2>🧠 <b>logical execution</b></div>
-<div op80>a task, a request, an app</div>
-<div mt-2 op70>partitioned by <b><code>contextvars</code></b></div>
-</div>
-
-<div v-click="2" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-<div text-5 mb-2>🧵 <b>the thread</b></div>
-<div op80>an OS thread</div>
-<div mt-2 op70>partitioned by <b><code>threading.local</code></b></div>
-</div>
-
-<div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
-<div text-5 mb-2>🌍 <b>the process</b></div>
-<div op80><code>cwd</code> · <code>environ</code> · signals</div>
-<div mt-2 op70>partitioned by <b>nothing</b></div>
-</div>
-
-</div>
-
-<div v-click="4" mt-8 text-5>
-
-Free-threading makes these **three different axes** impossible to keep confusing. 🔪
-
-</div>
-
-<div v-click="5" mt-4 text-5>
-
-And it makes the third column **worse** — real parallel writers to one `os.chdir()`. ⚠️
-
-</div>
-
-<!--
-And free-threaded Python sharpens this, which is why it's worth mentioning even though it's new.
-
-There are really three different things here, and we've historically been sloppy about the difference.
-
-[click]
-There's the logical execution — a task, a request, an app. contextvars partitions that.
-
-[click]
-There's the OS thread. threading dot local partitions that. And for years these two lined up closely enough that people used them interchangeably.
-
-[click]
-And then there's the process. The current directory, the environment, signal handlers. And nothing partitions those. There is no per-thread current directory, and there's no per-context one either.
-
-[click]
-Free-threading is the build with no GIL, where Python threads finally run in parallel on separate cores. And it is what makes it impossible to keep conflating the first two. Threads now run genuinely in parallel, so "which thread am I on" and "which request am I serving" drift apart in a way you can actually observe.
-
-[click]
-And it makes the third column strictly worse. Under the GIL, two tasks fighting over the current directory were at least taking turns. With real parallelism, you have genuinely concurrent writers to a single global. The borrowing trick I showed you gets harder, not easier.
--->
-
----
 layout: statement
 ---
 
-## `contextvars` tells *you* which context you're in.<br>It never tells the OS. 🧭
+## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
 
 <!--
 If you remember one sentence from this talk, this is the one.
@@ -1817,7 +1875,7 @@ So treat ambient state as a tax. It's worth paying sometimes. Just notice that y
 
 - 🧵 **`threading.local()` didn't break** — "one thread, one request" did
 - 📸 **Copied at task creation** — the rule behind most surprises
-- 🧭 **Models *which*, not *safe*** — `cwd` and `os.environ` stay process-wide
+- 🧭 **It tells you the context; it does not protect shared state** — `cwd` and `os.environ` stay process-wide
 - 🔁 **Global API? Borrow it** — apply on entry, restore on exit
 - 🏗️ **Building a runtime? The boundary is yours to draw**
 

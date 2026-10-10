@@ -396,3 +396,5 @@ The audience review of this rework found that the async break, its `ContextVar` 
 ### No looking back (2026-10-10)
 
 The statement slide "Every example you were *taught* with is a logging filter" is gone. Its title made no sense at that point, and its note asked the audience to look at the previous slide again. Its point is now the last click of "Where you've already met it": a floating line, "Tutorials only show logs. It's not just for logging.", over the four uses it refers to, with a plain-English note. Three other notes that pointed back at an earlier slide ("the last slide", "the executor slide", "the edges slide") now restate the fact instead.
+
+"You know *which* execution you're in" now defines "logical execution" before using it as a summary. The examples are already on the table by then (alice's request, a task, work sent to a thread pool, a JavaScript callback), so the note names them and calls each one a logical execution: the unit of work your code thinks in, whatever thread runs it. A one-line definition sits under the statement. The previous slide's note no longer uses the term before this point.

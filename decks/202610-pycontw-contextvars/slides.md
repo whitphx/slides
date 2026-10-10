@@ -1299,6 +1299,61 @@ That's the product. Now let me show you the part that made my life hard.
 -->
 
 ---
+clicks: 3
+---
+
+# Who runs your script?
+
+<div mt-4 mx-auto max-w-180 text-4>
+
+<div rounded-xl p-3 border transition-all duration-500 :class="$clicks >= 1 ? 'border-amber-400/60 bg-amber-400/10' : 'border-transparent'">
+
+<div text-center mb-2 transition-opacity duration-500 :class="$clicks >= 1 ? 'op100' : 'op0'">🎈 <b>The Streamlit runtime</b>: the host. <span op70>It runs your script again on every interaction.</span></div>
+
+<div v-click="2" mb-2 rounded-lg p-2 border="~ amber-400/60" bg-white dark:bg-black>
+<div op70 mb-1>Before each run, the host sets up the app's world:</div>
+
+```py
+os.chdir("/home/app-a")
+os.environ["HOME"] = "/home/app-a"
+```
+
+</div>
+
+<div rounded-lg p-2 border="~ emerald-400/60" bg-emerald-400:10>
+<div mb-1>📄 <b>app.py</b>: your script</div>
+
+```py
+rows = st.slider("Rows", 10, 100, 60)
+df = pd.read_csv("data.csv")
+```
+
+</div>
+
+</div>
+
+</div>
+
+<div v-click="3" mt-4 text-5 text-center>
+
+The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
+
+</div>
+
+<!--
+`app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
+
+[click]
+The Streamlit runtime does. Your script is not the program. The runtime is the program, and it is the host. It runs your script from top to bottom, and it runs it again every time the user does something, like moving the slider. It runs it in the same Python interpreter. Not in a separate process.
+
+[click]
+And before each run, the host prepares the world your script runs in. In Stlite, that means moving to the app's own directory, and setting `HOME` for it.
+
+[click]
+So there are two sides. The host calls `os.chdir()`. Your script does not know about any of that. It just opens files with relative paths, like `data.csv`, and expects them to be in its own directory.
+-->
+
+---
 plainBackground: true
 ---
 
@@ -1381,14 +1436,16 @@ pd.read_csv("data.csv")
 </div>
 
 <div flex="~ col" gap-6 text-4 mt-1>
-<div data-id="d-a" v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-center><b>App A's</b> script</div>
-<div data-id="d-b" v-click="2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center><b>App B's</b> script</div>
+<div data-id="d-a" v-click="1" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App A</b></div>
+<div data-id="d-b" v-click="2" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App B</b></div>
+<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center>📄 <b>App A's</b> script</div>
 </div>
 
 </div>
 
 <FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(1) @ right" arc="0.15" />
 <FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
+<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0.15" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1397,16 +1454,16 @@ pd.read_csv("data.csv")
 </div>
 
 <!--
-Why does the directory matter at all?
+Now put the two pictures together: one interpreter, many apps, and a host that moves to each app's directory before it runs that app's script.
 
 [click]
-Because a Streamlit script is ordinary Python. It opens files with relative paths. App A's files live in app A's directory.
+Before it runs App A's script, the host moves to App A's directory. App A's files live there.
 
 [click]
-So App B needs a different one.
+Before it runs App B's script, the host moves to App B's directory.
 
 [click]
-And this line is why it matters. Remember `open("greeting.txt")` in our very first view? Same thing. A user writes read_csv with a relative path, like anyone would. Which file that resolves to depends entirely on the current directory at that instant.
+And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask view at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 And here's the wall. There is exactly one current working directory per process. The OS has no concept of "the current directory for this task". You cannot have one per app, because it isn't yours to partition.
@@ -1448,7 +1505,7 @@ FileNotFoundError:
 
 <div v-click="5" mt-6 text-5>
 
-App A moved to its directory, **awaited**, and App B moved the whole process somewhere else. 💥
+The host moved to App A's directory, App A **awaited**, and the host moved the whole process to App B's. 💥
 
 </div>
 
@@ -1456,13 +1513,13 @@ App A moved to its directory, **awaited**, and App B moved the whole process som
 And this is what it looks like when it goes wrong.
 
 [click]
-App A sets the directory it needs.
+The host moves to App A's directory and starts App A's script.
 
 [click]
-Then it awaits. Which hands the thread to App B, which calls chdir for its own directory.
+The script awaits. That hands the thread to App B, and the host calls chdir for App B's directory.
 
 [click]
-And when App A resumes, it opens a relative path.
+And when App A's script resumes, it opens a relative path.
 
 [click]
 And gets App B's directory. A file-not-found for a file that exists, in a directory that app never asked about.

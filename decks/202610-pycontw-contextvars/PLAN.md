@@ -1,6 +1,6 @@
 # The hidden current context — PyCon TW 2026
 
-**Status:** built and merged in [PR #16](https://github.com/whitphx/slides/pull/16). One slide added since, on the boundary where JavaScript calls back into Python (see "Addition: called from outside Python" below); 38 slides.
+**Status:** built and merged in [PR #16](https://github.com/whitphx/slides/pull/16). Since then: one slide on the boundary where JavaScript calls back into Python, and a reworked opening that starts on a Flask view and a thread-per-request diagram (see the two "Addition" / "Rework" sections below); 40 slides.
 
 **Earlier:** both stages approved and built. `slides.md` has all 37 slides with presenter notes; `pnpm build` passes and the deck measures zero overflow on both axes.
 
@@ -382,3 +382,11 @@ The two notes that touched this case were adjusted so the slide is said once. "S
 The audience review of this addition changed several notes. The edges slide no longer lists callbacks among the hops *off* the loop, so the new slide can own the other direction. The new slide carries an on-slide Pyodide label, uses "top-level context" (glossed in the note as where module-level code runs) instead of "root"/"parent", explains `.copy()` when the code first shows it, and sets up the session-in-a-context-variable fact before the bug story that depends on it. The re-entrancy and `async def` details were cut from the spoken track as unmotivated for this audience. "Step 1: remember *which*" now says why the snapshot trick does not apply to Stlite's server entry points: JavaScript calls them directly rather than through a `create_proxy` callback, and each call lands in a fresh task with the top-level context, so it is re-bound on entry (`call_asgi` in `stlite_lib/asgi_app.py`). The recap note before the case study and the Pyodide introduction in "What is Stlite?" now refer back to the new slide.
 
 Raised by the review and left as built: moving the new slide after "`Token`" so the three API pieces stay together (the author placed it after the edges slide), and widening "Four things that will bite you" to cover foreign callbacks (the author chose a slide over bullets).
+
+### Rework: concrete opening and premise first (2026-10-10)
+
+The "invisible arguments" section opened on a grid of six kinds of "current" value, which the author found too abstract to start on. It now opens on "A view you've written a hundred times": a Flask view whose `index()` takes no arguments yet reads `current_user` and opens a relative path, with an arrow and label on each. The grid follows as a reference ("and those two aren't special"). "Current runtime" moved from the orange group to the blue one, since it is a value the program sets itself and not OS state.
+
+The running example of the first half follows the Flask view: the request id became the current user. "The sync answer" builds `current_user()` on `threading.local()`, the async break greets alice as bob, and the `ContextVar` slides use `user_var` with the default `"anonymous"`. "Hidden context, or just a parameter?" now separates the current user (hidden context) from the user whose data a function loads (a parameter). The `DEFAULT_TIMEOUT` line and its beat left "The sync answer" to make room for the premise caption.
+
+"The setting: one thread per request" is new, before "The sync answer". It draws the thread-per-request server on its own, so the sync code is read against a premise the audience already holds; the sync slide also states it above the code instead of after it. "Then we went async" shows the identical diagram, in the identical position, on its left before the event loop appears on its right. The diagrams' requests are alice's, bob's and carol's.

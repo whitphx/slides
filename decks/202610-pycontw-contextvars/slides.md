@@ -278,7 +278,7 @@ The current environment variables.
 [click]
 Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
 
-Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the operating system.
+Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the whole Python process. There is only one of each, shared by everything that runs in it.
 -->
 
 ---
@@ -1162,7 +1162,7 @@ It is not. Three of these four have nothing to do with logging. contextvars is m
 layout: statement
 ---
 
-## You know *which* execution you're in.<br>Nothing is safe yet. 🔓
+## Now you know which logical execution you're in.<br>That alone does not fix anything. 🔓
 
 <div mt-8 op70 text-5>
 
@@ -1466,71 +1466,94 @@ Before it runs App B's script, the host moves to App B's directory.
 And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask view at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
-And here's the wall. There is exactly one current working directory per process. The OS has no concept of "the current directory for this task". You cannot have one per app, because it isn't yours to partition.
+And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
 -->
 
 ---
 
 # So here's the bug
 
-<div mt-4 grid="~ cols-[1.1fr_1fr]" gap-5>
+<div mt-2 grid="~ cols-[1fr_1fr]" gap-5>
 
 <div>
 
-```py {*|2|3|4}{maxHeight:'280px'}
-async def run_app(home):
-    os.chdir(home)
-    await render()
-    return open("data.csv").read()
+<div text-4 mb-1>🎈 <b>The host</b> <span op70>(pseudocode)</span></div>
+
+```py {*|2|3|*}
+async def run_script(app):
+    os.chdir(app.home)
+    await exec_script(app.code)
+```
+
+<div v-click="3" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
+
+⏸️ App A's script **awaits**. The loop runs **App B**, and the host calls `os.chdir("/home/app-b")`.
+
+</div>
+
+</div>
+
+<div>
+
+<div v-click="2">
+
+<div text-4 mb-1>📄 <b>App A's</b> <code>app.py</code></div>
+
+```py
+resp = await pyfetch(url)
+df = pd.read_csv("data.csv")
 ```
 
 </div>
 
-<div v-click="4">
+<div v-click="4" mt-3>
 
-<WindowMockup title="Terminal" dark codeblock>
+<WindowMockup title="App A" dark codeblock>
 
 ```shell
-FileNotFoundError:
-  '/home/app-b/data.csv'
+FileNotFoundError: [Errno 44]
+  No such file or directory: 'data.csv'
 ```
 
 </WindowMockup>
 
-<div mt-3 text-4 op70>…raised by <b>App A</b></div>
+<div mt-2 text-4 op70>…because the process is now in <code>/home/app-b</code></div>
 
 </div>
 
 </div>
 
-<div v-click="5" mt-6 text-5>
+</div>
 
-The host moved to App A's directory, App A **awaited**, and the host moved the whole process to App B's. 💥
+<div v-click="5" mt-4 text-5>
+
+The host moved to App A's directory. App A **awaited**. The host moved to App B's. 💥
 
 </div>
 
 <!--
-And this is what it looks like when it goes wrong.
+This is what happens when it goes wrong. The code on the left is pseudocode. It is not Streamlit's real code, but it does the same thing: it is how the host runs one app's script.
 
 [click]
-The host moves to App A's directory and starts App A's script.
+First, the host moves to App A's directory.
 
 [click]
-The script awaits. That hands the thread to App B, and the host calls chdir for App B's directory.
+Then it runs App A's script, the user's `app.py`, and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+
+Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path.
 
 [click]
-And when App A's script resumes, it opens a relative path.
+While App A's script waits for the network, the event loop runs another task. That task is App B's script. So the host calls `os.chdir()` again, for App B.
 
 [click]
-And gets App B's directory. A file-not-found for a file that exists, in a directory that app never asked about.
+Then App A's script resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found. The file exists. It is just in a different directory.
 
 [click]
-This is the same shape as the threading dot local bug from the first half. Something got overwritten across an await. But this time I can't fix it by choosing a better storage class, because the thing being overwritten belongs to the operating system.
+This is the same shape as the `threading.local()` bug from the first half. A value was overwritten during an `await`. But this time a better storage class does not help, because the current directory is shared by the whole process.
 -->
-
 ---
 
-# Step 1: remember *which*
+# Step 1: store each app's directory in a `ContextVar`
 
 ```py {*|1-3|5}{maxHeight:'230px'}
 home_dir_contextvar: ContextVar[str | None] = ContextVar(
@@ -1542,13 +1565,13 @@ home_dir_contextvar.set(app_home_dir)
 
 <div v-click="2" mt-4 text-5>
 
-Bound at **every entry point** where JavaScript calls into Python. 🚪
+Set at **every entry point** where JavaScript calls Python. 🚪
 
 </div>
 
 <div v-click="3" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 
-Any code, at any depth, can now ask: **which directory should this task be in?** ✅
+Now any code can get **the directory this task should use**. ✅
 
 </div>
 
@@ -1559,42 +1582,42 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So step one is the part contextvars handles beautifully.
+So how do we fix it? Step one: store each app's directory in a context variable.
 
 [click]
-One context variable holding the home directory this task belongs to.
+Here is the context variable. It holds the home directory of the app that this task belongs to.
 
 [click]
-And it gets set at every entry point where JavaScript calls into Python. Every browser event that starts Python work binds it first.
+We set it at every entry point where JavaScript calls Python. Every browser event that starts Python work sets it first.
 
-That's the edge from earlier: when JavaScript calls Python, there's no Python caller to copy from. These entry points aren't callbacks we wrap with `create_proxy()`. JavaScript calls them directly, and each call lands in a fresh task with the top-level context, so we bind on entry, every time.
-
-[click]
-And now the question "which directory should this task be in" has a correct answer, available anywhere, at any depth, for free.
+Why at every entry point? When JavaScript calls Python, there is no Python caller to copy a context from. JavaScript calls these entry points directly, and each call starts a new task with the top-level context. So we set the value each time.
 
 [click]
-This is real code, it's in the repo if you want to read it.
+Now any code, in any function, can get the directory that this task should use.
+
+[click]
+This is real code from Stlite. The link is here if you want to read it.
 -->
 
 ---
 layout: statement
 ---
 
-## `contextvars` gave us the answer.<br>Nobody told the OS. 🤷
+## The `ContextVar` knows the right directory.<br>But `os.getcwd()` is still wrong. 🤷
 
 <!--
-And this is the exact moment the talk turns.
+But this does not fix the bug yet.
 
-I have a perfect, reliable answer to "which directory should I be in". I can ask for it from anywhere.
+The context variable knows the right directory for each task. Any code can read it.
 
-And the process is still sitting in the wrong directory, because nothing I've written actually calls chdir.
+But the process is still in the wrong directory. Nothing we have written so far calls `os.chdir()`.
 
-Knowing is not applying. contextvars did its job completely, and I still have the bug.
+Knowing the right directory is not the same as being in it. contextvars did its job, and we still have the bug.
 -->
 
 ---
 
-# Step 2: apply it, then put it back
+# Step 2: change the directory, then change it back
 
 ```py {*|2-3|6-7|10-11|*}{maxHeight:'340px'}
 class TaskSpecificDirectoryConfig:
@@ -1626,7 +1649,7 @@ It is built with the directory this task wants, which is exactly the value step 
 On the way in, it writes down where the process currently is, and then moves it to where this task wants to be.
 
 [click]
-On the way out, it puts back what it found. This is the Token pattern from the first half, except the thing being saved and restored is the operating system's state rather than a context variable.
+On the way out, it puts back what it found. This is the Token pattern from the first half, except the thing being saved and restored is process-wide state, not a context variable.
 
 [click]
 And there's one subtlety I want to call out, because it took me a while.
@@ -1636,7 +1659,7 @@ On the way out, before restoring, it saves the current directory again. Why? Bec
 
 ---
 
-# Around every resume
+# Step 3: do it every time the task resumes
 
 ````md magic-move {at:1}
 
@@ -1666,7 +1689,7 @@ class DirectorySyncCoroutineProxy(Coroutine):
 
 <div v-click="2" mt-3 text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
 
-`send()` is what the **event loop** calls to resume a coroutine. Every entry point hands the loop a `DirectorySyncCoroutineProxy(coro)` rather than the bare coroutine — so every step runs in the right place. 🎯
+`send()` is what the **event loop** calls to resume a coroutine. Streamlit's `ScriptRunner` wraps its coroutine in this proxy before `create_task()`, so **every step** runs in the right directory. 🎯
 
 </div>
 
@@ -1725,7 +1748,7 @@ Then A hits an await, the directory goes back, and B gets its turn in its own di
 And when A comes back for its next step, the proxy moves the process into A's directory again.
 
 [click]
-So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the operating system only gives you one.
+So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the process only has one.
 -->
 
 ---
@@ -1744,7 +1767,7 @@ Let's pull back out and generalise.
 
 ---
 
-# Four things that will bite you
+# Four common mistakes
 
 <div mt-6 text-6>
 
@@ -1776,71 +1799,10 @@ And the fourth one is the Stlite lesson. Global side effects stay global. The cu
 -->
 
 ---
-plainBackground: true
----
-
-# Python 3.13+: thread ≠ logical execution
-
-<div mt-8 grid="~ cols-3" gap-4 text-4>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>
-<div text-5 mb-2>🧠 <b>logical execution</b></div>
-<div op80>a task, a request, an app</div>
-<div mt-2 op70>partitioned by <b><code>contextvars</code></b></div>
-</div>
-
-<div v-click="2" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-<div text-5 mb-2>🧵 <b>the thread</b></div>
-<div op80>an OS thread</div>
-<div mt-2 op70>partitioned by <b><code>threading.local</code></b></div>
-</div>
-
-<div v-click="3" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
-<div text-5 mb-2>🌍 <b>the process</b></div>
-<div op80><code>cwd</code> · <code>environ</code> · signals</div>
-<div mt-2 op70>partitioned by <b>nothing</b></div>
-</div>
-
-</div>
-
-<div v-click="4" mt-8 text-5>
-
-Free-threading makes these **three different axes** impossible to keep confusing. 🔪
-
-</div>
-
-<div v-click="5" mt-4 text-5>
-
-And it makes the third column **worse** — real parallel writers to one `os.chdir()`. ⚠️
-
-</div>
-
-<!--
-And free-threaded Python sharpens this, which is why it's worth mentioning even though it's new.
-
-There are really three different things here, and we've historically been sloppy about the difference.
-
-[click]
-There's the logical execution — a task, a request, an app. contextvars partitions that.
-
-[click]
-There's the OS thread. threading dot local partitions that. And for years these two lined up closely enough that people used them interchangeably.
-
-[click]
-And then there's the process. The current directory, the environment, signal handlers. And nothing partitions those. There is no per-thread current directory, and there's no per-context one either.
-
-[click]
-Free-threading is the build with no GIL, where Python threads finally run in parallel on separate cores. And it is what makes it impossible to keep conflating the first two. Threads now run genuinely in parallel, so "which thread am I on" and "which request am I serving" drift apart in a way you can actually observe.
-
-[click]
-And it makes the third column strictly worse. Under the GIL, two tasks fighting over the current directory were at least taking turns. With real parallelism, you have genuinely concurrent writers to a single global. The borrowing trick I showed you gets harder, not easier.
--->
-
----
 layout: statement
 ---
 
-## `contextvars` tells *you* which context you're in.<br>It never tells the OS. 🧭
+## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
 
 <!--
 If you remember one sentence from this talk, this is the one.
@@ -1898,7 +1860,7 @@ So treat ambient state as a tax. It's worth paying sometimes. Just notice that y
 
 - 🧵 **`threading.local()` didn't break** — "one thread, one request" did
 - 📸 **Copied at task creation** — the rule behind most surprises
-- 🧭 **Models *which*, not *safe*** — `cwd` and `os.environ` stay process-wide
+- 🧭 **It tells you the context; it does not protect shared state** — `cwd` and `os.environ` stay process-wide
 - 🔁 **Global API? Borrow it** — apply on entry, restore on exit
 - 🏗️ **Building a runtime? The boundary is yours to draw**
 

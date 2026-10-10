@@ -296,15 +296,15 @@ plainBackground: true
 <div text-4 op60 mb-1>one process</div>
 <div class="row-offset"></div>
 <div flex="~ col" gap-1>
-<div data-id="t1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 1</b></div>
 <div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
 </div>
-<div data-id="t2" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 2</b></div>
 <div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
 </div>
-<div data-id="t3" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 3</b></div>
 <div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
 </div>
@@ -562,7 +562,6 @@ bob sees: Hello, bob!
 <!--
 Let me show you the failure, because it's short.
 
-[click]
 Here's the same app, made async. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
 
 [click]
@@ -1141,7 +1140,7 @@ Distributed tracing. OpenTelemetry's context API is contextvars underneath. That
 Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
 
 [click]
-And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` reads through it. So the `current_user` in our very first view was sitting on this all along.
+And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first view was sitting on this all along.
 
 And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
 

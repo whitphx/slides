@@ -314,7 +314,7 @@ After creating package.json, run `pnpm install` in the deck directory.
 
 ### 5. Write slides.md
 
-Read `references/slidev-syntax.md` before writing or editing `slides.md`. When the slides are done, section 6 runs the `audience-reviewer` pass over them. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
+Read `references/slidev-syntax.md` before writing or editing `slides.md`. When the slides are done, section 6 has you check your own edit and section 7 runs the `audience-reviewer` pass over them. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
 
 This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
@@ -452,13 +452,29 @@ layout: section
 ---
 ```
 
-### 6. Review the deck as its audience
+### 6. Check your own edit before handing it over
+
+Run this on every change to `slides.md`, a one-slide fix included. The rules in section 2 only help if someone holds the result up against them, and while writing, your attention is on the line in front of you. The failures below only show when the slides are read in sequence, and each of them is one the author has had to send back by hand.
+
+Re-read every slide you touched, together with the slide before and after it, in the order the audience meets them. Transitions break at the seams, so the neighbours count. Then go through the list:
+
+- **Concrete before abstract.** Does each topic open on an example before any list, definition or taxonomy of it?
+- **Premises first.** Is every assumption a slide depends on (an architecture, a setting, "this only works because…") shown before that slide, rather than stated at its end or in its closing note? When the story returns to a setting, is it the same picture in the same place?
+- **The running example still runs.** If the example changed, do the later slides that use it still agree on names, values and terminal output?
+- **The notes join up.** Does each touched slide's note open by connecting to the slide before it? Does it name its subject ("the `contextvars` module", "a value stored with `contextvars`") rather than "this module", "it" or "a value"?
+- **Clicks match.** Does the count of `[click]` markers in the notes equal the slide's clicks (code-highlight steps plus `v-click`s)? A mismatch puts every later beat one click late, and the last one is never reached.
+- **The terminal tells the truth.** When a slide shows code and its output, run the code and compare.
+- **It fits.** Build, measure overflow (see section 8), and screenshot each touched slide at its final click.
+
+Fix what fails before you hand the work back. Then say in one line which checks you ran, and name any you could not, such as screenshots without a browser, so the author knows what is still unverified.
+
+### 7. Review the deck as its audience
 
 Once `slides.md` is written, or substantially revised, launch the `audience-reviewer` subagent and wait for its report. Tell it the deck directory and the assumed knowledge level; it reads the deck once, in order, as someone at that level with no other context, and reports where the explanation loses them.
 
 It exists because of a failure that is invisible from the inside. Having built the deck, you know what every name means and which slide answers which question, so you read straight past a helper the audience has never seen, or an answer that arrives five slides after the question that raised it. The author will catch these on their first read-through and send them back one at a time. A pass that catches them first is cheaper for everyone.
 
-What it looks for: terms and functions used before anything introduces them, questions a slide provokes and never answers, answers separated from their question by intervening material, API detail presented before the audience wants it, and claims wider than the deck demonstrates. It reads presenter notes too, since the spoken track can introduce something the slide leaves bare.
+What it looks for: terms and functions used before anything introduces them, questions a slide provokes and never answers, answers separated from their question by intervening material, API detail presented before the audience wants it, claims wider than the deck demonstrates, a topic that opens on an abstraction before its example, a premise that arrives after what depends on it, and a spoken track that changes slides without a transition or talks about "it" without saying what. It reads presenter notes too, since the spoken track can introduce something the slide leaves bare. It overlaps with section 6 on purpose: you check the slides you touched, and it reads the whole deck cold.
 
 Act on the report before handing the deck over:
 
@@ -466,10 +482,12 @@ Act on the report before handing the deck over:
 - **Answer arrives late** usually means resequencing, not new content. Move the answer next to the question it settles.
 - **Detail before motivation** is the same fix pointed the other way: push the detail past the beat that makes the audience want it.
 - **Claim wider than the evidence** is a rewording.
+- **Abstract before its example** and **premise after what depends on it** are resequencing too: put the example, or the setting, first (see "Concrete first, then abstract" and "Premises before the things that depend on them").
+- **Cold transition** and **vague subject** are fixes to the presenter notes: open the note on its link to the previous slide, and name the thing.
 
 Tell the user about anything you decide not to fix, and why. When the report and the author disagree, the author wins — but say that the report raised it.
 
-### 7. Important notes
+### 8. Important notes
 
 - Always run `pnpm install` after creating/modifying `package.json`
 - The `public/` directory is for static assets (images, videos, etc.)

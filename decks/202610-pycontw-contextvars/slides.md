@@ -319,7 +319,7 @@ plainBackground: true
 </div>
 
 <style>
-.row-offset { height: 36px; }
+.row-offset { height: 67px; }
 </style>
 
 <!--
@@ -408,8 +408,10 @@ plainBackground: true
 
 <div v-click="1" border="~ gray/40 rounded-lg" p-2>
 <div text-4 op60 mb-1>one process</div>
-<div border="~ rose/50 rounded" p-2 bg-rose:5>
+<div border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ rose/50 rounded" p-1 bg-rose:5>
+<div text-4 mb-1><b>⚡ Event loop</b></div>
 <div flex="~ col" gap-1>
 <div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 1</b></div>
@@ -422,6 +424,7 @@ plainBackground: true
 <div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 3</b></div>
 <div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
+</div>
 </div>
 </div>
 </div>
@@ -439,7 +442,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </div>
 
 <style>
-.row-offset { height: 36px; }
+.row-offset { height: 67px; }
 </style>
 
 <!--
@@ -448,7 +451,7 @@ Here's the same picture again, on the left: the thread-per-request server our co
 But once we go async, that stops being true.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests. But notice the picture has one more layer: the requests are not sitting directly on a thread any more. Each one is wrapped in something called a task, and all three tasks share the single thread, taking turns and interleaving at every await.
+And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request is wrapped in something called a task. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
 
 [click]
 So one thread is serving many requests at once.
@@ -481,12 +484,24 @@ plainBackground: true
 
 </div>
 
-<div v-click="1" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
-<div text-4 mb-2><b>the event loop</b></div>
-<div flex="~ col" gap-2>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · alice's request</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · bob's request</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · carol's request</div>
+<div v-click="1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ rose/50 rounded" p-1 bg-rose:5>
+<div text-4 mb-1><b>⚡ Event loop</b></div>
+<div flex="~ col" gap-1>
+<div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 1</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
+</div>
+<div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 2</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
+</div>
+<div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
+<div text-4 mb-1><b>Task 3</b></div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -499,7 +514,7 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. In the async picture, there was a new layer between the thread and the requests: tasks. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. In asyncio, the event loop wraps each request in a task. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
 A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.

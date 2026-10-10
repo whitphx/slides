@@ -24,7 +24,7 @@ Understanding <code>contextvars</code> through<br>real-world runtime problems
 </div>
 
 <div mt-6 text-xl op80>
-Yuichiro Tachibana (橘 祐一郎) · @whitphx
+Yuichi · @whitphx
 </div>
 
 <div absolute bottom-8 right-10 text-sm op60>
@@ -60,7 +60,7 @@ The slides are behind that QR code if you want to follow along.
 
 ---
 
-<h1>Yuichiro Tachibana / 橘 祐一郎</h1>
+<h1>Yuichi</h1>
 
 @whitphx
 
@@ -112,7 +112,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 </style>
 
 <!--
-I'm Yuichiro Tachibana, whitphx online.
+I'm Yuichi, whitphx online.
 
 [click]
 I build and maintain open source projects in the Python ecosystem.

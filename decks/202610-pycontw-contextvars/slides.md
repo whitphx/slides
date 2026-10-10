@@ -169,6 +169,72 @@ Let's start with the problem.
 plainBackground: true
 ---
 
+# A view you've written a hundred times
+
+<div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-center>
+
+<div class="toy-code">
+
+```py {*|10|8|7|*}{'data-id':'toy'}
+from flask import Flask
+from flask_login import current_user
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    with open("greeting.txt") as f:
+        greeting = f.read()
+    return f"{greeting}, {current_user.name}!"
+```
+
+</div>
+
+<div flex="~ col" gap-5 text-5>
+<div v-click="3" data-id="toy-args" border="~ rose/50 rounded-lg" p-3 bg-rose:5>🚫 <b>no arguments</b></div>
+<div v-click="2" data-id="toy-dir" border="~ amber/50 rounded-lg" p-3 bg-amber:5>📁 <b>current directory</b></div>
+<div v-click="1" data-id="toy-user" border="~ sky/50 rounded-lg" p-3 bg-sky:5>👤 <b>current user</b></div>
+</div>
+
+</div>
+
+<FancyArrow v-click="1" from="[data-id=toy-user] @ left" to="[data-id=toy] .line:nth-child(10) @ right" arc="0.1" />
+<FancyArrow v-click="2" from="[data-id=toy-dir] @ left" to="[data-id=toy] .line:nth-child(8) @ right" arc="0.1" />
+<FancyArrow v-click="3" from="[data-id=toy-args] @ left" to="[data-id=toy] .line:nth-child(7) @ right" arc="-0.1" color="red" />
+
+<div v-click="4" mt-8 text-5 text-center>
+
+**Who** is asking, and **where** the file is: neither was passed in. 👻
+
+</div>
+
+<style>
+.toy-code {
+  --slidev-code-font-size: 20px;
+  --slidev-code-line-height: 1.6;
+}
+</style>
+
+<!--
+Let me show you a piece of code you've probably written a hundred times. A Flask app with one page. It reads a greeting from a file and says hello to whoever is logged in.
+
+[click]
+`current_user` here is the user who sent this request. Flask-Login works it out for us.
+
+[click]
+And `open("greeting.txt")` is a relative path. Which file it opens depends on the current working directory.
+
+[click]
+Now look at the function itself. `index()` takes no arguments. Nobody passed it the user, and nobody passed it the directory.
+
+[click]
+And yet it knows who is asking, and where to look. Both values are just there when the function runs.
+-->
+
+---
+plainBackground: true
+---
+
 # Python is full of "current"
 
 <div mt-8 grid="~ cols-3" gap-4 text-5>
@@ -189,19 +255,19 @@ None of these are function arguments. **They're just… around.** 👻
 </div>
 
 <!--
-Think about how much of your code reads values that were never passed to it as arguments.
+And those two aren't special. Once you start looking, Python code reads a lot of values that were never passed to it as arguments.
 
 [click]
 The current request.
 
 [click]
-The current user.
+The current user, which we just saw.
 
 [click]
 The current database transaction.
 
 [click]
-The current working directory.
+The current working directory, the other one from our example.
 
 [click]
 The current environment variables.

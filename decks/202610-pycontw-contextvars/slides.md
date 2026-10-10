@@ -139,7 +139,7 @@ And you can find me in all the usual places.
 </div>
 
 <!--
-Three things I want you to walk out with.
+OK, so let's start the talk. First, a quick overview of where we're going: three things I want you to walk out with.
 
 [click]
 First, what problem this module actually solves. It's a small API, but the problem behind it is easy to get wrong.

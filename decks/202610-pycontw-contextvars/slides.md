@@ -282,12 +282,62 @@ Keep an eye on the colours, by the way. The blue ones are values your own code s
 -->
 
 ---
+plainBackground: true
+---
+
+# The setting: one thread per request
+
+<div mt-4 grid="~ cols-2 rows-[auto_1fr_auto]" gap-x-10 gap-y-2>
+
+<div text-5 text-center><b>thread-per-request</b> 🧵</div>
+<div></div>
+
+<div border="~ gray/40 rounded-lg" p-2>
+<div text-4 op60 mb-1>one process</div>
+<div class="row-offset"></div>
+<div flex="~ col" gap-1>
+<div data-id="t1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div text-4 mb-1><b>Thread 1</b></div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
+</div>
+<div data-id="t2" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div text-4 mb-1><b>Thread 2</b></div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
+</div>
+<div data-id="t3" border="~ emerald/50 rounded" p-1 bg-emerald:5>
+<div text-4 mb-1><b>Thread 3</b></div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
+</div>
+</div>
+</div>
+
+<div></div>
+
+<div v-click="1" text-4 text-center op80>one thread = one request ✅</div>
+<div></div>
+
+</div>
+
+<style>
+.row-offset { height: 36px; }
+</style>
+
+<!--
+Before any code, let's fix the setting, because the code on the next slide only makes sense in it.
+
+Our example runs on a classic web server. One process, a pool of threads, and each incoming request gets a thread of its own. That thread handles the request from start to finish, and only that request.
+
+[click]
+So while alice's request is being handled, Thread 1 belongs to alice. One thread, one request.
+-->
+
+---
 
 # The sync answer
 
-```py {*|1|3|5-7|9-10|12-13|*}{maxHeight:'360px'}
-DEFAULT_TIMEOUT = 30
+<div text-4 op70 mb-2>🧵 on the thread-per-request server</div>
 
+```py {*|1|3-5|7-8|10-11|*}{maxHeight:'340px'}
 _local = threading.local()
 
 def handle(request):
@@ -301,20 +351,17 @@ def index():
     print(f"Hello, {current_user()}!")
 ```
 
-<div v-click="6" mt-4 text-5>
+<div v-click="5" mt-4 text-5>
 
-In a **thread-per-request** server, this is correct. One thread *is* one request. ✅
+Per-thread storage **is** per-request storage here. ✅
 
 </div>
 
 <!--
-So how would you build something like `current_user` yourself, in normal synchronous Python?
+So on that server, how would you build something like `current_user` yourself?
 
 [click]
-Sometimes a module-level global is genuinely fine. A default timeout doesn't change from request to request.
-
-[click]
-But the user does change from request to request, so a plain global won't do. The classic answer is threading dot local.
+The user changes from request to request, so a plain module-level global won't do. On this server, the classic answer is threading dot local: one value per thread.
 
 [click]
 At the top of each request, you stash the user on it, and then call the view.
@@ -326,7 +373,7 @@ At the top of each request, you stash the user on it, and then call the view.
 And the view is our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
 
 [click]
-And I want to be clear: this is not bad code. In a thread-per-request server, this is exactly right. One thread is handling one request, so per-thread storage really does mean per-request storage.
+And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
 -->
 
 ---
@@ -346,15 +393,15 @@ plainBackground: true
 <div flex="~ col" gap-1>
 <div data-id="t1" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 1</b></div>
-<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request A</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
 </div>
 <div data-id="t2" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 2</b></div>
-<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request B</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
 </div>
 <div data-id="t3" border="~ emerald/50 rounded" p-1 bg-emerald:5>
 <div text-4 mb-1><b>Thread 3</b></div>
-<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request C</div>
+<div border="~ emerald/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
 </div>
 </div>
 </div>
@@ -366,15 +413,15 @@ plainBackground: true
 <div flex="~ col" gap-1>
 <div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 1</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request A</div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
 </div>
 <div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 2</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request B</div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
 </div>
 <div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
 <div text-4 mb-1><b>Task 3</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>request C</div>
+<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
 </div>
 </div>
 </div>
@@ -396,9 +443,9 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-That code is correct, as long as one thread handles one request. But once we go async, that stops being true.
+Here's the same picture again, on the left: the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
-On the left is the world threading dot local was designed for. One process, three threads, one request each. Per-thread storage really is per-request storage.
+But once we go async, that stops being true.
 
 [click]
 And on the right is asyncio. Same one process, the same three requests. But notice the picture has one more layer: the requests are not sitting directly on a thread any more. Each one is wrapped in something called a task, and all three tasks share the single thread, taking turns and interleaving at every await.
@@ -435,9 +482,9 @@ plainBackground: true
 <div v-click="1" border="~ rose/50 rounded-lg" p-3 bg-rose:5>
 <div text-4 mb-2><b>the event loop</b></div>
 <div flex="~ col" gap-2>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request A</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request B</div>
-<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · request C</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · alice's request</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · bob's request</div>
+<div border="~ rose/40 rounded" px-2 py-1 bg-white dark:bg-black text-4 text-center>Task · carol's request</div>
 </div>
 </div>
 

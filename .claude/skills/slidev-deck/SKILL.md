@@ -314,7 +314,7 @@ After creating package.json, run `pnpm install` in the deck directory.
 
 ### 5. Write slides.md
 
-Read `references/slidev-syntax.md` before writing or editing `slides.md`. When the slides are done, section 6 has you check your own edit and section 7 runs the `audience-reviewer` pass over them. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file.
+Read `references/slidev-syntax.md` before writing or editing `slides.md`. It has the authoring syntax you need from here on: animation directives (`v-clicks`, `v-click`, `v-mark`, magic-move), the addons (`FancyArrow`, `WindowMockup`, `Anipres`, `QRCode`), UnoCSS styling patterns, code block options including the `maxHeight` rules that keep tall blocks from overflowing the slide, images and video, and custom components. Planning does not need any of it, which is why it sits in its own file. When the slides are done, section 6 has you check your own edit and section 7 runs the `audience-reviewer` pass over them.
 
 This section covers only the deck's own conventions: frontmatter, the title and bio slides, and the section layouts.
 
@@ -462,7 +462,7 @@ Re-read every slide you touched, together with the slide before and after it, in
 - **Premises first.** Is every assumption a slide depends on (an architecture, a setting, "this only works because…") shown before that slide, rather than stated at its end or in its closing note? When the story returns to a setting, is it the same picture in the same place?
 - **The running example still runs.** If the example changed, do the later slides that use it still agree on names, values and terminal output?
 - **The notes join up.** Does each touched slide's note open by connecting to the slide before it? Does it name its subject ("the `contextvars` module", "a value stored with `contextvars`") rather than "this module", "it" or "a value"?
-- **Clicks match.** Does the count of `[click]` markers in the notes equal the slide's clicks (code-highlight steps plus `v-click`s)? A mismatch puts every later beat one click late, and the last one is never reached.
+- **Clicks match.** Does the count of `[click]` markers in the notes equal the number of clicks the slide takes to reach its final state? That is the highest click anything waits for, not a sum: a `{*|10|8|*}` highlight is two clicks, and an arrow on `v-click="2"` paired with its second step adds none. A mismatch puts every later beat one click late, and the last one is never reached.
 - **The terminal tells the truth.** When a slide shows code and its output, run the code and compare.
 - **It fits.** Build, measure overflow (see section 8), and screenshot each touched slide at its final click.
 

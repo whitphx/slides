@@ -287,7 +287,7 @@ Deck is 37 slides.
 
 `.claude/agents/audience-reviewer.md` reads a finished deck once, in order, as someone at the stated knowledge level,
 and reports terms used before introduction, questions raised and not answered, answers separated from their question,
-detail arriving before motivation, and overstated claims. The slidev-deck skill runs it as step 6, after `slides.md`
+detail arriving before motivation, and overstated claims. The slidev-deck skill runs it after the self-check, once `slides.md`
 is written and before the deck goes to the author. Most of this deck's review rounds were findings of exactly that
 shape, caught by the author rather than before.
 

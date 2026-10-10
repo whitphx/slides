@@ -242,9 +242,9 @@ plainBackground: true
 <div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>who is asking</span></div>
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
 <div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
-<div v-click="4" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
-<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
-<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
+<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
 
 </div>
 
@@ -267,60 +267,63 @@ The current user, which we just saw.
 The current database transaction.
 
 [click]
+The current runtime, whatever "runtime" means in your system.
+
+[click]
 The current working directory, the other one from our example.
 
 [click]
 The current environment variables.
 
 [click]
-The current runtime, whatever "runtime" means in your system.
-
-[click]
 Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
 
-Keep an eye on the colours, by the way. The blue ones are values you declare yourself. The orange ones belong to the operating system.
+Keep an eye on the colours, by the way. The blue ones are values your own code sets, and they change from request to request. The orange ones belong to the operating system.
 -->
 
 ---
 
 # The sync answer
 
-```py {*|1|3|5-7|9-13|*}{maxHeight:'340px'}
+```py {*|1|3|5-7|9-10|12-13|*}{maxHeight:'360px'}
 DEFAULT_TIMEOUT = 30
 
 _local = threading.local()
 
 def handle(request):
-    _local.request_id = request.id
-    do_the_work()
+    _local.user = request.user
+    index()
 
-def do_the_work():
-    log("saving order")
+def current_user():
+    return _local.user
 
-def log(message):
-    print(f"[{_local.request_id}] {message}")
+def index():
+    print(f"Hello, {current_user()}!")
 ```
 
-<div v-click="5" mt-4 text-5>
+<div v-click="6" mt-4 text-5>
 
 In a **thread-per-request** server, this is correct. One thread *is* one request. ✅
 
 </div>
 
 <!--
-So how do we handle that in normal synchronous Python?
+So how would you build something like `current_user` yourself, in normal synchronous Python?
 
 [click]
 Sometimes a module-level global is genuinely fine. A default timeout doesn't change from request to request.
 
 [click]
-But when the value does change per request, the classic answer is threading dot local.
+But the user does change from request to request, so a plain global won't do. The classic answer is threading dot local.
 
 [click]
-You stash the request id on it at the top of the request, and then get on with the actual work.
+At the top of each request, you stash the user on it, and then call the view.
 
 [click]
-And down here, several frames deeper, the logging code reads it straight back out. Look at what is not happening: do_the_work never mentions a request id, and log never takes one as an argument. Nobody passed it down. It was just there.
+`current_user()` reads it straight back out.
+
+[click]
+And the view is our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
 
 [click]
 And I want to be clear: this is not bad code. In a thread-per-request server, this is exactly right. One thread is handling one request, so per-thread storage really does mean per-request storage.
@@ -473,12 +476,12 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 ```py {*|4|5|6|*}{maxHeight:'290px'}
 _local = threading.local()
 
-async def handle(request_id):
-    _local.request_id = request_id
+async def handle(user):
+    _local.user = user
     await asyncio.sleep(0.01)
-    print(f"{request_id} logged as {_local.request_id}")
+    print(f"{user} sees: Hello, {_local.user}!")
 
-await asyncio.gather(handle("A"), handle("B"))
+await asyncio.gather(handle("alice"), handle("bob"))
 ```
 
 </div>
@@ -488,8 +491,8 @@ await asyncio.gather(handle("A"), handle("B"))
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-A logged as B
-B logged as B
+alice sees: Hello, bob!
+bob sees: Hello, bob!
 ```
 
 </WindowMockup>
@@ -500,7 +503,7 @@ B logged as B
 
 <div v-click="5" mt-6 text-5>
 
-Request **A** wrote its id, **yielded**, and B overwrote the slot before A came back. 🫠
+**alice** stored her name, **yielded**, and bob overwrote the slot before she came back. 🫠
 
 </div>
 
@@ -508,19 +511,19 @@ Request **A** wrote its id, **yielded**, and B overwrote the slot before A came 
 Let me show you the failure, because it's short.
 
 [click]
-Task A sets its request id.
+Two requests come in, one from alice and one from bob. Alice's task stores her name.
 
 [click]
-Then it awaits. And that's the moment it hands the thread over to task B, which sets the same attribute on the same object.
+Then it awaits. And that's the moment it hands the thread over to bob's task, which sets the same attribute on the same object.
 
 [click]
-Then A resumes and reads it back.
+Then alice's task resumes and reads it back.
 
 [click]
-And A thinks it's request B. Both lines say B.
+And alice gets greeted as bob. Both lines say bob.
 
 [click]
-Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service this is the bug where your logs are confidently attributed to the wrong user, and you spend a day not believing your own log file.
+Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service, this is alice looking at bob's page. That's not a cosmetic bug. That's a data leak.
 -->
 
 ---
@@ -545,12 +548,12 @@ That's exactly what contextvars is.
 ```py {*|3-5|7|8}{'data-id':'cv'}{maxHeight:'300px'}
 from contextvars import ContextVar
 
-request_id_var = ContextVar(
-    "request_id", default="-"
+user_var = ContextVar(
+    "user", default="anonymous"
 )
 
-request_id_var.set("A")
-request_id_var.get()
+user_var.set("alice")
+user_var.get()
 ```
 
 <div v-click="2">
@@ -595,19 +598,19 @@ The shape is the same as the threading dot local version. Declare in one place, 
 ```py
 _local = threading.local()
 
-async def handle(request_id):
-    _local.request_id = request_id
+async def handle(user):
+    _local.user = user
     await asyncio.sleep(0.01)
-    print(f"{request_id} logged as {_local.request_id}")
+    print(f"{user} sees: Hello, {_local.user}!")
 ```
 
 ```py
-request_id_var = ContextVar("request_id", default="-")
+user_var = ContextVar("user", default="anonymous")
 
-async def handle(request_id):
-    request_id_var.set(request_id)
+async def handle(user):
+    user_var.set(user)
     await asyncio.sleep(0.01)
-    print(f"{request_id} logged as {request_id_var.get()}")
+    print(f"{user} sees: Hello, {user_var.get()}!")
 ```
 
 ````
@@ -619,8 +622,8 @@ async def handle(request_id):
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-A logged as B
-B logged as B
+alice sees: Hello, bob!
+bob sees: Hello, bob!
 ```
 
 </WindowMockup>
@@ -631,8 +634,8 @@ B logged as B
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-A logged as A
-B logged as B
+alice sees: Hello, alice!
+bob sees: Hello, bob!
 ```
 
 </WindowMockup>
@@ -669,7 +672,7 @@ ctx = copy_context()
 
 ctx.run(handler)
 
-ctx[request_id_var]
+ctx[user_var]
 ```
 
 </div>
@@ -681,9 +684,9 @@ ctx[request_id_var]
 <div text-4 op70 mb-3>one <code>Context</code></div>
 
 <div flex="~ col" gap-2 text-4>
-<div><code>request_id_var</code> <span op50>→</span> <b>"A"</b></div>
-<div><code>current_user</code> <span op50>→</span> <b>alice</b></div>
-<div><code>db_session</code> <span op50>→</span> <b>&lt;Session&gt;</b></div>
+<div><code>user_var</code> <span op50>→</span> <b>"alice"</b></div>
+<div><code>locale_var</code> <span op50>→</span> <b>"zh-TW"</b></div>
+<div><code>db_session_var</code> <span op50>→</span> <b>&lt;Session&gt;</b></div>
 </div>
 
 <div v-click="2" mt-3 border="~ violet/50 rounded" p-2 bg-violet:5 text-4 text-center>
@@ -696,7 +699,7 @@ ctx[request_id_var]
 
 ```py
 def handler():
-    print(request_id_var.get())
+    print(user_var.get())
 ```
 
 </div>
@@ -720,7 +723,7 @@ The second concept is the Context itself. Picture it as a dictionary: every cont
 copy_context takes a snapshot of that whole mapping and hands it back to you as one object.
 
 [click]
-And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the request id. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.
+And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the current user. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.
 
 [click]
 You can also read a variable straight out of the snapshot, like a dictionary lookup.
@@ -741,7 +744,7 @@ plainBackground: true
 
 <div data-id="parent" border="~ sky/50 rounded-lg" p-4 bg-sky:5 w-64>
 <div text-4 op70 mb-2>the <b>caller's</b> context</div>
-<div text-5><code>request_id</code> = <b>"A"</b></div>
+<div text-5><code>user</code> = <b>"alice"</b></div>
 </div>
 
 <div v-click="1" data-id="mid" text-center op80 w-44>
@@ -751,7 +754,7 @@ plainBackground: true
 
 <div v-click="2" data-id="child" border="~ violet/50 rounded-lg" p-4 bg-violet:5 w-64>
 <div text-4 op70 mb-2>the <b>task's</b> context</div>
-<div text-5><code>request_id</code> = <b>"A"</b></div>
+<div text-5><code>user</code> = <b>"alice"</b></div>
 </div>
 
 </div>
@@ -798,10 +801,10 @@ Copy, not share. Say it once and most of the confusion goes away.
 
 ```py {*|4|5|2}{maxHeight:'270px'}
 async def worker():
-    print(request_id_var.get())
+    print(user_var.get())
 
 task = asyncio.create_task(worker())
-request_id_var.set("A")
+user_var.set("alice")
 ```
 
 </div>
@@ -811,7 +814,7 @@ request_id_var.set("A")
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
--
+anonymous
 ```
 
 </WindowMockup>
@@ -824,7 +827,7 @@ request_id_var.set("A")
 
 <div v-click="4" mt-6 text-5>
 
-Swap the two lines and it prints `A`. **The snapshot is taken at `create_task()`.** 📸
+Swap the two lines and it prints `alice`. **The snapshot is taken at `create_task()`.** 📸
 
 </div>
 
@@ -913,21 +916,21 @@ plainBackground: true
 ````md magic-move {at:2}
 
 ```py
-async def handle(request_id):
-    request_id_var.set(request_id)
+async def handle(user):
+    user_var.set(user)
 
     def on_timeout():
-        print(request_id_var.get())
+        print(user_var.get())
 
     setTimeout(create_proxy(on_timeout), 1000)
 ```
 
 ```py
-async def handle(request_id):
-    request_id_var.set(request_id)
+async def handle(user):
+    user_var.set(user)
 
     def on_timeout():
-        print(request_id_var.get())
+        print(user_var.get())
 
     snapshot = copy_context()
     def in_snapshot():
@@ -946,7 +949,7 @@ async def handle(request_id):
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
--
+anonymous
 ```
 
 </WindowMockup>
@@ -957,7 +960,7 @@ async def handle(request_id):
 <WindowMockup title="Terminal" dark codeblock>
 
 ```shell
-A
+alice
 ```
 
 </WindowMockup>
@@ -986,16 +989,16 @@ There's a second kind of edge: something outside Python calling back in. The edg
 
 This is Pyodide, which is CPython compiled to WebAssembly and running in the browser. It's what powers the project in the case study coming up.
 
-Same `handle()` as before, running as its own task, one per request. It sets the request id, defines a callback, and hands it to JavaScript. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
+Same `handle()` as before, running as its own task, one per request. It sets the user, defines a callback, and hands it to JavaScript. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
 
 [click]
-And it prints the default. When JavaScript calls back in, no task is being created and there's no Python caller to copy from. Pyodide just runs the function in whatever context is current at that moment, which is the thread's top-level context. That's the one your module-level code runs in, not the task's copy. The request id was set in the task's copy, so it was never in there.
+And it prints the default. When JavaScript calls back in, no task is being created and there's no Python caller to copy from. Pyodide just runs the function in whatever context is current at that moment, which is the thread's top-level context. That's the one your module-level code runs in, not the task's copy. The user was set in the task's copy, so it was never in there.
 
 [click]
 So we take the copy ourselves. `copy_context()` runs while `handle()` is still handing the callback over, and every call runs inside that snapshot. `.copy()` on a context just makes another one with the same values.
 
 [click]
-Now it prints the request id. And notice when the copy happened: at the handoff, not when JavaScript calls. By the time JavaScript calls, there's nothing left to copy.
+Now it prints the user. And notice when the copy happened: at the handoff, not when JavaScript calls. By the time JavaScript calls, there's nothing left to copy.
 
 [click]
 Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh for every hop. Here one snapshot is reused for every call, so each call takes its own copy of it. That's the same deal a task gets: its own copy, so whatever one call sets never leaks into the next.
@@ -1003,7 +1006,7 @@ Why the extra `.copy()`? On the executor slide, we called `copy_context()` fresh
 [click]
 So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
 
-And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and Stlite looked it up from the running task. A JavaScript callback runs in no task, so every Streamlit call from it failed, unless the app attached the session by hand. The fix put the session in a context variable, just like our request id, and wraps `create_proxy()` like this. So every callback an app wraps with it runs in the snapshot.
+And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and Stlite looked it up from the running task. A JavaScript callback runs in no task, so every Streamlit call from it failed, unless the app attached the session by hand. The fix put the session in a context variable, just like our user, and wraps `create_proxy()` like this. So every callback an app wraps with it runs in the snapshot.
 -->
 
 ---
@@ -1011,11 +1014,11 @@ And this one was a real bug. Streamlit, the data-app framework, needs its sessio
 # `Token`: putting it back
 
 ```py {*|1|3|5}{maxHeight:'220px'}
-token = request_id_var.set("A")
+token = user_var.set("alice")
 
 do_some_work()
 
-request_id_var.reset(token)
+user_var.reset(token)
 ```
 
 <div mt-6 text-5>
@@ -1718,7 +1721,7 @@ Everything you do with that answer is still your design problem.
 | | 🧭 hidden context | 📮 explicit parameter |
 |---|---|---|
 | **Use it when** | every layer needs it, and you don't own the layers | it's part of what the function *does* |
-| **Classic fit** | request id, trace span, tenant, locale | the user id this function operates on |
+| **Classic fit** | current user, request id, trace span, locale | the user whose data this function loads |
 | **You pay in** | invisible in signatures, awkward to test | threading it through everything |
 | **Fails by** | silently returning the default | a `TypeError`, right away |
 
@@ -1735,9 +1738,9 @@ So when should you actually reach for this?
 
 The honest answer is: less often than it's fun to.
 
-Hidden context earns its place when every layer needs the value and you don't own all the layers. A request id has to reach a logging call twenty frames down, through library code you didn't write. You can't thread a parameter through that.
+Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that.
 
-But if the value is part of what the function does — this function operates on this user — pass it. Just pass it.
+But if the value is part of what the function does — this function loads this user's orders — pass it. Just pass it. Same kind of value, different job.
 
 And look at the bottom row, because I think it's the deciding one. An explicit parameter fails loudly. You forget it, and you find out immediately. Hidden context fails silently, by handing you a default that looks perfectly reasonable.
 

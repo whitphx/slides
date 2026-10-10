@@ -1243,48 +1243,57 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 
 # No backend, just a tab
 
-<WindowMockup title="https://example.com/my-app.html" light>
+<div grid="~ cols-[1.15fr_1fr]" gap-5 mt-0 items-start class="stlite-grid">
 
-<div p-4 class="mock-page" flex="~ col" gap-3>
-<div text-5 font-bold>🎈 Sales dashboard</div>
-<div text-4 op70>Move the slider to filter</div>
-<div flex="~" items-center gap-3>
-  <div text-4>Threshold</div>
-  <div w-60 h-1 bg-gray-300 rounded relative>
-    <div absolute left-30 top--1 w-3 h-3 rounded-full class="mock-knob"></div>
-  </div>
-  <div text-4>42</div>
-</div>
-<div flex="~ gap-2" items-end h-24>
-  <div w-8 h-16 class="mock-bar"></div>
-  <div w-8 h-24 class="mock-bar"></div>
-  <div w-8 h-10 class="mock-bar"></div>
-  <div w-8 h-20 class="mock-bar"></div>
-  <div w-8 h-14 class="mock-bar"></div>
-</div>
+<div>
+
+<div text-4 mb-1>📄 <b>app.py</b>: a Streamlit script</div>
+
+<<< @/samples/stlite-demo/app.py py
+
+<div text-4 mt-2 mb-1>🌐 <b>stlite.html</b>: a static page (+ Stlite's <code>&lt;script&gt;</code>)</div>
+
+<<< @/samples/stlite-demo/stlite.html#slide-mount html
+
 </div>
 
-</WindowMockup>
+<div>
 
-<div v-click="1" mt-5 text-5 text-center>
+<LiveEmbed url="/stlite-demo/stlite.html" title="stlite.html" light padding="0.4rem" height="280px" :zoom="0.5">
 
-The Python that renders this is running **in the page**. There is nothing behind it. 🪄
+<img src="/stlite-demo.png" alt="The Sales dashboard, running from a static HTML file in the browser" style="width: 100%; height: auto;" />
+
+</LiveEmbed>
+
+<div v-click="1" mt-4 text-5 text-center>
+
+**Static files only.**<br>The Python runs **in the page**. 🪄
+
+</div>
+
+</div>
 
 </div>
 
 <style>
-/* `light` pins the frame to white but leaves slot content on the theme's
-   text colour: white-on-white in dark mode without this. */
-.mock-page { color: #1f2937; }
-.mock-bar { background: #36709E; border-radius: 3px 3px 0 0; }
-.mock-knob { background: #36709E; }
+* {
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.5;
+}
+/* A code block will not shrink below its longest line, which would widen its
+   track and push the window off the slide. */
+.stlite-grid > * {
+  min-width: 0;
+}
 </style>
 
 <!--
-This is roughly what that looks like. An ordinary web page with an ordinary Streamlit app in it.
+Here is a real Stlite app. On the left is all of its source code. `app.py` is an ordinary Streamlit script: a title, a slider, and a line chart. Below it is `stlite.html`, a static HTML page. It loads Stlite from a CDN and points it at `app.py`.
+
+On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
 
 [click]
-And the only thing worth noticing is what isn't there. No API calls, no backend, no deployment. You move the slider, and Python runs in the tab to re-render the chart.
+And notice what is not there. The whole app is two static files. There is no backend, and no API calls. When I move the slider, Python runs in this tab and draws the chart again.
 
 That's the product. Now let me show you the part that made my life hard.
 -->
@@ -1295,48 +1304,60 @@ plainBackground: true
 
 # Many apps, one Python
 
-<div mt-6 flex="~" items-center justify-center gap-24>
+<div mt-4 mx-auto max-w-200 text-4 class="nest">
 
-<div flex="~ col" gap-3>
-<div data-id="appA" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App A</b><br><span op70>/home/app-a</span></div>
-<div data-id="appB" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App B</b><br><span op70>/home/app-b</span></div>
-<div data-id="appC" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 w-44><b>App C</b><br><span op70>/home/app-c</span></div>
+<div border="~ gray-400/50 rounded-xl" p-2 bg-gray-400:5>
+<div text-center op70 mb-1>🌐 <b>Browser</b>: one JavaScript thread (a Web Worker)</div>
+
+<div border="~ violet-400/50 rounded-lg" p-2 bg-violet-400:5>
+<div text-center op70 mb-1>🐍 <b>Pyodide</b>: one Python interpreter, on WebAssembly</div>
+
+<div border="~ sky-400/50 rounded-lg" p-2 bg-sky-400:5>
+<div text-center op70 mb-1>🧵 <b>one thread</b></div>
+
+<div border="~ rose-400/50 rounded-lg" p-2 bg-rose-400:5>
+<div text-center op70 mb-2>⚡ <b>one event loop</b></div>
+
+<div grid="~ cols-3" gap-2>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App A</b><br><span op70><code>/home/app-a</code></span></div>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App B</b><br><span op70><code>/home/app-b</code></span></div>
+<div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App C</b><br><span op70><code>/home/app-c</code></span></div>
 </div>
 
-<div v-click="1" data-id="env" border="~ amber/50 rounded-lg" p-5 bg-amber:5 w-80>
-<div text-5 mb-2><b>one Python environment</b></div>
-<div text-4 op80 flex="~ col" gap-1>
-<div>🧵 one thread</div>
-<div>⚡ one event loop</div>
-<div>📁 one <code>os.getcwd()</code></div>
-<div>🌍 one <code>os.environ</code></div>
 </div>
 </div>
 
+<div v-click="1" mt-2 border="~ amber-400/60 rounded-lg" p-2 bg-amber-400:10 text-center>
+📁 one <code>os.getcwd()</code> · 🌍 one <code>os.environ</code> — <b>shared by every app</b>
 </div>
 
-<FancyArrow v-click="1" from="[data-id=appA] @ right" to="[data-id=env] @ (0%, 25%)" arc="0.1" />
-<FancyArrow v-click="1" from="[data-id=appB] @ right" to="[data-id=env] @ (0%, 50%)" arc="0.1" />
-<FancyArrow v-click="1" from="[data-id=appC] @ right" to="[data-id=env] @ (0%, 75%)" arc="0.1" />
+</div>
+</div>
 
-<div v-click="2" mt-8 text-5 text-center>
+</div>
 
-Each app is a separate logical runtime. **They all share one interpreter.** 😬
+<div v-click="2" mt-4 text-5 text-center>
+
+Three apps, but **they all share one interpreter.** 😬
 
 </div>
 
 <!--
-Here's the setup.
+Here's the setup. Let's go from the outside in.
 
-A page can host more than one Stlite app, and when they share one browser worker they all live together.
+Everything runs in the browser. Stlite runs in a Web Worker, and that worker has one JavaScript thread.
+
+Inside it is Pyodide: one Python interpreter, compiled to WebAssembly.
+
+That interpreter has one thread, because the browser gives it one. On that thread there is one event loop.
+
+And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
 
 [click]
-And they share everything. One Python environment. One thread, because the browser gives you one. One event loop. And critically, one current working directory and one set of environment variables, because those belong to the interpreter, not to your app.
+But some things belong to the interpreter, not to an app. There is one current working directory, and one set of environment variables. Every app shares them.
 
 [click]
-So from Python's point of view these are three logical runtimes, but there is exactly one of every global thing they need.
-
-And each app has its own home directory, because each app has its own files.
+So from Python's point of view these are three separate apps, but there is exactly one of every global thing they need.
 -->
 
 ---

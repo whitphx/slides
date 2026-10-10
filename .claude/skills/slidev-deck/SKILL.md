@@ -38,6 +38,14 @@ These principles are the material you draft the plan from. The **information flo
 #### Narrative structure
 
 - **Start from what the audience already knows.** Introduce the simplest or most common approach first, then progressively build toward more advanced solutions. For example, if the talk is about CI/CD workflows, start with "run a build script locally" before jumping to "GitHub Actions matrix builds."
+- **Concrete first, then abstract.** Open the talk, and each new topic in it, on a concrete example: a short, simple piece of code or a scenario that shows the topic in miniature. Raise it to the general idea only after the audience has seen it. From there the story either returns to another concrete case or develops the abstract argument, whichever the talk needs next. The reverse order is the one to avoid. A taxonomy, a definition or a list of categories shown first asks the audience to hold a structure with nothing to hang it on, and every item reads as equally vague.
+  - **Pick the most familiar example there is.** The best opener is the kind of code the audience has written many times: the hello-world web app, the five-line script. Recognising it costs them nothing, so all their attention goes to the one thing you point at. Keep only the parts the point needs.
+  - **Show one or two instances, not all of them.** The example demonstrates the idea; it does not have to enumerate it. If the topic has several kinds, one or two of them in the code is enough, and a list of the rest can follow as a reference slide once the audience knows what a list item looks like.
+  - **Annotate the instances in place.** Point arrows at the exact lines where the idea shows up and label each with its name, so the audience sees the concept and its name together (see "Annotating code" in `references/slidev-syntax.md`).
+  - **Keep the example running.** Code later in the talk should grow out of the opening example where it can, so the audience follows one thread instead of meeting a new toy program on every slide.
+  - **The exception is narrow.** Skip the concrete step only for a strong reason, or when the example would be one the audience obviously already knows, so that showing it adds nothing.
+
+  For example, a talk on `contextvars` should not open on a grid of "current request · current user · current directory". It should open on a tiny Flask view whose function takes no arguments yet reads `current_user` and opens a relative path, with an arrow on each and the observation that neither was passed in. The grid comes after, as "and those two aren't special".
 - **Every technique needs motivation.** Before introducing a tool or methodology, explain the **problem** it solves. The audience must feel the pain before they can appreciate the cure. A slide that says "Use scriv for changelogs" without first showing why manual changelogs are painful will not land.
 - **Connect slides explicitly.** Each slide should flow into the next. End problem slides with a question or tension ("But who decides the version?") that the next slide resolves. Avoid abrupt topic jumps.
 - **Section headers can carry a subtitle** that previews the section's motivation (e.g., "Catch bugs before they reach users, across every supported environment"). Use this when it helps orient the audience, but don't force it on every section.
@@ -158,6 +166,8 @@ One case comes up often enough to be worth naming: the change you are asked for 
 Present the arc **alone**, with no slide titles, counts, or layouts. Slide-level detail at this stage pulls feedback toward slides when the thing that needs feedback is the story.
 
 An arc is a chain of tension and release. Each beat starts where the audience currently stands, exposes a problem they can feel, and hands that problem to the next beat. Write each one as **what the audience gains** plus **the pain that forces the next step**. If a beat has no pain, it has no reason to be followed by anything. That's the signal to merge it or cut it, and saying so is more useful than quietly padding it out.
+
+Name the concrete example each beat opens on, too (see "Concrete first, then abstract" above). A beat whose first slide would be a list, a definition or a taxonomy usually wants a small familiar example in front of it, and the arc is the cheapest place to notice that.
 
 ```
 STAGE 1: Narrative arc

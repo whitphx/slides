@@ -556,7 +556,7 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 <div>
 
-```py {*|8|4|5|*}{maxHeight:'330px'}
+```py {*|11|8|4,8|5|*}{maxHeight:'330px'}
 _local = threading.local()
 
 async def index():
@@ -572,7 +572,13 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 </div>
 
-<div v-click="4">
+<div>
+
+<div v-click="1" mb-2 text-4 border="~ violet/50 rounded-lg" px-3 py-2 bg-violet:5>🙋 <code>gather()</code> starts <b>two tasks</b>, alice's and bob's, on <b>one thread</b></div>
+
+<div v-click="3" mb-2 text-4 border="~ violet/50 rounded-lg" px-3 py-2 bg-violet:5>⏸️ <b>alice's task</b> waits at <code>await</code><br>▶️ <b>bob's task</b> stores <code>"bob"</code> in the <b>same slot</b></div>
+
+<div v-click="5">
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -587,7 +593,9 @@ bob sees: Hello, bob!
 
 </div>
 
-<div v-click="5" mt-6 text-5>
+</div>
+
+<div v-click="6" mt-6 text-5>
 
 **alice** stored her name, **yielded**, and bob overwrote the slot before she came back. 🫠
 
@@ -596,13 +604,16 @@ bob sees: Hello, bob!
 <!--
 Let me show you the failure.
 
-Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
+Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments.
 
 [click]
-Alice's task stores her name.
+The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. That is what an async server does for two requests that arrive together.
 
 [click]
-Then `index()` awaits. And that's the moment it hands the thread over to bob's task, which stores his name in the same slot.
+Alice's task runs first. It stores her name in `_local.user`.
+
+[click]
+Then `index()` awaits. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread.
 
 [click]
 Then alice's task resumes and reads the slot.

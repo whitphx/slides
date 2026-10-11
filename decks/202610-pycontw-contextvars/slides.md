@@ -234,52 +234,6 @@ And yet it knows who is asking, and where to look. Both values are just there wh
 ---
 plainBackground: true
 ---
-
-# Python is full of "current"
-
-<div mt-8 grid="~ cols-3" gap-4 text-5>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
-<div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
-<div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
-<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
-<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
-<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
-
-</div>
-
-<div v-click="7" mt-8 text-5 text-center>
-
-None of these are function arguments. **They're just… around.** 👻
-
-</div>
-
-<!--
-And those two aren't special. Once you start looking, Python code reads a lot of values that were never passed to it as arguments.
-
-[click]
-The current request.
-
-[click]
-The current user, which we just saw.
-
-[click]
-The current database transaction.
-
-[click]
-The current runtime, whatever "runtime" means in your system.
-
-[click]
-The current working directory, the other one from our example.
-
-[click]
-The current environment variables.
-
-[click]
-Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
--->
-
----
 plainBackground: true
 ---
 
@@ -321,7 +275,7 @@ plainBackground: true
 </style>
 
 <!--
-Before any code, let's fix the setting, because the code on the next slide only makes sense in it.
+So how does `index()` know who is asking? To answer that, we first need to look at the server it runs on.
 
 Our example runs on a classic web server. One process, a pool of threads, and each incoming request gets a thread of its own. That thread handles the request from start to finish, and only that request.
 
@@ -372,6 +326,52 @@ And the view is a stripped-down version of our `index()` from before. It still t
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
+-->
+
+---
+
+# Python is full of "current"
+
+<div mt-8 grid="~ cols-3" gap-4 text-5>
+
+<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
+<div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
+<div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
+<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
+<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
+
+</div>
+
+<div v-click="7" mt-8 text-5 text-center>
+
+None of these are **passed as arguments**. 👻
+
+</div>
+
+<!--
+The current user is only one example. Python code reads many values that were never passed to it as arguments.
+
+[click]
+The current request.
+
+[click]
+The current user, our example.
+
+[click]
+The current database transaction. SQLAlchemy's `scoped_session`, for example, keeps one session per thread by default, with `threading.local()`.
+
+[click]
+The current runtime: which app is running, in a system that runs more than one.
+
+[click]
+The current working directory, the other value our Flask view used.
+
+[click]
+And the current environment variables. These last two are different from the others. There is only one of each for the whole process, not one per thread.
+
+[click]
+None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
 -->
 
 ---
@@ -444,7 +444,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-Here's the same picture again, on the left: the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
+On the left is the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
 But once we go async, that stops being true.
 

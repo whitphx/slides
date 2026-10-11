@@ -550,7 +550,9 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 # Watch `threading.local()` break
 
-<div mt-4 grid="~ cols-[1.15fr_1fr]" gap-5>
+<div text-4 op70 mb-2>⚡ on an async server · <b>simplified</b>: how an async web framework works, not production code</div>
+
+<div grid="~ cols-[1.15fr_1fr]" gap-5>
 
 <div>
 
@@ -592,9 +594,9 @@ bob sees: Hello, bob!
 </div>
 
 <!--
-Let me show you the failure, because it's short.
+Let me show you the failure.
 
-Here's the same app, made async. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
+Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
 
 [click]
 Alice's task stores her name.

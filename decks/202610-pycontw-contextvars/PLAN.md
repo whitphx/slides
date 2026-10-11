@@ -436,3 +436,7 @@ Checked against the sources (Flask 1.1.4, Werkzeug 1.0.1, Flask-Login 0.5.0):
 - Flask-Login 0.5.0 `flask_login/utils.py` `_get_user()` (lines 344–348) loads the user onto `_request_ctx_stack.top.user` and reads it back; `current_user = LocalProxy(lambda: _get_user())`. This is the toy's `_local.user` and `current_user()`.
 
 This holds for Flask 1.x only. Werkzeug 2.0 reimplemented `Local` on a `ContextVar`, and Flask 2.2 replaced `LocalStack` with `ContextVar`s directly ("Where you've already met it" says so), so the slide and note say "Flask 1.x" and that newer versions store it differently.
+
+### Who creates the task for a request (2026-10-11)
+
+The notes said "In asyncio, the event loop wraps each request in a task." Both halves were wrong: asyncio itself puts no request in a task, and the event loop never creates tasks, it only runs them. In the usual async web setup the server does it: Uvicorn 0.30.6 calls `self.loop.create_task(self.cycle.run_asgi(app))` once per request (`uvicorn/protocols/http/httptools_impl.py` line 282, `h11_impl.py` line 253), and the ASGI framework runs inside that task. "Then we went async" and "What is a task?" now say that the major async web servers start one task per request and the event loop runs it; the first bullet names "an async web server like Uvicorn" instead of "a web framework", and "The loop owns them all" became "The loop runs them all".

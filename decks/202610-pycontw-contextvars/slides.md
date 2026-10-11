@@ -468,7 +468,7 @@ On the left is the thread-per-request server our code was written for. One proce
 But once we go async, that stops being true.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request is wrapped in something called a task. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
+And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
 
 [click]
 So one thread is serving many requests at once.
@@ -493,9 +493,9 @@ plainBackground: true
 
 <v-clicks>
 
-- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; a web framework does it per request
+- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; an async web server like Uvicorn does it per request
 - 📦 **It wraps one coroutine** — the caller carries on; the task is its own unit of work
-- 🔁 **The loop owns them all** — one thread, switching at every `await`
+- 🔁 **The loop runs them all** — one thread, switching at every `await`
 
 </v-clicks>
 
@@ -531,16 +531,16 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. In asyncio, the event loop wraps each request in a task. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. asyncio itself does not say that a request must run in a task. But the major async web servers work that way: they start one task for each request, and the event loop runs it. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
-A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
+A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In an async web app, it is usually the server. Uvicorn, for example, calls `create_task()` once for every incoming request, and your FastAPI or Starlette code runs inside that task. The event loop does not create tasks. It only runs them. Hold onto that, because who started it turns out to matter a lot later.
 
 [click]
 What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.
 
 [click]
-And the event loop owns the whole pile. One thread, running one task at a time, switching between them every time one of them hits an await.
+And the event loop runs them all. One thread, running one task at a time, switching between them every time one of them hits an await.
 
 [click]
 So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.

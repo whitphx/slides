@@ -540,7 +540,7 @@ A task does not appear on its own. Something starts it. In your own code, that i
 What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.
 
 [click]
-And the event loop runs them all. One thread, running one task at a time, switching between them every time one of them hits an await.
+And the event loop runs them all, on one thread. So the tasks run concurrently, not in parallel. The loop switches between them, and a switch can happen at an await. How the loop decides which task runs next is a big topic, and we don't need the details today. For this talk, just remember: one thread, many tasks, taking turns.
 
 [click]
 So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.

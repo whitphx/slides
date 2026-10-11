@@ -287,7 +287,9 @@ So while alice's request is being handled, Thread 1 belongs to alice. One thread
 
 # The sync answer
 
-<div text-4 op70 mb-2>🧵 on the thread-per-request server</div>
+<div text-4 op70 mb-2>🧵 on the thread-per-request server · <b>simplified</b>: what Flask does for you inside the library</div>
+
+<div grid="~ cols-[1.15fr_1fr]" gap-6 items-start>
 
 ```py {*|1|3-5|7-8|10-11|*}{maxHeight:'340px'}
 _local = threading.local()
@@ -303,14 +305,29 @@ def index():
     print(f"Hello, {current_user()}!")
 ```
 
-<div v-click="5" mt-4 text-5>
+<div>
+
+<div v-click="5" text-5>
 
 Per-thread storage **is** per-request storage here. ✅
 
 </div>
 
+<div v-click="5" mt-6 text-4 op70 border="~ gray/30 rounded-lg" p-3>
+
+📎 **The real code (Flask 1.x)**
+
+- Werkzeug's <a href="https://github.com/pallets/werkzeug/blob/1.0.1/src/werkzeug/local.py#L52-L80" target="_blank"><code>Local</code></a> keeps one storage per thread id
+- Flask-Login puts the user <a href="https://github.com/maxcountryman/flask-login/blob/0.5.0/flask_login/utils.py#L344-L348" target="_blank">on the request context</a> stored there
+
+</div>
+
+</div>
+
+</div>
+
 <!--
-So on that server, how would you build something like `current_user` yourself?
+So on that server, how does something like `current_user` work? Here is a simplified version. It is not Flask's real code. It shows what Flask and Flask-Login do for you, inside the library.
 
 [click]
 The user changes from request to request, so a plain module-level global won't do. On this server, the classic answer is threading dot local: one value per thread.
@@ -326,6 +343,8 @@ And the view is a stripped-down version of our `index()` from before. It still t
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
+
+And this is what Flask 1.x really did. Werkzeug's `Local` kept one storage per thread id, and Flask-Login put the user on the request context stored there. The links are on the slide. Newer versions of Flask store it differently.
 -->
 
 ---

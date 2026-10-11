@@ -424,3 +424,15 @@ Titles and statements in the case study were rewritten in plain, literal English
 ### "Python is full of current" moved after the sync answer (2026-10-11)
 
 The grid of "current" values sat between the Flask view and "The setting: one thread per request", which broke the web thread of the story: the view uses only the current user and the current directory, and the next slides are about requests handled one per thread. The view now leads straight into the setting ("So how does `index()` know who is asking?"), and the grid comes after "The sync answer", once `threading.local()` has been covered, as the widening step: the current user is only one of many such values. Its note now says which ones a library keeps per thread (SQLAlchemy's `scoped_session`) and that the current directory and environment variables are one per process, not per thread. The tagline is plain: "None of these are passed as arguments."
+
+### "The sync answer" says it is simplified, and points at the real code (2026-10-11)
+
+The slide came straight after a real Flask view and showed toy code without saying so. Its caption now says "simplified: what Flask does for you inside the library", the note opens by saying it is not Flask's real code, and a box at the last click links the real code.
+
+Checked against the sources (Flask 1.1.4, Werkzeug 1.0.1, Flask-Login 0.5.0):
+
+- `flask/app.py` `wsgi_app()` creates a `RequestContext` per request and calls `ctx.push()`; `flask/ctx.py` `RequestContext.push()` does `_request_ctx_stack.push(self)` (line 382); `flask/globals.py` defines `_request_ctx_stack = LocalStack()` (line 57). This is the toy's `handle()`.
+- Werkzeug 1.0.1 `werkzeug/local.py` `Local` (lines 52–80) stores values in `__storage__[get_ident()]`, where `get_ident` is `_thread.get_ident` (or greenlet's `getcurrent`, which is also one per thread for plain threads). This is the toy's `threading.local()`.
+- Flask-Login 0.5.0 `flask_login/utils.py` `_get_user()` (lines 344–348) loads the user onto `_request_ctx_stack.top.user` and reads it back; `current_user = LocalProxy(lambda: _get_user())`. This is the toy's `_local.user` and `current_user()`.
+
+This holds for Flask 1.x only. Werkzeug 2.0 reimplemented `Local` on a `ContextVar`, and Flask 2.2 replaced `LocalStack` with `ContextVar`s directly ("Where you've already met it" says so), so the slide and note say "Flask 1.x" and that newer versions store it differently.

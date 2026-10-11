@@ -1,0 +1,3 @@
+# Written by scripts/sync-demo-assets.mjs, which copies the pieces of
+# samples/stlite-demo/ that the "No backend, just a tab" slide embeds live.
+public/stlite-demo/

@@ -3,9 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build",
-    "dev": "slidev --open",
-    "export": "slidev export"
+    "build": "node scripts/sync-demo-assets.mjs && slidev build",
+    "dev": "node scripts/sync-demo-assets.mjs && slidev --open",
+    "export": "node scripts/sync-demo-assets.mjs && slidev export"
   },
   "dependencies": {
     "@iconify-json/ri": "^1.2.10",

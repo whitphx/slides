@@ -552,9 +552,9 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 <div text-4 op70 mb-2>⚡ on an async server · <b>simplified</b>: how an async web framework works, not production code</div>
 
-<div grid="~ cols-[1.15fr_1fr]" gap-5>
+<div grid="~ cols-[1.3fr_1fr]" gap-5>
 
-<div>
+<div class="tl-code">
 
 ```py {*|11|8|4,8|5|*}{maxHeight:'330px'}
 _local = threading.local()
@@ -574,10 +574,6 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 <div>
 
-<div v-click="1" mb-2 text-4 border="~ violet/50 rounded-lg" px-3 py-2 bg-violet:5>🙋 <code>gather()</code> starts <b>two tasks</b>, alice's and bob's, on <b>one thread</b></div>
-
-<div v-click="3" mb-2 text-4 border="~ violet/50 rounded-lg" px-3 py-2 bg-violet:5>⏸️ <b>alice's task</b> waits at <code>await</code><br>▶️ <b>bob's task</b> stores <code>"bob"</code> in the <b>same slot</b></div>
-
 <div v-click="5">
 
 <WindowMockup title="Terminal" dark codeblock>
@@ -595,11 +591,45 @@ bob sees: Hello, bob!
 
 </div>
 
-<div v-click="6" mt-6 text-5>
-
-**alice** stored her name, **yielded**, and bob overwrote the slot before she came back. 🫠
-
+<div v-click="1" mt-2 text-4 class="tl">
+<div class="tl-label">🙋 <code>gather()</code><br><span op70>two tasks, one thread</span><br><span op60>time →</span></div>
+<div class="tl-row">
+<div class="tl-name">alice's task</div>
+<div v-click="2" class="tl-a">set <code>"alice"</code></div>
+<div v-click="3" class="tl-a">⏸️ await</div>
+<div></div><div></div>
+<div v-click="4" class="tl-a">read → <code>"bob"</code> ❌</div>
 </div>
+<div class="tl-row">
+<div class="tl-name">bob's task</div>
+<div></div><div></div>
+<div v-click="3" class="tl-b">set <code>"bob"</code></div>
+<div v-click="3" class="tl-b">⏸️ await</div>
+<div></div>
+</div>
+<div class="tl-row">
+<div class="tl-name"><code>_local.user</code></div>
+<div v-click="2" class="tl-v">alice</div>
+<div v-click="3" class="tl-v">alice</div>
+<div v-click="3" class="tl-v tl-bad">bob</div>
+<div v-click="3" class="tl-v tl-bad">bob</div>
+<div v-click="4" class="tl-v tl-bad">bob</div>
+</div>
+</div>
+
+<style>
+.tl { position: relative; border: 1px solid rgb(139 92 246 / 0.5); border-radius: 0.5rem; padding: 0.4rem 0.75rem; background: rgb(139 92 246 / 0.05); display: grid; grid-template-columns: 9rem 1fr; column-gap: 0.75rem; }
+.tl-label { grid-row: span 3; align-self: center; line-height: 1.3; }
+.tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
+.tl-name { opacity: 0.75; }
+.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.4rem; text-align: center; white-space: nowrap; }
+.tl-a { background: rgb(14 165 233 / 0.18); }
+.tl-b { background: rgb(16 185 129 / 0.2); }
+.tl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.tl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.tl-time { grid-column: 2; text-align: right; opacity: 0.6; }
+.tl-code { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
+</style>
 
 <!--
 Let me show you the failure.
@@ -613,15 +643,14 @@ The last line plays the server receiving two requests. `asyncio.gather()` runs `
 Alice's task runs first. It stores her name in `_local.user`.
 
 [click]
-Then `index()` awaits. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread.
+Then `index()` awaits. Follow the timeline on the right. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread. Then bob's task also reaches the await, and waits.
 
 [click]
 Then alice's task resumes and reads the slot.
 
 [click]
-And alice gets greeted as bob. Both lines say bob.
+And alice gets greeted as bob. Both lines say bob. The timeline shows why: one slot, two tasks, and bob's write came between alice's write and alice's read.
 
-[click]
 Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service, this is alice looking at bob's page. That's not a cosmetic bug. That's a data leak.
 -->
 

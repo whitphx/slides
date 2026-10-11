@@ -531,10 +531,10 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. asyncio itself does not say that a request must run in a task. But the major async web servers work that way: they start one task for each request, and the event loop runs it. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
-A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In an async web app, it is usually the server. Uvicorn, for example, calls `create_task()` once for every incoming request, and your FastAPI or Starlette code runs inside that task. The event loop does not create tasks. It only runs them. Hold onto that, because who started it turns out to matter a lot later.
+A task does not appear on its own. Something starts it. In your own code, that is a call to `create_task()`, or `gather()`, which makes one task per coroutine you give it. In an async web app, it is usually the server. asyncio does not require this, but the major async web servers work this way. Uvicorn, for example, starts one task for each request, and your FastAPI or Starlette code runs inside it. Hold onto that, because who started it turns out to matter a lot later.
 
 [click]
 What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.

@@ -277,8 +277,6 @@ The current environment variables.
 
 [click]
 Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
-
-Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the whole Python process. There is only one of each, shared by everything that runs in it.
 -->
 
 ---

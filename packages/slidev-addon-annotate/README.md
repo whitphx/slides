@@ -99,17 +99,12 @@ If the toolbar's saves are rejected, the deck shows a notice at the top of the p
 ## Set up the PR-preview Worker (this repo)
 
 `worker.js` serves the API at `/__annotate/api` with notes in D1, agents via
-`ANNOTATE_AGENT_KEY` and reviewers via `ANNOTATE_REVIEWER_KEY`. Until the D1
-binding exists it answers 503. One-time setup:
+`ANNOTATE_AGENT_KEY` and reviewers via `ANNOTATE_REVIEWER_KEY`. One-time setup:
 
-1. Create the database and add its binding to `wrangler.jsonc`:
+1. The `slides-annotations` D1 database is bound as `ANNOTATIONS_DB` in `wrangler.jsonc`. To set it up on another account, create a database and put its id in that entry:
 
    ```sh
    pnpm dlx wrangler@4.129.0 d1 create slides-annotations
-   ```
-
-   ```jsonc
-   "d1_databases": [{ "binding": "ANNOTATIONS_DB", "database_name": "slides-annotations", "database_id": "<printed id>" }]
    ```
 
    Tables are created on first use. Preview versions share the production Worker's bindings and secrets, so this covers every PR.

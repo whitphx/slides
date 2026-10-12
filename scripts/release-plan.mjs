@@ -3,6 +3,8 @@
 //
 //   node scripts/release-plan.mjs          JSON array of the packages whose current version
 //                                          is not on npm yet.
+//     --changed-since <git ref>            ...limited to those whose version differs from <ref>'s,
+//                                          so a version is only staged by the commit that bumps it.
 //   node scripts/release-plan.mjs --check  Checks each package's release metadata and exits
 //                                          non-zero on problems; used on pull requests.
 //   node scripts/release-plan.mjs --dirs   The packages' directories, one per line.
@@ -10,7 +12,7 @@
 //                                          Copies each package's version into its
 //                                          .claude-plugin/plugin.json; runs after `changeset version`.
 //
-// Uses only Node and npm, so it runs before `pnpm install`.
+// Uses only Node, npm and git, so it runs before `pnpm install`.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -57,8 +59,16 @@ function onNpm({ name, version }) {
   throw new Error(`npm view ${name}@${version} failed:\n${result.stderr}`)
 }
 
+function versionAt(ref, dir) {
+  const result = run('git', ['show', `${ref}:${dir}/package.json`])
+  return result.ok ? JSON.parse(result.stdout).version : undefined
+}
+
 function plan() {
+  const i = process.argv.indexOf('--changed-since')
+  const since = i === -1 ? undefined : process.argv[i + 1]
   const pending = publicPackages()
+    .filter(p => since === undefined || versionAt(since, p.dir) !== p.version)
     .filter(p => !onNpm(p))
     .map(({ name, version, dir, tag }) => ({ name, version, dir, tag }))
   console.log(JSON.stringify(pending))

@@ -10,7 +10,6 @@ export type Role = 'reviewer' | 'agent' | 'admin'
 export interface Principal {
   id: string
   role: Role
-  name?: string
 }
 
 export interface Authenticator {
@@ -180,12 +179,18 @@ export function signedCookie({
         return htmlPage('That login link is not valid.', 401)
       const expires = Math.floor(Date.now() / 1000) + maxAgeSeconds
       const value = `${expires}.${await hmac(secret, `${id}.${role}.${expires}`)}`
+      // Resolve `next` the way a browser would and keep it only if it stays on this origin,
+      // so the link cannot send the reviewer elsewhere (e.g. `/\evil.example` or `//evil.example`).
       const next = url.searchParams.get('next')
-      // Only same-site paths, so the link cannot send the reviewer elsewhere.
-      if (next && next.startsWith('/') && !next.startsWith('//')) {
+      const target = next && URL.canParse(next, url) ? new URL(next, url) : undefined
+      if (target && target.origin === url.origin) {
         return new Response(null, {
           status: 303,
-          headers: { 'Location': next, 'Set-Cookie': cookie(value, maxAgeSeconds), 'Cache-Control': 'no-store' },
+          headers: {
+            'Location': target.pathname + target.search + target.hash,
+            'Set-Cookie': cookie(value, maxAgeSeconds),
+            'Cache-Control': 'no-store',
+          },
         })
       }
       const response = htmlPage('Logged in. Notes you leave on the slides in this browser will now be saved.')

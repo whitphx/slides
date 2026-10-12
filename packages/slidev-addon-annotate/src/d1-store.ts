@@ -1,5 +1,7 @@
 // An AnnotationStore on Cloudflare D1. Each record is kept as JSON, with the
 // columns the queries filter on alongside it. Tables are created on first use.
+// D1 has no interactive transactions, so updates use a version column: a write
+// only lands if the note is unchanged since it was read, and is retried otherwise.
 
 import type { Annotation, Session } from './afs'
 import type { AnnotationStore } from './server'
@@ -19,7 +21,7 @@ export interface D1Database {
 
 const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS annotate_sessions (id TEXT PRIMARY KEY, data TEXT NOT NULL)',
-  'CREATE TABLE IF NOT EXISTS annotate_annotations (id TEXT PRIMARY KEY, session_id TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL, data TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS annotate_annotations (id TEXT PRIMARY KEY, session_id TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL, version INTEGER NOT NULL, data TEXT NOT NULL)',
   'CREATE INDEX IF NOT EXISTS annotate_annotations_by_session ON annotate_annotations (session_id, status)',
 ]
 
@@ -67,11 +69,23 @@ export function createD1Store(db: D1Database): AnnotationStore {
       const row = await db.prepare('SELECT data FROM annotate_annotations WHERE id = ?').bind(id).first<{ data: string }>()
       return row ? JSON.parse(row.data) as Annotation : undefined
     },
-    async putAnnotation(annotation) {
+    async updateAnnotation(id, fn) {
       await init()
-      await db.prepare(`INSERT INTO annotate_annotations (id, session_id, status, created_at, data) VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT (id) DO UPDATE SET session_id = excluded.session_id, status = excluded.status, data = excluded.data`)
-        .bind(annotation.id, annotation.sessionId, annotation.status, annotation.createdAt, JSON.stringify(annotation)).run()
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const row = await db.prepare('SELECT data, version FROM annotate_annotations WHERE id = ?')
+          .bind(id).first<{ data: string, version: number }>()
+        const next = fn(row ? JSON.parse(row.data) as Annotation : undefined)
+        if (!next)
+          return undefined
+        const result = row
+          ? await db.prepare('UPDATE annotate_annotations SET session_id = ?, status = ?, data = ?, version = version + 1 WHERE id = ? AND version = ?')
+            .bind(next.sessionId, next.status, JSON.stringify(next), id, row.version).run()
+          : await db.prepare('INSERT INTO annotate_annotations (id, session_id, status, created_at, version, data) VALUES (?, ?, ?, ?, 0, ?) ON CONFLICT (id) DO NOTHING')
+            .bind(id, next.sessionId, next.status, next.createdAt, JSON.stringify(next)).run()
+        if (result.meta.changes > 0)
+          return next
+      }
+      throw new Error(`Note ${id} kept changing while being updated`)
     },
     async deleteAnnotation(id) {
       await init()

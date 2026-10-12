@@ -76,7 +76,7 @@ export function createMarkerFilter(deck: string) {
     }
     const hidden = [...known]
       .filter(([, ctx]) => ctx.deck !== deck || ctx.slide !== slide)
-      .map(([id]) => `[data-annotation-id="${CSS.escape(id)}"]`)
+      .map(([id]) => `[data-annotation-marker][data-annotation-id="${CSS.escape(id)}"]`)
     style.textContent = hidden.length ? `${hidden.join(',\n')} { display: none !important; }` : ''
   }
 
@@ -140,23 +140,22 @@ function showNotice(text: string) {
 }
 
 export function createSync(config: AnnotateClientConfig) {
-  const base = config.endpoint.replace(/\/$/, '')
-
   async function send(method: string, path: string, body?: unknown) {
     try {
-      const response = await fetch(`${base}${path}`, {
+      const response = await fetch(`${config.endpoint}${path}`, {
         method,
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       })
       if (response.status === 401)
         showNotice('Your notes are not being saved: open your reviewer login link for this site first.')
-      else if (!response.ok)
-        showNotice(`A note could not be saved (HTTP ${response.status}).`)
+      // Deleting a note the server never had (e.g. one made before logging in) is fine.
+      else if (!response.ok && !(method === 'DELETE' && response.status === 404))
+        showNotice(`A note could not be ${method === 'DELETE' ? 'deleted' : 'saved'} (HTTP ${response.status}).`)
     }
     catch (error) {
       console.warn(`[slidev-addon-annotate] ${method} ${path} failed`, error)
-      showNotice('A note could not be saved: the annotation server is unreachable.')
+      showNotice('The annotation server is unreachable, so notes are not being saved.')
     }
   }
 

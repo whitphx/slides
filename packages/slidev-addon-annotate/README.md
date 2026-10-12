@@ -19,7 +19,7 @@ served by this repo's Cloudflare Worker (`worker.js`).
     ├─ dev:     Vite middleware, notes in <deck>/.annotate/annotations.json
     └─ preview: Cloudflare Worker (worker.js), notes in D1
     ▲
-    │  agentation-mcp --mcp-only --http-url <API>   (agent reads, acknowledges, resolves)
+    │  agentation-mcp server --mcp-only --http-url <API>   (agent reads, acknowledges, resolves)
  Agent ──► Slidev MCP (/__mcp): get/update slides, go to slide
 ```
 
@@ -90,8 +90,8 @@ from the credential, never from the request body.
 
 Roles (`defaultAuthorize`; pass `authorize` to replace it):
 
-- `reviewer`: read, create, edit and delete their own notes, change status, reply.
-- `agent`: read, change status (acknowledge, resolve, dismiss), reply. It cannot create, edit or delete notes, so a leaked agent key cannot plant instructions for the agent.
+- `reviewer`: read, create, edit and delete their own notes, change status, reply. With one shared reviewer key (as in `worker.js`), all reviewers are the same principal.
+- `agent`: read, change status (acknowledge, resolve, dismiss, reopen), reply. It cannot create, edit or delete notes, so a leaked agent key can't plant or rewrite notes; it can still add replies and change status.
 - `admin`: everything.
 
 If the toolbar's saves are rejected, the deck shows a notice at the top of the page.
@@ -119,14 +119,16 @@ binding exists it answers 503. One-time setup:
    pnpm dlx wrangler@4.129.0 secret put ANNOTATE_AGENT_KEY
    pnpm dlx wrangler@4.129.0 secret put ANNOTATE_REVIEWER_KEY
    ```
-3. In each browser you review in, open once (and keep it in a password manager):
+3. Log in once per PR preview in each browser you review in. The cookie is per host, and
+   each PR preview has its own `*.workers.dev` host. Keep the link in a password manager:
    `https://<preview host>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>&next=/<deck>/`
-4. For a cloud agent session, add `ANNOTATE_AGENT_KEY` as a secret in the environment,
-   allow the Worker's host in its network policy, and register the MCP server with the
-   stable production host (all previews share the same database):
+4. For a cloud agent session, add the agent key to the environment as a secret named
+   `AGENTATION_API_KEY` (which `agentation-mcp` reads), allow the Worker's host in its
+   network policy, and register the MCP server with the stable production host (all
+   previews share the same database):
 
    ```sh
-   claude mcp add annotate --env AGENTATION_API_KEY=$ANNOTATE_AGENT_KEY -- \
+   claude mcp add annotate -- \
      npx -y agentation-mcp server --mcp-only --http-url https://<production host>/__annotate/api
    ```
 
@@ -153,7 +155,7 @@ Checked in Chromium with Playwright against `packages/annotate-playground`, in d
 - Notes record the slide number, click step, title, source line and position on the slide.
 - `agentation-mcp`, unmodified, lists, acknowledges and resolves the notes, and its watch mode picks up new notes.
 - Slidev's MCP reads the slide and moves the browser to it.
-- Through `worker.js` under `wrangler dev` with a local D1: requests without a credential get 401; the agent key reads, acknowledges and resolves but gets 403 on creating, editing or deleting notes; the login link sets the cookie and only redirects to same-site paths; forged or cross-site cookies are refused; before login the deck shows the notice, after it notes save with the reviewer as author; `agentation-mcp --api-key` works, watch mode included.
+- Through `worker.js` under `wrangler dev` with a local D1: requests without a credential get 401; the agent key reads, acknowledges and resolves but gets 403 on creating, editing or deleting notes; the login link sets the cookie and only redirects within the same origin; forged or cross-site cookies are refused; before login the deck shows the notice, after it notes save with the reviewer as author; `agentation-mcp --api-key` works, watch mode included.
 
 Limitations found:
 

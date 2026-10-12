@@ -6,7 +6,7 @@
 
 import type { Annotation, Session, ThreadMessage } from './afs'
 import type { Action, Authenticator, Authorize, Principal } from './auth'
-import { defaultAuthorize } from './auth'
+import { defaultAuthorize } from './auth.ts'
 
 export interface AnnotationStore {
   listSessions(): Promise<Session[]>
@@ -14,7 +14,10 @@ export interface AnnotationStore {
   putSession(session: Session): Promise<void>
   listAnnotations(filter?: { sessionId?: string, status?: Annotation['status'] }): Promise<Annotation[]>
   getAnnotation(id: string): Promise<Annotation | undefined>
-  putAnnotation(annotation: Annotation): Promise<void>
+  // Runs `fn` on the current note and stores what it returns, as one atomic step,
+  // so concurrent requests can't overwrite each other's changes.
+  // Returning undefined leaves the store unchanged. `fn` may run more than once.
+  updateAnnotation(id: string, fn: (existing: Annotation | undefined) => Annotation | undefined): Promise<Annotation | undefined>
   deleteAnnotation(id: string): Promise<boolean>
 }
 
@@ -72,8 +75,35 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
     return { count: annotations.length, annotations }
   }
 
+  // Each write runs its permission check inside the store's atomic update, against the
+  // note as it is at that moment. `denied` is set when the check fails, to tell a 403
+  // apart from a missing note.
   async function createAnnotation(principal: Principal, sessionId: string, body: Record<string, unknown>) {
-    if (!await store.getSession(sessionId)) {
+    const id = typeof body.id === 'string' && body.id ? body.id : newId()
+    const annotation = await store.updateAnnotation(id, (existing) => {
+      // The toolbar re-posts a note to save an edit, so posting an existing id is an edit.
+      if (existing ? existing.sessionId !== sessionId || !authorize(principal, 'edit', existing) : !authorize(principal, 'create'))
+        return undefined
+      return {
+        comment: '',
+        elementPath: '',
+        timestamp: Date.now(),
+        x: 0,
+        y: 0,
+        element: '',
+        thread: [],
+        createdAt: now(),
+        ...existing,
+        ...pickWritable(body),
+        id,
+        sessionId,
+        status: existing?.status ?? 'pending',
+        author: existing?.author ?? { id: principal.id, role: principal.role },
+        updatedAt: now(),
+      }
+    })
+    // Only once the note is stored, so a refused request leaves no session behind.
+    if (annotation && !await store.getSession(sessionId)) {
       await store.putSession({
         id: sessionId,
         url: typeof body.url === 'string' ? body.url : '',
@@ -81,55 +111,48 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
         createdAt: now(),
       })
     }
-    const id = typeof body.id === 'string' && body.id ? body.id : newId()
-    const existing = await store.getAnnotation(id)
-    // The toolbar re-posts a note to save an edit, so posting an existing id is an edit.
-    if (existing ? existing.sessionId !== sessionId || !authorize(principal, 'edit', existing) : !authorize(principal, 'create'))
-      return undefined
-    const annotation: Annotation = {
-      comment: '',
-      elementPath: '',
-      timestamp: Date.now(),
-      x: 0,
-      y: 0,
-      element: '',
-      thread: [],
-      createdAt: now(),
-      ...existing,
-      ...pickWritable(body),
-      id,
-      sessionId,
-      status: existing?.status ?? 'pending',
-      author: existing?.author ?? { id: principal.id, role: principal.role },
-      updatedAt: now(),
-    }
-    await store.putAnnotation(annotation)
     return annotation
   }
 
-  async function patchAnnotation(principal: Principal, existing: Annotation, body: Record<string, unknown>) {
+  async function patchAnnotation(principal: Principal, id: string, body: Record<string, unknown>) {
     const patch = pickWritable(body)
     const action: Action = Object.keys(body).every(key => STATUS_FIELDS.has(key)) ? 'set-status' : 'edit'
-    if (!authorize(principal, action, existing))
-      return undefined
-    const annotation: Annotation = { ...existing, ...patch, updatedAt: now() }
-    if (patch.status === 'resolved' || patch.status === 'dismissed') {
-      annotation.resolvedAt = now()
-      annotation.resolvedBy = principal.role === 'agent' ? 'agent' : 'human'
-    }
-    await store.putAnnotation(annotation)
-    return annotation
+    let denied = false
+    const annotation = await store.updateAnnotation(id, (existing) => {
+      if (!existing)
+        return undefined
+      if (!authorize(principal, action, existing)) {
+        denied = true
+        return undefined
+      }
+      const annotation: Annotation = { ...existing, ...patch, updatedAt: now() }
+      if (patch.status === 'resolved' || patch.status === 'dismissed') {
+        annotation.resolvedAt = now()
+        annotation.resolvedBy = principal.role === 'agent' ? 'agent' : 'human'
+      }
+      return annotation
+    })
+    return { annotation, denied }
   }
 
-  async function addThreadMessage(principal: Principal, existing: Annotation, body: Record<string, unknown>) {
+  async function addThreadMessage(principal: Principal, id: string, body: Record<string, unknown>) {
     const message: ThreadMessage = {
       id: newId(),
       role: principal.role === 'agent' ? 'agent' : 'human',
       content: String(body.content ?? ''),
       timestamp: Date.now(),
     }
-    await store.putAnnotation({ ...existing, thread: [...existing.thread, message], updatedAt: now() })
-    return message
+    let denied = false
+    const updated = await store.updateAnnotation(id, (existing) => {
+      if (!existing)
+        return undefined
+      if (!authorize(principal, 'reply', existing)) {
+        denied = true
+        return undefined
+      }
+      return { ...existing, thread: [...existing.thread, message], updatedAt: now() }
+    })
+    return { message: updated && message, denied }
   }
 
   // Server-sent events for agentation-mcp's watch tool. Only `annotation.created`
@@ -248,25 +271,26 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
 
     // GET|PATCH|DELETE /annotations/:id, POST /annotations/:id/thread
     if (segments[0] === 'annotations' && segments[1]) {
-      const existing = await store.getAnnotation(segments[1])
+      const id = segments[1]
+      if (segments.length === 2 && method === 'PATCH') {
+        const { annotation, denied } = await patchAnnotation(principal, id, await body())
+        return annotation ? json(annotation) : denied ? forbidden() : notFound('Annotation')
+      }
+      if (segments[2] === 'thread' && method === 'POST') {
+        const { message, denied } = await addThreadMessage(principal, id, await body())
+        return message ? json(message, 201) : denied ? forbidden() : notFound('Annotation')
+      }
+      const existing = await store.getAnnotation(id)
       if (!existing)
         return notFound('Annotation')
       if (segments.length === 2 && method === 'GET')
         return can('read', existing) ? json(existing) : forbidden()
-      if (segments.length === 2 && method === 'PATCH') {
-        const annotation = await patchAnnotation(principal, existing, await body())
-        return annotation ? json(annotation) : forbidden()
-      }
       if (segments.length === 2 && method === 'DELETE') {
+        // The author, which the delete check depends on, never changes after creation.
         if (!can('delete', existing))
           return forbidden()
-        await store.deleteAnnotation(existing.id)
+        await store.deleteAnnotation(id)
         return json({ deleted: true })
-      }
-      if (segments[2] === 'thread' && method === 'POST') {
-        if (!can('reply', existing))
-          return forbidden()
-        return json(await addThreadMessage(principal, existing, await body()), 201)
       }
     }
 

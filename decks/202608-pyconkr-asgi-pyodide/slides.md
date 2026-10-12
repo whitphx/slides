@@ -13,6 +13,7 @@ addons:
   - fancy-arrow
   - window-mockup
   - qrcode
+  - slidev-addon-annotate
 ---
 
 <h1 text-5xl leading-16>

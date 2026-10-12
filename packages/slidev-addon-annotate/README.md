@@ -6,8 +6,8 @@ You click an element on a slide, type a note, and the note is stored together wi
 the slide number, click step, slide title and source line. An agent reads the notes
 over MCP, edits the slides, and marks each note as resolved.
 
-Status: **spike**. It works with a local `slidev` dev server today.
-Serving it from a deployed preview (Cloudflare Worker) is the next step.
+Status: **spike**. It works with a local `slidev` dev server and with PR previews
+served by this repo's Cloudflare Worker (`worker.js`).
 
 ## How it fits together
 
@@ -17,7 +17,7 @@ Serving it from a deployed preview (Cloudflare Worker) is the next step.
     ▼
  Handler (src/server.ts, Fetch API) + store
     ├─ dev:     Vite middleware, notes in <deck>/.annotate/annotations.json
-    └─ preview: Cloudflare Worker (next step)
+    └─ preview: Cloudflare Worker (worker.js), notes in D1
     ▲
     │  agentation-mcp --mcp-only --http-url <API>   (agent reads, acknowledges, resolves)
  Agent ──► Slidev MCP (/__mcp): get/update slides, go to slide
@@ -75,6 +75,65 @@ A note as the agent sees it:
 }
 ```
 
+## Authentication
+
+The handler takes an `auth` option, so each host decides who may call the API
+(`src/auth.ts`). Who wrote a note or a reply, and who resolved a note, is taken
+from the credential, never from the request body.
+
+| Authenticator | For | How |
+|---|---|---|
+| `localDev()` | the `slidev` dev server | Every same-origin request is the local user; cross-site requests from other pages in the browser are refused. |
+| `apiKey({ key, role: 'agent' })` | agents | Shared key in `x-api-key` (what `agentation-mcp --api-key` sends) or `Authorization: Bearer`. |
+| `signedCookie({ secret })` | reviewers in a browser | Opening `<api>/login?token=<secret>&next=/<deck>/` sets a signed, expiring `HttpOnly` cookie; the toolbar's same-origin requests carry it. `<api>/logout` clears it. |
+| `chain(...)` | combining the above | The first authenticator that accepts the request wins. |
+
+Roles (`defaultAuthorize`; pass `authorize` to replace it):
+
+- `reviewer`: read, create, edit and delete their own notes, change status, reply.
+- `agent`: read, change status (acknowledge, resolve, dismiss), reply. It cannot create, edit or delete notes, so a leaked agent key cannot plant instructions for the agent.
+- `admin`: everything.
+
+If the toolbar's saves are rejected, the deck shows a notice at the top of the page.
+
+## Set up the PR-preview Worker (this repo)
+
+`worker.js` serves the API at `/__annotate/api` with notes in D1, agents via
+`ANNOTATE_AGENT_KEY` and reviewers via `ANNOTATE_REVIEWER_KEY`. Until the D1
+binding exists it answers 503. One-time setup:
+
+1. Create the database and add its binding to `wrangler.jsonc`:
+
+   ```sh
+   pnpm dlx wrangler@4.129.0 d1 create slides-annotations
+   ```
+
+   ```jsonc
+   "d1_databases": [{ "binding": "ANNOTATIONS_DB", "database_name": "slides-annotations", "database_id": "<printed id>" }]
+   ```
+
+   Tables are created on first use. Preview versions share the production Worker's bindings and secrets, so this covers every PR.
+2. Set the two secrets (long random strings, e.g. `openssl rand -base64 32`):
+
+   ```sh
+   pnpm dlx wrangler@4.129.0 secret put ANNOTATE_AGENT_KEY
+   pnpm dlx wrangler@4.129.0 secret put ANNOTATE_REVIEWER_KEY
+   ```
+3. In each browser you review in, open once (and keep it in a password manager):
+   `https://<preview host>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>&next=/<deck>/`
+4. For a cloud agent session, add `ANNOTATE_AGENT_KEY` as a secret in the environment,
+   allow the Worker's host in its network policy, and register the MCP server with the
+   stable production host (all previews share the same database):
+
+   ```sh
+   claude mcp add annotate --env AGENTATION_API_KEY=$ANNOTATE_AGENT_KEY -- \
+     npx -y agentation-mcp server --mcp-only --http-url https://<production host>/__annotate/api
+   ```
+
+CI builds PR previews with `SLIDEV_ANNOTATE=1`, `SLIDEV_ANNOTATE_SESSION=pr-<number>`
+and the PR head commit, so notes from different PRs are kept apart by session id.
+Decks opt in by listing the addon in their headmatter.
+
 ## Settings
 
 Environment variables read when `slidev` starts:
@@ -94,10 +153,10 @@ Checked in Chromium with Playwright against `packages/annotate-playground`, in d
 - Notes record the slide number, click step, title, source line and position on the slide.
 - `agentation-mcp`, unmodified, lists, acknowledges and resolves the notes, and its watch mode picks up new notes.
 - Slidev's MCP reads the slide and moves the browser to it.
+- Through `worker.js` under `wrangler dev` with a local D1: requests without a credential get 401; the agent key reads, acknowledges and resolves but gets 403 on creating, editing or deleting notes; the login link sets the cookie and only redirects to same-site paths; forged or cross-site cookies are refused; before login the deck shows the notice, after it notes save with the reviewer as author; `agentation-mcp --api-key` works, watch mode included.
 
 Limitations found:
 
 - **Markers on other slides.** agent-ui-annotation keeps a marker visible while its element is in the document, and Slidev keeps neighbouring slides mounted. The addon hides other slides' markers with a style rule in the toolbar's shadow root (`createMarkerFilter`). An upstream option to scope markers by route would remove this workaround.
 - **Toolbar storage.** The toolbar keeps its own copy of the notes in `localStorage`, one list per origin, and has no API to load notes from a server. So it doesn't show that the agent resolved a note, and notes made in another browser don't appear.
-- **No server for builds yet.** With `SLIDEV_ANNOTATE=1`, a static build still posts to `/__annotate/api`, which nothing serves until the Worker exists; saves fail with only a console warning.
 - **Source path in builds.** Slidev drops slide file paths from builds, so built decks report the entry file for every slide. That is wrong only for slides imported with `src:`.

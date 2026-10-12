@@ -5,6 +5,8 @@
 // PolyForm Shield 1.0.0), as called by agentation-mcp; no Agentation code is included.
 
 import type { Annotation, Session, ThreadMessage } from './afs'
+import type { Action, Authenticator, Authorize, Principal } from './auth'
+import { defaultAuthorize } from './auth'
 
 export interface AnnotationStore {
   listSessions(): Promise<Session[]>
@@ -20,6 +22,10 @@ export interface HandlerOptions {
   store: AnnotationStore
   // Path prefix the API is mounted at, e.g. "/__annotate/api".
   basePath: string
+  // Who may call the API at all, e.g. `localDev()` or `chain(apiKey(...), signedCookie(...))`.
+  auth: Authenticator
+  // What each caller may do; defaults to `defaultAuthorize`.
+  authorize?: Authorize
 }
 
 // How often an open event stream checks the store for new notes.
@@ -32,6 +38,8 @@ const json = (data: unknown, status = 200) =>
 
 const notFound = (what: string) => json({ error: `${what} not found` }, 404)
 
+const forbidden = () => json({ error: 'Not allowed' }, 403)
+
 const now = () => new Date().toISOString()
 
 const newId = () => crypto.randomUUID()
@@ -41,8 +49,11 @@ const newId = () => crypto.randomUUID()
 const WRITABLE_FIELDS = [
   'comment', 'elementPath', 'timestamp', 'x', 'y', 'element', 'url', 'boundingBox',
   'selectedText', 'nearbyText', 'sourceFile', 'attributes', 'intent', 'severity',
-  'status', 'resolvedBy',
+  'status',
 ] as const
+
+// Fields an agent may change: it reports on notes but cannot rewrite them.
+const STATUS_FIELDS: ReadonlySet<string> = new Set(['status', 'resolvedBy'])
 
 function pickWritable(body: Record<string, unknown>): Partial<Annotation> {
   const picked: Record<string, unknown> = {}
@@ -55,13 +66,13 @@ function pickWritable(body: Record<string, unknown>): Partial<Annotation> {
   return picked as Partial<Annotation>
 }
 
-export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
+export function createAnnotateHandler({ store, basePath, auth, authorize = defaultAuthorize }: HandlerOptions) {
   async function pending(sessionId?: string) {
     const annotations = await store.listAnnotations({ sessionId, status: 'pending' })
     return { count: annotations.length, annotations }
   }
 
-  async function createAnnotation(sessionId: string, body: Record<string, unknown>) {
+  async function createAnnotation(principal: Principal, sessionId: string, body: Record<string, unknown>) {
     if (!await store.getSession(sessionId)) {
       await store.putSession({
         id: sessionId,
@@ -72,6 +83,9 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
     }
     const id = typeof body.id === 'string' && body.id ? body.id : newId()
     const existing = await store.getAnnotation(id)
+    // The toolbar re-posts a note to save an edit, so posting an existing id is an edit.
+    if (existing ? existing.sessionId !== sessionId || !authorize(principal, 'edit', existing) : !authorize(principal, 'create'))
+      return undefined
     const annotation: Annotation = {
       comment: '',
       elementPath: '',
@@ -86,31 +100,31 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
       id,
       sessionId,
       status: existing?.status ?? 'pending',
+      author: existing?.author ?? { id: principal.id, role: principal.role },
       updatedAt: now(),
     }
     await store.putAnnotation(annotation)
     return annotation
   }
 
-  async function patchAnnotation(id: string, body: Record<string, unknown>) {
-    const existing = await store.getAnnotation(id)
-    if (!existing)
-      return undefined
+  async function patchAnnotation(principal: Principal, existing: Annotation, body: Record<string, unknown>) {
     const patch = pickWritable(body)
+    const action: Action = Object.keys(body).every(key => STATUS_FIELDS.has(key)) ? 'set-status' : 'edit'
+    if (!authorize(principal, action, existing))
+      return undefined
     const annotation: Annotation = { ...existing, ...patch, updatedAt: now() }
-    if (patch.status === 'resolved' || patch.status === 'dismissed')
+    if (patch.status === 'resolved' || patch.status === 'dismissed') {
       annotation.resolvedAt = now()
+      annotation.resolvedBy = principal.role === 'agent' ? 'agent' : 'human'
+    }
     await store.putAnnotation(annotation)
     return annotation
   }
 
-  async function addThreadMessage(id: string, body: Record<string, unknown>) {
-    const existing = await store.getAnnotation(id)
-    if (!existing)
-      return undefined
+  async function addThreadMessage(principal: Principal, existing: Annotation, body: Record<string, unknown>) {
     const message: ThreadMessage = {
       id: newId(),
-      role: body.role === 'agent' ? 'agent' : 'human',
+      role: principal.role === 'agent' ? 'agent' : 'human',
       content: String(body.content ?? ''),
       timestamp: Date.now(),
     }
@@ -188,10 +202,24 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
       return (parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}) as Record<string, unknown>
     }
 
+    if (segments.length === 1 && segments[0] === 'health')
+      return json({ ok: true })
+
+    // Authenticator routes such as `login`, then everything else needs a caller.
+    const routed = await auth.route?.(request, segments)
+    if (routed)
+      return routed
+    const principal = await auth.authenticate(request)
+    if (!principal)
+      return json({ error: 'Authentication required' }, 401)
+    const can = (action: Action, annotation?: Annotation) => authorize(principal, action, annotation)
+
     // GET /sessions, GET /sessions/:id, GET /sessions/:id/pending,
     // POST /sessions/:id/annotations, GET /sessions/:id/events
     if (segments[0] === 'sessions') {
       const [, sessionId, sub] = segments
+      if (method === 'GET' && !can('read'))
+        return forbidden()
       if (!sessionId && method === 'GET')
         return json(await store.listSessions())
       if (sessionId && !sub && method === 'GET') {
@@ -202,13 +230,17 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
       }
       if (sessionId && sub === 'pending' && method === 'GET')
         return json(await pending(sessionId))
-      if (sessionId && sub === 'annotations' && method === 'POST')
-        return json(await createAnnotation(sessionId, await body()), 201)
+      if (sessionId && sub === 'annotations' && method === 'POST') {
+        const annotation = await createAnnotation(principal, sessionId, await body())
+        return annotation ? json(annotation, 201) : forbidden()
+      }
       if (sessionId && sub === 'events' && method === 'GET')
         return events(request, sessionId)
     }
 
     // GET /pending, GET /events
+    if (segments.length === 1 && (segments[0] === 'pending' || segments[0] === 'events') && !can('read'))
+      return forbidden()
     if (segments.length === 1 && segments[0] === 'pending' && method === 'GET')
       return json(await pending())
     if (segments.length === 1 && segments[0] === 'events' && method === 'GET')
@@ -216,25 +248,27 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
 
     // GET|PATCH|DELETE /annotations/:id, POST /annotations/:id/thread
     if (segments[0] === 'annotations' && segments[1]) {
-      const id = segments[1]
-      if (segments.length === 2 && method === 'GET') {
-        const annotation = await store.getAnnotation(id)
-        return annotation ? json(annotation) : notFound('Annotation')
-      }
+      const existing = await store.getAnnotation(segments[1])
+      if (!existing)
+        return notFound('Annotation')
+      if (segments.length === 2 && method === 'GET')
+        return can('read', existing) ? json(existing) : forbidden()
       if (segments.length === 2 && method === 'PATCH') {
-        const annotation = await patchAnnotation(id, await body())
-        return annotation ? json(annotation) : notFound('Annotation')
+        const annotation = await patchAnnotation(principal, existing, await body())
+        return annotation ? json(annotation) : forbidden()
       }
-      if (segments.length === 2 && method === 'DELETE')
-        return await store.deleteAnnotation(id) ? json({ deleted: true }) : notFound('Annotation')
+      if (segments.length === 2 && method === 'DELETE') {
+        if (!can('delete', existing))
+          return forbidden()
+        await store.deleteAnnotation(existing.id)
+        return json({ deleted: true })
+      }
       if (segments[2] === 'thread' && method === 'POST') {
-        const message = await addThreadMessage(id, await body())
-        return message ? json(message, 201) : notFound('Annotation')
+        if (!can('reply', existing))
+          return forbidden()
+        return json(await addThreadMessage(principal, existing, await body()), 201)
       }
     }
-
-    if (segments.length === 1 && segments[0] === 'health')
-      return json({ ok: true })
 
     return json({ error: 'Not found' }, 404)
   }

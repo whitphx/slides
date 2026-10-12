@@ -35,6 +35,8 @@ export interface Annotation {
   resolvedAt?: string
   resolvedBy?: 'human' | 'agent'
   thread: ThreadMessage[]
+  // Who wrote the note, as authenticated by the server (not part of AFS).
+  author?: { id: string, role: string }
   createdAt: string
   updatedAt: string
 }

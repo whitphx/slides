@@ -116,6 +116,29 @@ export function toAfs(annotation: ToolbarAnnotation, config: AnnotateClientConfi
   }
 }
 
+// A dismissible message at the top of the page, shown once, e.g. when saving needs a login.
+function showNotice(text: string) {
+  const id = 'slidev-annotate-notice'
+  if (document.getElementById(id))
+    return
+  const notice = document.createElement('div')
+  notice.id = id
+  notice.setAttribute('role', 'alert')
+  notice.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2147483647;'
+    + 'display:flex;gap:12px;align-items:center;max-width:calc(100vw - 32px);padding:10px 14px;border-radius:8px;'
+    + 'background:#fff4e5;color:#4a2c00;border:1px solid #f0b45a;font:14px/1.4 system-ui,sans-serif;box-shadow:0 4px 12px rgb(0 0 0 / 15%)'
+  const message = document.createElement('span')
+  message.textContent = text
+  const close = document.createElement('button')
+  close.type = 'button'
+  close.textContent = '×'
+  close.setAttribute('aria-label', 'Dismiss')
+  close.style.cssText = 'border:0;background:none;color:inherit;font-size:20px;line-height:1;cursor:pointer'
+  close.addEventListener('click', () => notice.remove())
+  notice.append(message, close)
+  document.body.append(notice)
+}
+
 export function createSync(config: AnnotateClientConfig) {
   const base = config.endpoint.replace(/\/$/, '')
 
@@ -126,11 +149,14 @@ export function createSync(config: AnnotateClientConfig) {
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       })
-      if (!response.ok)
-        console.warn(`[slidev-addon-annotate] ${method} ${path} failed: ${response.status}`)
+      if (response.status === 401)
+        showNotice('Your notes are not being saved: open your reviewer login link for this site first.')
+      else if (!response.ok)
+        showNotice(`A note could not be saved (HTTP ${response.status}).`)
     }
     catch (error) {
       console.warn(`[slidev-addon-annotate] ${method} ${path} failed`, error)
+      showNotice('A note could not be saved: the annotation server is unreachable.')
     }
   }
 

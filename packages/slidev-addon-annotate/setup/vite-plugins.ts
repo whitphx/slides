@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { basename, relative, resolve } from 'node:path'
 import type { Plugin } from 'vite'
+import { localDev } from '../src/auth'
 import { createFileStore } from '../src/file-store'
 import { createAnnotateHandler } from '../src/server'
 import type { AnnotateClientConfig } from '../src/types'
@@ -100,19 +101,13 @@ export default function setupVitePlugins(options: SlidevOptions): Plugin[] {
       const handle = createAnnotateHandler({
         store: createFileStore(resolve(options.userRoot, '.annotate/annotations.json')),
         basePath: config.endpoint,
+        // The dev server listens on localhost: same-origin requests are the local user,
+        // and cross-site requests from other pages in the same browser are refused.
+        auth: localDev(),
       })
       server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith(config.endpoint))
           return next()
-        // Browsers send Origin on cross-site requests; refuse those so that other sites
-        // open in the same browser cannot write notes. CLI clients send no Origin.
-        const origin = req.headers.origin
-        // An unparseable Origin (e.g. "null" from a sandboxed iframe) counts as cross-origin.
-        if (origin && (!URL.canParse(origin) || new URL(origin).host !== req.headers.host)) {
-          res.statusCode = 403
-          res.end('Cross-origin requests are not allowed')
-          return
-        }
         try {
           const response = await handle(await toRequest(req, res))
           if (!response)

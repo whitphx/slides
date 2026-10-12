@@ -24,16 +24,30 @@ Releases are managed with [Changesets](https://github.com/changesets/changesets)
    - `.claude-plugin/plugin.json` versions kept in step.
 3. **Merge the Version Packages PR** when you want to release. The **Release** workflow
    then runs `.github/workflows/release.yml`:
-   1. **plan:** lists the packages whose version isn't on npm yet.
+   1. **plan:** lists the packages whose version this commit bumped and that aren't on
+      npm yet.
    2. **pack:** installs, tests and packs them with `pnpm pack`. pnpm applies
       `publishConfig`, and `prepack` builds them. This job has no publish rights.
-   3. **publish:** in the `npm` environment, publishes the tarballs with npm's trusted
-      publishing. This job never checks out or runs repository code. It then creates a
-      `<name>@<version>` tag and GitHub release, whose notes are the version's
-      `CHANGELOG.md` section.
+   3. **publish:** in the `npm` environment, never checking out or running repository
+      code:
+      - drafts a `<name>@<version>` GitHub release, whose notes are the version's
+        `CHANGELOG.md` section;
+      - **stages** the tarball on npm with `npm stage publish`, through trusted publishing
+        and with provenance. A staged version isn't public yet.
+4. **Approve the staged version** with 2FA:
+   - on npmjs.com, in the package's **Staged Packages** tab; or
+   - with `npm stage list slidev-addon-annotate`, then `npm stage approve <stage-id>`.
 
-If a publish or release step fails, re-run the failed jobs. Anything already published or
-released is skipped.
+   Approving makes the version public. To drop it instead, use **Reject** or
+   `npm stage reject <stage-id>`.
+5. **Publish the draft GitHub release** (**Releases** → the draft → **Publish release**).
+   This creates the `<name>@<version>` tag on the commit that bumped the version.
+
+If the publish job fails, re-run it. A release draft that already exists is kept, and a
+version already on npm is skipped. Don't re-run after a version has been staged: staging
+the same version again fails until it is approved or rejected. Pushes that don't bump a
+version never stage anything. To retry a version that isn't on npm, run the workflow by
+hand (**Actions → Release → Run workflow**).
 
 The Version Packages PR is created with the workflow's token, so GitHub doesn't run other
 workflows on it. Close and reopen it, or push to it, if you want CI on it.
@@ -43,7 +57,8 @@ metadata (`scripts/release-plan.mjs --check`), then packs each package the way i
 published and lints the tarball with publint and are-the-types-wrong.
 
 Changesets is used for versioning only. Publishing is done by our own jobs rather than
-`changeset publish`, so the job that holds publish rights never runs repository code.
+`changeset publish`, because Changesets can't stage, and so the job that holds publish
+rights never runs repository code.
 
 ## One-time setup for a new package
 
@@ -74,13 +89,16 @@ as described in [npmパッケージを最初からGitHub Actionsでリリース�
    - Repository: `slides`
    - Workflow filename: `release.yml`
    - Environment name: `npm`
+   - Allowed actions: leave `npm publish` unchecked. `npm stage publish`, which is all CI
+     uses, is always allowed.
 
    A new trusted publisher expires if no publish uses it within 2 days. So configure it
    when the first Version Packages PR is ready to merge.
-4. **Merge the Version Packages PR.** CI publishes the first real version with
-   provenance.
+4. **Merge the Version Packages PR**, then approve the staged version and publish the
+   draft release as above.
 5. **Lock it down** (recommended): on the same page, set publishing access to *Require
-   two-factor authentication and disallow tokens*. Trusted publishing keeps working.
+   two-factor authentication and disallow tokens*. Staging through trusted publishing
+   keeps working.
 
 Provenance attestations are added automatically, because the repository is public and
 publishing goes through trusted publishing.

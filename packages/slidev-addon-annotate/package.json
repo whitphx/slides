@@ -10,6 +10,9 @@
     "slidev-addon",
     "slidev"
   ],
+  "scripts": {
+    "test": "node --test src/*.test.ts"
+  },
   "engines": {
     "slidev": ">=52.19.0"
   },

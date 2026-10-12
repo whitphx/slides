@@ -139,6 +139,28 @@ function showNotice(text: string) {
   document.body.append(notice)
 }
 
+// Whether this browser may add notes right now. Asked before each new note, so logging
+// in (e.g. in another tab) takes effect without a reload.
+export async function checkCanCreate(config: AnnotateClientConfig) {
+  try {
+    const response = await fetch(`${config.endpoint}/whoami`)
+    if (response.status === 401) {
+      showNotice('Log in with your reviewer link for this site before adding notes; this note was not added.')
+      return false
+    }
+    if (!response.ok || !(await response.json() as { canCreate?: boolean }).canCreate) {
+      showNotice(`You can't add notes here (HTTP ${response.status}); this note was not added.`)
+      return false
+    }
+    return true
+  }
+  catch (error) {
+    console.warn('[slidev-addon-annotate] access check failed', error)
+    showNotice('The annotation server is unreachable, so this note was not added.')
+    return false
+  }
+}
+
 export function createSync(config: AnnotateClientConfig) {
   async function send(method: string, path: string, body?: unknown) {
     try {

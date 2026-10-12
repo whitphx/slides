@@ -94,7 +94,7 @@ Roles (`defaultAuthorize`; pass `authorize` to replace it):
 - `agent`: read, change status (acknowledge, resolve, dismiss, reopen), reply. It cannot create, edit or delete notes, so a leaked agent key can't plant or rewrite notes; it can still add replies and change status.
 - `admin`: everything.
 
-If the toolbar's saves are rejected, the deck shows a notice at the top of the page.
+Before each new note the toolbar asks the API (`GET <api>/whoami`) whether this browser may add notes, and refuses the note with a notice if not (e.g. before logging in). If a save is rejected later, the deck also shows a notice at the top of the page.
 
 ## Set up the PR-preview Worker (this repo)
 

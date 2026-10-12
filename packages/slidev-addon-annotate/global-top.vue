@@ -3,7 +3,7 @@
 import { computed, onBeforeUnmount, watch } from 'vue'
 import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
-import { createMarkerFilter, createSync, slidePosition, sourceLocation } from './src/client'
+import { checkCanCreate, createMarkerFilter, createSync, slidePosition, sourceLocation } from './src/client'
 import type { SlideContext } from './src/client'
 
 const config = __SLIDEV_ANNOTATE__
@@ -14,7 +14,10 @@ const sync = createSync(config)
 const visible = computed(() => config.enabled && nav.isPlaying.value
   && !nav.isPrintMode.value && !nav.isPresenter.value && !nav.isEmbedded.value)
 
-function beforeCreate(data: BeforeAnnotationCreateData) {
+async function beforeCreate(data: BeforeAnnotationCreateData) {
+  // Refuse the note before the toolbar stores it, rather than keep one the server rejects.
+  if (!await checkCanCreate(config))
+    return { cancel: true }
   const slide = nav.currentSlideRoute.value.meta?.slide
   const context: SlideContext = {
     deck: config.deck,

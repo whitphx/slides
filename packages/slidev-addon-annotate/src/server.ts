@@ -237,6 +237,11 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
       return json({ error: 'Authentication required' }, 401)
     const can = (action: Action, annotation?: Annotation) => authorize(principal, action, annotation)
 
+    // GET /whoami: who the caller is and whether they may add notes, so the toolbar
+    // can refuse a note up front instead of showing one the server will reject.
+    if (segments.length === 1 && segments[0] === 'whoami' && method === 'GET')
+      return json({ id: principal.id, role: principal.role, canCreate: can('create') })
+
     // GET /sessions, GET /sessions/:id, GET /sessions/:id/pending,
     // POST /sessions/:id/annotations, GET /sessions/:id/events
     if (segments[0] === 'sessions') {

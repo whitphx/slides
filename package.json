@@ -11,6 +11,7 @@
     "eslint": "^9.23.0",
     "eslint-plugin-vue": "^9.33.0",
     "globals": "^15.15.0",
+    "slidev-addon-annotate": "workspace:*",
     "typescript-eslint": "^8.28.0"
   },
   "dependencies": {

@@ -66,7 +66,7 @@ The coroutine proxy: wrap each step of the coroutine, set the global state on en
 ```
  1. The hidden current context      title        + subtitle "Understanding `contextvars` through real-world runtime problems"
  2. Hi 👋                           bio          full portfolio (projects, contributions, past talks)
- 3. What you'll leave with          bullets      v-clicks: the problem it solves · how values propagate · where it stops working
+ 3. What you'll learn today         bullets      v-clicks: the problem it solves · how values propagate · where it stops working
  4. Agenda                          bullets      🧩 🧠 🔬 ⚠️ — the four sections
 ```
 

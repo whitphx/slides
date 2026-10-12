@@ -1,0 +1,15 @@
+{
+  "name": "slidev-addon-annotate",
+  "version": "0.1.0",
+  "description": "Apply review notes left on Slidev decks with slidev-addon-annotate, then resolve them",
+  "author": {
+    "name": "Yuichiro Tachibana"
+  },
+  "repository": "https://github.com/whitphx/slides",
+  "license": "MIT",
+  "keywords": [
+    "slidev",
+    "annotations",
+    "review"
+  ]
+}

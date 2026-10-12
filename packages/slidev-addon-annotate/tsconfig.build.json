@@ -1,0 +1,27 @@
+{
+  // Compiles the server side (API handler, stores, auth, dispatchers, Worker route) to
+  // dist/ for publishing. The Slidev addon itself ships as source, which Slidev compiles.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "files": [
+    "src/server.ts",
+    "src/auth.ts",
+    "src/d1-store.ts",
+    "src/file-store.ts",
+    "src/github.ts",
+    "src/worker.ts",
+    "src/afs.ts"
+  ]
+}

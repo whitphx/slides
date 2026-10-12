@@ -13,6 +13,7 @@ addons:
   - fancy-arrow
   - window-mockup
   - qrcode
+  - slidev-addon-annotate
 ---
 
 <h1 text-5xl leading-14 mt-44>
@@ -96,17 +97,19 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <style>
   .portfolio {
     font-size: 1.0rem;
+    line-height: 1.8rem;
   }
+  /* Inline rather than inline-flex: a line may break before an inline-flex box, which
+     put the comma after an item at the start of the next line. nowrap keeps each item whole. */
   .item {
-    height: 1.8rem;
-    line-height: 1.0rem;
     font-weight: 300;
-    display: inline-flex;
-    align-items: center;
+    white-space: nowrap;
 
     img {
+      display: inline;
       height: 1.0em;
       margin-right: 0.25em;
+      vertical-align: -0.125em;
     }
   }
 </style>
@@ -124,7 +127,7 @@ And you can find me in all the usual places.
 
 ---
 
-# What you'll leave with
+# What you'll learn today
 
 <div mt-10 text-6>
 
@@ -139,7 +142,7 @@ And you can find me in all the usual places.
 </div>
 
 <!--
-OK, so let's get into the talk. Here's a quick overview of where we're going: three things I want you to walk out with.
+OK, so let's get into the talk. Here's a quick overview: three things you'll learn today.
 
 [click]
 First, what problem the `contextvars` module actually solves. It's a small API, but the problem behind it is easy to get wrong.

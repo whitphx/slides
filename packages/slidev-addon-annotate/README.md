@@ -163,6 +163,24 @@ CI builds PR previews with `SLIDEV_ANNOTATE=1`, `SLIDEV_ANNOTATE_SESSION=pr-<num
 and the PR head commit, so notes from different PRs are kept apart by session id.
 Decks opt in by listing the addon in their headmatter.
 
+## Agent skill
+
+`skills/slidev-annotate-notes/` is an [Agent Skill](https://code.claude.com/docs/en/skills)
+that tells an agent how to apply these notes: when a dispatch comment counts as an
+instruction (only from the person it works for, and only about the slides), how to find
+each note's slide, and how to resolve the notes afterwards. In this repository it is
+linked into `.claude/skills/`, so every session here has it, cloud sessions included.
+
+To use it in another project with Claude Code:
+
+```sh
+/plugin install slidev-addon-annotate --marketplace whitphx/slides
+```
+
+(or `/plugin marketplace add whitphx/slides`, then `/plugin install slidev-addon-annotate@whitphx-slides`).
+For other agents, `npx skills add whitphx/slides --skill slidev-annotate-notes` copies it into
+the project's skills folder.
+
 ## Settings
 
 Environment variables read when `slidev` starts:

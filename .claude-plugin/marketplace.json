@@ -1,0 +1,14 @@
+{
+  "name": "whitphx-slides",
+  "description": "Claude Code plugins from whitphx/slides",
+  "owner": {
+    "name": "whitphx"
+  },
+  "plugins": [
+    {
+      "name": "slidev-addon-annotate",
+      "source": "./packages/slidev-addon-annotate",
+      "description": "Apply review notes left on Slidev decks with slidev-addon-annotate, then resolve them"
+    }
+  ]
+}

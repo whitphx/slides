@@ -4,9 +4,9 @@
 //
 // cn-font-split's own install script fetches the *latest* release, looked up through the
 // third-party ungh.cc. When that lookup fails, the download URL has no version and 404s,
-// and "latest" needn't match the JavaScript version pinned in package.json's
-// pnpm.overrides anyway. So its install script is skipped (pnpm.ignoredBuiltDependencies)
-// and this runs from the root `postinstall`, asking for the matching release explicitly.
+// and "latest" changes under us. So its install script is skipped
+// (pnpm.ignoredBuiltDependencies) and this runs from the root `postinstall`, asking for a
+// listed release explicitly.
 
 import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'
@@ -14,9 +14,9 @@ import { join } from 'node:path'
 import process from 'node:process'
 
 // npm version of cn-font-split -> GitHub release with its native library: the newest
-// release published before that npm version.
+// release published before that npm version (7.6.8 is the last release with libraries).
 const BINARY_RELEASES = {
-  '7.2.4': '7.2.1',
+  '7.4.3': '7.6.8',
 }
 
 const store = new URL('../node_modules/.pnpm', import.meta.url).pathname

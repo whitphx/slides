@@ -25,7 +25,7 @@
   },
   "pnpm": {
     "overrides": {
-      "cn-font-split": "7.2.4"
+      "cn-font-split": "7.4.3"
     },
     "onlyBuiltDependencies": [
       "esbuild",

@@ -123,79 +123,183 @@ function readCookie(request: Request, name: string) {
   return undefined
 }
 
-function htmlPage(message: string, status = 200) {
-  return new Response(`<!doctype html><meta charset="utf-8"><title>Annotations</title><p>${message}</p>`, {
+const escapeHtml = (text: string) =>
+  text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[c]!)
+
+function htmlPage(body: string, status = 200, headers: Record<string, string> = {}) {
+  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reviewer login</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:28rem;margin:4rem auto;padding:0 1rem;color:#222}
+label{display:block;margin:1rem 0 .25rem}input[type=password]{width:100%;padding:.5rem;font:inherit;box-sizing:border-box}
+button{margin-top:1rem;padding:.5rem 1rem;font:inherit;border:0;border-radius:6px;background:#7c3aed;color:#fff;cursor:pointer}
+.error{color:#b00020}</style>
+${body}`, {
     status,
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', ...headers },
   })
 }
 
+function loginForm(action: string, next: string, error?: string) {
+  return htmlPage(`<h1>Reviewer login</h1>
+${error ? `<p class="error" role="alert">${escapeHtml(error)}</p>` : '<p>Enter the reviewer key to leave notes on the slides.</p>'}
+<form method="post" action="${escapeHtml(action)}">
+<input type="hidden" name="next" value="${escapeHtml(next)}">
+<input type="text" name="username" value="reviewer" autocomplete="username" hidden>
+<label for="token">Reviewer key</label>
+<input type="password" id="token" name="token" autocomplete="current-password" required autofocus>
+<button type="submit">Log in</button>
+</form>`, error ? 401 : 200)
+}
+
+// Resolves `next` the way a browser would and keeps it only if it stays on `origin`,
+// so a link cannot send the reviewer elsewhere (e.g. `/\evil.example` or `//evil.example`).
+function sameOriginPath(next: string | null | undefined, base: URL) {
+  const target = next && URL.canParse(next, base) ? new URL(next, base) : undefined
+  return target && target.origin === base.origin ? target.pathname + target.search + target.hash : undefined
+}
+
+function redirect(location: string, cookies: string[] = []) {
+  const headers = new Headers({ 'Location': location, 'Cache-Control': 'no-store' })
+  for (const c of cookies)
+    headers.append('Set-Cookie', c)
+  return new Response(null, { status: 303, headers })
+}
+
+const randomToken = () => base64url(crypto.getRandomValues(new Uint8Array(18)))
+
 export interface SignedCookieOptions {
-  // Both the login token and the key that signs the cookie. Rotating it logs everyone out.
+  // Both the reviewer key and the key that signs the cookie. Rotating it logs everyone out.
   secret: string | undefined
   role?: Role
   id?: string
   cookieName?: string
   maxAgeSeconds?: number
+  // Origin of a "home" host (e.g. the production site). When set, logging in on any other
+  // host goes through the home host, so one login there covers every host it trusts.
+  home?: string
+  // Which origins the home host may hand a login to. Required for `home` to be used.
+  trustOrigin?: (origin: string) => boolean
 }
 
-// Browser login for reviewers. Opening `<api>/login?token=<secret>` sets a signed, expiring,
-// HttpOnly cookie; the toolbar's same-origin requests then carry it automatically.
-// `next=/path` redirects back to the deck after logging in. `<api>/logout` clears the cookie.
+// Browser login for reviewers, with the reviewer key typed into a form (never put in a URL):
+// - `GET <api>/login?next=/path` shows the form; `POST <api>/login` checks the key and sets a
+//   signed, expiring, HttpOnly cookie, which the toolbar's same-origin requests then carry.
+// - With `home`, `GET <api>/login` on another host starts a hand-off instead: the browser goes
+//   to the home host's `<api>/login/authorize`, which (once logged in there) sends it back to
+//   `<api>/login/finish` with a pass signed for that origin, valid for a minute and tied to a
+//   one-time state cookie on that host.
+// - `<api>/logout` clears the cookie.
 export function signedCookie({
   secret,
   role = 'reviewer',
   id = role,
   cookieName = 'annotate_session',
   maxAgeSeconds = 30 * 24 * 60 * 60,
+  home,
+  trustOrigin,
 }: SignedCookieOptions): Authenticator {
-  const cookie = (value: string, maxAge: number) =>
-    `${cookieName}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Strict`
+  const stateCookieName = `${cookieName}_state`
+  // Lax rather than Strict so the home host sees its cookie when a preview sends the browser
+  // there; writes are still refused cross-site by the Origin check in `authenticate`.
+  const cookie = (name: string, value: string, maxAge: number) =>
+    `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax`
+  const homeOrigin = home && trustOrigin && URL.canParse(home) ? new URL(home).origin : undefined
+
+  async function sessionCookie() {
+    const expires = Math.floor(Date.now() / 1000) + maxAgeSeconds
+    return cookie(cookieName, `${expires}.${await hmac(secret!, `${id}.${role}.${expires}`)}`, maxAgeSeconds)
+  }
+
+  async function loggedIn(request: Request) {
+    const [expires, signature] = readCookie(request, cookieName)?.split('.') ?? []
+    if (!secret || !expires || !signature || Number(expires) < Date.now() / 1000)
+      return false
+    return timingSafeEqual(signature, await hmac(secret, `${id}.${role}.${expires}`))
+  }
+
+  const passMessage = (origin: string, state: string, expires: string) => `handoff.${id}.${role}.${origin}.${state}.${expires}`
 
   return {
     async authenticate(request) {
-      if (!secret)
-        return undefined
-      // SameSite=Strict already keeps the cookie off cross-site requests; check Origin as well.
+      // Also refuse cross-site requests outright, so the cookie never authorises one.
       if (!sameOrigin(request))
         return undefined
-      const [expires, signature] = readCookie(request, cookieName)?.split('.') ?? []
-      if (!expires || !signature || Number(expires) < Date.now() / 1000)
-        return undefined
-      const valid = await timingSafeEqual(signature, await hmac(secret, `${id}.${role}.${expires}`))
-      return valid ? { id, role } : undefined
+      return await loggedIn(request) ? { id, role } : undefined
     },
     async route(request, segments) {
-      if (segments.length !== 1 || request.method !== 'GET')
-        return undefined
-      if (segments[0] === 'logout') {
-        return new Response(null, { status: 204, headers: { 'Set-Cookie': cookie('', 0) } })
-      }
-      if (segments[0] !== 'login')
+      if (segments[0] !== 'login' && segments[0] !== 'logout')
         return undefined
       const url = new URL(request.url)
-      const token = url.searchParams.get('token')
-      if (!secret || !token || !await timingSafeEqual(token, secret))
-        return htmlPage('That login link is not valid.', 401)
-      const expires = Math.floor(Date.now() / 1000) + maxAgeSeconds
-      const value = `${expires}.${await hmac(secret, `${id}.${role}.${expires}`)}`
-      // Resolve `next` the way a browser would and keep it only if it stays on this origin,
-      // so the link cannot send the reviewer elsewhere (e.g. `/\evil.example` or `//evil.example`).
-      const next = url.searchParams.get('next')
-      const target = next && URL.canParse(next, url) ? new URL(next, url) : undefined
-      if (target && target.origin === url.origin) {
-        return new Response(null, {
-          status: 303,
-          headers: {
-            'Location': target.pathname + target.search + target.hash,
-            'Set-Cookie': cookie(value, maxAgeSeconds),
-            'Cache-Control': 'no-store',
-          },
-        })
+      const api = url.pathname.slice(0, url.pathname.lastIndexOf(`/${segments.join('/')}`))
+      if (!secret)
+        return htmlPage('<p class="error">Reviewer login is not set up on this site.</p>', 503)
+
+      if (segments.length === 1 && segments[0] === 'logout')
+        return new Response(null, { status: 204, headers: { 'Set-Cookie': cookie(cookieName, '', 0) } })
+
+      // GET /login: the form, or the hand-off to the home host.
+      if (segments.length === 1 && request.method === 'GET') {
+        const next = sameOriginPath(url.searchParams.get('next'), url) ?? '/'
+        if (homeOrigin && url.origin !== homeOrigin) {
+          const state = randomToken()
+          const authorize = new URL(`${homeOrigin}${api}/login/authorize`)
+          authorize.searchParams.set('origin', url.origin)
+          authorize.searchParams.set('state', state)
+          authorize.searchParams.set('next', next)
+          return redirect(authorize.href, [cookie(stateCookieName, state, 600)])
+        }
+        return loginForm(`${api}/login`, next)
       }
-      const response = htmlPage('Logged in. Notes you leave on the slides in this browser will now be saved.')
-      response.headers.set('Set-Cookie', cookie(value, maxAgeSeconds))
-      return response
+
+      // POST /login: check the key from the form.
+      if (segments.length === 1 && request.method === 'POST') {
+        if (!sameOrigin(request))
+          return htmlPage('<p class="error">Cross-site login refused.</p>', 403)
+        const form = await request.formData().catch(() => undefined)
+        const token = form?.get('token')
+        const next = String(form?.get('next') ?? '/')
+        if (typeof token !== 'string' || !await timingSafeEqual(token, secret))
+          return loginForm(`${api}/login`, next, 'That key is not valid.')
+        const target = sameOriginPath(next, url)
+        if (target)
+          return redirect(target, [await sessionCookie()])
+        return htmlPage('<p>Logged in. Notes you leave on the slides in this browser will now be saved.</p>', 200, { 'Set-Cookie': await sessionCookie() })
+      }
+
+      // GET /login/authorize (home host): hand a login to a trusted origin.
+      if (segments[1] === 'authorize' && request.method === 'GET' && homeOrigin && url.origin === homeOrigin) {
+        const origin = url.searchParams.get('origin') ?? ''
+        const state = url.searchParams.get('state') ?? ''
+        const next = url.searchParams.get('next') ?? '/'
+        if (!trustOrigin!(origin) || !/^[\w-]{16,64}$/.test(state))
+          return htmlPage('<p class="error">That site is not allowed to log in through here.</p>', 403)
+        if (!await loggedIn(request))
+          return loginForm(`${api}/login`, url.pathname + url.search)
+        const expires = String(Math.floor(Date.now() / 1000) + 60)
+        const finish = new URL(`${origin}${api}/login/finish`)
+        finish.searchParams.set('state', state)
+        finish.searchParams.set('expires', expires)
+        finish.searchParams.set('pass', await hmac(secret, passMessage(origin, state, expires)))
+        finish.searchParams.set('next', next)
+        return redirect(finish.href)
+      }
+
+      // GET /login/finish: accept the pass from the home host.
+      if (segments[1] === 'finish' && request.method === 'GET' && homeOrigin) {
+        const state = url.searchParams.get('state') ?? ''
+        const expires = url.searchParams.get('expires') ?? ''
+        const pass = url.searchParams.get('pass') ?? ''
+        const expected = readCookie(request, stateCookieName)
+        const valid = !!expected && await timingSafeEqual(state, expected)
+          && Number(expires) >= Date.now() / 1000
+          && await timingSafeEqual(pass, await hmac(secret, passMessage(url.origin, state, expires)))
+        const clearState = cookie(stateCookieName, '', 0)
+        if (!valid)
+          return htmlPage('<p class="error">That login has expired or is not valid. Try logging in again.</p>', 401, { 'Set-Cookie': clearState })
+        return redirect(sameOriginPath(url.searchParams.get('next'), url) ?? '/', [await sessionCookie(), clearState])
+      }
+
+      return undefined
     },
   }
 }

@@ -3,6 +3,7 @@
 // the button or, with auto-send on, once they have stopped adding notes for a while.
 
 import type { Annotation } from './afs'
+import { loginUrl } from './client'
 import type { AnnotateClientConfig } from './types'
 
 const AUTO_KEY = 'slidev-annotate:auto-dispatch'
@@ -49,18 +50,25 @@ export function createDispatchControl(config: AnnotateClientConfig) {
   const status = document.createElement('div')
   status.setAttribute('role', 'status')
   status.style.cssText = 'max-width:320px;padding:4px 8px;border-radius:6px;background:rgb(255 255 255 / 90%);color:#222;text-align:right'
-  panel.append(send, autoLabel, status)
+  const login = document.createElement('a')
+  login.textContent = 'Log in to review'
+  login.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #7c3aed;background:rgb(255 255 255 / 90%);color:#5b21b6;font-weight:600;text-decoration:none'
+  panel.append(login, send, autoLabel, status)
   document.body.append(panel)
 
   let canDispatch = false
+  let loggedOut = false
   let unsent = 0
   let timer: ReturnType<typeof setTimeout> | undefined
   let sending = false
   auto.checked = readAuto(config.autoDispatch)
 
   function render() {
-    panel.style.display = canDispatch && (unsent > 0 || status.textContent) ? 'flex' : 'none'
-    send.style.display = unsent > 0 ? '' : 'none'
+    panel.style.display = loggedOut || (canDispatch && (unsent > 0 || status.textContent)) ? 'flex' : 'none'
+    login.style.display = loggedOut ? '' : 'none'
+    login.href = loginUrl(config)
+    autoLabel.style.display = canDispatch ? 'flex' : 'none'
+    send.style.display = canDispatch && unsent > 0 ? '' : 'none'
     send.disabled = sending
     send.textContent = sending ? 'Sending…' : `Send ${unsent} note${unsent === 1 ? '' : 's'} to agent`
   }
@@ -82,6 +90,7 @@ export function createDispatchControl(config: AnnotateClientConfig) {
     try {
       if (!canDispatch) {
         const who = await api('/whoami')
+        loggedOut = who.status === 401
         canDispatch = who.ok && !!(await who.json() as { canDispatch?: boolean }).canDispatch
       }
       if (canDispatch) {

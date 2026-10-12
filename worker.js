@@ -4,11 +4,14 @@ import { githubComment } from "./packages/slidev-addon-annotate/src/github.ts";
 import { createAnnotateHandler } from "./packages/slidev-addon-annotate/src/server.ts";
 
 // Review notes left on PR previews with slidev-addon-annotate.
-// Agents send ANNOTATE_AGENT_KEY in `x-api-key`; reviewers log in once per browser
-// with `<preview>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>`.
+// Agents send ANNOTATE_AGENT_KEY in `x-api-key`; reviewers log in at `<host>/__annotate/api/login`
+// with ANNOTATE_REVIEWER_KEY. With ANNOTATE_HOME_ORIGIN set (e.g. the production host), previews
+// hand logins off to that host, so one login there covers every PR preview.
 // With ANNOTATE_GITHUB_TOKEN set, "Send to agent" posts the notes as a comment on the PR.
 const ANNOTATE_API = "/__annotate/api";
 const GITHUB_REPO = "whitphx/slides";
+// This Worker's preview hosts (`<version or alias>-slides.whitphx.workers.dev`), which the home host may log in.
+const PREVIEW_ORIGIN = /^https:\/\/[a-z0-9-]+-slides\.whitphx\.workers\.dev$/;
 
 let annotate;
 function annotations(env) {
@@ -17,7 +20,12 @@ function annotations(env) {
     basePath: ANNOTATE_API,
     auth: chain(
       apiKey({ key: env.ANNOTATE_AGENT_KEY, role: "agent" }),
-      signedCookie({ secret: env.ANNOTATE_REVIEWER_KEY, role: "reviewer" }),
+      signedCookie({
+        secret: env.ANNOTATE_REVIEWER_KEY,
+        role: "reviewer",
+        home: env.ANNOTATE_HOME_ORIGIN,
+        trustOrigin: (origin) => PREVIEW_ORIGIN.test(origin),
+      }),
     ),
     dispatch: env.ANNOTATE_GITHUB_TOKEN
       ? githubComment({ token: env.ANNOTATE_GITHUB_TOKEN, repo: GITHUB_REPO })

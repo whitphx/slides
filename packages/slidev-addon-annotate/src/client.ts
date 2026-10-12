@@ -117,7 +117,12 @@ export function toAfs(annotation: ToolbarAnnotation, config: AnnotateClientConfi
 }
 
 // A dismissible message at the top of the page, shown once, e.g. when saving needs a login.
-function showNotice(text: string) {
+// Where the reviewer logs in; it brings them back to the current slide afterwards.
+export function loginUrl(config: AnnotateClientConfig) {
+  return `${config.endpoint}/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
+}
+
+function showNotice(text: string, action?: { label: string, href: string }) {
   const id = 'slidev-annotate-notice'
   if (document.getElementById(id))
     return
@@ -131,6 +136,13 @@ function showNotice(text: string) {
     + 'background:#fff4e5;color:#4a2c00;border:1px solid #f0b45a;font:14px/1.4 system-ui,sans-serif;box-shadow:0 4px 12px rgb(0 0 0 / 15%)'
   const message = document.createElement('span')
   message.textContent = text
+  if (action) {
+    const link = document.createElement('a')
+    link.href = action.href
+    link.textContent = action.label
+    link.style.cssText = 'color:inherit;font-weight:600;margin-left:8px'
+    message.append(link)
+  }
   const close = document.createElement('button')
   close.type = 'button'
   close.textContent = '×'
@@ -147,7 +159,7 @@ export async function checkCanCreate(config: AnnotateClientConfig) {
   try {
     const response = await fetch(`${config.endpoint}/whoami`)
     if (response.status === 401) {
-      showNotice('Log in with your reviewer link for this site before adding notes; this note was not added.')
+      showNotice('Log in before adding notes; this note was not added.', { label: 'Log in', href: loginUrl(config) })
       return false
     }
     if (!response.ok || !(await response.json() as { canCreate?: boolean }).canCreate) {
@@ -172,7 +184,7 @@ export function createSync(config: AnnotateClientConfig) {
         body: body ? JSON.stringify(body) : undefined,
       })
       if (response.status === 401)
-        showNotice('Your notes are not being saved: open your reviewer login link for this site first.')
+        showNotice('Your notes are not being saved: log in first.', { label: 'Log in', href: loginUrl(config) })
       // Deleting a note the server never had (e.g. one made before logging in) is fine.
       else if (!response.ok && !(method === 'DELETE' && response.status === 404))
         showNotice(`A note could not be ${method === 'DELETE' ? 'deleted' : 'saved'} (HTTP ${response.status}).`)

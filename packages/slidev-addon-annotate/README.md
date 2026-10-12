@@ -85,7 +85,7 @@ from the credential, never from the request body.
 |---|---|---|
 | `localDev()` | the `slidev` dev server | Every same-origin request is the local user; cross-site requests from other pages in the browser are refused. |
 | `apiKey({ key, role: 'agent' })` | agents | Shared key in `x-api-key` (what `agentation-mcp --api-key` sends) or `Authorization: Bearer`. |
-| `signedCookie({ secret })` | reviewers in a browser | Opening `<api>/login?token=<secret>&next=/<deck>/` sets a signed, expiring `HttpOnly` cookie; the toolbar's same-origin requests carry it. `<api>/logout` clears it. |
+| `signedCookie({ secret, home?, trustOrigin? })` | reviewers in a browser | `<api>/login` shows a form for the reviewer key (a password field, so password managers fill it; the key is posted, never put in a URL) and sets a signed, expiring `HttpOnly` cookie that the toolbar's same-origin requests carry. With `home`, other hosts that `trustOrigin` accepts hand logins off to the home host: one login there covers them all (see below). `<api>/logout` clears it. |
 | `chain(...)` | combining the above | The first authenticator that accepts the request wins. |
 
 Roles (`defaultAuthorize`; pass `authorize` to replace it):
@@ -144,10 +144,23 @@ Code Routine's API trigger.
    ```
 
    Without it the button doesn't appear. Comments are posted as the token's owner.
-3. Log in once per PR preview in each browser you review in. The cookie is per host, and
-   each PR preview has its own `*.workers.dev` host. Keep the link in a password manager
-   (URL-encode the key if it contains `+`, `/` or `=`):
-   `https://<preview host>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>&next=/<deck>/`
+3. To log in, press **Log in to review** at the top right of a preview deck (or open
+   `<host>/__annotate/api/login`) and enter `ANNOTATE_REVIEWER_KEY`; your password manager can
+   save it for the host. Each PR preview has its own `*.workers.dev` host, and cookies aren't
+   shared between them, so by default that is once per preview.
+
+   **Log in once for all previews:** once this Worker's API is deployed to production, add
+   the production host as the home host in `wrangler.jsonc`:
+
+   ```jsonc
+   "vars": { "ANNOTATE_HOME_ORIGIN": "https://slides.whitphx.workers.dev" }
+   ```
+
+   Previews then send the login to the home host (only hosts matching `PREVIEW_ORIGIN` in
+   `worker.js` are accepted), which asks for the key once and hands back a pass signed for
+   that preview, valid for a minute and tied to a one-time cookie. Later previews log in
+   with one click and no key. Don't set it before production serves the API, or the
+   hand-off lands on a page that doesn't exist.
 4. For a cloud agent session, add the agent key to the environment as a secret named
    `AGENTATION_API_KEY` (which `agentation-mcp` reads), allow the Worker's host in its
    network policy, and register the MCP server. Once this is deployed to production, use
@@ -202,7 +215,7 @@ Checked in Chromium with Playwright against `packages/annotate-playground`, in d
 - Notes record the slide number, click step, title, source line and position on the slide.
 - `agentation-mcp`, unmodified, lists, acknowledges and resolves the notes, and its watch mode picks up new notes.
 - Slidev's MCP reads the slide and moves the browser to it.
-- Through `worker.js` under `wrangler dev` with a local D1: requests without a credential get 401; the agent key reads, acknowledges and resolves but gets 403 on creating, editing or deleting notes; the login link sets the cookie and only redirects within the same origin; forged or cross-site cookies are refused; before login the deck shows the notice, after it notes save with the reviewer as author; `agentation-mcp --api-key` works, watch mode included.
+- Through `worker.js` under `wrangler dev` with a local D1: requests without a credential get 401; the agent key reads, acknowledges and resolves but gets 403 on creating, editing or deleting notes; the login form sets the cookie and only redirects within the same origin; the home-host hand-off logs a second origin in (one key entry, then one click); forged or cross-site cookies are refused; before login the deck shows the notice, after it notes save with the reviewer as author; `agentation-mcp --api-key` works, watch mode included.
 
 Limitations found:
 

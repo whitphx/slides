@@ -1,4 +1,5 @@
 {
+  "name": "be-biased-for-open-sourcing",
   "type": "module",
   "private": true,
   "scripts": {

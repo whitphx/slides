@@ -8,6 +8,7 @@ on:
     paths:
       - "packages/**"
       - "themes/**"
+      - ".changeset/**"
       - "pnpm-workspace.yaml"
       - "pnpm-lock.yaml"
       - "scripts/release-plan.mjs"

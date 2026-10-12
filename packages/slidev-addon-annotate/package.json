@@ -1,6 +1,6 @@
 {
   "name": "slidev-addon-annotate",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "description": "Annotate a Slidev deck on screen and hand the notes to an AI coding agent",
   "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",

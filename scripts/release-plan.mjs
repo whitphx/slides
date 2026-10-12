@@ -2,16 +2,18 @@
 // Finds the workspace packages that are published to npm (those not marked "private").
 //
 //   node scripts/release-plan.mjs          JSON array of the packages whose current version
-//                                          still needs releasing: not on npm yet, or (when
-//                                          GITHUB_REPOSITORY is set) without a GitHub release.
+//                                          is not on npm yet.
 //   node scripts/release-plan.mjs --check  Checks each package's release metadata and exits
 //                                          non-zero on problems; used on pull requests.
 //   node scripts/release-plan.mjs --dirs   The packages' directories, one per line.
+//   node scripts/release-plan.mjs --sync-plugin-versions
+//                                          Copies each package's version into its
+//                                          .claude-plugin/plugin.json; runs after `changeset version`.
 //
-// Uses only Node, npm and (for the GitHub release check) gh, so it runs before `pnpm install`.
+// Uses only Node and npm, so it runs before `pnpm install`.
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
 
@@ -55,28 +57,15 @@ function onNpm({ name, version }) {
   throw new Error(`npm view ${name}@${version} failed:\n${result.stderr}`)
 }
 
-function hasGitHubRelease({ tag }) {
-  const result = run('gh', ['release', 'view', tag, '--repo', process.env.GITHUB_REPOSITORY, '--json', 'tagName'])
-  if (result.ok)
-    return true
-  if (/release not found/i.test(result.stderr))
-    return false
-  throw new Error(`gh release view ${tag} failed:\n${result.stderr}`)
-}
-
 function plan() {
-  const pending = []
-  for (const { name, version, dir, tag } of publicPackages()) {
-    const published = onNpm({ name, version })
-    const released = process.env.GITHUB_REPOSITORY ? hasGitHubRelease({ tag }) : true
-    if (!published || !released)
-      pending.push({ name, version, dir, tag, published, released })
-  }
+  const pending = publicPackages()
+    .filter(p => !onNpm(p))
+    .map(({ name, version, dir, tag }) => ({ name, version, dir, tag }))
   console.log(JSON.stringify(pending))
 }
 
-// The release workflow takes the release notes from the package's CHANGELOG.md, and npm's
-// provenance check needs `repository` to name this repository.
+// npm's provenance check needs `repository` to name this repository, and the release
+// workflow takes the release notes from the CHANGELOG.md that `changeset version` writes.
 function check() {
   const problems = []
   for (const { name, version, dir, pkg } of publicPackages()) {
@@ -89,9 +78,6 @@ function check() {
       problems.push(`${where}: no "license"`)
     if (!existsSync(join(root, dir, 'LICENSE')))
       problems.push(`${dir}: no LICENSE file`)
-    const changelog = join(root, dir, 'CHANGELOG.md')
-    if (!existsSync(changelog) || !readFileSync(changelog, 'utf-8').split('\n').includes(`## ${version}`))
-      problems.push(`${dir}/CHANGELOG.md: no "## ${version}" section for the current version`)
     if (!pkg.files?.includes('CHANGELOG.md'))
       problems.push(`${where}: "files" must include CHANGELOG.md`)
     const plugin = join(root, dir, '.claude-plugin', 'plugin.json')
@@ -108,7 +94,24 @@ function check() {
   console.log(`Release metadata OK: ${publicPackages().map(p => p.tag).join(', ') || 'no public packages'}`)
 }
 
-if (process.argv.includes('--check'))
+function syncPluginVersions() {
+  for (const { dir, version } of publicPackages()) {
+    const plugin = join(root, dir, '.claude-plugin', 'plugin.json')
+    if (!existsSync(plugin))
+      continue
+    const text = readFileSync(plugin, 'utf-8')
+    // Edits the one field, keeping the file's formatting.
+    const updated = text.replace(/("version"\s*:\s*)"[^"]*"/, `$1${JSON.stringify(version)}`)
+    if (updated !== text) {
+      writeFileSync(plugin, updated)
+      console.log(`${dir}/.claude-plugin/plugin.json: version ${version}`)
+    }
+  }
+}
+
+if (process.argv.includes('--sync-plugin-versions'))
+  syncPluginVersions()
+else if (process.argv.includes('--check'))
   check()
 else if (process.argv.includes('--dirs'))
   console.log(publicPackages().map(p => p.dir).join('\n'))

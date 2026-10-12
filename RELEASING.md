@@ -2,67 +2,86 @@
 
 Workspace packages without `"private": true` are published to npm. Today that is only
 [`slidev-addon-annotate`](packages/slidev-addon-annotate); decks, themes and the index site
-are private.
+are private and are never versioned or published.
 
-## Release a new version
+Releases are managed with [Changesets](https://github.com/changesets/changesets).
 
-In a pull request:
+## Release a change
 
-1. Bump `version` in the package's `package.json` (and in `.claude-plugin/plugin.json`
-   if the package has one).
-2. Add a `## <version>` section to its `CHANGELOG.md`. This section becomes the GitHub
-   release notes.
-
-The **Packages** workflow checks this on the PR. It also packs each package the way it
-will be published and lints the tarball (publint, are-the-types-wrong).
-
-Merging to `main` runs the **Release** workflow (`.github/workflows/release.yml`):
-
-1. **plan:** lists packages whose version isn't on npm or has no GitHub release.
-2. **pack:** installs, tests and packs them with `pnpm pack`. pnpm applies `publishConfig`,
-   and `prepack` builds them. This job has no publish rights.
-3. **publish:** in the `npm` environment, publishes the tarballs with npm's trusted
-   publishing, then creates a `<name>@<version>` tag and GitHub release for each.
-   This job never checks out or runs repository code.
-
-Re-running the workflow is safe: anything already published or released is skipped.
-
-## One-time setup
-
-npm can only add a trusted publisher to a package that already exists, so the first
-version is published by hand.
-
-1. **First publish, from your machine** (needs your npm login and 2FA):
+1. **Add a changeset** in the pull request that makes a user-facing change:
 
    ```sh
-   pnpm install
-   cd packages/slidev-addon-annotate
-   pnpm pack                        # builds and applies publishConfig; npm alone would skip it
-   npm publish ./slidev-addon-annotate-0.1.0.tgz --access public
+   pnpm changeset
    ```
 
-   Publish the tarball, not the directory: `npm publish` in the directory ignores
-   `publishConfig.exports` and would publish the TypeScript entry points.
-   The Release workflow then only creates the GitHub release for 0.1.0. Run it from the
-   Actions tab (**Release → Run workflow**) or let the next merge do it.
+   Pick the package and the bump (patch, minor or major), and write a short summary for
+   the changelog. Commit the generated `.changeset/*.md` file with the change. A PR that
+   doesn't need a release (docs, tests, decks) needs no changeset.
+2. **Merge the PR.** The **Release** workflow opens (or updates) a **Version Packages**
+   pull request. It contains `changeset version`'s output:
+   - bumped versions;
+   - `CHANGELOG.md` entries that link the PRs;
+   - `.claude-plugin/plugin.json` versions kept in step.
+3. **Merge the Version Packages PR** when you want to release. The **Release** workflow
+   then runs `.github/workflows/release.yml`:
+   1. **plan:** lists the packages whose version isn't on npm yet.
+   2. **pack:** installs, tests and packs them with `pnpm pack`. pnpm applies
+      `publishConfig`, and `prepack` builds them. This job has no publish rights.
+   3. **publish:** in the `npm` environment, publishes the tarballs with npm's trusted
+      publishing. This job never checks out or runs repository code. It then creates a
+      `<name>@<version>` tag and GitHub release, whose notes are the version's
+      `CHANGELOG.md` section.
 
-2. **Trusted publisher:** on npmjs.com, open the package's **Settings → Trusted
-   Publisher**, choose **GitHub Actions** and enter:
+If a publish or release step fails, re-run the failed jobs. Anything already published or
+released is skipped.
+
+The Version Packages PR is created with the workflow's token, so GitHub doesn't run other
+workflows on it. Close and reopen it, or push to it, if you want CI on it.
+
+The **Packages** workflow checks every PR that touches a package. It checks the release
+metadata (`scripts/release-plan.mjs --check`), then packs each package the way it will be
+published and lints the tarball with publint and are-the-types-wrong.
+
+Changesets v3 is used for versioning only. Its publish step (`changeset publish` and the
+`pack`/`publish` actions) needs pnpm 10, and this repository uses pnpm 9, so publishing is
+done by our own jobs.
+
+## One-time setup for a new package
+
+npm only lets you configure trusted publishing on a package that already exists. So the
+package name is first claimed with a placeholder, and the real first version comes from CI.
+This uses [`setup-npm-trusted-publish`](https://github.com/azu/setup-npm-trusted-publish),
+as described in [npmパッケージを最初からGitHub Actionsでリリースする方法](https://eiji.page/blog/npm-first-publish/).
+
+1. **Repository settings** (once per repository):
+   - In **Settings → Actions → General**, enable *Allow GitHub Actions to create and
+     approve pull requests*, so the workflow can open the Version Packages PR.
+   - Optionally, in **Settings → Environments → npm**, add yourself as a required reviewer,
+     so every publish waits for your approval. The workflow creates the environment on its
+     first run if it doesn't exist.
+2. **Publish a placeholder** from your machine (needs your npm login):
+
+   ```sh
+   npx setup-npm-trusted-publish@2.2.0 slidev-addon-annotate
+   ```
+
+   This publishes version `0.0.0`. It has only a `package.json` and a README saying it is
+   a placeholder for setting up trusted publishing. The package in this repository starts
+   at `0.0.0` too, so CI doesn't try to republish it.
+3. **Configure the trusted publisher** at
+   `https://www.npmjs.com/package/slidev-addon-annotate/access`. Choose **GitHub Actions**
+   and enter:
    - Organization or user: `whitphx`
    - Repository: `slides`
    - Workflow filename: `release.yml`
    - Environment name: `npm`
 
-   A new trusted publisher expires if it isn't used for a publish within 2 days. So add it
-   when the next release PR is ready to merge, not ahead of time.
-
-3. **Lock it down** (recommended): after a CI publish has succeeded, set **Publishing
-   access** to *Require two-factor authentication and disallow tokens*. Trusted publishing
-   keeps working.
-
-4. **Optional:** in the repository's **Settings → Environments → npm**, add yourself as a
-   required reviewer, so every publish waits for your approval. The workflow creates the
-   environment on its first run if it doesn't exist.
+   A new trusted publisher expires if no publish uses it within 2 days. So configure it
+   when the first Version Packages PR is ready to merge.
+4. **Merge the Version Packages PR.** CI publishes the first real version with
+   provenance.
+5. **Lock it down** (recommended): on the same page, set publishing access to *Require
+   two-factor authentication and disallow tokens*. Trusted publishing keeps working.
 
 Provenance attestations are added automatically, because the repository is public and
 publishing goes through trusted publishing.

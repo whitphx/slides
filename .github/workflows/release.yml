@@ -1,10 +1,17 @@
 name: Release
 
-# Publishes each workspace package (not marked "private") whose version isn't on npm yet, and
-# creates its GitHub release with notes from its CHANGELOG.md. To release, bump `version` (and
-# add a CHANGELOG section) in a pull request; merging it publishes.
+# Release management with Changesets (https://github.com/changesets/changesets):
 #
-# npm authenticates this workflow by trusted publishing (OIDC): no npm token is stored, and
+# - While `.changeset/` holds changesets, the `version` job keeps a "Version Packages" pull
+#   request up to date: `changeset version` bumps versions and writes CHANGELOG.md.
+# - Once that pull request is merged (no changesets left), each workspace package (not marked
+#   "private") whose version isn't on npm yet is packed, published, and given a GitHub release
+#   with its CHANGELOG section as the notes.
+#
+# Publishing uses our own pack/publish jobs rather than `changeset publish`, because Changesets
+# v3's publish path needs pnpm 10 and this repository uses pnpm 9.
+#
+# npm authenticates the publish job by trusted publishing (OIDC): no npm token is stored, and
 # provenance is attached automatically. The trusted publisher on npmjs.com must name this file
 # (release.yml) and the `npm` environment. Packing runs the packages' build scripts in a job
 # without publish rights; the publish job only uploads the tarballs and never runs repo code.
@@ -12,11 +19,6 @@ name: Release
 on:
   push:
     branches: [main]
-    paths:
-      - "packages/**"
-      - "themes/**"
-      - "scripts/release-plan.mjs"
-      - ".github/workflows/release.yml"
   workflow_dispatch:
 
 permissions: {}
@@ -32,6 +34,7 @@ jobs:
     permissions:
       contents: read
     outputs:
+      has-changesets: ${{ steps.plan.outputs.has-changesets }}
       packages: ${{ steps.plan.outputs.packages }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -41,12 +44,41 @@ jobs:
         with:
           node-version: 24
       - id: plan
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
+          if find .changeset -maxdepth 1 -name '*.md' ! -name README.md | grep -q .; then
+            echo "Changesets are pending; the version job updates the Version Packages pull request."
+            echo "has-changesets=true" >> "$GITHUB_OUTPUT"
+            echo "packages=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           packages=$(node scripts/release-plan.mjs)
           echo "Packages to release: $packages"
+          echo "has-changesets=false" >> "$GITHUB_OUTPUT"
           echo "packages=$packages" >> "$GITHUB_OUTPUT"
+
+  version:
+    needs: plan
+    if: needs.plan.outputs.has-changesets == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the version commit
+      pull-requests: write # to open the Version Packages pull request
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile
+      # Runs `changeset version` (the changelog generator reads PR links with GITHUB_TOKEN,
+      # which the action provides) and copies versions into Claude plugin manifests.
+      - uses: changesets/action/version@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          script: pnpm run version-packages
 
   pack:
     needs: plan
@@ -124,10 +156,11 @@ jobs:
             if gh release view "$tag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
               echo "$tag already has a GitHub release."
             else
-              # The CHANGELOG section for this version, without its heading.
-              tar -xzOf "$tarball" package/CHANGELOG.md \
+              # The CHANGELOG section for this version (written by `changeset version`), without its heading.
+              { tar -xzOf "$tarball" package/CHANGELOG.md 2> /dev/null || true; } \
                 | awk -v heading="## $version" '$0 == heading { found = 1; next } found && /^## / { exit } found' \
                 > notes.md
+              [ -s notes.md ] || echo "See the package's CHANGELOG.md." > notes.md
               gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
                 --title "$tag" --notes-file notes.md
             fi

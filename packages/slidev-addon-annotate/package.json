@@ -1,0 +1,23 @@
+{
+  "name": "slidev-addon-annotate",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Annotate a Slidev deck on screen and hand the notes to an AI coding agent",
+  "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "slidev-addon",
+    "slidev"
+  ],
+  "engines": {
+    "slidev": ">=52.19.0"
+  },
+  "exports": {
+    "./server": "./src/server.ts",
+    "./file-store": "./src/file-store.ts"
+  },
+  "dependencies": {
+    "agent-ui-annotation": "^0.8.0"
+  }
+}

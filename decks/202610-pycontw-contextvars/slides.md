@@ -234,54 +234,6 @@ And yet it knows who is asking, and where to look. Both values are just there wh
 ---
 plainBackground: true
 ---
-
-# Python is full of "current"
-
-<div mt-8 grid="~ cols-3" gap-4 text-5>
-
-<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
-<div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
-<div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
-<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
-<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
-<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
-
-</div>
-
-<div v-click="7" mt-8 text-5 text-center>
-
-None of these are function arguments. **They're just… around.** 👻
-
-</div>
-
-<!--
-And those two aren't special. Once you start looking, Python code reads a lot of values that were never passed to it as arguments.
-
-[click]
-The current request.
-
-[click]
-The current user, which we just saw.
-
-[click]
-The current database transaction.
-
-[click]
-The current runtime, whatever "runtime" means in your system.
-
-[click]
-The current working directory, the other one from our example.
-
-[click]
-The current environment variables.
-
-[click]
-Notice that none of these appear in a function signature. No caller hands them over. Every layer just reaches out and reads them.
-
-Keep an eye on the colours, by the way. The blue ones belong to one logical execution: a request, a task, an app. The orange ones belong to the whole Python process. There is only one of each, shared by everything that runs in it.
--->
-
----
 plainBackground: true
 ---
 
@@ -323,7 +275,7 @@ plainBackground: true
 </style>
 
 <!--
-Before any code, let's fix the setting, because the code on the next slide only makes sense in it.
+So how does `index()` know who is asking? To answer that, we first need to look at the server it runs on.
 
 Our example runs on a classic web server. One process, a pool of threads, and each incoming request gets a thread of its own. That thread handles the request from start to finish, and only that request.
 
@@ -335,7 +287,9 @@ So while alice's request is being handled, Thread 1 belongs to alice. One thread
 
 # The sync answer
 
-<div text-4 op70 mb-2>🧵 on the thread-per-request server</div>
+<div text-4 op70 mb-2>🧵 on the thread-per-request server · <b>simplified</b>: what Flask does for you inside the library</div>
+
+<div grid="~ cols-[1.15fr_1fr]" gap-6 items-start>
 
 ```py {*|1|3-5|7-8|10-11|*}{maxHeight:'340px'}
 _local = threading.local()
@@ -351,14 +305,29 @@ def index():
     print(f"Hello, {current_user()}!")
 ```
 
-<div v-click="5" mt-4 text-5>
+<div>
+
+<div v-click="5" text-5>
 
 Per-thread storage **is** per-request storage here. ✅
 
 </div>
 
+<div v-click="5" mt-6 text-4 op70 border="~ gray/30 rounded-lg" p-3>
+
+📎 **The real code (Flask 1.x)**
+
+- Werkzeug's <a href="https://github.com/pallets/werkzeug/blob/1.0.1/src/werkzeug/local.py#L52-L80" target="_blank"><code>Local</code></a> keeps one storage per thread id
+- Flask-Login puts the user <a href="https://github.com/maxcountryman/flask-login/blob/0.5.0/flask_login/utils.py#L344-L348" target="_blank">on the request context</a> stored there
+
+</div>
+
+</div>
+
+</div>
+
 <!--
-So on that server, how would you build something like `current_user` yourself?
+So on that server, how does something like `current_user` work? Here is a simplified version. It is not Flask's real code. It shows what Flask and Flask-Login do for you, inside the library.
 
 [click]
 The user changes from request to request, so a plain module-level global won't do. On this server, the classic answer is threading dot local: one value per thread.
@@ -374,6 +343,54 @@ And the view is a stripped-down version of our `index()` from before. It still t
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
+
+And this is what Flask 1.x really did. Werkzeug's `Local` kept one storage per thread id, and Flask-Login put the user on the request context stored there. The links are on the slide. Newer versions of Flask store it differently.
+-->
+
+---
+
+# Python is full of "current"
+
+<div mt-8 grid="~ cols-3" gap-4 text-5>
+
+<div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
+<div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
+<div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
+<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
+<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
+
+</div>
+
+<div v-click="7" mt-8 text-5 text-center>
+
+None of these are **passed as arguments**. 👻
+
+</div>
+
+<!--
+The current user is only one example. Python code reads many values that were never passed to it as arguments.
+
+[click]
+The current request.
+
+[click]
+The current user, our example.
+
+[click]
+The current database transaction. SQLAlchemy's `scoped_session`, for example, keeps one session per thread by default, with `threading.local()`.
+
+[click]
+The current runtime: which app is running, in a system that runs more than one.
+
+[click]
+The current working directory, the other value our Flask view used.
+
+[click]
+And the current environment variables. These last two are different from the others. There is only one of each for the whole process, not one per thread.
+
+[click]
+None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
 -->
 
 ---
@@ -446,12 +463,12 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-Here's the same picture again, on the left: the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
+On the left is the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
 
 But once we go async, that stops being true.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request is wrapped in something called a task. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
+And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
 
 [click]
 So one thread is serving many requests at once.
@@ -476,9 +493,9 @@ plainBackground: true
 
 <v-clicks>
 
-- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; a web framework does it per request
+- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; an async web server like Uvicorn does it per request
 - 📦 **It wraps one coroutine** — the caller carries on; the task is its own unit of work
-- 🔁 **The loop owns them all** — one thread, switching at every `await`
+- 🔁 **The loop runs them all** — one thread, switching at every `await`
 
 </v-clicks>
 
@@ -514,16 +531,16 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 </div>
 
 <!--
-So: task. In asyncio, the event loop wraps each request in a task. Let me be precise about what one is, because the rest of the talk leans on it.
+So: task. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
-A task does not appear on its own. Something starts it. Usually that is your code calling create_task, or gather, which makes one per coroutine you hand it. In a web framework it is the framework, starting one per incoming request. Hold onto that, because who started it turns out to matter a lot later.
+A task does not appear on its own. Something starts it. In your own code, that is a call to `create_task()`, or `gather()`, which makes one task per coroutine you give it. In an async web app, it is usually the server. asyncio does not require this, but the major async web servers work this way. Uvicorn, for example, starts one task for each request, and your FastAPI or Starlette code runs inside it. Hold onto that, because who started it turns out to matter a lot later.
 
 [click]
 What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.
 
 [click]
-And the event loop owns the whole pile. One thread, running one task at a time, switching between them every time one of them hits an await.
+And the event loop runs them all, on one thread. So the tasks run concurrently, not in parallel. The loop switches between them, and a switch can happen at an await. How the loop decides which task runs next is a big topic, and we don't need the details today. For this talk, just remember: one thread, many tasks, taking turns.
 
 [click]
 So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.
@@ -533,11 +550,13 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 # Watch `threading.local()` break
 
-<div mt-4 grid="~ cols-[1.15fr_1fr]" gap-5>
+<div text-4 op70 mb-2>⚡ on an async server · <b>simplified</b>: how an async web framework works, not production code</div>
 
-<div>
+<div grid="~ cols-[1.3fr_1fr]" gap-5>
 
-```py {*|8|4|5|*}{maxHeight:'330px'}
+<div class="tl-code">
+
+```py {*|11|8|4,8|5|*}{maxHeight:'330px'}
 _local = threading.local()
 
 async def index():
@@ -553,7 +572,9 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 </div>
 
-<div v-click="4">
+<div>
+
+<div v-click="5">
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -568,30 +589,68 @@ bob sees: Hello, bob!
 
 </div>
 
-<div v-click="5" mt-6 text-5>
-
-**alice** stored her name, **yielded**, and bob overwrote the slot before she came back. 🫠
-
 </div>
 
+<div v-click="1" mt-2 text-4 class="tl">
+<div class="tl-label">🙋 <code>gather()</code><br><span op70>two tasks, one thread</span><br><span op60>time →</span></div>
+<div class="tl-row">
+<div class="tl-name">alice's task</div>
+<div v-click="2" class="tl-a">set <code>"alice"</code></div>
+<div v-click="3" class="tl-a">⏸️ await</div>
+<div></div><div></div>
+<div v-click="4" class="tl-a">read → <code>"bob"</code> ❌</div>
+</div>
+<div class="tl-row">
+<div class="tl-name">bob's task</div>
+<div></div><div></div>
+<div v-click="3" class="tl-b">set <code>"bob"</code></div>
+<div v-click="3" class="tl-b">⏸️ await</div>
+<div></div>
+</div>
+<div class="tl-row">
+<div class="tl-name"><code>_local.user</code></div>
+<div v-click="2" class="tl-v">alice</div>
+<div v-click="3" class="tl-v">alice</div>
+<div v-click="3" class="tl-v tl-bad">bob</div>
+<div v-click="3" class="tl-v tl-bad">bob</div>
+<div v-click="4" class="tl-v tl-bad">bob</div>
+</div>
+</div>
+
+<style>
+.tl { position: relative; border: 1px solid rgb(139 92 246 / 0.5); border-radius: 0.5rem; padding: 0.4rem 0.75rem; background: rgb(139 92 246 / 0.05); display: grid; grid-template-columns: 9rem 1fr; column-gap: 0.75rem; }
+.tl-label { grid-row: span 3; align-self: center; line-height: 1.3; }
+.tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
+.tl-name { opacity: 0.75; }
+.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.4rem; text-align: center; white-space: nowrap; }
+.tl-a { background: rgb(14 165 233 / 0.18); }
+.tl-b { background: rgb(16 185 129 / 0.2); }
+.tl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.tl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.tl-time { grid-column: 2; text-align: right; opacity: 0.6; }
+.tl-code { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
+</style>
+
 <!--
-Let me show you the failure, because it's short.
+Let me show you the failure.
 
-Here's the same app, made async. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments. Two requests come in, one from alice and one from bob.
-
-[click]
-Alice's task stores her name.
+Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments.
 
 [click]
-Then `index()` awaits. And that's the moment it hands the thread over to bob's task, which stores his name in the same slot.
+The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. That is what an async server does for two requests that arrive together.
+
+[click]
+Alice's task runs first. It stores her name in `_local.user`.
+
+[click]
+Then `index()` awaits. Follow the timeline on the right. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread. Then bob's task also reaches the await, and waits.
 
 [click]
 Then alice's task resumes and reads the slot.
 
 [click]
-And alice gets greeted as bob. Both lines say bob.
+And alice gets greeted as bob. Both lines say bob. The timeline shows why: one slot, two tasks, and bob's write came between alice's write and alice's read.
 
-[click]
 Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service, this is alice looking at bob's page. That's not a cosmetic bug. That's a data leak.
 -->
 

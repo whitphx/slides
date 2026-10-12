@@ -420,3 +420,23 @@ Titles and statements in the case study were rewritten in plain, literal English
 ### Event loop drawn as its own layer (2026-10-10)
 
 "Then we went async" named the event loop in its column header but did not draw it. Its right column is now nested one level deeper: one process, Thread 1 (green, like the threads on the left), ⚡ Event loop (rose), then Task 1–3 (violet) with each request inside. "What is a task?" draws the same nesting instead of a flat list of "Task · alice's request" rows, so tasks and requests sit on two levels on both slides: layer names left-aligned, requests centred in white. The left column's spacer grew so each thread still lines up with the matching task, and "The setting" keeps the identical picture in the identical place.
+
+### "Python is full of current" moved after the sync answer (2026-10-11)
+
+The grid of "current" values sat between the Flask view and "The setting: one thread per request", which broke the web thread of the story: the view uses only the current user and the current directory, and the next slides are about requests handled one per thread. The view now leads straight into the setting ("So how does `index()` know who is asking?"), and the grid comes after "The sync answer", once `threading.local()` has been covered, as the widening step: the current user is only one of many such values. Its note now says which ones a library keeps per thread (SQLAlchemy's `scoped_session`) and that the current directory and environment variables are one per process, not per thread. The tagline is plain: "None of these are passed as arguments."
+
+### "The sync answer" says it is simplified, and points at the real code (2026-10-11)
+
+The slide came straight after a real Flask view and showed toy code without saying so. Its caption now says "simplified: what Flask does for you inside the library", the note opens by saying it is not Flask's real code, and a box at the last click links the real code.
+
+Checked against the sources (Flask 1.1.4, Werkzeug 1.0.1, Flask-Login 0.5.0):
+
+- `flask/app.py` `wsgi_app()` creates a `RequestContext` per request and calls `ctx.push()`; `flask/ctx.py` `RequestContext.push()` does `_request_ctx_stack.push(self)` (line 382); `flask/globals.py` defines `_request_ctx_stack = LocalStack()` (line 57). This is the toy's `handle()`.
+- Werkzeug 1.0.1 `werkzeug/local.py` `Local` (lines 52–80) stores values in `__storage__[get_ident()]`, where `get_ident` is `_thread.get_ident` (or greenlet's `getcurrent`, which is also one per thread for plain threads). This is the toy's `threading.local()`.
+- Flask-Login 0.5.0 `flask_login/utils.py` `_get_user()` (lines 344–348) loads the user onto `_request_ctx_stack.top.user` and reads it back; `current_user = LocalProxy(lambda: _get_user())`. This is the toy's `_local.user` and `current_user()`.
+
+This holds for Flask 1.x only. Werkzeug 2.0 reimplemented `Local` on a `ContextVar`, and Flask 2.2 replaced `LocalStack` with `ContextVar`s directly ("Where you've already met it" says so), so the slide and note say "Flask 1.x" and that newer versions store it differently.
+
+### Who creates the task for a request (2026-10-11)
+
+The notes said "In asyncio, the event loop wraps each request in a task." Both halves were wrong: asyncio itself puts no request in a task, and the event loop never creates tasks, it only runs them. In the usual async web setup the server does it: Uvicorn 0.30.6 calls `self.loop.create_task(self.cycle.run_asgi(app))` once per request (`uvicorn/protocols/http/httptools_impl.py` line 282, `h11_impl.py` line 253), and the ASGI framework runs inside that task. "Then we went async" and "What is a task?" now say that the major async web servers start one task per request and the event loop runs it; the first bullet names "an async web server like Uvicorn" instead of "a web framework", and "The loop owns them all" became "The loop runs them all".

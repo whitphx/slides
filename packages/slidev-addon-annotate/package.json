@@ -5,6 +5,13 @@
   "description": "Annotate a Slidev deck on screen and hand the notes to an AI coding agent",
   "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/whitphx/slides/tree/main/packages/slidev-addon-annotate#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whitphx/slides.git",
+    "directory": "packages/slidev-addon-annotate"
+  },
+  "bugs": "https://github.com/whitphx/slides/issues",
   "keywords": [
     "slidev-addon",
     "slidev"
@@ -27,7 +34,8 @@
     "env.d.ts",
     "dist",
     "skills",
-    ".claude-plugin"
+    ".claude-plugin",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "npx -y -p typescript@5.9.3 tsc -p tsconfig.build.json",

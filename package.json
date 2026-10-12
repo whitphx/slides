@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
+  "packageManager": "pnpm@10.34.6",
   "scripts": {
     "lint": "eslint .",
     "changeset": "changeset",
@@ -24,6 +25,16 @@
   "pnpm": {
     "overrides": {
       "cn-font-split": "7.2.4"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "cn-font-split",
+      "esbuild",
+      "koffi",
+      "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "protobufjs"
+    ]
   }
 }

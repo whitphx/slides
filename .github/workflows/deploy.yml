@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
+      - run: pnpm -r test
       - run: ./scripts/build.sh
         env:
           # PR previews include the slidev-addon-annotate toolbar; production builds don't.

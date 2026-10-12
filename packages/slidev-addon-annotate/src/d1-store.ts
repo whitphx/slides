@@ -3,8 +3,8 @@
 // D1 has no interactive transactions, so updates use a version column: a write
 // only lands if the note is unchanged since it was read, and is retried otherwise.
 
-import type { Annotation, Session } from './afs'
-import type { AnnotationStore } from './server'
+import type { Annotation, Session } from './afs.ts'
+import type { AnnotationStore } from './server.ts'
 
 // The parts of D1's API used here, so this file needs no Workers type package.
 interface D1PreparedStatement {

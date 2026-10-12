@@ -4,8 +4,8 @@
 // The API is the one defined by Agentation (https://github.com/benjitaylor/agentation,
 // PolyForm Shield 1.0.0), as called by agentation-mcp; no Agentation code is included.
 
-import type { Annotation, Session, ThreadMessage } from './afs'
-import type { Action, Authenticator, Authorize, Principal } from './auth'
+import type { Annotation, Session, ThreadMessage } from './afs.ts'
+import type { Action, Authenticator, Authorize, Principal } from './auth.ts'
 import { defaultAuthorize } from './auth.ts'
 
 export interface AnnotationStore {

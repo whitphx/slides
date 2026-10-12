@@ -113,6 +113,56 @@ is woken by the comment, applies the notes, pushes, and resolves them by id. Any
 `(batch) => Promise<{ url? }>` can be passed as `dispatch` instead, e.g. to call a Claude
 Code Routine's API trigger.
 
+## Host the API in your own Worker
+
+`slidev-addon-annotate/worker` sets the API up from a Worker's bindings, so another
+repository's Worker needs only a few lines (this repo's `worker.js` is the same thing):
+
+```js
+import { createAnnotateWorker } from 'slidev-addon-annotate/worker'
+
+const annotate = createAnnotateWorker({
+  repo: 'owner/slides', // PRs that get "Send to agent" comments
+  // Hosts the home host may log in, e.g. this Worker's preview hosts.
+  trustOrigin: origin => /^https:\/\/[a-z0-9-]+-slides\.owner\.workers\.dev$/.test(origin),
+})
+
+export default {
+  async fetch(request, env) {
+    // The API's response under /__annotate/api, undefined for anything else.
+    return (await annotate(request, env)) ?? env.ASSETS.fetch(request)
+  },
+}
+```
+
+| Binding | Needed for |
+|---|---|
+| `ANNOTATIONS_DB` (D1) | storing notes; without it the API answers 503 |
+| `ANNOTATE_AGENT_KEY` | agents (`x-api-key`) |
+| `ANNOTATE_REVIEWER_KEY` | reviewer login; also signs the login cookie |
+| `ANNOTATE_HOME_ORIGIN` | optional: one login for every host `trustOrigin` accepts |
+| `ANNOTATE_GITHUB_TOKEN` | optional: **Send to agent** as a PR comment (with `repo`) |
+
+Options: `basePath` (default `/__annotate/api`; match `SLIDEV_ANNOTATE_ENDPOINT`), `repo`,
+`prNumber` (session id to PR number; default `pr-<number>.<deck>`) and `trustOrigin`.
+Build the decks with the settings under [Settings](#settings), as this repo's CI does.
+
+For other hosts, or to change the parts, use the building blocks directly. They use only
+the Fetch API and Web Crypto (except `file-store`), so they run in Cloudflare Workers and
+Node 20+, and should in other runtimes with those APIs:
+
+| Import | Exports |
+|---|---|
+| `slidev-addon-annotate/server` | `createAnnotateHandler({ store, basePath, auth, authorize?, dispatch? })` and the `AnnotationStore` and `Dispatcher` interfaces |
+| `slidev-addon-annotate/auth` | `apiKey`, `signedCookie`, `localDev`, `chain`, `defaultAuthorize` |
+| `slidev-addon-annotate/d1` | `createD1Store(db)` |
+| `slidev-addon-annotate/file-store` | `createFileStore(path)` (Node) |
+| `slidev-addon-annotate/github` | `githubComment({ token, repo })` |
+| `slidev-addon-annotate/afs` | the AFS `Annotation` and `Session` types |
+
+Inside this workspace these resolve to the TypeScript sources; the published package
+points them at compiled JavaScript with type declarations (`pnpm run build`, run on pack).
+
 ## Set up the PR-preview Worker (this repo)
 
 `worker.js` serves the API at `/__annotate/api` with notes in D1, agents via
@@ -156,8 +206,8 @@ Code Routine's API trigger.
    "vars": { "ANNOTATE_HOME_ORIGIN": "https://slides.whitphx.workers.dev" }
    ```
 
-   Previews then send the login to the home host (only hosts matching `PREVIEW_ORIGIN` in
-   `worker.js` are accepted), which asks for the key once and hands back a pass signed for
+   Previews then send the login to the home host (only hosts that `trustOrigin` in
+   `worker.js` accepts), which asks for the key once and hands back a pass signed for
    that preview, valid for a minute and tied to a one-time cookie. Later previews log in
    with one click and no key. Don't set it before production serves the API, or the
    hand-off lands on a page that doesn't exist.

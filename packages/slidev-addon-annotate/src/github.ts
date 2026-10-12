@@ -2,8 +2,8 @@
 // so an agent watching that PR (e.g. a Claude Code session subscribed to it) is woken up.
 // Uses only fetch, so it runs in Cloudflare Workers and Node alike.
 
-import type { Annotation } from './afs'
-import type { DispatchBatch, Dispatcher } from './server'
+import type { Annotation } from './afs.ts'
+import type { DispatchBatch, Dispatcher } from './server.ts'
 
 // Marks the comments this dispatcher posts, so agents and people can tell them apart.
 export const DISPATCH_MARKER = '<!-- slidev-annotate:dispatch -->'

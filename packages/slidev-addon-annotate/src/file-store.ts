@@ -2,8 +2,8 @@
 
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
-import type { Annotation, Session } from './afs'
-import type { AnnotationStore } from './server'
+import type { Annotation, Session } from './afs.ts'
+import type { AnnotationStore } from './server.ts'
 
 interface FileContent {
   sessions: Session[]

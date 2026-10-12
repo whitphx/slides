@@ -2,7 +2,7 @@
 // Everything here uses the Fetch API and Web Crypto only, so it runs in Node,
 // Cloudflare Workers and other Fetch-compatible hosts alike.
 
-import type { Annotation } from './afs'
+import type { Annotation } from './afs.ts'
 
 export type Role = 'reviewer' | 'agent' | 'admin'
 

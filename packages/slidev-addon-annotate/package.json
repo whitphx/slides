@@ -1,7 +1,6 @@
 {
   "name": "slidev-addon-annotate",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
   "description": "Annotate a Slidev deck on screen and hand the notes to an AI coding agent",
   "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
@@ -10,7 +9,29 @@
     "slidev-addon",
     "slidev"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./server": "./src/server.ts",
+    "./auth": "./src/auth.ts",
+    "./d1": "./src/d1-store.ts",
+    "./file-store": "./src/file-store.ts",
+    "./github": "./src/github.ts",
+    "./worker": "./src/worker.ts",
+    "./afs": "./src/afs.ts"
+  },
+  "files": [
+    "global-top.vue",
+    "setup",
+    "src/*.ts",
+    "!src/*.test.ts",
+    "env.d.ts",
+    "dist",
+    "skills",
+    ".claude-plugin"
+  ],
   "scripts": {
+    "build": "npx -y -p typescript@5.9.3 tsc -p tsconfig.build.json",
+    "prepack": "pnpm run build",
     "test": "node --test src/*.test.ts"
   },
   "engines": {
@@ -18,5 +39,41 @@
   },
   "dependencies": {
     "agent-ui-annotation": "^0.8.0"
+  },
+  "publishConfig": {
+    "exports": {
+      "./package.json": "./package.json",
+      "./server": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "./auth": {
+        "types": "./dist/auth.d.ts",
+        "default": "./dist/auth.js"
+      },
+      "./d1": {
+        "types": "./dist/d1-store.d.ts",
+        "default": "./dist/d1-store.js"
+      },
+      "./file-store": {
+        "types": "./dist/file-store.d.ts",
+        "default": "./dist/file-store.js"
+      },
+      "./github": {
+        "types": "./dist/github.d.ts",
+        "default": "./dist/github.js"
+      },
+      "./worker": {
+        "types": "./dist/worker.d.ts",
+        "default": "./dist/worker.js"
+      },
+      "./afs": {
+        "types": "./dist/afs.d.ts",
+        "default": "./dist/afs.js"
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.2"
   }
 }

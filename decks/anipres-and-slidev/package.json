@@ -1,4 +1,5 @@
 {
+  "name": "anipres-and-slidev",
   "type": "module",
   "private": true,
   "scripts": {

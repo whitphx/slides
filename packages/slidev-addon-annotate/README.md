@@ -6,8 +6,9 @@ You click an element on a slide, type a note, and the note is stored together wi
 the slide number, click step, slide title and source line. An agent reads the notes
 over MCP, edits the slides, and marks each note as resolved.
 
-Status: **spike**. It works with a local `slidev` dev server and with PR previews
-served by this repo's Cloudflare Worker (`worker.js`).
+Status: **experimental** (0.x; the API may change between minor versions). It works with a
+local `slidev` dev server and with PR previews served by a Cloudflare Worker, as in
+[whitphx/slides](https://github.com/whitphx/slides).
 
 ## How it fits together
 
@@ -29,7 +30,11 @@ served by this repo's Cloudflare Worker (`worker.js`).
 
 ## Use it in a deck
 
-Add the addon to the deck's dependencies and headmatter (Slidev 52.19 or later):
+Install the addon (Slidev 52.19 or later) and list it in the deck's headmatter:
+
+```sh
+npm i -D slidev-addon-annotate
+```
 
 ```yaml
 ---
@@ -162,6 +167,7 @@ Node 20+, and should in other runtimes with those APIs:
 
 Inside this workspace these resolve to the TypeScript sources; the published package
 points them at compiled JavaScript with type declarations (`pnpm run build`, run on pack).
+Releases are described in the repository's [RELEASING.md](https://github.com/whitphx/slides/blob/main/RELEASING.md).
 
 ## Set up the PR-preview Worker (this repo)
 

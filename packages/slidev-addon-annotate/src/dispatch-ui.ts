@@ -69,6 +69,8 @@ export function createDispatchControl(config: AnnotateClientConfig) {
     login.href = loginUrl(config)
     autoLabel.style.display = canDispatch ? 'flex' : 'none'
     send.style.display = canDispatch && unsent > 0 ? '' : 'none'
+    // Its padding and background would otherwise show as an empty box.
+    status.style.display = status.textContent ? '' : 'none'
     send.disabled = sending
     send.textContent = sending ? 'Sending…' : `Send ${unsent} note${unsent === 1 ? '' : 's'} to agent`
   }

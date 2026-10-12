@@ -12,7 +12,10 @@ export interface AnnotationStore {
   putSession(session: Session): Promise<void>
   listAnnotations(filter?: { sessionId?: string, status?: Annotation['status'] }): Promise<Annotation[]>
   getAnnotation(id: string): Promise<Annotation | undefined>
-  putAnnotation(annotation: Annotation): Promise<void>
+  // Runs `fn` on the current note and stores what it returns, as one atomic step,
+  // so concurrent requests can't overwrite each other's changes.
+  // Returning undefined leaves the store unchanged.
+  updateAnnotation(id: string, fn: (existing: Annotation | undefined) => Annotation | undefined): Promise<Annotation | undefined>
   deleteAnnotation(id: string): Promise<boolean>
 }
 
@@ -71,8 +74,7 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
       })
     }
     const id = typeof body.id === 'string' && body.id ? body.id : newId()
-    const existing = await store.getAnnotation(id)
-    const annotation: Annotation = {
+    const annotation = await store.updateAnnotation(id, existing => ({
       comment: '',
       elementPath: '',
       timestamp: Date.now(),
@@ -87,35 +89,32 @@ export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
       sessionId,
       status: existing?.status ?? 'pending',
       updatedAt: now(),
-    }
-    await store.putAnnotation(annotation)
-    return annotation
+    }))
+    return annotation!
   }
 
-  async function patchAnnotation(id: string, body: Record<string, unknown>) {
-    const existing = await store.getAnnotation(id)
-    if (!existing)
-      return undefined
+  function patchAnnotation(id: string, body: Record<string, unknown>) {
     const patch = pickWritable(body)
-    const annotation: Annotation = { ...existing, ...patch, updatedAt: now() }
-    if (patch.status === 'resolved' || patch.status === 'dismissed')
-      annotation.resolvedAt = now()
-    await store.putAnnotation(annotation)
-    return annotation
+    return store.updateAnnotation(id, (existing) => {
+      if (!existing)
+        return undefined
+      const annotation: Annotation = { ...existing, ...patch, updatedAt: now() }
+      if (patch.status === 'resolved' || patch.status === 'dismissed')
+        annotation.resolvedAt = now()
+      return annotation
+    })
   }
 
   async function addThreadMessage(id: string, body: Record<string, unknown>) {
-    const existing = await store.getAnnotation(id)
-    if (!existing)
-      return undefined
     const message: ThreadMessage = {
       id: newId(),
       role: body.role === 'agent' ? 'agent' : 'human',
       content: String(body.content ?? ''),
       timestamp: Date.now(),
     }
-    await store.putAnnotation({ ...existing, thread: [...existing.thread, message], updatedAt: now() })
-    return message
+    const updated = await store.updateAnnotation(id, existing =>
+      existing && { ...existing, thread: [...existing.thread, message], updatedAt: now() })
+    return updated && message
   }
 
   // Server-sent events for agentation-mcp's watch tool. Only `annotation.created`

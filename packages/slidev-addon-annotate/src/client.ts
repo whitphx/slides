@@ -76,7 +76,7 @@ export function createMarkerFilter(deck: string) {
     }
     const hidden = [...known]
       .filter(([, ctx]) => ctx.deck !== deck || ctx.slide !== slide)
-      .map(([id]) => `[data-annotation-id="${CSS.escape(id)}"]`)
+      .map(([id]) => `[data-annotation-marker][data-annotation-id="${CSS.escape(id)}"]`)
     style.textContent = hidden.length ? `${hidden.join(',\n')} { display: none !important; }` : ''
   }
 
@@ -117,11 +117,9 @@ export function toAfs(annotation: ToolbarAnnotation, config: AnnotateClientConfi
 }
 
 export function createSync(config: AnnotateClientConfig) {
-  const base = config.endpoint.replace(/\/$/, '')
-
   async function send(method: string, path: string, body?: unknown) {
     try {
-      const response = await fetch(`${base}${path}`, {
+      const response = await fetch(`${config.endpoint}${path}`, {
         method,
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,

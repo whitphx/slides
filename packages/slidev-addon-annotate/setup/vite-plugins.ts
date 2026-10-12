@@ -34,7 +34,7 @@ function resolveConfig({ mode, entry, userRoot }: SlidevOptions): AnnotateClient
   const session = env.SLIDEV_ANNOTATE_SESSION || 'local'
   return {
     enabled,
-    endpoint: env.SLIDEV_ANNOTATE_ENDPOINT || '/__annotate/api',
+    endpoint: (env.SLIDEV_ANNOTATE_ENDPOINT || '/__annotate/api').replace(/\/$/, ''),
     sessionId: `${session}.${deck}`,
     deck,
     entry: relative(repoRoot, entry),

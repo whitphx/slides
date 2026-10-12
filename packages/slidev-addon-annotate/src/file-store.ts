@@ -63,13 +63,17 @@ export function createFileStore(path: string): AnnotationStore {
     async getAnnotation(id) {
       return (await read()).annotations.find(a => a.id === id)
     },
-    putAnnotation(annotation) {
+    updateAnnotation(id, fn) {
       return update(({ annotations }) => {
-        const i = annotations.findIndex(a => a.id === annotation.id)
+        const i = annotations.findIndex(a => a.id === id)
+        const annotation = fn(annotations[i])
+        if (!annotation)
+          return undefined
         if (i === -1)
           annotations.push(annotation)
         else
           annotations[i] = annotation
+        return annotation
       })
     },
     deleteAnnotation(id) {

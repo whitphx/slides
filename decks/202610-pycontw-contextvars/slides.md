@@ -97,17 +97,19 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <style>
   .portfolio {
     font-size: 1.0rem;
+    line-height: 1.8rem;
   }
+  /* Inline rather than inline-flex: a line may break before an inline-flex box, which
+     put the comma after an item at the start of the next line. nowrap keeps each item whole. */
   .item {
-    height: 1.8rem;
-    line-height: 1.0rem;
     font-weight: 300;
-    display: inline-flex;
-    align-items: center;
+    white-space: nowrap;
 
     img {
+      display: inline;
       height: 1.0em;
       margin-right: 0.25em;
+      vertical-align: -0.125em;
     }
   }
 </style>

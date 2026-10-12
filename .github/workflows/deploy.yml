@@ -16,7 +16,10 @@ permissions:
 jobs:
   deploy:
     # Workflows triggered from forks don't receive the Cloudflare secrets.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # Changesets' "Version Packages" PRs only bump versions and changelogs, so they get no preview.
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+      && !startsWith(github.head_ref, 'changeset-release/')
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}

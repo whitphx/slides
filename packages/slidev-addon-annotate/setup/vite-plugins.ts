@@ -42,6 +42,8 @@ function resolveConfig({ mode, entry, userRoot }: SlidevOptions): AnnotateClient
     // Only needed to shorten dev-mode source paths; kept out of built bundles.
     repoRoot: mode === 'dev' ? repoRoot : '',
     revision: env.SLIDEV_ANNOTATE_REVISION || git(userRoot, 'rev-parse', 'HEAD') || '',
+    autoDispatch: env.SLIDEV_ANNOTATE_AUTO_DISPATCH === '1',
+    autoDispatchSeconds: Number(env.SLIDEV_ANNOTATE_AUTO_DISPATCH_SECONDS) || 120,
   }
 }
 

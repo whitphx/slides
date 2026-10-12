@@ -12,4 +12,9 @@ export interface AnnotateClientConfig {
   repoRoot: string
   // Commit the deck was served or built from.
   revision: string
+  // Whether "Send to agent" starts on its own after the reviewer stops adding notes.
+  // Each reviewer can switch it in the deck; this is the default.
+  autoDispatch: boolean
+  // How long to wait after the last note before an automatic send.
+  autoDispatchSeconds: number
 }

@@ -21,6 +21,17 @@ export interface AnnotationStore {
   deleteAnnotation(id: string): Promise<boolean>
 }
 
+// A batch of notes handed to an agent, e.g. by posting them as a PR comment.
+export interface DispatchBatch {
+  sessionId: string
+  annotations: Annotation[]
+  principal: Principal
+  request: Request
+}
+
+// Returns where the batch went (e.g. the comment URL). Throwing leaves the notes unsent.
+export type Dispatcher = (batch: DispatchBatch) => Promise<{ url?: string } | void>
+
 export interface HandlerOptions {
   store: AnnotationStore
   // Path prefix the API is mounted at, e.g. "/__annotate/api".
@@ -29,6 +40,10 @@ export interface HandlerOptions {
   auth: Authenticator
   // What each caller may do; defaults to `defaultAuthorize`.
   authorize?: Authorize
+  // Hands pending notes to an agent on `POST /sessions/:id/dispatch`. Without it, that route answers 501.
+  dispatch?: Dispatcher
+  // Minimum time between dispatches of one session.
+  dispatchIntervalMs?: number
 }
 
 // How often an open event stream checks the store for new notes.
@@ -69,7 +84,7 @@ function pickWritable(body: Record<string, unknown>): Partial<Annotation> {
   return picked as Partial<Annotation>
 }
 
-export function createAnnotateHandler({ store, basePath, auth, authorize = defaultAuthorize }: HandlerOptions) {
+export function createAnnotateHandler({ store, basePath, auth, authorize = defaultAuthorize, dispatch, dispatchIntervalMs = 60_000 }: HandlerOptions) {
   async function pending(sessionId?: string) {
     const annotations = await store.listAnnotations({ sessionId, status: 'pending' })
     return { count: annotations.length, annotations }
@@ -99,6 +114,8 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
         sessionId,
         status: existing?.status ?? 'pending',
         author: existing?.author ?? { id: principal.id, role: principal.role },
+        // An edited note goes to the agent again with the next batch.
+        dispatchedAt: existing && body.comment === existing.comment ? existing.dispatchedAt : undefined,
         updatedAt: now(),
       }
     })
@@ -153,6 +170,49 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
       return { ...existing, thread: [...existing.thread, message], updatedAt: now() }
     })
     return { message: updated && message, denied }
+  }
+
+  // Sends the session's pending notes that haven't been sent yet. Each note is claimed
+  // atomically before sending, so concurrent requests never send a note twice, and
+  // unclaimed again if the dispatcher fails.
+  async function dispatchSession(principal: Principal, sessionId: string, request: Request) {
+    if (!dispatch)
+      return json({ error: 'No dispatcher is configured' }, 501)
+    const session = await store.getSession(sessionId)
+    if (!session)
+      return notFound('Session')
+    const last = session.lastDispatchAt ? Date.parse(session.lastDispatchAt) : 0
+    const wait = last + dispatchIntervalMs - Date.now()
+    if (wait > 0)
+      return new Response(JSON.stringify({ error: 'Sent too recently', retryAfterSeconds: Math.ceil(wait / 1000) }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Retry-After': String(Math.ceil(wait / 1000)) },
+      })
+    const dispatchedAt = now()
+    const claimed: Annotation[] = []
+    for (const note of await store.listAnnotations({ sessionId, status: 'pending' })) {
+      if (note.dispatchedAt)
+        continue
+      const updated = await store.updateAnnotation(note.id, existing =>
+        existing && existing.status === 'pending' && !existing.dispatchedAt ? { ...existing, dispatchedAt } : undefined)
+      if (updated)
+        claimed.push(updated)
+    }
+    if (!claimed.length)
+      return json({ count: 0 })
+    await store.putSession({ ...session, lastDispatchAt: dispatchedAt })
+    try {
+      const result = await dispatch({ sessionId, annotations: claimed, principal, request })
+      return json({ count: claimed.length, url: result?.url })
+    }
+    catch (error) {
+      for (const note of claimed) {
+        await store.updateAnnotation(note.id, existing =>
+          existing?.dispatchedAt === dispatchedAt ? { ...existing, dispatchedAt: undefined } : undefined)
+      }
+      await store.putSession({ ...session, lastDispatchAt: session.lastDispatchAt })
+      return json({ error: `Dispatch failed: ${(error as Error).message}` }, 502)
+    }
   }
 
   // Server-sent events for agentation-mcp's watch tool. Only `annotation.created`
@@ -240,7 +300,7 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
     // GET /whoami: who the caller is and whether they may add notes, so the toolbar
     // can refuse a note up front instead of showing one the server will reject.
     if (segments.length === 1 && segments[0] === 'whoami' && method === 'GET')
-      return json({ id: principal.id, role: principal.role, canCreate: can('create') })
+      return json({ id: principal.id, role: principal.role, canCreate: can('create'), canDispatch: !!dispatch && can('dispatch') })
 
     // GET /sessions, GET /sessions/:id, GET /sessions/:id/pending,
     // POST /sessions/:id/annotations, GET /sessions/:id/events
@@ -264,6 +324,8 @@ export function createAnnotateHandler({ store, basePath, auth, authorize = defau
       }
       if (sessionId && sub === 'events' && method === 'GET')
         return events(request, sessionId)
+      if (sessionId && sub === 'dispatch' && method === 'POST')
+        return can('dispatch') ? dispatchSession(principal, sessionId, request) : forbidden()
     }
 
     // GET /pending, GET /events

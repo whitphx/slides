@@ -124,6 +124,8 @@ function showNotice(text: string) {
   const notice = document.createElement('div')
   notice.id = id
   notice.setAttribute('role', 'alert')
+  // Keeps the dismiss button clickable while the toolbar is picking elements.
+  notice.setAttribute('data-annotation-toolbar', '')
   notice.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2147483647;'
     + 'display:flex;gap:12px;align-items:center;max-width:calc(100vw - 32px);padding:10px 14px;border-radius:8px;'
     + 'background:#fff4e5;color:#4a2c00;border:1px solid #f0b45a;font:14px/1.4 system-ui,sans-serif;box-shadow:0 4px 12px rgb(0 0 0 / 15%)'

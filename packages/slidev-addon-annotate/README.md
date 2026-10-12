@@ -96,6 +96,23 @@ Roles (`defaultAuthorize`; pass `authorize` to replace it):
 
 Before each new note the toolbar asks the API (`GET <api>/whoami`) whether this browser may add notes, and refuses the note with a notice if not (e.g. before logging in). If a save is rejected later, the deck also shows a notice at the top of the page.
 
+## Sending notes to an agent
+
+With a dispatcher configured, a logged-in reviewer sees **Send N notes to agent** at the
+top right of the deck. It sends the session's pending notes that haven't been sent yet
+(`POST <api>/sessions/<id>/dispatch`); each note is sent once, and again only if its text
+is edited. Ticking **Send automatically** sends on its own once no note has been added for
+a while (`SLIDEV_ANNOTATE_AUTO_DISPATCH_SECONDS`, default 120); the choice is remembered
+per browser, and `SLIDEV_ANNOTATE_AUTO_DISPATCH=1` makes it the default. Only reviewers
+can dispatch, at most once a minute per session.
+
+`githubComment()` (`src/github.ts`) is the dispatcher `worker.js` uses: it posts the batch
+as one comment on the PR the session belongs to (`pr-<number>.<deck>`), listing each note
+with its slide, click step, title, source line and id. An agent session watching that PR
+is woken by the comment, applies the notes, pushes, and resolves them by id. Any function
+`(batch) => Promise<{ url? }>` can be passed as `dispatch` instead, e.g. to call a Claude
+Code Routine's API trigger.
+
 ## Set up the PR-preview Worker (this repo)
 
 `worker.js` serves the API at `/__annotate/api` with notes in D1, agents via
@@ -119,6 +136,14 @@ Before each new note the toolbar asks the API (`GET <api>/whoami`) whether this 
    them, so the latest version is never the deployed one and `secret put` refuses. Later
    versions, previews and the next production deploy alike, inherit the secrets. Don't
    "deploy the latest version first" as wrangler suggests; that is a PR preview build.
+   For **Send to agent**, also create a fine-grained GitHub token limited to this repository
+   with *Pull requests: Read and write*, and store it the same way:
+
+   ```sh
+   pnpm dlx wrangler@4.129.0 versions secret put ANNOTATE_GITHUB_TOKEN
+   ```
+
+   Without it the button doesn't appear. Comments are posted as the token's owner.
 3. Log in once per PR preview in each browser you review in. The cookie is per host, and
    each PR preview has its own `*.workers.dev` host. Keep the link in a password manager
    (URL-encode the key if it contains `+`, `/` or `=`):
@@ -148,6 +173,8 @@ Environment variables read when `slidev` starts:
 | `SLIDEV_ANNOTATE_ENDPOINT` | `/__annotate/api` | Base URL of the annotation API. |
 | `SLIDEV_ANNOTATE_SESSION` | `local` | Session name, e.g. `pr-12`. The session id is `<session>.<deck directory>`. |
 | `SLIDEV_ANNOTATE_REVISION` | `git rev-parse HEAD` | Commit recorded on each note. |
+| `SLIDEV_ANNOTATE_AUTO_DISPATCH` | off | `1` turns **Send automatically** on by default (each browser can change it). |
+| `SLIDEV_ANNOTATE_AUTO_DISPATCH_SECONDS` | `120` | Quiet time after the last note before an automatic send. |
 
 ## What the spike showed
 

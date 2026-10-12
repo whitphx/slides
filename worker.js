@@ -1,11 +1,14 @@
 import { apiKey, chain, signedCookie } from "./packages/slidev-addon-annotate/src/auth.ts";
 import { createD1Store } from "./packages/slidev-addon-annotate/src/d1-store.ts";
+import { githubComment } from "./packages/slidev-addon-annotate/src/github.ts";
 import { createAnnotateHandler } from "./packages/slidev-addon-annotate/src/server.ts";
 
 // Review notes left on PR previews with slidev-addon-annotate.
 // Agents send ANNOTATE_AGENT_KEY in `x-api-key`; reviewers log in once per browser
 // with `<preview>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>`.
+// With ANNOTATE_GITHUB_TOKEN set, "Send to agent" posts the notes as a comment on the PR.
 const ANNOTATE_API = "/__annotate/api";
+const GITHUB_REPO = "whitphx/slides";
 
 let annotate;
 function annotations(env) {
@@ -16,6 +19,9 @@ function annotations(env) {
       apiKey({ key: env.ANNOTATE_AGENT_KEY, role: "agent" }),
       signedCookie({ secret: env.ANNOTATE_REVIEWER_KEY, role: "reviewer" }),
     ),
+    dispatch: env.ANNOTATE_GITHUB_TOKEN
+      ? githubComment({ token: env.ANNOTATE_GITHUB_TOKEN, repo: GITHUB_REPO })
+      : undefined,
   });
   return annotate;
 }

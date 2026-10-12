@@ -102,6 +102,6 @@ test('a refused create leaves no session behind', async () => {
 
 test('whoami tells the toolbar whether the caller may add notes', async () => {
   assert.equal((await call('GET', '/whoami', undefined, null)).status, 401)
-  assert.deepEqual((await call('GET', '/whoami', undefined, 'rev:reviewer')).json, { id: 'rev', role: 'reviewer', canCreate: true })
+  assert.deepEqual((await call('GET', '/whoami', undefined, 'rev:reviewer')).json, { id: 'rev', role: 'reviewer', canCreate: true, canDispatch: false })
   assert.equal((await call('GET', '/whoami', undefined, 'bot:agent')).json.canCreate, false)
 })

@@ -5,6 +5,7 @@ import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
 import { checkCanCreate, createMarkerFilter, createSync, slidePosition, sourceLocation } from './src/client'
 import type { SlideContext } from './src/client'
+import { createDispatchControl } from './src/dispatch-ui'
 
 const config = __SLIDEV_ANNOTATE__
 const nav = useNav()
@@ -36,20 +37,23 @@ async function beforeCreate(data: BeforeAnnotationCreateData) {
 // container, so its fixed positioning is relative to the viewport.
 let toolbar: AnnotationInstance | undefined
 let markers: ReturnType<typeof createMarkerFilter> | undefined
+let dispatcher: ReturnType<typeof createDispatchControl> | undefined
 
 function refreshMarkers() {
   if (toolbar && markers)
     markers.apply(toolbar.element, nav.currentSlideNo.value)
 }
 
-function saved(annotation: Annotation) {
+async function saved(annotation: Annotation) {
   markers?.remember(annotation)
-  sync.save(annotation)
+  await sync.save(annotation)
+  await dispatcher?.changed()
 }
 
-function removed(id: string) {
+async function removed(id: string) {
   markers?.forget(id)
-  sync.remove(id)
+  await sync.remove(id)
+  await dispatcher?.changed()
 }
 
 watch(nav.currentSlideNo, refreshMarkers)
@@ -72,15 +76,21 @@ watch(visible, async (show) => {
       onAnnotationDelete: removed,
       onAnnotationsClear: annotations => annotations.forEach(a => removed(a.id)),
     })
+    dispatcher = createDispatchControl(config)
     requestAnimationFrame(refreshMarkers)
   }
   else if (!show && toolbar) {
     toolbar.destroy()
     toolbar = undefined
+    dispatcher?.destroy()
+    dispatcher = undefined
   }
 }, { immediate: true })
 
-onBeforeUnmount(() => toolbar?.destroy())
+onBeforeUnmount(() => {
+  toolbar?.destroy()
+  dispatcher?.destroy()
+})
 </script>
 
 <template>

@@ -19,16 +19,16 @@ export interface Authenticator {
   route?(request: Request, segments: string[]): Promise<Response | undefined> | Response | undefined
 }
 
-export type Action = 'read' | 'create' | 'edit' | 'delete' | 'set-status' | 'reply'
+export type Action = 'read' | 'create' | 'edit' | 'delete' | 'set-status' | 'reply' | 'dispatch'
 
 // `annotation` is the note being acted on, when there is one.
 export type Authorize = (principal: Principal, action: Action, annotation?: Annotation) => boolean
 
 const PERMISSIONS: Record<Role, ReadonlySet<Action>> = {
-  reviewer: new Set(['read', 'create', 'edit', 'delete', 'set-status', 'reply']),
+  reviewer: new Set(['read', 'create', 'edit', 'delete', 'set-status', 'reply', 'dispatch']),
   // Agents can read notes and report on them, but cannot write instructions for themselves.
   agent: new Set(['read', 'set-status', 'reply']),
-  admin: new Set(['read', 'create', 'edit', 'delete', 'set-status', 'reply']),
+  admin: new Set(['read', 'create', 'edit', 'delete', 'set-status', 'reply', 'dispatch']),
 }
 
 // Role-based, and reviewers may edit or delete only their own notes.

@@ -37,6 +37,8 @@ export interface Annotation {
   thread: ThreadMessage[]
   // Who wrote the note, as authenticated by the server (not part of AFS).
   author?: { id: string, role: string }
+  // When the note was last handed to an agent through the dispatcher (not part of AFS).
+  dispatchedAt?: string
   createdAt: string
   updatedAt: string
 }
@@ -46,4 +48,6 @@ export interface Session {
   url: string
   status: 'active' | 'closed'
   createdAt: string
+  // When notes in this session were last dispatched (not part of AFS).
+  lastDispatchAt?: string
 }

@@ -56,9 +56,9 @@ The **Packages** workflow checks every PR that touches a package. It checks the 
 metadata (`scripts/release-plan.mjs --check`), then packs each package the way it will be
 published and lints the tarball with publint and are-the-types-wrong.
 
-Changesets v3 is used for versioning only. Its publish step (`changeset publish` and the
-`pack`/`publish` actions) needs pnpm 10, which this repository doesn't use, and can't stage, so publishing is
-done by our own jobs.
+Changesets is used for versioning only. Publishing is done by our own jobs rather than
+`changeset publish`, because Changesets can't stage, and so the job that holds publish
+rights never runs repository code.
 
 ## One-time setup for a new package
 

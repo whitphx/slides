@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
+  "packageManager": "pnpm@10.34.6",
   "scripts": {
     "lint": "eslint .",
     "changeset": "changeset",
-    "version-packages": "changeset version && node scripts/release-plan.mjs --sync-plugin-versions"
+    "version-packages": "changeset version && node scripts/release-plan.mjs --sync-plugin-versions",
+    "postinstall": "node scripts/install-cn-font-split.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
@@ -23,7 +25,17 @@
   },
   "pnpm": {
     "overrides": {
-      "cn-font-split": "7.2.4"
-    }
+      "cn-font-split": "7.4.3"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "koffi",
+      "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "cn-font-split",
+      "core-js",
+      "protobufjs"
+    ]
   }
 }

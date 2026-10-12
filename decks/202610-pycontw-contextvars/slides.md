@@ -127,7 +127,7 @@ And you can find me in all the usual places.
 
 ---
 
-# What you'll leave with
+# What you'll learn today
 
 <div mt-10 text-6>
 
@@ -142,7 +142,7 @@ And you can find me in all the usual places.
 </div>
 
 <!--
-OK, so let's get into the talk. Here's a quick overview of where we're going: three things I want you to walk out with.
+OK, so let's get into the talk. Here's a quick overview: three things you'll learn today.
 
 [click]
 First, what problem the `contextvars` module actually solves. It's a small API, but the problem behind it is easy to get wrong.

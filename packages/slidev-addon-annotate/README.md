@@ -108,19 +108,26 @@ If the toolbar's saves are rejected, the deck shows a notice at the top of the p
    ```
 
    Tables are created on first use. Preview versions share the production Worker's bindings and secrets, so this covers every PR.
-2. Set the two secrets (long random strings, e.g. `openssl rand -base64 32`):
+2. Set the two secrets (long random strings; `openssl rand -hex 32` gives ones that need no URL encoding):
 
    ```sh
-   pnpm dlx wrangler@4.129.0 secret put ANNOTATE_AGENT_KEY
-   pnpm dlx wrangler@4.129.0 secret put ANNOTATE_REVIEWER_KEY
+   pnpm dlx wrangler@4.129.0 versions secret put ANNOTATE_AGENT_KEY
+   pnpm dlx wrangler@4.129.0 versions secret put ANNOTATE_REVIEWER_KEY
    ```
+
+   Use `versions secret put`, not `secret put`: PR previews upload versions without deploying
+   them, so the latest version is never the deployed one and `secret put` refuses. Later
+   versions, previews and the next production deploy alike, inherit the secrets. Don't
+   "deploy the latest version first" as wrangler suggests; that is a PR preview build.
 3. Log in once per PR preview in each browser you review in. The cookie is per host, and
-   each PR preview has its own `*.workers.dev` host. Keep the link in a password manager:
+   each PR preview has its own `*.workers.dev` host. Keep the link in a password manager
+   (URL-encode the key if it contains `+`, `/` or `=`):
    `https://<preview host>/__annotate/api/login?token=<ANNOTATE_REVIEWER_KEY>&next=/<deck>/`
 4. For a cloud agent session, add the agent key to the environment as a secret named
    `AGENTATION_API_KEY` (which `agentation-mcp` reads), allow the Worker's host in its
-   network policy, and register the MCP server with the stable production host (all
-   previews share the same database):
+   network policy, and register the MCP server. Once this is deployed to production, use
+   the stable production host (all previews share the same database); before that, use
+   the PR's preview host:
 
    ```sh
    claude mcp add annotate -- \

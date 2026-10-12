@@ -1,6 +1,8 @@
 // A Fetch-API (Request -> Response) handler serving the parts of Agentation's HTTP API
 // that the browser toolbar and agentation-mcp use, so the same handler can run
 // in a Vite dev server, a Cloudflare Worker, or any other Fetch-compatible host.
+// The API is the one defined by Agentation (https://github.com/benjitaylor/agentation,
+// PolyForm Shield 1.0.0), as called by agentation-mcp; no Agentation code is included.
 
 import type { Annotation, Session, ThreadMessage } from './afs'
 
@@ -18,9 +20,12 @@ export interface HandlerOptions {
   store: AnnotationStore
   // Path prefix the API is mounted at, e.g. "/__annotate/api".
   basePath: string
-  // How often an open event stream checks the store for new notes.
-  pollIntervalMs?: number
 }
+
+// How often an open event stream checks the store for new notes.
+const POLL_INTERVAL_MS = 1000
+
+const STATUSES: ReadonlySet<string> = new Set(['pending', 'acknowledged', 'resolved', 'dismissed'])
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })
@@ -45,10 +50,12 @@ function pickWritable(body: Record<string, unknown>): Partial<Annotation> {
     if (key in body)
       picked[key] = body[key]
   }
+  if ('status' in picked && !STATUSES.has(String(picked.status)))
+    delete picked.status
   return picked as Partial<Annotation>
 }
 
-export function createAnnotateHandler({ store, basePath, pollIntervalMs = 1000 }: HandlerOptions) {
+export function createAnnotateHandler({ store, basePath }: HandlerOptions) {
   async function pending(sessionId?: string) {
     const annotations = await store.listAnnotations({ sessionId, status: 'pending' })
     return { count: annotations.length, annotations }
@@ -120,6 +127,11 @@ export function createAnnotateHandler({ store, basePath, pollIntervalMs = 1000 }
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         const seen = new Set((await store.listAnnotations({ sessionId })).map(a => a.id))
+        // The client may have gone away while the store was being read.
+        if (request.signal.aborted) {
+          controller.close()
+          return
+        }
         let sequence = 0
         controller.enqueue(encoder.encode(': connected\n\n'))
         timer = setInterval(async () => {
@@ -142,7 +154,7 @@ export function createAnnotateHandler({ store, basePath, pollIntervalMs = 1000 }
             clearInterval(timer)
             controller.error(error)
           }
-        }, pollIntervalMs)
+        }, POLL_INTERVAL_MS)
         request.signal.addEventListener('abort', () => {
           clearInterval(timer)
           try {
@@ -170,7 +182,11 @@ export function createAnnotateHandler({ store, basePath, pollIntervalMs = 1000 }
     const path = url.pathname.slice(basePath.length).replace(/\/$/, '') || '/'
     const segments = path.split('/').filter(Boolean).map(decodeURIComponent)
     const method = request.method
-    const body = async () => (await request.json().catch(() => ({}))) as Record<string, unknown>
+    // Anything but a JSON object counts as an empty body.
+    const body = async () => {
+      const parsed: unknown = await request.json().catch(() => undefined)
+      return (parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}) as Record<string, unknown>
+    }
 
     // GET /sessions, GET /sessions/:id, GET /sessions/:id/pending,
     // POST /sessions/:id/annotations, GET /sessions/:id/events

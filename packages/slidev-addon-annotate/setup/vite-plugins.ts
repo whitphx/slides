@@ -107,7 +107,8 @@ export default function setupVitePlugins(options: SlidevOptions): Plugin[] {
         // Browsers send Origin on cross-site requests; refuse those so that other sites
         // open in the same browser cannot write notes. CLI clients send no Origin.
         const origin = req.headers.origin
-        if (origin && new URL(origin).host !== req.headers.host) {
+        // An unparseable Origin (e.g. "null" from a sandboxed iframe) counts as cross-origin.
+        if (origin && (!URL.canParse(origin) || new URL(origin).host !== req.headers.host)) {
           res.statusCode = 403
           res.end('Cross-origin requests are not allowed')
           return

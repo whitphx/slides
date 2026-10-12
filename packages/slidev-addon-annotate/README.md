@@ -25,7 +25,7 @@ Serving it from a deployed preview (Cloudflare Worker) is the next step.
 
 - **Toolbar:** [agent-ui-annotation](https://github.com/YeomansIII/agent-ui-annotation)'s framework-agnostic `createAnnotation`.
 - **Note format:** [Agentation's AFS v1.1](https://www.agentation.com/schema) annotations. The slide context goes into `sourceFile` and `slidev-*` keys in `attributes`, because `agentation-mcp` passes those two fields through to the agent.
-- **HTTP API:** the part of Agentation's API that its MCP server calls, so the unmodified [`agentation-mcp`](https://www.npmjs.com/package/agentation-mcp) works as the agent-side client.
+- **HTTP API:** the part of Agentation's API that its MCP server calls, so the unmodified [`agentation-mcp`](https://www.npmjs.com/package/agentation-mcp) works as the agent-side client. `agentation-mcp` is licensed under PolyForm Shield 1.0.0 and is run with `npx`, not bundled; this addon implements Agentation's HTTP API so that it can talk to it, without including any Agentation code.
 
 ## Use it in a deck
 
@@ -99,4 +99,5 @@ Limitations found:
 
 - **Markers on other slides.** agent-ui-annotation keeps a marker visible while its element is in the document, and Slidev keeps neighbouring slides mounted. The addon hides other slides' markers with a style rule in the toolbar's shadow root (`createMarkerFilter`). An upstream option to scope markers by route would remove this workaround.
 - **Toolbar storage.** The toolbar keeps its own copy of the notes in `localStorage`, one list per origin, and has no API to load notes from a server. So it doesn't show that the agent resolved a note, and notes made in another browser don't appear.
+- **No server for builds yet.** With `SLIDEV_ANNOTATE=1`, a static build still posts to `/__annotate/api`, which nothing serves until the Worker exists; saves fail with only a console warning.
 - **Source path in builds.** Slidev drops slide file paths from builds, so built decks report the entry file for every slide. That is wrong only for slides imported with `src:`.

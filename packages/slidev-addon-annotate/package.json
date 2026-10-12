@@ -13,10 +13,6 @@
   "engines": {
     "slidev": ">=52.19.0"
   },
-  "exports": {
-    "./server": "./src/server.ts",
-    "./file-store": "./src/file-store.ts"
-  },
   "dependencies": {
     "agent-ui-annotation": "^0.8.0"
   }

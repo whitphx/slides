@@ -7,6 +7,11 @@
 // and "latest" changes under us. So its install script is skipped
 // (pnpm.ignoredBuiltDependencies) and this runs from the root `postinstall`, asking for a
 // listed release explicitly.
+//
+// Upstream fix: https://github.com/KonghaYao/cn-font-split/pull/219 (fails clearly instead of
+// reporting success, and adds CN_FONT_SPLIT_VERSION to pin the release). Once a release with
+// it is out, this script and the ignoredBuiltDependencies entry can go: let cn-font-split's
+// own install script run, with CN_FONT_SPLIT_VERSION set to the release listed below.
 
 import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'

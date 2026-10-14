@@ -53,8 +53,10 @@ and of the presenter view. It is not shown in print/export or in embedded slides
 To give feedback on a slide's **speaker notes**, open the presenter view (`/presenter/<n>`)
 and annotate the notes panel. Those annotations carry `slidev-target: notes`, the PR
 comment labels them "speaker notes", and the agent edits the notes rather than the slide.
-Only the current slide (and, in the presenter view, its notes) can be annotated, not
-Slidev's navigation controls and menus or the presenter view's next-slide preview.
+Only the current slide (and, in the presenter view, its notes) can be annotated. Slidev's
+navigation controls and menus and the presenter view's next-slide preview are left out of
+annotating entirely: hovering doesn't highlight them, and they keep working, so you can
+change slides without leaving annotate mode.
 
 Register both MCP servers with your agent, e.g. for Claude Code:
 

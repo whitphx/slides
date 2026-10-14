@@ -136,3 +136,40 @@ test('works in memory when storage fails', async () => {
   assert.equal((await box.flush()).pending, 1)
   assert.equal((await box.flush()).pending, 0)
 })
+
+test('two tabs sharing the storage and a lock save an annotation\'s versions in order', async () => {
+  // A mutex like navigator.locks: runs one holder at a time, in request order.
+  let tail = Promise.resolve()
+  const lock = <T>(run: () => Promise<T>) => {
+    const result = tail.then(run)
+    tail = result.then(() => {}, () => {})
+    return result
+  }
+  const received: string[] = []
+  let releaseA!: () => void
+  const tab = (name: string) => createOutbox({
+    storage,
+    key: 'outbox',
+    lock,
+    send: async (entry) => {
+      // Tab A's first request is slow to arrive.
+      if (name === 'A' && !received.length)
+        await new Promise<void>(resolve => (releaseA = resolve))
+      received.push(entry.op === 'save' ? String(entry.annotation.comment) : 'delete')
+      return new Response(null, { status: 200 })
+    },
+  })
+  const a = tab('A')
+  const b = tab('B')
+  a.add(save('x', 'old'))
+  const flushingA = a.flush()
+  await new Promise(resolve => setImmediate(resolve))
+  // Edited in tab B while tab A's request with the old text is on its way.
+  b.add(save('x', 'new'))
+  const flushingB = b.flush()
+  await new Promise(resolve => setImmediate(resolve))
+  releaseA()
+  await Promise.all([flushingA, flushingB])
+  assert.deepEqual(received, ['old', 'new'])
+  assert.equal(b.pending(), 0)
+})

@@ -125,10 +125,13 @@ export function loginUrl(config: ReviewAnnotationsClientConfig) {
   return `${config.endpoint}/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
 }
 
-function showNotice(text: string, action?: { label: string, href: string }) {
+// With `replace`, it takes the place of a notice already shown; otherwise that one stays.
+function showNotice(text: string, action?: { label: string, href: string }, { replace = false } = {}) {
   const id = 'slidev-review-annotations-notice'
-  if (document.getElementById(id))
+  const shown = document.getElementById(id)
+  if (shown && !replace)
     return
+  shown?.remove()
   const notice = document.createElement('div')
   notice.id = id
   notice.setAttribute('role', 'alert')
@@ -239,9 +242,10 @@ const RETRY_MS = 30_000
 // can be reached: right away, when the browser comes back online, and every 30 s meanwhile.
 export function createSync(config: ReviewAnnotationsClientConfig, onFlushed?: (result: FlushResult) => void) {
   const sessionPath = `/sessions/${encodeURIComponent(config.sessionId)}`
+  const outboxKey = `slidev-review-annotations:outbox:${config.endpoint}:${config.sessionId}`
   const outbox = createOutbox({
     storage: browserStorage(),
-    key: `slidev-review-annotations:outbox:${config.endpoint}:${config.sessionId}`,
+    key: outboxKey,
     send: entry => entry.op === 'save'
       // The toolbar assigns the id, so creating and editing both post the full note.
       ? fetch(`${config.endpoint}${sessionPath}/annotations`, {
@@ -250,6 +254,9 @@ export function createSync(config: ReviewAnnotationsClientConfig, onFlushed?: (r
           body: JSON.stringify(entry.annotation),
         })
       : fetch(`${config.endpoint}/annotations/${encodeURIComponent(entry.id)}`, { method: 'DELETE' }),
+    lock: run => navigator.locks
+      ? navigator.locks.request(`${outboxKey}:flush`, run)
+      : run(),
   })
 
   let retry: ReturnType<typeof setTimeout> | undefined
@@ -262,17 +269,20 @@ export function createSync(config: ReviewAnnotationsClientConfig, onFlushed?: (r
     // Tell the reviewer when this changes, not on every try, so a dismissed notice stays dismissed.
     if (result.stopped !== stopped) {
       if (result.stopped === 'login')
-        showNotice('Your annotations are kept in this browser until you log in again.', { label: 'Log in', href: loginUrl(config) })
+        showNotice('Your annotations are kept in this browser until you log in again.', { label: 'Log in', href: loginUrl(config) }, { replace: true })
       else if (result.stopped === 'unreachable')
-        showNotice('Offline: your annotations are kept in this browser and will be saved when the connection is back. Keep annotating, but don\'t clear this site\'s data.')
+        showNotice('Offline: your annotations are kept in this browser and will be saved when the connection is back. Keep annotating, but don\'t clear this site\'s data.', undefined, { replace: true })
       else
         hideNotice()
       stopped = result.stopped
     }
     for (const { op, status } of result.rejected)
       showNotice(`An annotation could not be ${op === 'delete' ? 'deleted' : 'saved'} (HTTP ${status}).`)
-    if (result.pending && !destroyed)
+    if (result.pending && !destroyed) {
+      // Concurrent calls share one outbox run and all get here: keep a single timer.
+      clearTimeout(retry)
       retry = setTimeout(flush, RETRY_MS)
+    }
     onFlushed?.(result)
     return result
   }

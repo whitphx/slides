@@ -26,6 +26,10 @@ export interface OutboxOptions {
   key: string
   // Sends one change. Throws when the request doesn't get through.
   send: (entry: OutboxEntry) => Promise<Response>
+  // Runs a flush exclusively among everything sharing the storage, e.g. other tabs of the
+  // deck. Otherwise a tab could send an annotation's older version after another tab has
+  // saved a newer one, and the server would keep the older one.
+  lock?: <T>(run: () => Promise<T>) => Promise<T>
 }
 
 type Outcome = 'done' | 'retry' | 'login' | number
@@ -41,7 +45,7 @@ function outcomeOf(entry: OutboxEntry, response: Response): Outcome {
   return response.status
 }
 
-export function createOutbox({ storage, key, send }: OutboxOptions) {
+export function createOutbox({ storage, key, send, lock = run => run() }: OutboxOptions) {
   let memory: OutboxEntry[] = []
   let useStorage = !!storage
 
@@ -115,7 +119,7 @@ export function createOutbox({ storage, key, send }: OutboxOptions) {
     add,
     pending: () => read().length,
     // Sends the waiting changes in order. Concurrent calls share one run.
-    flush: () => (flushing ??= run().finally(() => {
+    flush: () => (flushing ??= lock(run).finally(() => {
       flushing = undefined
     })),
   }

@@ -133,7 +133,8 @@ you are back online:
 - Every change (new annotation, edit, delete) first goes into an outbox in `localStorage`.
   It is sent to the server right away, again when the browser comes back online, every
   30 seconds while changes are waiting, and on the next page load. Only the latest change
-  to each annotation is sent.
+  to each annotation is sent. Tabs of the same deck share the outbox and take turns sending
+  (with the browser's Web Locks API), so an older version never overwrites a newer one.
 - While changes are waiting, the deck says so. **Send to agent** saves them before sending,
   and doesn't send while any are still waiting. With **Send automatically** on, sending
   starts once they are saved.

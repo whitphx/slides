@@ -28,6 +28,12 @@ A deck for trying the annotation toolbar.
 
 </v-click>
 
+<!--
+Speaker notes for the clicks slide.
+
+[click] Say this when the first item appears.
+-->
+
 ---
 layout: two-cols
 ---

@@ -129,6 +129,21 @@ test('the PR comment lists each note with its slide and quotes the reviewer text
   assert.match(body, /https:\/\/preview\.example\/api/)
 })
 
+test('the PR comment marks annotations on the speaker notes', () => {
+  const note = (id: string, attributes: Record<string, string>) => ({
+    id, sessionId: 'pr-7.deck', comment: 'Explain this before the demo', elementPath: 'p', element: 'p',
+    timestamp: 0, x: 0, y: 0, status: 'pending' as const, thread: [], createdAt: '', updatedAt: '',
+    sourceFile: 'decks/deck/slides.md:13', attributes: { 'slidev-deck': 'deck', 'slidev-slide': '2', ...attributes },
+  })
+  const request = new Request('https://preview.example/api/sessions/pr-7.deck/dispatch')
+  const principal = { id: 'rev', role: 'reviewer' as const }
+  const withNotes = formatDispatchComment({ sessionId: 'pr-7.deck', principal, request, annotations: [note('n1', { 'slidev-target': 'notes' })] }, 'https://preview.example/api')
+  assert.match(withNotes, /slide 2 · speaker notes · `decks\/deck\/slides.md:13`/)
+  assert.match(withNotes, /those marked "speaker notes" to the slide's notes/)
+  const slideOnly = formatDispatchComment({ sessionId: 'pr-7.deck', principal, request, annotations: [note('n2', {})] }, 'https://preview.example/api')
+  assert.doesNotMatch(slideOnly, /speaker notes/)
+})
+
 test('githubComment posts to the PR named by the session id', async () => {
   const calls: { url: string, init: RequestInit }[] = []
   const realFetch = globalThis.fetch

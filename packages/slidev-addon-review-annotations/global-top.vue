@@ -3,18 +3,26 @@
 import { computed, onBeforeUnmount, watch } from 'vue'
 import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
-import { checkCanCreate, createMarkerFilter, createSync, slidePosition, sourceLocation } from './src/client'
+import { annotationTarget, checkCanCreate, createMarkerFilter, createSync, showNotice, slidePosition, sourceLocation } from './src/client'
 import type { SlideContext, Sync } from './src/client'
 import { createDispatchControl } from './src/dispatch-ui'
 
 const config = __SLIDEV_REVIEW_ANNOTATIONS__
 const nav = useNav()
 
-// Only in the audience view: not in print/export, the presenter view or embeds.
-const visible = computed(() => config.enabled && nav.isPlaying.value
-  && !nav.isPrintMode.value && !nav.isPresenter.value && !nav.isEmbedded.value)
+// In the audience view, and in the presenter view for annotating speaker notes;
+// not in print/export or embeds.
+const visible = computed(() => config.enabled && (nav.isPlaying.value || nav.isPresenter.value)
+  && !nav.isPrintMode.value && !nav.isEmbedded.value)
 
 async function beforeCreate(data: BeforeAnnotationCreateData) {
+  // Only the current slide and its notes have a source an annotation can point to, not
+  // Slidev's controls or the presenter view's next-slide preview.
+  const target = annotationTarget(data.element)
+  if (!target) {
+    showNotice(`Annotate the current slide${nav.isPresenter.value ? ' or its speaker notes' : ''}; this annotation was not added.`, undefined, { replace: true })
+    return { cancel: true }
+  }
   // Refuse the note before the toolbar stores it, rather than keep one the server rejects.
   if (!await checkCanCreate(config))
     return { cancel: true }
@@ -27,7 +35,8 @@ async function beforeCreate(data: BeforeAnnotationCreateData) {
     clicksTotal: nav.clicksTotal.value,
     title: slide?.title,
     sourceFile: sourceLocation(config, slide?.filepath, slide?.start),
-    ...slidePosition(data.clickX, data.clickY),
+    // A position on the slide means nothing for the notes.
+    ...(target === 'notes' ? { target } : slidePosition(data.clickX, data.clickY)),
   }
   return { context: { slidev: context } }
 }

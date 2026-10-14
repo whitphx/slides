@@ -21,6 +21,8 @@ export interface SlideContext {
   // Click position as a percentage of the slide's width and height.
   slideX?: number
   slideY?: number
+  // 'notes' when the annotation is about the slide's speaker notes (made in the presenter view).
+  target?: 'notes'
 }
 
 const round = (n: number) => Math.round(n * 10) / 10
@@ -33,6 +35,17 @@ export function slidePosition(clientX: number, clientY: number) {
     slideX: round(((clientX - slide.left) / slide.width) * 100),
     slideY: round(((clientY - slide.top) / slide.height) * 100),
   }
+}
+
+// What a clicked element belongs to: the current slide (Slidev's main #slide-content, in
+// the audience and the presenter view), its speaker notes (presenter view), or neither:
+// Slidev's navigation controls and menus, the next-slide preview and other parts of the UI.
+export function annotationTarget(element: Element): 'slide' | 'notes' | undefined {
+  if (element.closest('.slidev-note'))
+    return 'notes'
+  if (element.closest('#slide-content'))
+    return 'slide'
+  return undefined
 }
 
 export function sourceLocation(config: ReviewAnnotationsClientConfig, filepath: string | undefined, start: number | undefined) {
@@ -101,6 +114,8 @@ export function toAfs(annotation: ToolbarAnnotation, config: ReviewAnnotationsCl
       attributes['slidev-title'] = ctx.title
     if (ctx.slideX !== undefined && ctx.slideY !== undefined)
       attributes['slidev-position'] = `${ctx.slideX}% ${ctx.slideY}%`
+    if (ctx.target)
+      attributes['slidev-target'] = ctx.target
   }
   return {
     id: annotation.id,
@@ -126,7 +141,7 @@ export function loginUrl(config: ReviewAnnotationsClientConfig) {
 }
 
 // With `replace`, it takes the place of a notice already shown; otherwise that one stays.
-function showNotice(text: string, action?: { label: string, href: string }, { replace = false } = {}) {
+export function showNotice(text: string, action?: { label: string, href: string }, { replace = false } = {}) {
   const id = 'slidev-review-annotations-notice'
   const shown = document.getElementById(id)
   if (shown && !replace)

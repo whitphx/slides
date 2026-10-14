@@ -879,7 +879,7 @@ plainBackground: true
 
 ```py
 def handler():
-    print(user_var.get())
+    print(user_var.get())  # "alice"
 ```
 
 </div>
@@ -911,7 +911,7 @@ ctx = copy_context()
 
 ctx.run(handler)
 
-ctx[user_var]
+ctx[user_var]  # "alice"
 ```
 
 ````
@@ -933,7 +933,7 @@ ctx[user_var]
 The second concept is the Context itself, the thing every task carries around. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
 
 [click]
-copy_context takes a snapshot of that whole mapping and hands it back to you as one object.
+There is always a current context. Your code is running inside one right now, even if you never created it. `copy_context()` takes a snapshot of that current context, the whole mapping, and gives it back to you as one object.
 
 [click]
 And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the current user. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.

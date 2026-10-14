@@ -2,9 +2,11 @@
 // and writes the precache manifest that it imports: every file of the built site, grouped by deck, with a content hash.
 //
 // - The index page's files are cached when the service worker installs.
-// - A deck's files are all cached the first time the deck is opened (and kept up to date on later visits to the site), so it can be presented offline afterwards.
+// - A deck's files are all cached the first time the deck is opened (and kept up to date on later visits to the site).
 // - Cached files are keyed by their content hash, so a deploy re-downloads only the files that changed,
 //   and only for decks that were cached before.
+// - A cached deck keeps being served as a whole from the version it was cached at
+//   until its new version has been cached completely, so it stays viewable offline during an update.
 
 importScripts("__SW_MANIFEST_URL__");
 
@@ -16,11 +18,15 @@ const RUNTIME_CACHE = "slides-runtime";
 // Cross-origin hosts the decks load fonts and scripts from; their responses are cached as they are used.
 const RUNTIME_HOSTS = new Set(["fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"]);
 
+const cacheKeyOf = (path, revision) => `${path}?__sw_rev=${revision}`;
+// Where the files (path -> revision) of the version of a deck that is completely cached are recorded, in PRECACHE.
+const deckRecordKey = (deck) => `/__sw-deck/${encodeURIComponent(deck)}`;
+
 /** path -> cache key, for every file in the manifest */
 const cacheKeys = new Map();
 for (const files of [MANIFEST.root, ...Object.values(MANIFEST.decks)]) {
   for (const [path, revision] of Object.entries(files))
-    cacheKeys.set(path, `${path}?__sw_rev=${revision}`);
+    cacheKeys.set(path, cacheKeyOf(path, revision));
 }
 
 const deckOf = (pathname) => {
@@ -32,6 +38,14 @@ const keyOf = (request) => {
   const url = new URL(request.url);
   return url.pathname + url.search;
 };
+
+// Cloudflare redirects /<deck>/index.html to /<deck>/, and a response that went through a redirect
+// can't answer a navigation, so cache a copy that doesn't carry the redirect.
+async function cacheable(response) {
+  if (!response.redirected)
+    return response;
+  return new Response(await response.blob(), { status: response.status, statusText: response.statusText, headers: response.headers });
+}
 
 async function precache(files) {
   const cache = await caches.open(PRECACHE);
@@ -45,7 +59,7 @@ async function precache(files) {
         const response = await fetch(path, { cache: "no-cache" });
         if (!response.ok)
           throw new Error(`${response.status} ${response.statusText}`);
-        await cache.put(cacheKeys.get(path), response);
+        await cache.put(cacheKeys.get(path), await cacheable(response));
       } catch (error) {
         failed++;
         console.warn(`[sw] Failed to cache ${path}:`, error);
@@ -56,10 +70,33 @@ async function precache(files) {
     throw new Error(`[sw] Failed to cache ${failed} file(s)`);
 }
 
+/** deck -> Promise of the files of its completely cached version (path -> revision), or null if none */
+const deckRecords = new Map();
+function cachedDeckFiles(deck) {
+  if (!deckRecords.has(deck)) {
+    deckRecords.set(deck, caches.match(deckRecordKey(deck), { cacheName: PRECACHE })
+      .then((response) => response ? response.json() : null));
+  }
+  return deckRecords.get(deck);
+}
+
 const deckCaching = new Map();
 function cacheDeck(deck) {
-  if (!deckCaching.has(deck))
-    deckCaching.set(deck, precache(MANIFEST.decks[deck]).finally(() => deckCaching.delete(deck)));
+  if (!deckCaching.has(deck)) {
+    deckCaching.set(deck, (async () => {
+      const files = MANIFEST.decks[deck];
+      await precache(files);
+      // The new version is complete: switch to it, then drop the files of the old one.
+      const cache = await caches.open(PRECACHE);
+      await cache.put(deckRecordKey(deck), Response.json(files));
+      deckRecords.set(deck, Promise.resolve(files));
+      const validKeys = new Set(Object.keys(files).map((path) => cacheKeys.get(path)));
+      for (const request of await cache.keys()) {
+        if (deckOf(new URL(request.url).pathname) === deck && !validKeys.has(keyOf(request)))
+          await cache.delete(request);
+      }
+    })().finally(() => deckCaching.delete(deck)));
+  }
   return deckCaching.get(deck);
 }
 
@@ -78,7 +115,7 @@ self.addEventListener("message", (event) => {
   event.waitUntil(sync(deckOf(new URL(event.source.url).pathname)));
 });
 
-// Drops the files that are no longer part of the site or have changed since they were cached,
+// Drops the files of the index page and of removed decks that are no longer part of the site,
 // then caches the deck being viewed and brings the decks cached before up to date with the manifest.
 async function sync(currentDeck) {
   const cache = await caches.open(PRECACHE);
@@ -86,13 +123,26 @@ async function sync(currentDeck) {
   const decks = new Set(requests.map((request) => deckOf(new URL(request.url).pathname)).filter(Boolean));
   if (currentDeck)
     decks.add(currentDeck);
-  const validKeys = new Set(cacheKeys.values());
-  await Promise.all(requests.filter((request) => !validKeys.has(keyOf(request))).map((request) => cache.delete(request)));
+  const validKeys = new Set([...cacheKeys.values(), ...Object.keys(MANIFEST.decks).map(deckRecordKey)]);
+  await Promise.all(requests
+    .filter((request) => !deckOf(new URL(request.url).pathname) && !validKeys.has(keyOf(request)))
+    .map((request) => cache.delete(request)));
   const results = await Promise.allSettled([...decks].map(cacheDeck));
   for (const result of results) {
     if (result.status === "rejected")
       console.warn(result.reason);
   }
+}
+
+// The cache key a file is served from: the version of its deck that is completely cached if there is one,
+// otherwise the current one. The second value tells whether the key is the current one, which may be filled from the network.
+async function servingKeyOf(path) {
+  const deck = deckOf(path);
+  const files = deck ? await cachedDeckFiles(deck) : null;
+  if (files && Object.hasOwn(files, path))
+    return [cacheKeyOf(path, files[path]), cacheKeys.get(path) === cacheKeyOf(path, files[path])];
+  const key = cacheKeys.get(path);
+  return key ? [key, true] : [null, false];
 }
 
 self.addEventListener("fetch", (event) => {
@@ -111,37 +161,38 @@ self.addEventListener("fetch", (event) => {
     // Each deck is a single-page app, so all of its routes (/<deck>/12, /<deck>/presenter/3, ...) render its index.html.
     const deck = deckOf(url.pathname);
     const entry = deck ? `/${deck}/index.html` : url.pathname === "/" ? "/index.html" : null;
-    if (!entry)
-      return;
-    event.respondWith(networkFirst(request, cacheKeys.get(entry)));
+    if (entry)
+      event.respondWith(networkFirst(request, entry));
     return;
   }
 
-  const key = cacheKeys.get(url.pathname);
-  if (key)
-    event.respondWith(cacheFirst(request, key));
+  if (cacheKeys.has(url.pathname) || deckOf(url.pathname))
+    event.respondWith(cacheFirst(request, url.pathname));
 });
 
-async function networkFirst(request, key) {
+async function networkFirst(request, entry) {
   try {
     return await fetch(request);
   } catch (error) {
-    const cached = await caches.match(key, { cacheName: PRECACHE });
+    const [key] = await servingKeyOf(entry);
+    const cached = key && await caches.match(key, { cacheName: PRECACHE });
     if (cached)
       return cached;
     throw error;
   }
 }
 
-async function cacheFirst(request, key) {
-  const cached = await caches.match(key, { cacheName: PRECACHE });
+async function cacheFirst(request, path) {
+  const [key, current] = await servingKeyOf(path);
+  const cached = key && await caches.match(key, { cacheName: PRECACHE });
   if (cached)
     return request.headers.has("range") ? rangeOf(cached, request.headers.get("range")) : cached;
   const response = await fetch(request);
-  // Cache only complete responses, not the partial ones answering a Range request (e.g. for a video).
-  if (response.status === 200) {
+  // Cache only complete responses of the current version,
+  // not the partial ones answering a Range request (e.g. for a video).
+  if (current && response.status === 200) {
     const cache = await caches.open(PRECACHE);
-    await cache.put(key, response.clone());
+    await cache.put(key, await cacheable(response.clone()));
   }
   return response;
 }

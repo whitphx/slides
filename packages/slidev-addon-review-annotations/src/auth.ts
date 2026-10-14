@@ -141,7 +141,7 @@ ${body}`, {
 
 function loginForm(action: string, next: string, error?: string) {
   return htmlPage(`<h1>Reviewer login</h1>
-${error ? `<p class="error" role="alert">${escapeHtml(error)}</p>` : '<p>Enter the reviewer key to leave notes on the slides.</p>'}
+${error ? `<p class="error" role="alert">${escapeHtml(error)}</p>` : '<p>Enter the reviewer key to leave review annotations on the slides.</p>'}
 <form method="post" action="${escapeHtml(action)}">
 <input type="hidden" name="next" value="${escapeHtml(next)}">
 <input type="text" name="username" value="reviewer" autocomplete="username" hidden>
@@ -193,7 +193,7 @@ export function signedCookie({
   secret,
   role = 'reviewer',
   id = role,
-  cookieName = 'annotate_session',
+  cookieName = 'review_annotations_session',
   maxAgeSeconds = 30 * 24 * 60 * 60,
   home,
   trustOrigin,
@@ -263,7 +263,7 @@ export function signedCookie({
         const target = sameOriginPath(next, url)
         if (target)
           return redirect(target, [await sessionCookie()])
-        return htmlPage('<p>Logged in. Notes you leave on the slides in this browser will now be saved.</p>', 200, { 'Set-Cookie': await sessionCookie() })
+        return htmlPage('<p>Logged in. Annotations you leave on the slides in this browser will now be saved.</p>', 200, { 'Set-Cookie': await sessionCookie() })
       }
 
       // GET /login/authorize (home host): hand a login to a trusted origin.

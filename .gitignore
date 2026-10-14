@@ -139,5 +139,5 @@ dist
 # Wrangler local state
 .wrangler/
 
-# Notes saved by slidev-addon-annotate in dev mode
-.annotate/
+# Notes saved by slidev-addon-review-annotations in dev mode
+.review-annotations/

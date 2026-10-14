@@ -20,9 +20,9 @@ export interface D1Database {
 }
 
 const SCHEMA = [
-  'CREATE TABLE IF NOT EXISTS annotate_sessions (id TEXT PRIMARY KEY, data TEXT NOT NULL)',
-  'CREATE TABLE IF NOT EXISTS annotate_annotations (id TEXT PRIMARY KEY, session_id TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL, version INTEGER NOT NULL, data TEXT NOT NULL)',
-  'CREATE INDEX IF NOT EXISTS annotate_annotations_by_session ON annotate_annotations (session_id, status)',
+  'CREATE TABLE IF NOT EXISTS review_annotation_sessions (id TEXT PRIMARY KEY, data TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS review_annotations (id TEXT PRIMARY KEY, session_id TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL, version INTEGER NOT NULL, data TEXT NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS review_annotations_by_session ON review_annotations (session_id, status)',
 ]
 
 export function createD1Store(db: D1Database): AnnotationStore {
@@ -37,16 +37,16 @@ export function createD1Store(db: D1Database): AnnotationStore {
   return {
     async listSessions() {
       await init()
-      return parse<Session>((await db.prepare('SELECT data FROM annotate_sessions').all<{ data: string }>()).results)
+      return parse<Session>((await db.prepare('SELECT data FROM review_annotation_sessions').all<{ data: string }>()).results)
     },
     async getSession(id) {
       await init()
-      const row = await db.prepare('SELECT data FROM annotate_sessions WHERE id = ?').bind(id).first<{ data: string }>()
+      const row = await db.prepare('SELECT data FROM review_annotation_sessions WHERE id = ?').bind(id).first<{ data: string }>()
       return row ? JSON.parse(row.data) as Session : undefined
     },
     async putSession(session) {
       await init()
-      await db.prepare('INSERT INTO annotate_sessions (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = excluded.data')
+      await db.prepare('INSERT INTO review_annotation_sessions (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = excluded.data')
         .bind(session.id, JSON.stringify(session)).run()
     },
     async listAnnotations(filter = {}) {
@@ -61,26 +61,26 @@ export function createD1Store(db: D1Database): AnnotationStore {
         where.push('status = ?')
         values.push(filter.status)
       }
-      const query = `SELECT data FROM annotate_annotations${where.length ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY created_at`
+      const query = `SELECT data FROM review_annotations${where.length ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY created_at`
       return parse<Annotation>((await db.prepare(query).bind(...values).all<{ data: string }>()).results)
     },
     async getAnnotation(id) {
       await init()
-      const row = await db.prepare('SELECT data FROM annotate_annotations WHERE id = ?').bind(id).first<{ data: string }>()
+      const row = await db.prepare('SELECT data FROM review_annotations WHERE id = ?').bind(id).first<{ data: string }>()
       return row ? JSON.parse(row.data) as Annotation : undefined
     },
     async updateAnnotation(id, fn) {
       await init()
       for (let attempt = 0; attempt < 5; attempt++) {
-        const row = await db.prepare('SELECT data, version FROM annotate_annotations WHERE id = ?')
+        const row = await db.prepare('SELECT data, version FROM review_annotations WHERE id = ?')
           .bind(id).first<{ data: string, version: number }>()
         const next = fn(row ? JSON.parse(row.data) as Annotation : undefined)
         if (!next)
           return undefined
         const result = row
-          ? await db.prepare('UPDATE annotate_annotations SET session_id = ?, status = ?, data = ?, version = version + 1 WHERE id = ? AND version = ?')
+          ? await db.prepare('UPDATE review_annotations SET session_id = ?, status = ?, data = ?, version = version + 1 WHERE id = ? AND version = ?')
             .bind(next.sessionId, next.status, JSON.stringify(next), id, row.version).run()
-          : await db.prepare('INSERT INTO annotate_annotations (id, session_id, status, created_at, version, data) VALUES (?, ?, ?, ?, 0, ?) ON CONFLICT (id) DO NOTHING')
+          : await db.prepare('INSERT INTO review_annotations (id, session_id, status, created_at, version, data) VALUES (?, ?, ?, ?, 0, ?) ON CONFLICT (id) DO NOTHING')
             .bind(id, next.sessionId, next.status, next.createdAt, JSON.stringify(next)).run()
         if (result.meta.changes > 0)
           return next
@@ -89,7 +89,7 @@ export function createD1Store(db: D1Database): AnnotationStore {
     },
     async deleteAnnotation(id) {
       await init()
-      return (await db.prepare('DELETE FROM annotate_annotations WHERE id = ?').bind(id).run()).meta.changes > 0
+      return (await db.prepare('DELETE FROM review_annotations WHERE id = ?').bind(id).run()).meta.changes > 0
     },
   }
 }

@@ -14,7 +14,7 @@ async function route(auth: ReturnType<typeof signedCookie>, request: Request) {
 const post = (origin: string, fields: Record<string, string>, headers: Record<string, string> = {}) =>
   new Request(`${origin}${API}/login`, { method: 'POST', headers: { Origin: origin, ...headers }, body: new URLSearchParams(fields) })
 
-const cookieOf = (response: Response, name = 'annotate_session') =>
+const cookieOf = (response: Response, name = 'review_annotations_session') =>
   response.headers.getSetCookie().find(c => c.startsWith(`${name}=`))?.split(';')[0]
 
 test('the login form posts the key, never puts it in a URL', async () => {
@@ -70,7 +70,7 @@ async function handoff(authorizeCookie?: string, tamper?: (finish: URL) => void)
   assert.equal(start.status, 303)
   const authorize = new URL(start.headers.get('Location')!)
   assert.equal(authorize.origin + authorize.pathname, `${HOME}${API}/login/authorize`)
-  const state = cookieOf(start, 'annotate_session_state')!
+  const state = cookieOf(start, 'review_annotations_session_state')!
   // 2. The home host, if logged in, sends it back with a pass.
   const back = await route(auth, new Request(authorize, { headers: authorizeCookie ? { Cookie: authorizeCookie } : {} }))
   if (back.status !== 303)

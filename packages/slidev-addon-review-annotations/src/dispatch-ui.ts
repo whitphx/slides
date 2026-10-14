@@ -4,9 +4,9 @@
 
 import type { Annotation } from './afs'
 import { loginUrl } from './client'
-import type { AnnotateClientConfig } from './types'
+import type { ReviewAnnotationsClientConfig } from './types'
 
-const AUTO_KEY = 'slidev-annotate:auto-dispatch'
+const AUTO_KEY = 'slidev-review-annotations:auto-dispatch'
 
 function readAuto(fallback: boolean) {
   try {
@@ -27,13 +27,13 @@ function writeAuto(on: boolean) {
   }
 }
 
-export function createDispatchControl(config: AnnotateClientConfig) {
+export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
   const api = (path: string, init?: RequestInit) => fetch(`${config.endpoint}${path}`, init)
   const sessionPath = `/sessions/${encodeURIComponent(config.sessionId)}`
 
   const panel = document.createElement('div')
   panel.setAttribute('role', 'group')
-  panel.setAttribute('aria-label', 'Send slide notes to the agent')
+  panel.setAttribute('aria-label', 'Send review annotations to the agent')
   // agent-ui-annotation swallows page clicks while picking elements, except on its own
   // parts; this attribute makes it treat the panel as one of them.
   panel.setAttribute('data-annotation-toolbar', '')
@@ -46,7 +46,7 @@ export function createDispatchControl(config: AnnotateClientConfig) {
   autoLabel.style.cssText = 'display:flex;gap:6px;align-items:center;padding:4px 8px;border-radius:6px;background:rgb(255 255 255 / 90%);color:#222;cursor:pointer'
   const auto = document.createElement('input')
   auto.type = 'checkbox'
-  autoLabel.append(auto, `Send automatically ${config.autoDispatchSeconds}s after the last note`)
+  autoLabel.append(auto, `Send automatically ${config.autoDispatchSeconds}s after the last annotation`)
   const status = document.createElement('div')
   status.setAttribute('role', 'status')
   status.style.cssText = 'max-width:320px;padding:4px 8px;border-radius:6px;background:rgb(255 255 255 / 90%);color:#222;text-align:right'
@@ -72,7 +72,7 @@ export function createDispatchControl(config: AnnotateClientConfig) {
     // Its padding and background would otherwise show as an empty box.
     status.style.display = status.textContent ? '' : 'none'
     send.disabled = sending
-    send.textContent = sending ? 'Sending…' : `Send ${unsent} note${unsent === 1 ? '' : 's'} to agent`
+    send.textContent = sending ? 'Sending…' : `Send ${unsent} annotation${unsent === 1 ? '' : 's'} to agent`
   }
 
   function say(message: string, link?: string) {
@@ -112,7 +112,7 @@ export function createDispatchControl(config: AnnotateClientConfig) {
     if (!auto.checked || !unsent)
       return
     timer = setTimeout(dispatch, config.autoDispatchSeconds * 1000)
-    say(`Sending automatically ${config.autoDispatchSeconds}s after your last note.`)
+    say(`Sending automatically ${config.autoDispatchSeconds}s after your last annotation.`)
   }
 
   async function dispatch() {
@@ -131,7 +131,7 @@ export function createDispatchControl(config: AnnotateClientConfig) {
         say(`Could not send: ${result.error ?? `HTTP ${response.status}`}`)
       }
       else {
-        say(result.count ? `Sent ${result.count} note${result.count === 1 ? '' : 's'} to the agent.` : 'No new notes to send.', result.url)
+        say(result.count ? `Sent ${result.count} annotation${result.count === 1 ? '' : 's'} to the agent.` : 'No new annotations to send.', result.url)
       }
     }
     catch {

@@ -1,15 +1,15 @@
 {
-  "name": "slidev-addon-annotate",
-  "version": "0.1.0",
+  "name": "slidev-addon-review-annotations",
+  "version": "0.0.0",
   "type": "module",
-  "description": "Annotate a Slidev deck on screen and hand the notes to an AI coding agent",
+  "description": "Leave review annotations on a Slidev deck in the browser and hand them to an AI coding agent",
   "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/whitphx/slides/tree/main/packages/slidev-addon-annotate#readme",
+  "homepage": "https://github.com/whitphx/slides/tree/main/packages/slidev-addon-review-annotations#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/whitphx/slides.git",
-    "directory": "packages/slidev-addon-annotate"
+    "directory": "packages/slidev-addon-review-annotations"
   },
   "bugs": "https://github.com/whitphx/slides/issues",
   "keywords": [

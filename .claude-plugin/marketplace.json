@@ -6,9 +6,9 @@
   },
   "plugins": [
     {
-      "name": "slidev-addon-annotate",
-      "source": "./packages/slidev-addon-annotate",
-      "description": "Apply review notes left on Slidev decks with slidev-addon-annotate, then resolve them"
+      "name": "slidev-addon-review-annotations",
+      "source": "./packages/slidev-addon-review-annotations",
+      "description": "Apply review annotations left on Slidev decks with slidev-addon-review-annotations, then resolve them"
     }
   ]
 }

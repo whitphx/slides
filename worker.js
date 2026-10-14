@@ -1,11 +1,11 @@
-import { createAnnotateWorker } from "slidev-addon-annotate/worker";
+import { createReviewAnnotationsWorker } from "slidev-addon-review-annotations/worker";
 
-// Review notes left on PR previews with slidev-addon-annotate; see its README for the bindings.
-// Agents send ANNOTATE_AGENT_KEY in `x-api-key`; reviewers log in at `<host>/__annotate/api/login`
-// with ANNOTATE_REVIEWER_KEY. With ANNOTATE_HOME_ORIGIN set (e.g. the production host), previews
+// Review notes left on PR previews with slidev-addon-review-annotations; see its README for the bindings.
+// Agents send REVIEW_ANNOTATIONS_AGENT_KEY in `x-api-key`; reviewers log in at `<host>/__review-annotations/api/login`
+// with REVIEW_ANNOTATIONS_REVIEWER_KEY. With REVIEW_ANNOTATIONS_HOME_ORIGIN set (e.g. the production host), previews
 // hand logins off to that host, so one login there covers every PR preview.
-// With ANNOTATE_GITHUB_TOKEN set, "Send to agent" posts the notes as a comment on the PR.
-const annotate = createAnnotateWorker({
+// With REVIEW_ANNOTATIONS_GITHUB_TOKEN set, "Send to agent" posts the notes as a comment on the PR.
+const reviewAnnotations = createReviewAnnotationsWorker({
   repo: "whitphx/slides",
   // This Worker's preview hosts (`<version or alias>-slides.whitphx.workers.dev`), which the home host may log in.
   trustOrigin: (origin) => /^https:\/\/[a-z0-9-]+-slides\.whitphx\.workers\.dev$/.test(origin),
@@ -17,7 +17,7 @@ const annotate = createAnnotateWorker({
 // each deck is its own SPA, so we serve that deck's index.html.
 export default {
   async fetch(request, env) {
-    const response = await annotate(request, env);
+    const response = await reviewAnnotations(request, env);
     if (response)
       return response;
     const url = new URL(request.url);

@@ -1,7 +1,7 @@
-// Settings the Vite plugin passes to the browser as `__SLIDEV_ANNOTATE__`.
-export interface AnnotateClientConfig {
+// Settings the Vite plugin passes to the browser as `__SLIDEV_REVIEW_ANNOTATIONS__`.
+export interface ReviewAnnotationsClientConfig {
   enabled: boolean
-  // Base URL of the annotation API, e.g. "/__annotate/api" on the same origin.
+  // Base URL of the annotation API, e.g. "/__review-annotations/api" on the same origin.
   endpoint: string
   sessionId: string
   // Deck directory name.

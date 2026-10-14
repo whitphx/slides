@@ -1,11 +1,11 @@
 ---
-title: Annotate playground
+title: Review annotations playground
 theme: none
 addons:
-  - slidev-addon-annotate
+  - slidev-addon-review-annotations
 ---
 
-# Annotate playground
+# Review annotations playground
 
 A deck for trying the annotation toolbar.
 

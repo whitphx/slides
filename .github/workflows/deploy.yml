@@ -38,10 +38,10 @@ jobs:
       - run: pnpm -r test
       - run: ./scripts/build.sh
         env:
-          # PR previews include the slidev-addon-annotate toolbar; production builds don't.
-          SLIDEV_ANNOTATE: ${{ github.event_name == 'pull_request' && '1' || '' }}
-          SLIDEV_ANNOTATE_SESSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
-          SLIDEV_ANNOTATE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+          # PR previews include the slidev-addon-review-annotations toolbar; production builds don't.
+          SLIDEV_REVIEW_ANNOTATIONS: ${{ github.event_name == 'pull_request' && '1' || '' }}
+          SLIDEV_REVIEW_ANNOTATIONS_SESSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
+          SLIDEV_REVIEW_ANNOTATIONS_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
       - id: wrangler
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

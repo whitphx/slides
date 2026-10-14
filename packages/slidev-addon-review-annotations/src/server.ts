@@ -34,7 +34,7 @@ export type Dispatcher = (batch: DispatchBatch) => Promise<{ url?: string } | vo
 
 export interface HandlerOptions {
   store: AnnotationStore
-  // Path prefix the API is mounted at, e.g. "/__annotate/api".
+  // Path prefix the API is mounted at, e.g. "/__review-annotations/api".
   basePath: string
   // Who may call the API at all, e.g. `localDev()` or `chain(apiKey(...), signedCookie(...))`.
   auth: Authenticator
@@ -84,7 +84,7 @@ function pickWritable(body: Record<string, unknown>): Partial<Annotation> {
   return picked as Partial<Annotation>
 }
 
-export function createAnnotateHandler({ store, basePath, auth, authorize = defaultAuthorize, dispatch, dispatchIntervalMs = 60_000 }: HandlerOptions) {
+export function createReviewAnnotationsHandler({ store, basePath, auth, authorize = defaultAuthorize, dispatch, dispatchIntervalMs = 60_000 }: HandlerOptions) {
   async function pending(sessionId?: string) {
     const annotations = await store.listAnnotations({ sessionId, status: 'pending' })
     return { count: annotations.length, annotations }

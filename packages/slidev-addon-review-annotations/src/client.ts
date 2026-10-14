@@ -3,7 +3,7 @@
 
 import type { Annotation as ToolbarAnnotation } from 'agent-ui-annotation/vue'
 import type { Annotation } from './afs'
-import type { AnnotateClientConfig } from './types'
+import type { ReviewAnnotationsClientConfig } from './types'
 
 // Captured when a note is created, so it describes the slide the reviewer was looking at.
 export interface SlideContext {
@@ -32,7 +32,7 @@ export function slidePosition(clientX: number, clientY: number) {
   }
 }
 
-export function sourceLocation(config: AnnotateClientConfig, filepath: string | undefined, start: number | undefined) {
+export function sourceLocation(config: ReviewAnnotationsClientConfig, filepath: string | undefined, start: number | undefined) {
   // Slidev keeps the source path only in dev mode; builds fall back to the deck's entry file,
   // which is wrong only for slides pulled in from other files with `src:`.
   let file = filepath || config.entry
@@ -68,10 +68,10 @@ export function createMarkerFilter(deck: string) {
     const root = host.shadowRoot
     if (!root)
       return
-    let style = root.querySelector<HTMLStyleElement>('style[data-slidev-annotate]')
+    let style = root.querySelector<HTMLStyleElement>('style[data-slidev-review-annotations]')
     if (!style) {
       style = document.createElement('style')
-      style.dataset.slidevAnnotate = ''
+      style.dataset.slidevReviewAnnotations = ''
       root.append(style)
     }
     const hidden = [...known]
@@ -83,7 +83,7 @@ export function createMarkerFilter(deck: string) {
   return { remember, forget: (id: string) => known.delete(id), apply }
 }
 
-export function toAfs(annotation: ToolbarAnnotation, config: AnnotateClientConfig): Partial<Annotation> {
+export function toAfs(annotation: ToolbarAnnotation, config: ReviewAnnotationsClientConfig): Partial<Annotation> {
   const info = annotation.elementInfo
   const ctx = annotation.context?.slidev as SlideContext | undefined
   const attributes: Record<string, string> = {
@@ -118,12 +118,12 @@ export function toAfs(annotation: ToolbarAnnotation, config: AnnotateClientConfi
 
 // A dismissible message at the top of the page, shown once, e.g. when saving needs a login.
 // Where the reviewer logs in; it brings them back to the current slide afterwards.
-export function loginUrl(config: AnnotateClientConfig) {
+export function loginUrl(config: ReviewAnnotationsClientConfig) {
   return `${config.endpoint}/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
 }
 
 function showNotice(text: string, action?: { label: string, href: string }) {
-  const id = 'slidev-annotate-notice'
+  const id = 'slidev-review-annotations-notice'
   if (document.getElementById(id))
     return
   const notice = document.createElement('div')
@@ -155,27 +155,27 @@ function showNotice(text: string, action?: { label: string, href: string }) {
 
 // Whether this browser may add notes right now. Asked before each new note, so logging
 // in (e.g. in another tab) takes effect without a reload.
-export async function checkCanCreate(config: AnnotateClientConfig) {
+export async function checkCanCreate(config: ReviewAnnotationsClientConfig) {
   try {
     const response = await fetch(`${config.endpoint}/whoami`)
     if (response.status === 401) {
-      showNotice('Log in before adding notes; this note was not added.', { label: 'Log in', href: loginUrl(config) })
+      showNotice('Log in before adding annotations; this annotation was not added.', { label: 'Log in', href: loginUrl(config) })
       return false
     }
     if (!response.ok || !(await response.json() as { canCreate?: boolean }).canCreate) {
-      showNotice(`You can't add notes here (HTTP ${response.status}); this note was not added.`)
+      showNotice(`You can't add annotations here (HTTP ${response.status}); this annotation was not added.`)
       return false
     }
     return true
   }
   catch (error) {
-    console.warn('[slidev-addon-annotate] access check failed', error)
-    showNotice('The annotation server is unreachable, so this note was not added.')
+    console.warn('[slidev-addon-review-annotations] access check failed', error)
+    showNotice('The annotation server is unreachable, so this annotation was not added.')
     return false
   }
 }
 
-export function createSync(config: AnnotateClientConfig) {
+export function createSync(config: ReviewAnnotationsClientConfig) {
   async function send(method: string, path: string, body?: unknown) {
     try {
       const response = await fetch(`${config.endpoint}${path}`, {
@@ -184,14 +184,14 @@ export function createSync(config: AnnotateClientConfig) {
         body: body ? JSON.stringify(body) : undefined,
       })
       if (response.status === 401)
-        showNotice('Your notes are not being saved: log in first.', { label: 'Log in', href: loginUrl(config) })
+        showNotice('Your annotations are not being saved: log in first.', { label: 'Log in', href: loginUrl(config) })
       // Deleting a note the server never had (e.g. one made before logging in) is fine.
       else if (!response.ok && !(method === 'DELETE' && response.status === 404))
-        showNotice(`A note could not be ${method === 'DELETE' ? 'deleted' : 'saved'} (HTTP ${response.status}).`)
+        showNotice(`An annotation could not be ${method === 'DELETE' ? 'deleted' : 'saved'} (HTTP ${response.status}).`)
     }
     catch (error) {
-      console.warn(`[slidev-addon-annotate] ${method} ${path} failed`, error)
-      showNotice('The annotation server is unreachable, so notes are not being saved.')
+      console.warn(`[slidev-addon-review-annotations] ${method} ${path} failed`, error)
+      showNotice('The annotation server is unreachable, so annotations are not being saved.')
     }
   }
 

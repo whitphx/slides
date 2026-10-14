@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* global __SLIDEV_ANNOTATE__, __SLIDEV_ANNOTATE_ENABLED__ -- defined by setup/vite-plugins.ts */
+/* global __SLIDEV_REVIEW_ANNOTATIONS__, __SLIDEV_REVIEW_ANNOTATIONS_ENABLED__ -- defined by setup/vite-plugins.ts */
 import { computed, onBeforeUnmount, watch } from 'vue'
 import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
@@ -7,7 +7,7 @@ import { checkCanCreate, createMarkerFilter, createSync, slidePosition, sourceLo
 import type { SlideContext } from './src/client'
 import { createDispatchControl } from './src/dispatch-ui'
 
-const config = __SLIDEV_ANNOTATE__
+const config = __SLIDEV_REVIEW_ANNOTATIONS__
 const nav = useNav()
 const sync = createSync(config)
 
@@ -60,7 +60,7 @@ watch(nav.currentSlideNo, refreshMarkers)
 
 watch(visible, async (show) => {
   // A compile-time constant: builds without annotations drop the toolbar import entirely.
-  if (!__SLIDEV_ANNOTATE_ENABLED__)
+  if (!__SLIDEV_REVIEW_ANNOTATIONS_ENABLED__)
     return
   if (show && !toolbar) {
     const { createAnnotation } = await import('agent-ui-annotation/vanilla')

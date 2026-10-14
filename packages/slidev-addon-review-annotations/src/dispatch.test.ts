@@ -7,7 +7,7 @@ import type { Authenticator, Role } from './auth.ts'
 import { createFileStore } from './file-store.ts'
 import { DISPATCH_MARKER, formatDispatchComment, githubComment } from './github.ts'
 import type { DispatchBatch } from './server.ts'
-import { createAnnotateHandler } from './server.ts'
+import { createReviewAnnotationsHandler } from './server.ts'
 
 const testAuth: Authenticator = {
   authenticate(request) {
@@ -19,13 +19,13 @@ const testAuth: Authenticator = {
 let dir: string
 let sent: DispatchBatch[]
 let fail: boolean
-let handle: ReturnType<typeof createAnnotateHandler>
+let handle: ReturnType<typeof createReviewAnnotationsHandler>
 
 beforeEach(async () => {
-  dir = await mkdtemp(join(tmpdir(), 'slidev-annotate-'))
+  dir = await mkdtemp(join(tmpdir(), 'slidev-review-annotations-'))
   sent = []
   fail = false
-  handle = createAnnotateHandler({
+  handle = createReviewAnnotationsHandler({
     store: createFileStore(join(dir, 'annotations.json')),
     basePath: '/api',
     auth: testAuth,
@@ -85,7 +85,7 @@ test('only reviewers dispatch, and a failed dispatch leaves notes unsent', async
 })
 
 test('dispatches of one session are rate limited', async () => {
-  const limited = createAnnotateHandler({
+  const limited = createReviewAnnotationsHandler({
     store: createFileStore(join(dir, 'limited.json')),
     basePath: '/api',
     auth: testAuth,
@@ -103,7 +103,7 @@ test('dispatches of one session are rate limited', async () => {
 })
 
 test('without a dispatcher the route answers 501 and whoami says so', async () => {
-  const plain = createAnnotateHandler({ store: createFileStore(join(dir, 'plain.json')), basePath: '/api', auth: testAuth })
+  const plain = createReviewAnnotationsHandler({ store: createFileStore(join(dir, 'plain.json')), basePath: '/api', auth: testAuth })
   const req = (method: string, path: string) => plain(new Request(`http://localhost/api${path}`, { method, headers: { 'x-test-user': 'rev:reviewer' } }))
   assert.equal((await req('POST', '/sessions/s/dispatch'))!.status, 501)
   assert.equal((await (await req('GET', '/whoami'))!.json()).canDispatch, false)

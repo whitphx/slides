@@ -37,6 +37,8 @@ export function slidePosition(clientX: number, clientY: number) {
   }
 }
 
+const TARGETS = '#slide-content, .slidev-note'
+
 // What a clicked element belongs to: the current slide (Slidev's main #slide-content, in
 // the audience and the presenter view), its speaker notes (presenter view), or neither:
 // Slidev's navigation controls and menus, the next-slide preview and other parts of the UI.
@@ -46,6 +48,59 @@ export function annotationTarget(element: Element): 'slide' | 'notes' | undefine
   if (element.closest('#slide-content'))
     return 'slide'
   return undefined
+}
+
+// The toolbar ignores anything inside an element with data-annotation-toolbar (its own UI):
+// no hover highlight, and clicks reach the element as usual. Mark every part of the page
+// that isn't an annotation target, or an ancestor of one, so Slidev's controls, the
+// next-slide preview and the like can't be picked and stay usable while annotating.
+// Slidev renders and removes those parts as you navigate, so this keeps watching the page.
+const EXCLUDED = 'data-slidev-review-annotations-excluded'
+
+export function excludeNonTargets() {
+  function mark(parent: Element) {
+    for (const child of parent.children) {
+      if (child.matches(TARGETS) || child.tagName === 'AGENT-UI-ANNOTATION' || child.tagName === 'SCRIPT' || child.tagName === 'STYLE')
+        continue
+      if (child.querySelector(TARGETS)) {
+        mark(child)
+      }
+      else if (!child.hasAttribute('data-annotation-toolbar')) {
+        child.setAttribute('data-annotation-toolbar', '')
+        child.setAttribute(EXCLUDED, '')
+      }
+    }
+  }
+  function unmark() {
+    for (const el of document.querySelectorAll(`[${EXCLUDED}]`)) {
+      el.removeAttribute('data-annotation-toolbar')
+      el.removeAttribute(EXCLUDED)
+    }
+  }
+  let frame: number | undefined
+  function update() {
+    frame = undefined
+    // An element marked earlier may since have come to hold a target (e.g. the notes).
+    for (const el of document.querySelectorAll(`[${EXCLUDED}]`)) {
+      if (el.querySelector(TARGETS)) {
+        el.removeAttribute('data-annotation-toolbar')
+        el.removeAttribute(EXCLUDED)
+      }
+    }
+    mark(document.body)
+  }
+  update()
+  // Only child-list changes: the attributes set here don't trigger it again.
+  const observer = new MutationObserver(() => {
+    frame ??= requestAnimationFrame(update)
+  })
+  observer.observe(document.body, { childList: true, subtree: true })
+  return () => {
+    observer.disconnect()
+    if (frame !== undefined)
+      cancelAnimationFrame(frame)
+    unmark()
+  }
 }
 
 export function sourceLocation(config: ReviewAnnotationsClientConfig, filepath: string | undefined, start: number | undefined) {

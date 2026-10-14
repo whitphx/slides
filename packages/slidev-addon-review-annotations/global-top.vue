@@ -3,7 +3,7 @@
 import { computed, onBeforeUnmount, watch } from 'vue'
 import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
-import { annotationTarget, checkCanCreate, createMarkerFilter, createSync, showNotice, slidePosition, sourceLocation } from './src/client'
+import { annotationTarget, checkCanCreate, createMarkerFilter, createSync, excludeNonTargets, showNotice, slidePosition, sourceLocation } from './src/client'
 import type { SlideContext, Sync } from './src/client'
 import { createDispatchControl } from './src/dispatch-ui'
 
@@ -47,6 +47,8 @@ let toolbar: AnnotationInstance | undefined
 let markers: ReturnType<typeof createMarkerFilter> | undefined
 let dispatcher: ReturnType<typeof createDispatchControl> | undefined
 let sync: Sync | undefined
+// Undoes excludeNonTargets().
+let stopExcluding: (() => void) | undefined
 
 function refreshMarkers() {
   if (toolbar && markers)
@@ -74,6 +76,7 @@ watch(visible, async (show) => {
     if (toolbar || !visible.value)
       return
     markers = createMarkerFilter(config.deck)
+    stopExcluding = excludeNonTargets()
     // After every attempt to save, including the retries once back online.
     sync = createSync(config, () => dispatcher?.changed())
     toolbar = createAnnotation({
@@ -95,6 +98,8 @@ watch(visible, async (show) => {
     dispatcher = undefined
     sync?.destroy()
     sync = undefined
+    stopExcluding?.()
+    stopExcluding = undefined
   }
 }, { immediate: true })
 
@@ -102,6 +107,7 @@ onBeforeUnmount(() => {
   toolbar?.destroy()
   dispatcher?.destroy()
   sync?.destroy()
+  stopExcluding?.()
 })
 </script>
 

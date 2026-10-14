@@ -855,21 +855,7 @@ plainBackground: true
 
 # `Context`: what a task carries
 
-<div mt-4 grid="~ cols-[1.05fr_1fr]" gap-8>
-
-<div>
-
-```py {*|3|5|7}{'data-id':'ctxcode'}{maxHeight:'220px'}
-from contextvars import copy_context
-
-ctx = copy_context()
-
-ctx.run(handler)
-
-ctx[user_var]
-```
-
-</div>
+<div mt-4 grid="~ cols-[1fr_1.05fr]" gap-8>
 
 <div flex="~ col" gap-4>
 
@@ -900,9 +886,42 @@ def handler():
 
 </div>
 
+<div v-click="1" data-id="ctxcode">
+
+````md magic-move {at:2}
+
+```py
+from contextvars import copy_context
+
+ctx = copy_context()
+```
+
+```py
+from contextvars import copy_context
+
+ctx = copy_context()
+
+ctx.run(handler)
+```
+
+```py
+from contextvars import copy_context
+
+ctx = copy_context()
+
+ctx.run(handler)
+
+ctx[user_var]
+```
+
+````
+
 </div>
 
-<FancyArrow v-click="2" from="[data-id=handler-def] @ left" to="[data-id=ctxcode] .line:nth-child(5) @ right" arc="0.2" />
+</div>
+
+<div data-id="ctx-run-line" absolute style="left:490px;top:195px;width:1px;height:1px"></div>
+<FancyArrow v-click="2" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
 
 <div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
 

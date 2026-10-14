@@ -805,7 +805,7 @@ async def handle(user):
 </div>
 
 <style>
-.mm-ann { background: var(--slidev-theme-background, white); border: 1px solid rgb(14 165 233 / 0.5); border-radius: 0.5rem; padding: 0.15rem 0.5rem; font-size: 0.95rem; }
+.mm-ann { background: var(--slidev-theme-background, white); border: 1px solid rgb(14 165 233 / 0.5); border-radius: 0.5rem; padding: 0.15rem 0.5rem; font-size: 1rem; }
 html.dark .mm-ann { background: black; }
 </style>
 
@@ -942,7 +942,7 @@ And you can run a function inside that snapshot. handler here is nothing special
 You can also read a variable straight out of the snapshot, like a dictionary lookup.
 
 [click]
-So when I said set binds in "the current context", this box is the thing it means. There is always one of these running, set writes into that one, and get reads from that one.
+So when I said `set()` binds a value in "the current context", I meant a `Context` like the mapping on the left. There is always exactly one current context. `set()` writes into it, and `get()` reads from it.
 
 Which leaves exactly one question. When a new task starts, where does its context come from?
 -->

@@ -38,6 +38,9 @@ Each annotation (in the comment, or from the annotation API) carries:
 - `slidev-slide` / `slidev-click`: the slide number as shown in the presentation (1-based)
   and the click step the reviewer was looking at.
 - `slidev-title`, and `sourceFile` as `<markdown file>:<line>` where that slide starts.
+- `slidev-target: notes` (shown as "speaker notes" in a dispatch comment): the annotation is
+  about the slide's speaker notes, the `<!-- ... -->` comment at the end of that slide's
+  markdown, and `nearbyText` is the notes' text. Change the notes, not the slide content.
 - `element`, `elementPath`, `nearbyText`, `selectedText`: what was clicked or selected.
 - `slidev-revision`: the commit the preview was built from. If the branch has moved on
   since, find the slide by title and nearby text rather than trusting the line number.

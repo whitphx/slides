@@ -4,12 +4,11 @@ import { computed, onBeforeUnmount, watch } from 'vue'
 import { useNav } from '@slidev/client'
 import type { Annotation, AnnotationInstance, BeforeAnnotationCreateData } from 'agent-ui-annotation/vanilla'
 import { checkCanCreate, createMarkerFilter, createSync, slidePosition, sourceLocation } from './src/client'
-import type { SlideContext } from './src/client'
+import type { SlideContext, Sync } from './src/client'
 import { createDispatchControl } from './src/dispatch-ui'
 
 const config = __SLIDEV_REVIEW_ANNOTATIONS__
 const nav = useNav()
-const sync = createSync(config)
 
 // Only in the audience view: not in print/export, the presenter view or embeds.
 const visible = computed(() => config.enabled && nav.isPlaying.value
@@ -38,6 +37,7 @@ async function beforeCreate(data: BeforeAnnotationCreateData) {
 let toolbar: AnnotationInstance | undefined
 let markers: ReturnType<typeof createMarkerFilter> | undefined
 let dispatcher: ReturnType<typeof createDispatchControl> | undefined
+let sync: Sync | undefined
 
 function refreshMarkers() {
   if (toolbar && markers)
@@ -46,14 +46,12 @@ function refreshMarkers() {
 
 async function saved(annotation: Annotation) {
   markers?.remember(annotation)
-  await sync.save(annotation)
-  await dispatcher?.changed()
+  await sync?.save(annotation)
 }
 
 async function removed(id: string) {
   markers?.forget(id)
-  await sync.remove(id)
-  await dispatcher?.changed()
+  await sync?.remove(id)
 }
 
 watch(nav.currentSlideNo, refreshMarkers)
@@ -67,6 +65,8 @@ watch(visible, async (show) => {
     if (toolbar || !visible.value)
       return
     markers = createMarkerFilter(config.deck)
+    // After every attempt to save, including the retries once back online.
+    sync = createSync(config, () => dispatcher?.changed())
     toolbar = createAnnotation({
       theme: 'auto',
       outputLevel: 'standard',
@@ -76,7 +76,7 @@ watch(visible, async (show) => {
       onAnnotationDelete: removed,
       onAnnotationsClear: annotations => annotations.forEach(a => removed(a.id)),
     })
-    dispatcher = createDispatchControl(config)
+    dispatcher = createDispatchControl(config, sync)
     requestAnimationFrame(refreshMarkers)
   }
   else if (!show && toolbar) {
@@ -84,12 +84,15 @@ watch(visible, async (show) => {
     toolbar = undefined
     dispatcher?.destroy()
     dispatcher = undefined
+    sync?.destroy()
+    sync = undefined
   }
 }, { immediate: true })
 
 onBeforeUnmount(() => {
   toolbar?.destroy()
   dispatcher?.destroy()
+  sync?.destroy()
 })
 </script>
 

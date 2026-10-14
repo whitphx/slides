@@ -4,6 +4,7 @@
 
 import type { Annotation } from './afs'
 import { loginUrl } from './client'
+import type { Sync } from './client'
 import type { ReviewAnnotationsClientConfig } from './types'
 
 const AUTO_KEY = 'slidev-review-annotations:auto-dispatch'
@@ -27,7 +28,7 @@ function writeAuto(on: boolean) {
   }
 }
 
-export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
+export function createDispatchControl(config: ReviewAnnotationsClientConfig, sync: Pick<Sync, 'flush' | 'pending'>) {
   const api = (path: string, init?: RequestInit) => fetch(`${config.endpoint}${path}`, init)
   const sessionPath = `/sessions/${encodeURIComponent(config.sessionId)}`
 
@@ -50,10 +51,13 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
   const status = document.createElement('div')
   status.setAttribute('role', 'status')
   status.style.cssText = 'max-width:320px;padding:4px 8px;border-radius:6px;background:rgb(255 255 255 / 90%);color:#222;text-align:right'
+  // Changes the toolbar made that haven't reached the server yet (offline).
+  const unsaved = document.createElement('div')
+  unsaved.style.cssText = status.style.cssText
   const login = document.createElement('a')
   login.textContent = 'Log in to review'
   login.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #7c3aed;background:rgb(255 255 255 / 90%);color:#5b21b6;font-weight:600;text-decoration:none'
-  panel.append(login, send, autoLabel, status)
+  panel.append(login, send, autoLabel, unsaved, status)
   document.body.append(panel)
 
   let canDispatch = false
@@ -61,21 +65,29 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
   let unsent = 0
   let timer: ReturnType<typeof setTimeout> | undefined
   let sending = false
+  // Whether the status says a send waited for offline changes, to clear it once they're saved.
+  let heldBack = false
   auto.checked = readAuto(config.autoDispatch)
 
   function render() {
-    panel.style.display = loggedOut || (canDispatch && (unsent > 0 || status.textContent)) ? 'flex' : 'none'
+    const waiting = sync.pending()
+    panel.style.display = loggedOut || (canDispatch && (unsent > 0 || waiting > 0 || status.textContent)) ? 'flex' : 'none'
+    unsaved.textContent = waiting ? `${waiting} annotation change${waiting === 1 ? ' is' : 's are'} kept in this browser until the connection is back.` : ''
+    unsaved.style.display = waiting ? '' : 'none'
     login.style.display = loggedOut ? '' : 'none'
     login.href = loginUrl(config)
     autoLabel.style.display = canDispatch ? 'flex' : 'none'
-    send.style.display = canDispatch && unsent > 0 ? '' : 'none'
+    send.style.display = canDispatch && unsent + waiting > 0 ? '' : 'none'
     // Its padding and background would otherwise show as an empty box.
     status.style.display = status.textContent ? '' : 'none'
     send.disabled = sending
-    send.textContent = sending ? 'Sending…' : `Send ${unsent} annotation${unsent === 1 ? '' : 's'} to agent`
+    // Waiting changes are mostly new annotations; the count is exact again once they are saved.
+    const count = unsent + waiting
+    send.textContent = sending ? 'Sending…' : `Send ${count} annotation${count === 1 ? '' : 's'} to agent`
   }
 
   function say(message: string, link?: string) {
+    heldBack = false
     status.textContent = message
     if (link) {
       const a = document.createElement('a')
@@ -109,7 +121,8 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
 
   function schedule() {
     clearTimeout(timer)
-    if (!auto.checked || !unsent)
+    // With changes still waiting to be saved, this runs again once they are.
+    if (!auto.checked || !unsent || sync.pending())
       return
     timer = setTimeout(dispatch, config.autoDispatchSeconds * 1000)
     say(`Sending automatically ${config.autoDispatchSeconds}s after your last annotation.`)
@@ -120,6 +133,15 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
     sending = true
     render()
     try {
+      // Annotations made offline must reach the server before they can be sent on.
+      const saved = await sync.flush()
+      if (saved.pending) {
+        say(saved.stopped === 'login'
+          ? 'Not sent: log in again so your annotations can be saved first.'
+          : `Not sent: still offline. ${auto.checked ? 'Sending' : 'Send again'} once the connection is back.`)
+        heldBack = true
+        return
+      }
       const response = await api(`${sessionPath}/dispatch`, { method: 'POST' })
       const result = await response.json().catch(() => ({})) as { count?: number, url?: string, error?: string, retryAfterSeconds?: number }
       if (response.status === 429) {
@@ -159,6 +181,10 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig) {
   return {
     // Call after the toolbar saves, edits or deletes a note.
     async changed() {
+      if (heldBack && !sync.pending()) {
+        heldBack = false
+        say('')
+      }
       await refresh()
       schedule()
     },

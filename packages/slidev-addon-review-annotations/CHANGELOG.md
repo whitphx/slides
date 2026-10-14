@@ -1,5 +1,15 @@
 # slidev-addon-review-annotations
 
+## 0.2.0
+
+### Minor Changes
+
+- [#37](https://github.com/whitphx/slides/pull/37) [`93bbd72`](https://github.com/whitphx/slides/commit/93bbd72c0aa52aff09c46bb1f51ea6fc29a9c1ed) Thanks [@whitphx](https://github.com/whitphx)! - Annotate offline or on a poor connection. Annotation changes go through an outbox in the
+  browser's `localStorage` and are saved once the server can be reached (when the browser
+  comes back online, every 30 seconds while changes are waiting, and on the next page load).
+  A deck opened online can be annotated after going offline. **Send to agent** saves waiting
+  changes before sending and holds the send until they are saved.
+
 ## 0.1.0
 
 ### Minor Changes

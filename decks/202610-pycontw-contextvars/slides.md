@@ -292,7 +292,7 @@ So while alice's request is being handled, Thread 1 belongs to alice. One thread
 
 <div grid="~ cols-[1.15fr_1fr]" gap-6 items-start>
 
-```py {*|1|3-6|8-10|12-14|*}{maxHeight:'340px'}
+```py {*|1|3-6|8-10|12-14|*}
 _local = threading.local()
 
 # Flask: runs on the request's own thread
@@ -586,17 +586,18 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 <div class="tl-code">
 
-```py {*|11|8|4,8|5|*}{maxHeight:'330px'}
+```py {*|12|8|4,8|5|*}
 _local = threading.local()
 
-async def index():
+async def index():  # your code
     await asyncio.sleep(0.01)
     return f"Hello, {_local.user}!"
 
-async def handle(user):
+async def handle(user):  # the framework
     _local.user = user
     print(f"{user} sees: {await index()}")
 
+# the server: one task per request
 await asyncio.gather(handle("alice"), handle("bob"))
 ```
 
@@ -623,14 +624,14 @@ bob sees: Hello, bob!
 
 <div v-click="1" mt-2 text-4 class="tl">
 <div class="tl-label">🙋 <code>gather()</code><br><span op70>two tasks, one thread</span><br><span op60>time →</span></div>
-<div class="tl-row">
+<div class="tl-row tl-lane tl-lane-a">
 <div class="tl-name">alice's task</div>
 <div v-click="2" class="tl-a">set <code>"alice"</code></div>
 <div v-click="3" class="tl-a">⏸️ await</div>
 <div></div><div></div>
 <div v-click="4" class="tl-a">read → <code>"bob"</code> ❌</div>
 </div>
-<div class="tl-row">
+<div class="tl-row tl-lane tl-lane-b">
 <div class="tl-name">bob's task</div>
 <div></div><div></div>
 <div v-click="3" class="tl-b">set <code>"bob"</code></div>
@@ -652,6 +653,15 @@ bob sees: Hello, bob!
 .tl-label { grid-row: span 3; align-self: center; line-height: 1.3; }
 .tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
 .tl-name { opacity: 0.75; }
+.tl-lane { border-radius: 0.4rem; padding: 0 0.3rem; background-image: linear-gradient(to right, transparent 7.5rem, rgb(128 128 128 / 0.6) 7.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
+.tl-lane .tl-name { opacity: 1; font-weight: 700; }
+.tl-lane-a { border: 1.5px solid rgb(14 165 233 / 0.6); background-color: rgb(14 165 233 / 0.08); color: inherit; }
+.tl-lane-b { border: 1.5px solid rgb(16 185 129 / 0.6); background-color: rgb(16 185 129 / 0.08); }
+.tl-lane .tl-a, .tl-lane .tl-b { position: relative; }
+.tl-lane-a .tl-a { background: rgb(186 230 253); }
+.tl-lane-b .tl-b { background: rgb(167 243 208); }
+html.dark .tl-lane-a .tl-a { background: rgb(7 89 133); }
+html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
 .tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.4rem; text-align: center; white-space: nowrap; }
 .tl-a { background: rgb(14 165 233 / 0.18); }
 .tl-b { background: rgb(16 185 129 / 0.2); }
@@ -673,7 +683,7 @@ The last line plays the server receiving two requests. `asyncio.gather()` runs `
 Alice's task runs first. It stores her name in `_local.user`.
 
 [click]
-Then `index()` awaits. Follow the timeline on the right. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread. Then bob's task also reaches the await, and waits.
+Then `index()` awaits. Follow the timeline at the bottom. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread. Then bob's task also reaches the await, and waits.
 
 [click]
 Then alice's task resumes and reads the slot.

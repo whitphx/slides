@@ -493,17 +493,32 @@ plainBackground: true
 
 # What is a task?
 
-<div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-start>
+<div mt-2 grid="~ cols-[1.4fr_1fr]" gap-8 items-start>
 
-<div text-5>
+<div text-4.5>
 
 <v-clicks>
 
-- 🙋 **Someone starts it** — your code calls `create_task()` or `gather()`; an async web server like Uvicorn does it per request
-- 📦 **It wraps one coroutine** — the caller carries on; the task is its own unit of work
+- 🙋 **Someone starts it** — `create_task()`, `gather()`, the server
+- 📦 **It runs one coroutine** — the caller doesn't wait
 - 🔁 **The loop runs them all** — one thread, switching at every `await`
 
 </v-clicks>
+
+<div v-click="1" mt-3 class="task-code">
+
+```py
+async def greet(name):
+    await asyncio.sleep(1)
+    print(f"Hello, {name}!")
+
+async def main():
+    task = asyncio.create_task(greet("alice"))
+    print("main() carries on")
+    await task
+```
+
+</div>
 
 </div>
 
@@ -530,20 +545,29 @@ plainBackground: true
 
 </div>
 
-<div v-click="4" mt-8 text-5 text-center>
+<div v-click="4" mt-4 text-5 text-center>
 
 Three requests, three tasks, **one thread** — taking turns. 🔁
 
 </div>
 
+<style>
+.task-code {
+  --slidev-code-font-size: 15px;
+  --slidev-code-line-height: 1.4;
+}
+</style>
+
 <!--
 So: task. Let me be precise about what one is, because the rest of the talk leans on it.
 
 [click]
-A task does not appear on its own. Something starts it. In your own code, that is a call to `create_task()`, or `gather()`, which makes one task per coroutine you give it. In an async web app, it is usually the server. asyncio does not require this, but the major async web servers work this way. Uvicorn, for example, starts one task for each request, and your FastAPI or Starlette code runs inside it. Hold onto that, because who started it turns out to matter a lot later.
+A task doesn't appear on its own. Something starts it. Look at this small example. `greet()` is defined with `async def`, so calling `greet("alice")` gives you a coroutine. A coroutine is a function call that can pause at each `await`. You pass that coroutine to `asyncio.create_task()`, and that starts a task. `gather()` starts tasks too, one for each coroutine you pass to it.
+
+In an async web app, you usually don't start the tasks yourself. The server does. Uvicorn, for example, starts one task for each request, and your FastAPI or Starlette code runs inside that task. Remember this, because who starts a task matters a lot later.
 
 [click]
-What it wraps is a single coroutine. The caller does not wait around. It carries on, and the task becomes its own unit of work with its own lifetime.
+Each task runs one coroutine. Here, that's `greet("alice")`. And `create_task()` doesn't wait for it to finish. `main()` keeps going and prints its line right away, while the task runs on its own.
 
 [click]
 And the event loop runs them all, on one thread. So the tasks run concurrently, not in parallel. The loop switches between them, and a switch can happen at an await. How the loop decides which task runs next is a big topic, and we don't need the details today. For this talk, just remember: one thread, many tasks, taking turns.

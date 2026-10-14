@@ -792,6 +792,23 @@ async def handle(user):
 
 ````
 
+<div v-click="1">
+<div data-id="mm-decl" absolute style="left:612px;top:113px;width:1px;height:1px"></div>
+<div data-id="mm-get" absolute style="left:482px;top:185px;width:1px;height:1px"></div>
+<div data-id="mm-set" absolute style="left:310px;top:239px;width:1px;height:1px"></div>
+<div data-id="mm-ann-decl" absolute style="left:700px;top:102px;width:200px" class="mm-ann">declare: <b><code>ContextVar</code></b></div>
+<div data-id="mm-ann-get" absolute style="left:700px;top:172px;width:200px" class="mm-ann">read: <b><code>.get()</code></b></div>
+<div data-id="mm-ann-set" absolute style="left:700px;top:226px;width:200px" class="mm-ann">write: <b><code>.set()</code></b></div>
+<FancyArrow from="[data-id=mm-ann-decl] @ left" to="[data-id=mm-decl]" arc="0.1" />
+<FancyArrow from="[data-id=mm-ann-get] @ left" to="[data-id=mm-get]" arc="0.1" />
+<FancyArrow from="[data-id=mm-ann-set] @ left" to="[data-id=mm-set]" arc="-0.15" />
+</div>
+
+<style>
+.mm-ann { background: var(--slidev-theme-background, white); border: 1px solid rgb(14 165 233 / 0.5); border-radius: 0.5rem; padding: 0.15rem 0.5rem; font-size: 0.95rem; }
+html.dark .mm-ann { background: black; }
+</style>
+
 <div mt-6 grid="~ cols-2" gap-6>
 
 <div>
@@ -824,12 +841,12 @@ bob sees: Hello, bob!
 So here's the same program again.
 
 [click]
-Three lines change: the declaration, the set, and the get.
+Three lines change. The `threading.local()` object becomes a `ContextVar`. Reading `_local.user` becomes `user_var.get()`. And writing `_local.user` becomes `user_var.set()`.
 
 [click]
-And now each task reads back its own value, across the await. Same interleaving, same single thread, right answer.
+And now each task reads back its own value, across the await. The tasks still take turns in the same order, on the same single thread. But now we get the right answer.
 
-That's the whole pitch of the module. Now let's look at what's actually underneath it, because the mechanism is what tells you where it stops working.
+That's the main idea of the `contextvars` module. Next, let's look at how it works inside, because how it works is what tells you where it stops working.
 -->
 
 ---

@@ -1,8 +1,11 @@
 // Browser side: turns the toolbar's notes into AFS annotations with slide context
-// and keeps the annotation API in sync with what the toolbar creates, edits and deletes.
+// and keeps the annotation API in sync with what the toolbar creates, edits and deletes,
+// through an outbox (src/outbox.ts) that holds changes while the server is unreachable.
 
 import type { Annotation as ToolbarAnnotation } from 'agent-ui-annotation/vue'
 import type { Annotation } from './afs'
+import type { FlushResult } from './outbox'
+import { createOutbox } from './outbox'
 import type { ReviewAnnotationsClientConfig } from './types'
 
 // Captured when a note is created, so it describes the slide the reviewer was looking at.
@@ -122,10 +125,13 @@ export function loginUrl(config: ReviewAnnotationsClientConfig) {
   return `${config.endpoint}/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
 }
 
-function showNotice(text: string, action?: { label: string, href: string }) {
+// With `replace`, it takes the place of a notice already shown; otherwise that one stays.
+function showNotice(text: string, action?: { label: string, href: string }, { replace = false } = {}) {
   const id = 'slidev-review-annotations-notice'
-  if (document.getElementById(id))
+  const shown = document.getElementById(id)
+  if (shown && !replace)
     return
+  shown?.remove()
   const notice = document.createElement('div')
   notice.id = id
   notice.setAttribute('role', 'alert')
@@ -153,55 +159,160 @@ function showNotice(text: string, action?: { label: string, href: string }) {
   document.body.append(notice)
 }
 
-// Whether this browser may add notes right now. Asked before each new note, so logging
-// in (e.g. in another tab) takes effect without a reload.
-export async function checkCanCreate(config: ReviewAnnotationsClientConfig) {
+function hideNotice() {
+  document.getElementById('slidev-review-annotations-notice')?.remove()
+}
+
+function browserStorage() {
   try {
-    const response = await fetch(`${config.endpoint}/whoami`)
-    if (response.status === 401) {
-      showNotice('Log in before adding annotations; this annotation was not added.', { label: 'Log in', href: loginUrl(config) })
-      return false
-    }
-    if (!response.ok || !(await response.json() as { canCreate?: boolean }).canCreate) {
-      showNotice(`You can't add annotations here (HTTP ${response.status}); this annotation was not added.`)
-      return false
-    }
-    return true
+    return window.localStorage
   }
-  catch (error) {
-    console.warn('[slidev-addon-review-annotations] access check failed', error)
-    showNotice('The annotation server is unreachable, so this annotation was not added.')
+  catch {
+    return undefined
+  }
+}
+
+// Remembers that this browser may add annotations, so annotating can go on offline.
+const canCreateKey = (config: ReviewAnnotationsClientConfig) => `slidev-review-annotations:can-create:${config.endpoint}`
+
+function rememberCanCreate(config: ReviewAnnotationsClientConfig, can: boolean) {
+  try {
+    if (can)
+      localStorage.setItem(canCreateKey(config), '1')
+    else
+      localStorage.removeItem(canCreateKey(config))
+  }
+  catch {
+    // Without storage, annotating offline needs this page to have been online once.
+  }
+}
+
+function rememberedCanCreate(config: ReviewAnnotationsClientConfig) {
+  try {
+    return localStorage.getItem(canCreateKey(config)) === '1'
+  }
+  catch {
     return false
   }
 }
 
-export function createSync(config: ReviewAnnotationsClientConfig) {
-  async function send(method: string, path: string, body?: unknown) {
-    try {
-      const response = await fetch(`${config.endpoint}${path}`, {
-        method,
-        headers: body ? { 'Content-Type': 'application/json' } : undefined,
-        body: body ? JSON.stringify(body) : undefined,
-      })
-      if (response.status === 401)
-        showNotice('Your annotations are not being saved: log in first.', { label: 'Log in', href: loginUrl(config) })
-      // Deleting a note the server never had (e.g. one made before logging in) is fine.
-      else if (!response.ok && !(method === 'DELETE' && response.status === 404))
-        showNotice(`An annotation could not be ${method === 'DELETE' ? 'deleted' : 'saved'} (HTTP ${response.status}).`)
+// Asks the server whether this browser may add annotations, and remembers the answer.
+// Undefined when the server can't be reached.
+async function askCanCreate(config: ReviewAnnotationsClientConfig): Promise<{ can: boolean, status: number } | undefined> {
+  let response: Response
+  try {
+    response = await fetch(`${config.endpoint}/whoami`)
+  }
+  catch (error) {
+    console.warn('[slidev-addon-review-annotations] access check failed', error)
+    return undefined
+  }
+  if (response.status >= 500)
+    return undefined
+  const can = response.ok && !!(await response.json().catch(() => ({})) as { canCreate?: boolean }).canCreate
+  rememberCanCreate(config, can)
+  return { can, status: response.status }
+}
+
+// Whether this browser may add notes right now. Asked before each new note, so logging
+// in (e.g. in another tab) takes effect without a reload. When the server can't be
+// reached, the last answer it gave counts: the note is kept in the outbox until it can.
+export async function checkCanCreate(config: ReviewAnnotationsClientConfig) {
+  const answer = await askCanCreate(config)
+  if (!answer)
+    return offlineCanCreate(config)
+  if (answer.status === 401)
+    showNotice('Log in before adding annotations; this annotation was not added.', { label: 'Log in', href: loginUrl(config) })
+  else if (!answer.can)
+    showNotice(`You can't add annotations here (HTTP ${answer.status}); this annotation was not added.`)
+  return answer.can
+}
+
+function offlineCanCreate(config: ReviewAnnotationsClientConfig) {
+  if (rememberedCanCreate(config))
+    return true
+  showNotice('The annotation server is unreachable, so this annotation was not added. Open the deck online and log in once to annotate offline.')
+  return false
+}
+
+const RETRY_MS = 30_000
+
+// Keeps the annotation API in step with the toolbar. Changes go through an outbox in
+// localStorage, so they survive being offline and reloads, and are sent once the server
+// can be reached: right away, when the browser comes back online, and every 30 s meanwhile.
+export function createSync(config: ReviewAnnotationsClientConfig, onFlushed?: (result: FlushResult) => void) {
+  const sessionPath = `/sessions/${encodeURIComponent(config.sessionId)}`
+  const outboxKey = `slidev-review-annotations:outbox:${config.endpoint}:${config.sessionId}`
+  const outbox = createOutbox({
+    storage: browserStorage(),
+    key: outboxKey,
+    send: entry => entry.op === 'save'
+      // The toolbar assigns the id, so creating and editing both post the full note.
+      ? fetch(`${config.endpoint}${sessionPath}/annotations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry.annotation),
+        })
+      : fetch(`${config.endpoint}/annotations/${encodeURIComponent(entry.id)}`, { method: 'DELETE' }),
+    lock: run => navigator.locks
+      ? navigator.locks.request(`${outboxKey}:flush`, run)
+      : run(),
+  })
+
+  let retry: ReturnType<typeof setTimeout> | undefined
+  let stopped: FlushResult['stopped']
+  let destroyed = false
+
+  async function flush() {
+    clearTimeout(retry)
+    const result = await outbox.flush()
+    // Tell the reviewer when this changes, not on every try, so a dismissed notice stays dismissed.
+    if (result.stopped !== stopped) {
+      if (result.stopped === 'login')
+        showNotice('Your annotations are kept in this browser until you log in again.', { label: 'Log in', href: loginUrl(config) }, { replace: true })
+      else if (result.stopped === 'unreachable')
+        showNotice('Offline: your annotations are kept in this browser and will be saved when the connection is back. Keep annotating, but don\'t clear this site\'s data.', undefined, { replace: true })
+      else
+        hideNotice()
+      stopped = result.stopped
     }
-    catch (error) {
-      console.warn(`[slidev-addon-review-annotations] ${method} ${path} failed`, error)
-      showNotice('The annotation server is unreachable, so annotations are not being saved.')
+    for (const { op, status } of result.rejected)
+      showNotice(`An annotation could not be ${op === 'delete' ? 'deleted' : 'saved'} (HTTP ${status}).`)
+    if (result.pending && !destroyed) {
+      // Concurrent calls share one outbox run and all get here: keep a single timer.
+      clearTimeout(retry)
+      retry = setTimeout(flush, RETRY_MS)
     }
+    onFlushed?.(result)
+    return result
   }
 
-  const sessionPath = `/sessions/${encodeURIComponent(config.sessionId)}`
+  // Asked up front too, so a deck opened online can be annotated after going offline.
+  void askCanCreate(config)
+
+  const online = () => void flush()
+  window.addEventListener('online', online)
+  // Changes left from an earlier visit.
+  if (outbox.pending())
+    void flush()
 
   return {
-    // The toolbar assigns the id, so creating and editing both post the full note.
-    save: (annotation: ToolbarAnnotation) =>
-      send('POST', `${sessionPath}/annotations`, toAfs(annotation, config)),
-    remove: (id: string) =>
-      send('DELETE', `/annotations/${encodeURIComponent(id)}`),
+    save: (annotation: ToolbarAnnotation) => {
+      outbox.add({ op: 'save', id: annotation.id, annotation: toAfs(annotation, config) })
+      return flush()
+    },
+    remove: (id: string) => {
+      outbox.add({ op: 'delete', id })
+      return flush()
+    },
+    flush,
+    pending: () => outbox.pending(),
+    destroy() {
+      destroyed = true
+      clearTimeout(retry)
+      window.removeEventListener('online', online)
+    },
   }
 }
+
+export type Sync = ReturnType<typeof createSync>

@@ -122,6 +122,30 @@ is woken by the comment, applies the annotations, pushes, and resolves them by i
 `(batch) => Promise<{ url? }>` can be passed as `dispatch` instead, e.g. to call a Claude
 Code Routine's API trigger.
 
+## Reviewing offline
+
+You can open a deck online, go offline, keep annotating, and send the annotations once
+you are back online:
+
+- When the deck loads, it asks the server whether this browser may add annotations and
+  remembers the answer. Offline, that remembered answer is used. So log in and open the
+  deck once while online.
+- Every change (new annotation, edit, delete) first goes into an outbox in `localStorage`.
+  It is sent to the server right away, again when the browser comes back online, every
+  30 seconds while changes are waiting, and on the next page load. Only the latest change
+  to each annotation is sent. Tabs of the same deck share the outbox and take turns sending
+  (with the browser's Web Locks API), so an older version never overwrites a newer one.
+- While changes are waiting, the deck says so. **Send to agent** saves them before sending,
+  and doesn't send while any are still waiting. With **Send automatically** on, sending
+  starts once they are saved.
+- If the login expired meanwhile, the changes stay in the outbox until you log in again.
+
+The deck's own files need the network: a slide or image the browser hasn't loaded yet may
+not show offline, and reloading the page offline fails unless something like a service
+worker caches the deck. Such a service worker must not cache or answer requests under the
+annotation API (`/__review-annotations/api`), or the outbox would count changes as saved
+that never reached the server.
+
 ## Host the API in your own Worker
 
 `slidev-addon-review-annotations/worker` sets the API up from a Worker's bindings, so another

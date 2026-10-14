@@ -29,3 +29,5 @@ done
 
 pnpm --filter index build
 mv packages/index/dist/* "${rootDist}/."
+
+node scripts/build-service-worker.mjs "$rootDist"

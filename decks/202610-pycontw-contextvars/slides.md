@@ -706,7 +706,10 @@ State that belongs to the execution, not to the thread
 
 <!--
 So we need storage that follows the logical execution instead of the thread.
-That's exactly what contextvars is.
+
+What do I mean by logical execution? It's the code that runs for one request, from start to finish. On the async server, that's one task. The task stops at each `await`, other tasks run on the same thread, and later it picks up where it left off. The thread is shared, but the task's own line of work goes on.
+
+So we want a value that belongs to that line of work, and goes with it across every `await`. That's exactly what the `contextvars` module gives us.
 -->
 
 ---
@@ -721,7 +724,7 @@ user_var = ContextVar(
 )
 
 user_var.set("alice")
-user_var.get()
+user_var.get()  # "alice"
 ```
 
 <div v-click="2">

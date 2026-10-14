@@ -7,10 +7,10 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Logging in here covers every PR preview (see packages/slidev-addon-annotate/README.md).
-    "ANNOTATE_HOME_ORIGIN": "https://slides.whitphx.workers.dev"
+    // Logging in here covers every PR preview (see packages/slidev-addon-review-annotations/README.md).
+    "REVIEW_ANNOTATIONS_HOME_ORIGIN": "https://slides.whitphx.workers.dev"
   },
   "d1_databases": [
-    { "binding": "ANNOTATIONS_DB", "database_name": "slides-annotations", "database_id": "20034360-b82f-4061-a0a3-2bd0db98ab1c" }
+    { "binding": "REVIEW_ANNOTATIONS_DB", "database_name": "slides-annotations", "database_id": "20034360-b82f-4061-a0a3-2bd0db98ab1c" }
   ]
 }

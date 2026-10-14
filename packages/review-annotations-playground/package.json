@@ -1,0 +1,14 @@
+{
+  "name": "review-annotations-playground",
+  "type": "module",
+  "private": true,
+  "description": "A small deck for trying slidev-addon-review-annotations; not deployed",
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.19.0",
+    "slidev-addon-review-annotations": "workspace:*"
+  }
+}

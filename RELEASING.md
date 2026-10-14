@@ -1,7 +1,7 @@
 # Releasing packages
 
 Workspace packages without `"private": true` are published to npm. Today that is only
-[`slidev-addon-annotate`](packages/slidev-addon-annotate); decks, themes and the index site
+[`slidev-addon-review-annotations`](packages/slidev-addon-review-annotations); decks, themes and the index site
 are private and are never versioned or published.
 
 Releases are managed with [Changesets](https://github.com/changesets/changesets).
@@ -36,7 +36,7 @@ Releases are managed with [Changesets](https://github.com/changesets/changesets)
         and with provenance. A staged version isn't public yet.
 4. **Approve the staged version** with 2FA:
    - on npmjs.com, in the package's **Staged Packages** tab; or
-   - with `npm stage list slidev-addon-annotate`, then `npm stage approve <stage-id>`.
+   - with `npm stage list slidev-addon-review-annotations`, then `npm stage approve <stage-id>`.
 
    Approving makes the version public. To drop it instead, use **Reject** or
    `npm stage reject <stage-id>`.
@@ -76,14 +76,14 @@ as described in [npmパッケージを最初からGitHub Actionsでリリース�
 2. **Publish a placeholder** from your machine (needs your npm login):
 
    ```sh
-   npx setup-npm-trusted-publish@2.2.0 slidev-addon-annotate
+   npx setup-npm-trusted-publish@2.2.0 slidev-addon-review-annotations
    ```
 
    This publishes version `0.0.0`. It has only a `package.json` and a README saying it is
    a placeholder for setting up trusted publishing. The package in this repository starts
    at `0.0.0` too, so CI doesn't try to republish it.
 3. **Configure the trusted publisher** at
-   `https://www.npmjs.com/package/slidev-addon-annotate/access`. Choose **GitHub Actions**
+   `https://www.npmjs.com/package/slidev-addon-review-annotations/access`. Choose **GitHub Actions**
    and enter:
    - Organization or user: `whitphx`
    - Repository: `slides`

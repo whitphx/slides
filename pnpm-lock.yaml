@@ -33,9 +33,9 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
-      slidev-addon-annotate:
+      slidev-addon-review-annotations:
         specifier: workspace:*
-        version: link:packages/slidev-addon-annotate
+        version: link:packages/slidev-addon-review-annotations
       typescript-eslint:
         specifier: ^8.28.0
         version: 8.28.0(eslint@9.23.0(jiti@2.7.0))(typescript@6.0.3)
@@ -282,15 +282,15 @@ importers:
       '@slidev/cli':
         specifier: ^52.19.0
         version: 52.19.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@oxc-project/types@0.143.0)(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.1(@types/node@22.16.2)(esbuild@0.27.4)(jiti@2.7.0)(tsx@4.19.2)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.41)(cac@7.0.0)(esbuild@0.27.4)(hono@4.13.0)(lightningcss@1.33.0)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(oxc-parser@0.131.0)(postcss@8.5.26)(react@18.3.1)(rolldown@1.2.3)(rollup@4.44.2)(srvx@0.12.5)(tsx@4.19.2)
-      slidev-addon-annotate:
-        specifier: workspace:*
-        version: link:../../packages/slidev-addon-annotate
       slidev-addon-fancy-arrow:
         specifier: ^0.16.1
         version: 0.16.1(typescript@6.0.3)
       slidev-addon-qrcode:
         specifier: ^1.0.2
         version: 1.0.2
+      slidev-addon-review-annotations:
+        specifier: workspace:*
+        version: link:../../packages/slidev-addon-review-annotations
       slidev-addon-window-mockup:
         specifier: ^0.3.1
         version: 0.3.1(typescript@6.0.3)
@@ -307,15 +307,15 @@ importers:
       '@slidev/cli':
         specifier: ^52.19.0
         version: 52.19.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@oxc-project/types@0.143.0)(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.1(@types/node@22.16.2)(esbuild@0.27.4)(jiti@2.7.0)(tsx@4.19.2)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.41)(cac@7.0.0)(esbuild@0.27.4)(hono@4.13.0)(lightningcss@1.33.0)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(oxc-parser@0.131.0)(postcss@8.5.26)(react@18.3.1)(rolldown@1.2.3)(rollup@4.44.2)(srvx@0.12.5)(tsx@4.19.2)
-      slidev-addon-annotate:
-        specifier: workspace:*
-        version: link:../../packages/slidev-addon-annotate
       slidev-addon-fancy-arrow:
         specifier: ^0.16.1
         version: 0.16.1(typescript@6.0.3)
       slidev-addon-qrcode:
         specifier: ^1.0.2
         version: 1.0.2
+      slidev-addon-review-annotations:
+        specifier: workspace:*
+        version: link:../../packages/slidev-addon-review-annotations
       slidev-addon-window-mockup:
         specifier: ^0.3.1
         version: 0.3.1(typescript@6.0.3)
@@ -350,15 +350,6 @@ importers:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
 
-  packages/annotate-playground:
-    dependencies:
-      '@slidev/cli':
-        specifier: ^52.19.0
-        version: 52.19.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@oxc-project/types@0.143.0)(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.1(@types/node@22.16.2)(esbuild@0.27.4)(jiti@2.7.0)(tsx@4.19.2)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.41)(cac@7.0.0)(esbuild@0.27.4)(hono@4.13.0)(lightningcss@1.33.0)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(oxc-parser@0.131.0)(postcss@8.5.26)(react@18.3.1)(rolldown@1.2.3)(rollup@4.44.2)(srvx@0.12.5)(tsx@4.19.2)
-      slidev-addon-annotate:
-        specifier: workspace:*
-        version: link:../slidev-addon-annotate
-
   packages/index:
     dependencies:
       '@tailwindcss/vite':
@@ -371,7 +362,16 @@ importers:
         specifier: ^4.0.17
         version: 4.0.17
 
-  packages/slidev-addon-annotate:
+  packages/review-annotations-playground:
+    dependencies:
+      '@slidev/cli':
+        specifier: ^52.19.0
+        version: 52.19.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@oxc-project/types@0.143.0)(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.1(@types/node@22.16.2)(esbuild@0.27.4)(jiti@2.7.0)(tsx@4.19.2)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.41)(cac@7.0.0)(esbuild@0.27.4)(hono@4.13.0)(lightningcss@1.33.0)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(oxc-parser@0.131.0)(postcss@8.5.26)(react@18.3.1)(rolldown@1.2.3)(rollup@4.44.2)(srvx@0.12.5)(tsx@4.19.2)
+      slidev-addon-review-annotations:
+        specifier: workspace:*
+        version: link:../slidev-addon-review-annotations
+
+  packages/slidev-addon-review-annotations:
     dependencies:
       agent-ui-annotation:
         specifier: ^0.8.0

@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, test } from 'node:test'
 import type { Authenticator, Role } from './auth.ts'
 import { createFileStore } from './file-store.ts'
-import { createAnnotateHandler } from './server.ts'
+import { createReviewAnnotationsHandler } from './server.ts'
 
 // Test callers name themselves in `x-test-user: <id>:<role>`; no header means no credential.
 const testAuth: Authenticator = {
@@ -16,11 +16,11 @@ const testAuth: Authenticator = {
 }
 
 let dir: string
-let handle: ReturnType<typeof createAnnotateHandler>
+let handle: ReturnType<typeof createReviewAnnotationsHandler>
 
 beforeEach(async () => {
-  dir = await mkdtemp(join(tmpdir(), 'slidev-annotate-'))
-  handle = createAnnotateHandler({ store: createFileStore(join(dir, 'annotations.json')), basePath: '/api', auth: testAuth })
+  dir = await mkdtemp(join(tmpdir(), 'slidev-review-annotations-'))
+  handle = createReviewAnnotationsHandler({ store: createFileStore(join(dir, 'annotations.json')), basePath: '/api', auth: testAuth })
 })
 
 afterEach(() => rm(dir, { recursive: true, force: true }))

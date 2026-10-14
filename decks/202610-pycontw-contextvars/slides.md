@@ -172,7 +172,7 @@ Let's start with the problem that the `contextvars` module is going to solve.
 plainBackground: true
 ---
 
-# A view you've written a hundred times
+# A route function you've written a hundred times
 
 <div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-center>
 
@@ -207,7 +207,7 @@ def index():
 
 <div v-click="4" mt-8 text-5 text-center>
 
-**Who** is asking, and **where** the file is: neither was passed in. 👻
+The **user** and the **directory**: neither is an argument. 👻
 
 </div>
 
@@ -228,14 +228,12 @@ Let me show you a piece of code you've probably written a hundred times. A Flask
 And `open("greeting.txt")` is a relative path. Which file it opens depends on the current working directory.
 
 [click]
-Now look at the function itself. `index()` takes no arguments. Nobody passed it the user, and nobody passed it the directory.
+Now look at the function itself. `index()` takes no arguments. The user and the directory both come from somewhere else.
 
 [click]
-And yet it knows who is asking, and where to look. Both values are just there when the function runs.
+So the current user and the current directory are not arguments. They're just there when the function runs. How does Python manage values like these?
 -->
 
----
-plainBackground: true
 ---
 plainBackground: true
 ---
@@ -278,7 +276,7 @@ plainBackground: true
 </style>
 
 <!--
-So how does `index()` know who is asking? To answer that, we first need to look at the server it runs on.
+So how does `index()` get the current user? To answer that, we first need to look at the server it runs on.
 
 Our example runs on a classic web server. One process, a pool of threads, and each incoming request gets a thread of its own. That thread handles the request from start to finish, and only that request.
 
@@ -294,16 +292,19 @@ So while alice's request is being handled, Thread 1 belongs to alice. One thread
 
 <div grid="~ cols-[1.15fr_1fr]" gap-6 items-start>
 
-```py {*|1|3-5|7-8|10-11|*}{maxHeight:'340px'}
+```py {*|1|3-6|8-10|12-14|*}{maxHeight:'340px'}
 _local = threading.local()
 
+# Flask: runs on the request's own thread
 def handle(request):
     _local.user = request.user
     index()
 
+# Flask-Login
 def current_user():
     return _local.user
 
+# your code
 def index():
     print(f"Hello, {current_user()}!")
 ```
@@ -336,18 +337,18 @@ So on that server, how does something like `current_user` work? Here is a simpli
 The user changes from request to request, so a plain module-level global won't do. On this server, the classic answer is threading dot local: one value per thread.
 
 [click]
-At the top of each request, you stash the user on it, and then call the view.
+At the top of each request, Flask stashes the user on it, and then calls your route function. The server has already given this request a thread of its own, so `handle()` runs on that thread.
 
 [click]
-`current_user()` reads it straight back out.
+`current_user()` is the Flask-Login part. It reads the user straight back out.
 
 [click]
-And the view is a stripped-down version of our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
+And the route function is a stripped-down version of our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
 
-And this is what Flask 1.x really did. Werkzeug's `Local` kept one storage per thread id, and Flask-Login put the user on the request context stored there. The links are on the slide. Newer versions of Flask store it differently.
+This is roughly what Flask 1.x did. The links to the real code are on the slide.
 -->
 
 ---
@@ -387,13 +388,15 @@ The current database transaction. SQLAlchemy's `scoped_session`, for example, ke
 The current runtime: which app is running, in a system that runs more than one.
 
 [click]
-The current working directory, the other value our Flask view used.
+The current working directory, the other value our Flask route function used.
 
 [click]
 And the current environment variables. These last two are different from the others. There is only one of each for the whole process, not one per thread.
 
 [click]
 None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
+
+And for the per-thread ones, like the request and the user, `threading.local()` is the classic tool. That's how they've been managed.
 -->
 
 ---
@@ -637,7 +640,7 @@ bob sees: Hello, bob!
 <!--
 Let me show you the failure.
 
-Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the view. `index()` reads the user back, and it still takes no arguments.
+Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the route function. `index()` reads the user back, and it still takes no arguments.
 
 [click]
 The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. That is what an async server does for two requests that arrive together.
@@ -1198,7 +1201,7 @@ And it's how a library borrows a context variable without permanently changing i
 - 🪵 **Request IDs in logs** — a logging filter that calls `.get()`
 - 🔭 **Tracing** — `opentelemetry.context` is `contextvars` underneath; the current span follows your `await`
 - 💾 **Async DB sessions** — SQLAlchemy's `async_scoped_session` is scoped to a context
-- 🌐 **Web frameworks** — Flask's `request`, and the `current_user` from our first view
+- 🌐 **Web frameworks** — Flask's `request`, and the `current_user` from our first route function
 
 </v-clicks>
 
@@ -1223,7 +1226,7 @@ Distributed tracing. OpenTelemetry's context API is contextvars underneath. That
 Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
 
 [click]
-And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first view was sitting on this all along.
+And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
 
 And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
 
@@ -1540,7 +1543,7 @@ Before it runs App A's script, the host moves to App A's directory. App A's file
 Before it runs App B's script, the host moves to App B's directory.
 
 [click]
-And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask view at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask route function at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
@@ -1917,7 +1920,7 @@ So when should you actually reach for this?
 
 The honest answer is: less often than it's fun to.
 
-Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that. Our very first view is the textbook case: Flask calls `index()` for you, and you don't own that call, so the user can't arrive as an argument.
+Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that. Our very first route function is the textbook case: Flask calls `index()` for you, and you don't own that call, so the user can't arrive as an argument.
 
 But if the value is part of what the function does — this function loads this user's orders — pass it. Just pass it. Same kind of value, different job.
 

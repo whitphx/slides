@@ -348,7 +348,7 @@ And the route function is a stripped-down version of our `index()` from before. 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
 
-This is roughly what Flask 1.x did. The links to the real code are on the slide.
+This is roughly what Flask did in version one. The links to the real code are on the slide.
 -->
 
 ---
@@ -1318,7 +1318,7 @@ Distributed tracing. OpenTelemetry's context API is contextvars underneath. That
 Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
 
 [click]
-And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
+And web frameworks. Since Flask version two point two, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
 
 So your stack already depends on it.
 

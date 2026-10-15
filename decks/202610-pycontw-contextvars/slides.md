@@ -866,7 +866,7 @@ plainBackground: true
 
 <div border="~ sky/50 rounded-lg" p-4 bg-sky:5>
 
-<div text-4 op70 mb-3>one <code>Context</code></div>
+<div text-4 op70 mb-3>a <code>Context</code>: each <code>ContextVar</code> → its value</div>
 
 <div flex="~ col" gap-2 text-4>
 <div><code>user_var</code> <span op50>→</span> <b>"alice"</b></div>
@@ -930,7 +930,7 @@ ctx[user_var]  # "alice"
 
 <div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
 
-`set()` and `get()` always touch **the one you are running inside**. 🎯
+`set()` and `get()` always use **the `Context` you are running in**. 🎯
 
 </div>
 

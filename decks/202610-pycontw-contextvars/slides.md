@@ -1287,7 +1287,7 @@ And reset puts alice back.
 Why do we need this? The copy only happens when a new task starts. Here we stay in the same task, so the old value is gone unless you put it back yourself. `reset()` with the token does that.
 
 [click]
-And it's how a library borrows a context variable without permanently changing it for the application that called it.
+And this matters most if you write a library. A polite library may change a context variable while it does its job, but it puts the old value back with `reset()` before it returns. Then the application that called it never sees the change.
 -->
 
 ---

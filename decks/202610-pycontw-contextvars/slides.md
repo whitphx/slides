@@ -1812,94 +1812,104 @@ Knowing the right directory is not the same as being in it. contextvars did its 
 
 # Step 2: change the directory, then change it back
 
-```py {*|2-3|6-7|10-11|*}{maxHeight:'340px'}
-class TaskSpecificDirectoryConfig:
-    def __init__(self, home):
-        self.wanted = DirectoryConfig(cwd=home, home_dir=home)
+<div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
 
-    def __enter__(self):
-        self.saved = DirectoryConfig(os.getcwd(), os.environ.get("HOME"))
-        self._apply(self.wanted)
-
-    def __exit__(self, *excinfo):
-        self.wanted = DirectoryConfig(os.getcwd(), os.environ.get("HOME"))
-        self._apply(self.saved)
+```py {*|2|3-5|6|7-8|*}
+@contextmanager
+def app_directory(home):
+    saved = (os.getcwd(), os.environ.get("HOME"))
+    os.chdir(home)
+    os.environ["HOME"] = home
+    yield
+    os.chdir(saved[0])
+    os.environ["HOME"] = saved[1]
 ```
 
-<div v-click="4" mt-3 text-5 border="~ amber/40 rounded-lg" p-3 bg-amber:5>
+<div v-click="6" mt-4 text-5>
 
-`__exit__` **saves before it restores** — the app may have called `os.chdir()` itself, and that has to survive. 🔁
+Move in, run, **move back**. The directory is only **borrowed**. 🔁
 
 </div>
 
 <!--
-So step two. A context manager that does the applying.
+So step two. Now we use that value to change the real directory. Here is a simplified version, as pseudocode.
 
 [click]
-It is built with the directory this task wants, which is exactly the value step one put into the context variable. That is where the two halves join up.
+It's a context manager. It takes `home`, the directory this app should use. That is exactly the value step one put into the context variable.
 
 [click]
-On the way in, it writes down where the process currently is, and then moves it to where this task wants to be.
+On the way in, it remembers where the process is now. Then it moves to the app's directory and sets `HOME`. These are the same `os.chdir()` and `os.environ` calls the host made before.
 
 [click]
-On the way out, it puts back what it found. This is the Token pattern from the first half, except the thing being saved and restored is process-wide state, not a context variable.
+Then the app's code runs, inside the `with` block.
 
 [click]
-And there's one subtlety I want to call out, because it took me a while.
+On the way out, it puts back what it found. This is the same idea as the `Token` from the first half: change a value, then put the old one back. But here, the value is process-wide state, not a context variable.
 
-On the way out, before restoring, it saves the current directory again. Why? Because the app's own code might have called chdir while it was running. That's a legitimate thing for a user script to do. If we just restored blindly, we'd throw away the app's own change, and next time we resume we'd put it back in the wrong place. So the app's move has to survive being suspended.
+[click]
+So the app never owns the directory. It borrows it, and gives it back.
 -->
 
 ---
 
 # Step 3: do it every time the task resumes
 
-````md magic-move {at:1}
+<div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
+
+````md magic-move {at:2}
 
 ```py
-class TaskSpecificDirectoryConfig:
-    def __enter__(self): ...
-    def __exit__(self, *excinfo): ...
+async def run_script(app):
+    with app_directory(app.home):
+        await exec_script(app.code)
 ```
 
 ```py
 class DirectorySyncCoroutineProxy(Coroutine):
     def __init__(self, coro):
         self.iter = coro.__await__()
-        home = home_dir_contextvar.get()
-        self._dir = (
-            TaskSpecificDirectoryConfig(home)
-            if home
-            else nullcontext()
-        )
+        self.home = home_dir_contextvar.get()
 
     def send(self, value):
-        with self._dir:
+        with app_directory(self.home):
             return self.iter.send(value)
 ```
 
 ````
 
-<div v-click="2" mt-3 text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
+<div mt-3 grid>
 
-`send()` is what the **event loop** calls to resume a coroutine. Streamlit's `ScriptRunner` wraps its coroutine in this proxy before `create_task()`, so **every step** runs in the right directory. 🎯
+<div v-click="[1,2]" style="grid-area: 1 / 1" text-5 border="~ rose/40 rounded-lg" p-3 bg-rose:5>
+
+❌ The `with` stays open while App A is **paused** at `await`. App B moves the directory. App A **resumes** in the wrong one.
+
+</div>
+
+<div v-click="3" style="grid-area: 1 / 1" text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
+
+`send()` is what the **event loop** calls to **resume** a coroutine. So **every step** runs in the right directory. 🎯
+
+</div>
 
 </div>
 
 <!--
-But a context manager only helps if something enters it at the right moments. And the right moment is every single time this coroutine gets resumed.
+But where do we use this context manager? This is the part that took me the longest.
+
+The first idea is simple: wrap the whole script in it. Move in, run the script, move back.
 
 [click]
-So: a proxy that wraps the coroutine.
+But this does not work. The `with` block stays open while App A's script is paused at an `await`. While it is paused, App B's task runs, and moves the directory to App B's. When App A resumes, nothing moves it back. So we are back to the same bug.
 
-It reads the context variable once, at construction, and builds the directory context manager for that task. Note the nullcontext fallback — if there's no home directory bound, this does nothing at all.
+The problem is that a task does not run in one piece. It runs in steps. It runs until an `await` pauses it, and later the event loop resumes it. So we need to move in every time the task resumes, and move back every time it pauses. Is there a place that runs exactly at those moments?
 
 [click]
-And then send. send is the method the event loop calls every time it resumes a coroutine. Each await that comes back is a call to send.
+There is. We wrap the script's coroutine in a proxy. When it is created, it reads the app's directory from the context variable.
 
-So by wrapping send in the directory context manager, every single step of that coroutine runs in its own directory, and the directory is put back the instant it yields.
+[click]
+And then `send()`. `send()` is the method the event loop calls every time it resumes a coroutine. It runs one step, until the next `await` pauses it.
 
-The real class does the same for throw and close, so exceptions and cancellation are covered too.
+So we wrap `send()` in our context manager. Every step of the script runs in its own app's directory, and the directory is put back as soon as the step pauses. Stlite wraps the script's coroutine in this proxy before it creates the task. The real class does the same for `throw()` and `close()`, so errors and cancellation are covered too.
 -->
 
 ---

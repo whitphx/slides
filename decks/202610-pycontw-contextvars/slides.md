@@ -1134,7 +1134,7 @@ Now, the other place values go missing is when you leave the event loop.
 asyncio dot to_thread copies the context across for you. This one is safe, and it's documented as such.
 
 [click]
-run_in_executor does not. Same idea, different function, opposite behaviour. Your worker runs on a pool thread with a fresh, empty context, and every get returns the default.
+run_in_executor does not. Same idea, different function, opposite behaviour. The function you pass in, `work` here, runs on a thread from a thread pool. That thread starts with a fresh, empty context, so every get inside `work` returns the default.
 
 [click]
 If you need it, you copy the context yourself and hand run the function. A bit ugly, but explicit.
@@ -1253,11 +1253,11 @@ And this one was a real bug. Streamlit, the data-app framework, needs its sessio
 # `Token`: putting it back
 
 ```py {*|1|3|5}{maxHeight:'220px'}
-token = user_var.set("admin")
+token = user_var.set("guest")
 
-run_admin_job()
+do_work()  # sees "guest"
 
-user_var.reset(token)
+user_var.reset(token)  # back to "alice"
 ```
 
 <div mt-6 text-5>
@@ -1272,19 +1272,19 @@ user_var.reset(token)
 </div>
 
 <!--
-One more piece of the API: the Token. Say alice's request has to run one job as admin.
+One more piece of the API: the `Token`. A `Token` lets you undo a `set()`. We're in alice's task, and we change the value for a short time.
 
 [click]
-set doesn't just return None. It gives you back a token, which remembers what the value was before you touched it. Here, that's alice.
+`set()` doesn't just return None. It gives you back a token, which remembers the value before your change. Here, that's alice.
 
 [click]
-The admin job runs.
+The work runs and sees the new value.
 
 [click]
 And reset puts alice back.
 
 [click]
-Why do you need this, if tasks get their own copy? Because there's no copy here. This is all one task, alice's task, so nothing protects her value except you putting it back.
+Why do we need this? The copy only happens when a new task starts. Here we stay in the same task, so the old value is gone unless you put it back yourself. `reset()` with the token does that.
 
 [click]
 And it's how a library borrows a context variable without permanently changing it for the application that called it.

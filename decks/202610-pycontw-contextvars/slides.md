@@ -454,12 +454,12 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-On the left is the thread-per-request server our code was written for. One process, three threads, one request each. Per-thread storage really is per-request storage.
+On the left is the thread-per-request server our code was written for. One process, many threads, one thread per request. Per-thread storage really is per-request storage.
 
 But once we go async, that stops being true.
 
 [click]
-And on the right is asyncio. Same one process, the same three requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All three tasks share the one thread. They take turns, and the event loop switches between them at every await.
+And on the right is an async web server, built on asyncio. Same one process, the same requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All the tasks share the one thread. They take turns, and the event loop switches between them at every await.
 
 [click]
 So one thread is serving many requests at once.

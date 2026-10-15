@@ -996,16 +996,8 @@ await asyncio.gather(handle("alice"), handle("bob"))
 <FancyArrow v-click="1" from="[data-id=parent] @ left" to="[data-id=rulecode] .line:nth-child(11) @ right" arc="0" />
 <FancyArrow v-click="3" from="[data-id=child-a] @ left" to="[data-id=rulecode] .line:nth-child(8) @ right" arc="0.1" />
 
-<div v-click="4" mt-4 grid="~ cols-2" gap-6 text-5>
-
-<div border="~ emerald/40 rounded-lg" p-3 bg-emerald:5>
+<div v-click="4" mt-4 text-5 border="~ emerald/40 rounded-lg" p-3 bg-emerald:5 text-center>
 ✅ the task <b>inherits</b> what you set before it started
-</div>
-
-<div v-click="5" border="~ rose/40 rounded-lg" p-3 bg-rose:5>
-❌ what the task sets <b>never</b> comes back to you
-</div>
-
 </div>
 
 <style>
@@ -1028,9 +1020,6 @@ Then each task sets the user in its own copy of the context: "alice" in one, "bo
 
 [click]
 So a task starts with everything the caller had set.
-
-[click]
-And what a task sets stays in the task. The caller still has no user.
 -->
 
 ---
@@ -1351,10 +1340,10 @@ The usual example is 🪵 **logs**. It's **not just for logging**.
 Now let's look at real tools that use `contextvars`. You've probably used some of them already.
 
 [click]
-Request IDs in logs. A `logging.Filter` reads the current request ID from a context variable and adds it to every log record.
+Request IDs in logs. At the start of each request, a middleware stores a new request ID in a context variable. Then a `logging.Filter` reads it and adds it to every log record.
 
 [click]
-Distributed tracing. OpenTelemetry's context is `contextvars` underneath. That's how the current span follows you across awaits.
+Distributed tracing. OpenTelemetry records each operation as a span, and a new span needs to know which span is running now, so it can attach to it as a child. OpenTelemetry keeps that current span in a context variable, so it stays right across awaits.
 
 [click]
 Async database sessions. SQLAlchemy can scope a session to the current task.
@@ -1374,7 +1363,8 @@ layout: statement
 
 <div mt-8 op70 text-5>
 
-🧠 **logical execution**: one unit of work (a request, a task, a callback), **on any thread**
+🧠 **logical execution**<br>
+one unit of work: a request, a task, a callback · **on any thread**
 
 </div>
 
@@ -1397,7 +1387,7 @@ Streamlit in the browser, and one very global variable
 </div>
 
 <!--
-This is Stlite, the project where I learned that.
+This is Stlite. I'm its author and maintainer, and it's the project where I learned that.
 -->
 
 ---
@@ -1491,13 +1481,13 @@ So the whole runtime ships as a static web page.
 </style>
 
 <!--
-Here's a Stlite app. On the left is all of its source code: `app.py`, a short Streamlit script, and `stlite.html`, a static page that runs it.
+Here's a Stlite app. On the left is the whole source code of this app: a short Streamlit script, and a web page that loads it.
 
 [click]
 On the right is that page, running live in this slide. When I move the slider, the chart changes.
 
 [click]
-Two static files, no backend, no API calls. Python runs in this tab.
+It's only static files. There is no server. The Python code runs right here, in the browser tab.
 
 Now let me show you the part that made my life hard.
 -->
@@ -1545,16 +1535,16 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 </div>
 
 <!--
-`app.py` has no server code and no main loop. So who runs it?
+`app.py` is the application script, the one a Stlite user writes. It has no server code. So who runs it?
 
 [click]
 The Streamlit runtime does. It's the host, and it runs your script in the same Python interpreter.
 
 [click]
-And one Stlite runtime can run several apps, which regular Streamlit never does. So before each run, Stlite moves to the app's own directory and sets `HOME` for it.
+And one Stlite runtime can run several apps, which regular Streamlit never does. So before each run, Stlite moves to the app's own directory and sets the `HOME` environment variable for it.
 
 [click]
-So the host calls `os.chdir()`, and your script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
+So the host calls `os.chdir()` to prepare for running the app script, and your script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
 -->
 
 ---
@@ -1606,7 +1596,7 @@ Three apps, but **they all share one interpreter.** 😬
 </style>
 
 <!--
-Here's the setup, from the outside in.
+This diagram shows the layers that Stlite apps run inside, from the outside in.
 
 [click]
 Stlite runs in a Web Worker, which has one JavaScript thread.

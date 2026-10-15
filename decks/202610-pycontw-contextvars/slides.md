@@ -1470,7 +1470,7 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 
 </div>
 
-<div>
+<div v-click="1">
 
 <LiveEmbed url="/stlite-demo/stlite.html" title="stlite.html" light padding="0.4rem" height="280px" :zoom="0.5">
 
@@ -1478,7 +1478,7 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 
 </LiveEmbed>
 
-<div v-click="1" mt-4 text-5 text-center>
+<div v-click="2" mt-4 text-5 text-center>
 
 **Static files only.**<br>The Python runs **in the page**. 🪄
 
@@ -1501,8 +1501,9 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 </style>
 
 <!--
-Here is an example of a Streamlit app running on Stlite. On the left is all of its source code. `app.py` is an ordinary Streamlit script: a title, a slider, and a line chart. Below it is `stlite.html`, a static HTML page. It loads Stlite from a CDN and points it at `app.py`.
+Here is an example of a Streamlit app running on Stlite. On the left is all of its source code. `app.py` is a short Streamlit script: a title, a slider, and a chart. `stlite.html` is a static HTML page that loads Stlite and runs `app.py`.
 
+[click]
 On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
 
 [click]

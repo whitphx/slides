@@ -1980,23 +1980,27 @@ plainBackground: true
 
 # Two tasks, one directory, no collisions
 
-<div mt-10 grid="~ cols-[9rem_1fr_1fr_1fr]" gap-3 items-center>
+<div mt-10 grid="~ cols-[8rem_1fr_auto_1fr_auto_1fr]" gap-2 items-center>
 
 <div text-4 op70>the thread runs</div>
 <div v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 1</div>
-<div v-click="2" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4 text-center><b>App B</b> · step 1</div>
-<div v-click="3" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 2</div>
+<div v-click="2" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
+<div v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4 text-center><b>App B</b> · step 1</div>
+<div v-click="4" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
+<div v-click="5" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 2</div>
 
 <div text-4 op70><code>os.getcwd()</code></div>
 <div v-click="1" text-4 text-center><code>/home/app-a</code></div>
-<div v-click="2" text-4 text-center><code>/home/app-b</code></div>
-<div v-click="3" text-4 text-center><code>/home/app-a</code></div>
+<div v-click="2" text-4 text-center op60>put back</div>
+<div v-click="3" text-4 text-center><code>/home/app-b</code></div>
+<div v-click="4" text-4 text-center op60>put back</div>
+<div v-click="5" text-4 text-center><code>/home/app-a</code></div>
 
 </div>
 
-<div v-click="4" mt-10 text-5 text-center>
+<div v-click="6" mt-10 text-5 text-center>
 
-Each resume **enters** its own directory; each yield **leaves** it.<br>The global is only ever **borrowed**. 🔐
+Each resume **moves in** to its own directory; each <code>await</code> **moves back**.<br>The directory is only ever **borrowed**. 🔐
 
 </div>
 
@@ -2004,16 +2008,22 @@ Each resume **enters** its own directory; each yield **leaves** it.<br>The globa
 Putting it together, this is what the timeline looks like on that one thread.
 
 [click]
-App A gets resumed. The proxy moves the process into A's directory, and A's code runs there.
+App A's task resumes. The proxy moves the process into App A's directory, and App A's code runs there.
 
 [click]
-Then A hits an await, the directory goes back, and B gets its turn in its own directory.
+Then App A's code reaches an `await`. The step ends, so the proxy puts the directory back. The event loop hands the turn to the next task.
 
 [click]
-And when A comes back for its next step, the proxy moves the process into A's directory again.
+App B's task resumes, and the proxy moves the process into App B's directory.
 
 [click]
-So the process-global directory is never owned by anyone. It's borrowed for the length of one step, and handed back. Which is the closest thing to "a current directory per task" that you can build when the process only has one.
+App B also reaches an `await`. The directory is put back again, and the turn goes back to App A.
+
+[click]
+App A's task resumes for its next step, and the proxy moves the process into App A's directory again.
+
+[click]
+So no task owns the process-wide directory. Each task borrows it for one step, and gives it back. That is the closest thing to "a current directory per task" you can build when the process only has one.
 -->
 
 ---

@@ -1382,7 +1382,8 @@ This is Stlite. It's the project where I hit the wall I just described.
 </div>
 
 <div>
-<img src="/stlite.svg" alt="Stlite" w="220px">
+<img src="/stlite.svg" alt="Stlite" w="220px" dark:hidden>
+<img src="/stlite-dark.svg" alt="Stlite" w="220px" hidden dark:block>
 </div>
 
 </div>
@@ -1452,7 +1453,7 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 </style>
 
 <!--
-Here is a real Stlite app. On the left is all of its source code. `app.py` is an ordinary Streamlit script: a title, a slider, and a line chart. Below it is `stlite.html`, a static HTML page. It loads Stlite from a CDN and points it at `app.py`.
+Here is an example of a Streamlit app running on Stlite. On the left is all of its source code. `app.py` is an ordinary Streamlit script: a title, a slider, and a line chart. Below it is `stlite.html`, a static HTML page. It loads Stlite from a CDN and points it at `app.py`.
 
 On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
 

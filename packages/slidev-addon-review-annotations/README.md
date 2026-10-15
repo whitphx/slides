@@ -111,7 +111,7 @@ Roles (`defaultAuthorize`; pass `authorize` to replace it):
 - `agent`: read, change status (acknowledge, resolve, dismiss, reopen), reply. It cannot create, edit or delete annotations, so a leaked agent key can't plant or rewrite annotations; it can still add replies and change status.
 - `admin`: everything.
 
-Before each new annotation the toolbar asks the API (`GET <api>/whoami`) whether this browser may add annotations, and refuses the annotation with a notice if not (e.g. before logging in). If a save is rejected later, the deck also shows a notice at the top of the page.
+Before each new annotation the toolbar asks the API (`GET <api>/whoami`) whether this browser may add annotations, and refuses the annotation with a notice if this browser's login may not (e.g. the agent key). Annotations made before logging in are kept: they wait in the browser, the deck asks you to log in, and they are saved once you have. If a save is rejected later, the deck also shows a notice at the top of the page.
 
 ## Sending annotations to an agent
 

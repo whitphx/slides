@@ -72,7 +72,7 @@ export function createDispatchControl(config: ReviewAnnotationsClientConfig, syn
   function render() {
     const waiting = sync.pending()
     panel.style.display = loggedOut || (canDispatch && (unsent > 0 || waiting > 0 || status.textContent)) ? 'flex' : 'none'
-    unsaved.textContent = waiting ? `${waiting} annotation change${waiting === 1 ? ' is' : 's are'} kept in this browser until the connection is back.` : ''
+    unsaved.textContent = waiting ? `${waiting} annotation change${waiting === 1 ? ' is' : 's are'} kept in this browser until ${loggedOut ? 'you log in' : 'the connection is back'}.` : ''
     unsaved.style.display = waiting ? '' : 'none'
     login.style.display = loggedOut ? '' : 'none'
     login.href = loginUrl(config)

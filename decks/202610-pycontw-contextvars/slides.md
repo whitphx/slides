@@ -545,7 +545,7 @@ Something has to start a task. Let's look at a small example.
 `greet` is an `async def` function, so calling it gives you a coroutine: a function call that can pause at each `await`.
 
 [click]
-We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you, one task per request.
+We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you. Uvicorn, for example, starts one task per request.
 
 [click]
 Each task runs one coroutine. `create_task()` doesn't wait for it, so the `main` function prints its line right away.

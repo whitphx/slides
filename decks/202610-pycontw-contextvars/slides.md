@@ -1476,7 +1476,7 @@ clicks: 3
 <div text-center mb-2 transition-opacity duration-500 :class="$clicks >= 1 ? 'op100' : 'op0'">🎈 <b>The Streamlit runtime</b>: the host. <span op70>It runs your script again on every interaction.</span></div>
 
 <div v-click="2" mb-2 rounded-lg p-2 border="~ amber-400/60" bg-white dark:bg-black>
-<div op70 mb-1>Before each run, the host sets up the app's world:</div>
+<div op70 mb-1>Only in <b>Stlite</b>: before each run, the host sets up the app's world:</div>
 
 ```py
 os.chdir("/home/app-a")
@@ -1509,10 +1509,10 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 `app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
 
 [click]
-The Streamlit runtime does. Your script is not the program. The runtime is the program, and it is the host. It runs your script from top to bottom, and it runs it again every time the user does something, like moving the slider. It runs it in the same Python interpreter. Not in a separate process.
+The Streamlit runtime does. It is the host. It runs your script from top to bottom, and it runs it again every time the user does something, like moving the slider. It runs it in the same Python interpreter. Not in a separate process.
 
 [click]
-And before each run, the host prepares the world your script runs in. In Stlite, that means moving to the app's own directory, and setting `HOME` for it.
+And this part is special to Stlite. Regular Streamlit runs one app per runtime, so it never needs this. But one Stlite runtime can run several apps. So before each run, Stlite prepares the world for that app: it moves to the app's own directory, and sets `HOME` for it.
 
 [click]
 So there are two sides. The host calls `os.chdir()`. Your script does not know about any of that. It just opens files with relative paths, like `data.csv`, and expects them to be in its own directory.

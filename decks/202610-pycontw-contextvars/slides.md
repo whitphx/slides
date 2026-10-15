@@ -1031,8 +1031,6 @@ This means a task inherits everything that was set before it was created. If the
 
 [click]
 And it means anything the task sets stays inside the task. It never goes back to the caller. After `gather()` finishes, the caller's context still has no user set. That sounds natural when I say it like this, but it's easy to forget when a library or a server starts the task for you.
-
-Copy, not share. Say it once and most of the confusion goes away.
 -->
 
 ---
@@ -1076,7 +1074,7 @@ Swap the two lines and it prints `alice`. **The snapshot is taken at `create_tas
 </div>
 
 <!--
-Here's the classic version of that bug.
+Because the task gets a copy, one detail matters: when exactly is the copy made? Here's a small example where it matters.
 
 [click]
 We create the task. The snapshot is taken right here, on this line.

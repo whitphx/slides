@@ -324,7 +324,7 @@ Per-thread storage **is** per-request storage here. ✅
 </div>
 
 <!--
-So how does `current_user` work on that server? Here is a simplified version of what Flask and Flask-Login do inside.
+So how does `current_user` work on that server? Here is some pseudo code for what Flask and Flask-Login do inside.
 
 [click]
 The user changes from request to request, so a plain global won't work. The answer is threading dot local: one value per thread.
@@ -453,7 +453,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 This is the thread-per-request server our code was written for. One thread per request, so per-thread storage is per-request storage.
 
 [click]
-On the right is an async server, built on asyncio. Still one process, but only one thread. On that thread runs the event loop, which decides what runs next. Each request runs in its own task, and the event loop switches between tasks at every await.
+On the right is an async server, built on asyncio. Still one process, but only one thread, running an event loop. Each request runs in its own task, and the event loop switches between tasks at every await.
 
 [click]
 So one thread now serves many requests at once.

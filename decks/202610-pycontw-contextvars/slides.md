@@ -148,7 +148,7 @@ OK, so let's get into the talk. Here's a quick overview: three things you'll lea
 First, what problem the `contextvars` module actually solves. It's a small API, but the problem behind it is easy to get wrong.
 
 [click]
-Second, how a value you store with `contextvars` moves around your program. Does it go along when your code crosses an await? When it starts a new task? When it hands work to a thread? This is where the surprises live.
+Second, how a value you store with `contextvars` moves around your program. Does it go along when your code crosses an await? When it starts a new task? When it runs a function in another thread? This is where the surprises live.
 
 [click]
 And third, where the limits of `contextvars` are. There is a point where it stops helping, and I found it the hard way in a real project. That's the second half of the talk.

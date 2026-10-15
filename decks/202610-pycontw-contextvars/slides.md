@@ -2033,13 +2033,15 @@ layout: section
 # ⚠️ Drawing the boundary
 
 <div mt-4 op70 text-5>
-The pitfalls, and the one lesson worth taking home
+The one lesson worth taking home
 </div>
 
 <!--
 Now let's step back from Stlite and sum up what we learned.
 -->
 
+---
+hide: true
 ---
 
 # Four common mistakes
@@ -2090,6 +2092,8 @@ What you do with the answer is still up to you. In Stlite, we used it to move th
 -->
 
 ---
+hide: true
+---
 
 # Hidden context, or just a parameter?
 
@@ -2134,10 +2138,9 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 <v-clicks>
 
 - 🧵 **`threading.local()` didn't break** — "one thread, one request" did
-- 📸 **Each task gets a copy** — what a task sets stays in that task
-- 🧭 **It tells you the context; it does not protect shared state** — `cwd` and `os.environ` stay process-wide
+- 📸 **`ContextVar` follows the task** — each task gets its own copy of the context
+- 🧭 **It tells you the context; it does not change process-wide state** — `os.getcwd()` and `os.environ` stay shared
 - 🔁 **Process-wide state? Borrow it** — move in on every resume, move back on every pause
-- 🏗️ **Building a runtime? The boundary is yours to draw**
 
 </v-clicks>
 
@@ -2213,16 +2216,13 @@ So, to wrap up.
 threading dot local never broke. What broke is the assumption underneath it, that one thread means one request. Async took that away.
 
 [click]
-Each task gets a copy of the context when it is created. What a task sets stays inside that task.
+A `ContextVar` follows the task, not the thread. Each task gets its own copy of the context, so each request sees its own value.
 
 [click]
-contextvars models which context you're in. It does not make anything safe. The current directory and the environment are still process-wide, no matter how clean your context handling is.
+But `contextvars` only tells you which context you're in. It does not change process-wide state. The current directory and the environment variables are still shared by the whole process.
 
 [click]
-So when code in many tasks has to share process-wide state, like the current directory, you borrow it. Move in when the task resumes, and move back when it pauses. Every step, not once per task.
-
-[click]
-And if you're building a runtime, a framework, or an async library, you decide where your context boundary is. Python does not decide it for you, and it will not warn you if you get it wrong.
+So when many tasks need their own version of process-wide state, like the current directory, you borrow it. Move in when the task resumes, and move back when it pauses. Every step, not once per task.
 
 [click]
 That's all from me. Thank you very much.

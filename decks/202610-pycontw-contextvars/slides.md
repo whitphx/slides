@@ -917,8 +917,8 @@ ctx[user_var]  # "alice"
 
 </div>
 
-<div data-id="ctx-run-line" absolute style="left:490px;top:195px;width:1px;height:1px"></div>
-<FancyArrow v-click="2" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
+<div data-id="ctx-run-line" absolute style="left:643px;top:209px;width:1px;height:1px"></div>
+<FancyArrow v-click="[2,3]" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
 
 <div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
 
@@ -1015,14 +1015,16 @@ await asyncio.gather(handle("alice"), handle("bob"))
 <!--
 One rule connects tasks and contexts.
 
-[click]
-Here's our fixed example again. The last line calls `gather()`. At that moment, the caller's context has no user set.
+Here's our fixed example again. At the top, `user_var` is declared as a context variable, with the default "anonymous".
 
 [click]
-`gather()` creates one task per request. Each new task gets a copy of the caller's context.
+The last line calls `gather()`. At that moment, the caller's context has no user set.
 
 [click]
-Then each task sets the user in its own copy: "alice" in one, "bob" in the other.
+`gather()` turns each `handle` coroutine into a task, one per request. Each new task gets a copy of the caller's context.
+
+[click]
+Then each task sets the user in its own copy of the context: "alice" in one, "bob" in the other.
 
 [click]
 So a task starts with everything the caller had set.

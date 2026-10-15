@@ -1298,7 +1298,7 @@ And this matters most if you write a library. A polite library may change a cont
 
 <v-clicks>
 
-- 🪵 **Request IDs in logs** — a logging filter that calls `.get()`
+- 🪵 **Request IDs in logs** — a `logging.Filter` that calls `.get()`
 - 🔭 **Tracing** — `opentelemetry.context` is `contextvars` underneath; the current span follows your `await`
 - 💾 **Async DB sessions** — SQLAlchemy's `async_scoped_session` is scoped to a context
 - 🌐 **Web frameworks** — Flask's `request`, and the `current_user` from our first route function
@@ -1309,15 +1309,15 @@ And this matters most if you write a library. A polite library may change a cont
 
 <div v-click="5" absolute bottom-10 inset-x-0 text-center text-5>
 
-Tutorials only show 🪵 **logs**. It's **not just for logging**.
+The usual example is 🪵 **logs**. It's **not just for logging**.
 
 </div>
 
 <!--
-And you've almost certainly used this already, without writing any of it yourself.
+So far, we've only used `contextvars` in our own small example. Now let's look at real tools that use it. You've probably used some of them already, without knowing `contextvars` was inside.
 
 [click]
-The request id in your log lines. That's a logging filter calling get on a context variable.
+First, request IDs in logs. Many web apps put a request ID in every log line, so you can find all the lines for one request. A common way to do this with Python's standard `logging` module is a `logging.Filter`. The filter calls `get()` on a context variable that holds the current request ID, and adds it to each log record.
 
 [click]
 Distributed tracing. OpenTelemetry's context API is contextvars underneath. That's how the current span knows which span it's inside, across awaits, without passing it around.
@@ -1328,12 +1328,10 @@ Async database sessions. SQLAlchemy can scope a session to the context, so "the 
 [click]
 And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
 
-And if you use Streamlit, you've met the other side of it. Regular Streamlit keeps that session, the `ScriptRunContext`, on the current thread. If you've ever had to call `add_script_run_ctx()` before a Streamlit call worked from a worker thread, that's state keyed by thread, the shape this talk started from. Stlite moving it into a context variable is the same move we just made: from "which thread am I on" to "which execution am I in".
-
 So your stack already depends on it.
 
 [click]
-But most tutorials and blog posts show only one of these four: request IDs in logs. It's a good example, but a small one. It can make you think contextvars is just a logging tool.
+Request IDs in logs is the example you see most often. It's a good example, but a small one. It can make you think `contextvars` is just a logging tool.
 
 It is not. Three of these four have nothing to do with logging. contextvars is much more general than that.
 -->

@@ -1040,6 +1040,8 @@ And what a task sets stays in the task. The caller's context still has no user.
 -->
 
 ---
+hide: true
+---
 
 # The copy is made at `create_task()`
 
@@ -1121,6 +1123,8 @@ So the copy is made when the task is created, not when it starts running. If you
 -->
 
 ---
+hide: true
+---
 
 # The edges: leaving the event loop
 
@@ -1176,6 +1180,7 @@ I'm not asking you to memorise which function does which. I'm asking you to trea
 
 ---
 plainBackground: true
+hide: true
 ---
 
 # The edges: called from outside Python
@@ -1281,6 +1286,8 @@ So the edges go both ways. Leaving the event loop is one. Coming back in from so
 And this one was a real bug in Stlite. App code that ran from a JavaScript callback could not find its app's data, for the same reason we just saw. The fix is this same pattern: Stlite wraps `create_proxy()` so that every callback runs in a snapshot taken at the handoff. The link to that code is at the bottom of the slide.
 -->
 
+---
+hide: true
 ---
 
 # `Token`: putting it back
@@ -1436,7 +1443,7 @@ Quick introduction, because the architecture is the reason this talk exists.
 Streamlit is a Python framework for building data apps. You write only a Python script. No JavaScript, no HTML, no frontend code at all. And that script becomes a web app.
 
 [click]
-Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly, the same runtime as in the JavaScript callback example.
+Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly.
 
 [click]
 And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.
@@ -1885,7 +1892,7 @@ On the way in, it remembers where the process is now. Then it moves to the app's
 Then the app's code runs, inside the `with` block.
 
 [click]
-On the way out, it puts back what it found. This is the same idea as the `Token` from the first half: change a value, then put the old one back. But here, the value is process-wide state, not a context variable.
+On the way out, it puts back what it found: change a value, then put the old one back. Here the value is process-wide state, not a context variable.
 
 [click]
 So the app never owns the directory. It borrows it, and gives it back.

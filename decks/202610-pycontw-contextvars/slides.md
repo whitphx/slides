@@ -1763,7 +1763,7 @@ home_dir_contextvar.set(app_home_dir)
 
 <div v-click="2" mt-4 text-5>
 
-Set at **every entry point** where JavaScript calls Python. 🚪
+Set **when an app is started**, before its script runs. 🚪
 
 </div>
 
@@ -1773,7 +1773,7 @@ Now any code can get **the directory this task should use**. ✅
 
 </div>
 
-<div v-click="4" mt-4 text-sm op60>
+<div absolute bottom-6 left-14 text-4 op60>
 
 Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/server/task_context.py" target="_blank">stlite-lib/stlite_lib/server/task_context.py</a>
 
@@ -1786,15 +1786,10 @@ So how do we fix it? Step one: store each app's directory in a context variable.
 Here is the context variable. It holds the home directory of the app that this task belongs to.
 
 [click]
-We set it at every entry point where JavaScript calls Python. Every browser event that starts Python work sets it first.
-
-Why at every entry point? When JavaScript calls Python, there is no Python caller to copy a context from. JavaScript calls these entry points directly, and each call starts a new task with the top-level context. So we set the value each time.
+We set it when an app is asked to start, before its script runs. So the task that runs that app's script starts with the right value.
 
 [click]
 Now any code, in any function, can get the directory that this task should use.
-
-[click]
-This is real code from Stlite. The link is here if you want to read it.
 -->
 
 ---

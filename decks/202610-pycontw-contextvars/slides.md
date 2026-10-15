@@ -573,7 +573,7 @@ So: three requests, three tasks, one thread, taking turns. That is the execution
 
 <div class="tl-code">
 
-```py {*|12|8|4,8|5|*}
+```py {*|7-9|3-5|12|8|4|8|4|5|*}
 _local = threading.local()
 
 async def index():  # your code
@@ -592,7 +592,7 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 <div>
 
-<div v-click="5">
+<div v-click="9">
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -609,35 +609,43 @@ bob sees: Hello, bob!
 
 </div>
 
-<div v-click="1" mt-2 text-4 class="tl">
-<div class="tl-label">🙋 <code>gather()</code><br><span op70>two tasks, one thread</span><br><span op60>time →</span></div>
+<div v-click="3" mt-2 text-4 class="tl">
+<div class="tl-label">🙋 <code>gather()</code><br><span op70>two tasks, one thread</span></div>
 <div class="tl-row tl-lane tl-lane-a">
 <div class="tl-name">alice's task</div>
-<div v-click="2" class="tl-a">set <code>"alice"</code></div>
-<div v-click="3" class="tl-a">⏸️ await</div>
+<div v-click="4" class="tl-a">set <code>"alice"</code></div>
+<div v-click="5" class="tl-a">⏸️ await</div>
 <div></div><div></div>
-<div v-click="4" class="tl-a">read → <code>"bob"</code> ❌</div>
+<div v-click="8" class="tl-a">read → <code>"bob"</code> ❌</div>
 </div>
 <div class="tl-row tl-lane tl-lane-b">
 <div class="tl-name">bob's task</div>
 <div></div><div></div>
-<div v-click="3" class="tl-b">set <code>"bob"</code></div>
-<div v-click="3" class="tl-b">⏸️ await</div>
+<div v-click="6" class="tl-b">set <code>"bob"</code></div>
+<div v-click="7" class="tl-b">⏸️ await</div>
 <div></div>
 </div>
 <div class="tl-row">
 <div class="tl-name"><code>_local.user</code></div>
-<div v-click="2" class="tl-v">alice</div>
-<div v-click="3" class="tl-v">alice</div>
-<div v-click="3" class="tl-v tl-bad">bob</div>
-<div v-click="3" class="tl-v tl-bad">bob</div>
-<div v-click="4" class="tl-v tl-bad">bob</div>
+<div v-click="4" class="tl-v">alice</div>
+<div v-click="5" class="tl-v">alice</div>
+<div v-click="6" class="tl-v tl-bad">bob</div>
+<div v-click="7" class="tl-v tl-bad">bob</div>
+<div v-click="8" class="tl-v tl-bad">bob</div>
+</div>
+<div class="tl-row tl-axis-row">
+<div class="tl-name tl-axis-label">time</div>
+<div class="tl-axis"></div>
 </div>
 </div>
 
 <style>
-.tl { position: relative; border: 1px solid rgb(139 92 246 / 0.5); border-radius: 0.5rem; padding: 0.4rem 0.75rem; background: rgb(139 92 246 / 0.05); display: grid; grid-template-columns: 9rem 1fr; column-gap: 0.75rem; }
-.tl-label { grid-row: span 3; align-self: center; line-height: 1.3; }
+.tl { position: relative; border: 1px solid rgb(139 92 246 / 0.5); border-radius: 0.5rem; padding: 0.25rem 0.75rem; background: rgb(139 92 246 / 0.05); display: grid; grid-template-columns: 9rem 1fr; column-gap: 0.75rem; }
+.tl-label { grid-row: span 4; align-self: center; line-height: 1.3; }
+.tl-axis-row { margin-top: 0.1rem; }
+.tl-axis-label { text-align: right; font-weight: 700; opacity: 0.8; }
+.tl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
+.tl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
 .tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
 .tl-name { opacity: 0.75; }
 .tl-lane { border-radius: 0.4rem; padding: 0 0.3rem; background-image: linear-gradient(to right, transparent 7.5rem, rgb(128 128 128 / 0.6) 7.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
@@ -655,25 +663,35 @@ html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
 .tl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
 .tl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
 .tl-time { grid-column: 2; text-align: right; opacity: 0.6; }
-.tl-code { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
+.tl-code { --slidev-code-font-size: 14px; --slidev-code-line-height: 1.4; }
 </style>
 
 <!--
-Let me show you the failure.
-
-Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works. `handle()` plays the server's part: it's told who the request is from, stores the user, and calls the route function. `index()` reads the user back, and it still takes no arguments.
+Let me show you the failure. Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works.
 
 [click]
-The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. That is what an async server does for two requests that arrive together.
+The `handle` function plays the framework's part. It's told who the request is from, stores the user in `_local.user`, and calls the route function.
 
 [click]
-Alice's task runs first. It stores her name in `_local.user`.
+The `index` function is the route function. It reads the user back, and it still takes no arguments.
 
 [click]
-Then `index()` awaits. Follow the timeline at the bottom. Alice's task stops here and waits, so the event loop runs the other task: bob's task. Bob's task runs the same line we just saw, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread. Then bob's task also reaches the await, and waits.
+The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. The timeline at the bottom follows these two tasks.
 
 [click]
-Then alice's task resumes and reads the slot.
+Alice's task runs first. It stores "alice" in `_local.user`.
+
+[click]
+Then the `index` function awaits. Alice's task stops here and waits, so the event loop runs the other task: bob's task.
+
+[click]
+Bob's task runs the same line, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread.
+
+[click]
+Then bob's task also reaches the await, and waits.
+
+[click]
+Now alice's task resumes and reads the slot. It gets "bob".
 
 [click]
 And alice gets greeted as bob. Both lines say bob. The timeline shows why: one slot, two tasks, and bob's write came between alice's write and alice's read.

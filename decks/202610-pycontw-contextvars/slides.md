@@ -29,7 +29,7 @@ Yuichi · @whitphx
 </div>
 
 <div absolute bottom-8 right-10 text-sm op60>
-PyCon Taiwan 2026
+PyCon TW 2026
 </div>
 
 <div absolute top-17 right-10 flex="~ col" items-center gap-2>
@@ -341,7 +341,7 @@ And the route function is a stripped-down version of our `index` function from b
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
 
-This is roughly what Flask did in version one. The links to the real code are on the slide.
+This is roughly what Flask did in version one.
 -->
 
 ---
@@ -364,7 +364,7 @@ None of these are **passed as arguments**. 👻
 </div>
 
 <!--
-The current user is only one example. Python code reads many values that were never passed to it as arguments.
+The current user is only one example. There are many cases where Python code reads a value that was never passed to it as an argument.
 
 [click]
 The current request.
@@ -376,7 +376,7 @@ The current user, our example.
 The current database transaction. SQLAlchemy's `scoped_session`, for example, keeps one session per thread by default, with `threading.local()`.
 
 [click]
-The current runtime: which app is running, in a system that runs more than one.
+The current runtime: which app is running, in a system that runs more than one app runtime.
 
 [click]
 None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
@@ -454,7 +454,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-On the left is the thread-per-request server our code was written for. One process, many threads, one thread per request. Per-thread storage really is per-request storage.
+This is the thread-per-request server our code was written for. One process, many threads, one thread per request. Per-thread storage really is per-request storage.
 
 But once we go async, that stops being true.
 

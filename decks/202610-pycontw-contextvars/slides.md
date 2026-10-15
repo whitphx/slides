@@ -1965,7 +1965,7 @@ The pitfalls, and the one lesson worth taking home
 </div>
 
 <!--
-Let's pull back out and generalise.
+Now let's step back from Stlite and sum up what we learned.
 -->
 
 ---
@@ -1979,26 +1979,26 @@ Let's pull back out and generalise.
 - 📸 **Copied at task creation** — set the value *before* `create_task()`, or the task never sees it
 - 🧵 **Threads inherit nothing** — `run_in_executor` drops it; `asyncio.to_thread` copies it for you
 - 🔇 **The failure is silent** — you get the *default*, not an exception
-- 🌍 **Global side effects stay global** — `cwd`, `os.environ`, signal handlers, `locale`
+- 🌍 **Process-wide state stays process-wide** — `os.getcwd()`, `os.environ`
 
 </v-clicks>
 
 </div>
 
 <!--
-Four pitfalls. Three of them we've seen.
+Here are four common mistakes. We've seen all of them today.
 
 [click]
 The copy happens at task creation, so ordering matters. Set, then spawn.
 
 [click]
-Threads inherit nothing on their own. A brand new thread starts with a completely empty context, which is what run_in_executor hands you. to_thread is the exception, and only because it copies the context across for you explicitly.
+Threads don't get your context on their own. A thread from a thread pool starts with an empty context, and that's what `run_in_executor` gives you. `to_thread` is different, because it copies the context for you.
 
 [click]
 And these failures are silent. You don't get an exception, you get the default value. Which means the bug shows up later, somewhere else, as wrong data rather than a crash.
 
 [click]
-And the fourth one is the Stlite lesson. Global side effects stay global. The current directory, environment variables, signal handlers, locale. Perfect context handling does not touch any of them.
+And the fourth one is the Stlite lesson. Process-wide state stays process-wide. The current directory and the environment variables have one value for the whole process. Even perfect use of `contextvars` does not change that.
 -->
 
 ---
@@ -2012,9 +2012,9 @@ If you remember one sentence from this talk, this is the one.
 
 contextvars is a mechanism for answering a question. Which logical execution is this?
 
-It is not a mechanism for making anything safe. It doesn't protect global state, it doesn't synchronise anything, it doesn't isolate you from other tasks. It answers a question, and answering it correctly is genuinely valuable, but the answer is all you get.
+It does not make anything safe. It doesn't protect process-wide state, and it doesn't keep tasks away from each other. It answers one question, and that answer is useful. But it's all you get.
 
-Everything you do with that answer is still your design problem.
+What you do with the answer is still up to you. In Stlite, we used it to move the directory in and out on every step.
 -->
 
 ---
@@ -2026,22 +2026,22 @@ Everything you do with that answer is still your design problem.
 | | 🧭 hidden context | 📮 explicit parameter |
 |---|---|---|
 | **Use it when** | every layer needs it, and you don't own the layers | it's part of what the function *does* |
-| **Classic fit** | current user, request id, trace span, locale | the user whose data this function loads |
-| **You pay in** | invisible in signatures, awkward to test | threading it through everything |
+| **Classic fit** | current user, request ID, trace span | the user whose data this function loads |
+| **You pay in** | invisible in signatures, awkward to test | passing it through every function |
 | **Fails by** | silently returning the default | a `TypeError`, right away |
 
 </div>
 
 <div v-click="1" mt-6 text-5>
 
-Ambient state is a **tax on readability**. Charge it only where passing the value is genuinely impractical. 🧾
+Hidden context makes code **harder to read**. Use it only where passing the value **really isn't practical**. 🧾
 
 </div>
 
 <!--
 So when should you actually reach for this?
 
-The honest answer is: less often than it's fun to.
+Less often than you might think.
 
 Hidden context earns its place when every layer needs the value and you don't own all the layers. The logged-in user has to reach a permission check twenty frames down, through library code you didn't write. You can't thread a parameter through that. Our very first route function is the textbook case: Flask calls `index()` for you, and you don't own that call, so the user can't arrive as an argument.
 
@@ -2050,7 +2050,7 @@ But if the value is part of what the function does — this function loads this 
 And look at the bottom row, because I think it's the deciding one. An explicit parameter fails loudly. You forget it, and you find out immediately. Hidden context fails silently, by handing you a default that looks perfectly reasonable.
 
 [click]
-So treat ambient state as a tax. It's worth paying sometimes. Just notice that you're paying it.
+So hidden context has a cost: the code is harder to read and test. Sometimes that cost is worth it. Just choose it on purpose.
 -->
 
 ---
@@ -2062,9 +2062,9 @@ So treat ambient state as a tax. It's worth paying sometimes. Just notice that y
 <v-clicks>
 
 - 🧵 **`threading.local()` didn't break** — "one thread, one request" did
-- 📸 **Copied at task creation** — the rule behind most surprises
+- 📸 **Each task gets a copy** — what a task sets stays in that task
 - 🧭 **It tells you the context; it does not protect shared state** — `cwd` and `os.environ` stay process-wide
-- 🔁 **Global API? Borrow it** — apply on entry, restore on exit
+- 🔁 **Process-wide state? Borrow it** — move in on every resume, move back on every pause
 - 🏗️ **Building a runtime? The boundary is yours to draw**
 
 </v-clicks>
@@ -2141,16 +2141,16 @@ So, to wrap up.
 threading dot local never broke. What broke is the assumption underneath it, that one thread means one request. Async took that away.
 
 [click]
-Context is copied at task creation, not shared. That one rule explains most of the confusing behaviour.
+Each task gets a copy of the context when it is created. What a task sets stays inside that task.
 
 [click]
 contextvars models which context you're in. It does not make anything safe. The current directory and the environment are still process-wide, no matter how clean your context handling is.
 
 [click]
-So when you have to reconcile a logical context with a global API, you borrow it. Apply on entry, restore on exit, and do that around every resume rather than once per task.
+So when code in many tasks has to share process-wide state, like the current directory, you borrow it. Move in when the task resumes, and move back when it pauses. Every step, not once per task.
 
 [click]
-And if you're building a runtime, or a framework, or an async library — you are the one who decides where your context boundary is. Nobody draws that line for you, and the language will not complain if you draw it wrong.
+And if you're building a runtime, a framework, or an async library, you decide where your context boundary is. Python does not decide it for you, and it will not warn you if you get it wrong.
 
 [click]
 That's all from me. Thank you very much.

@@ -799,14 +799,14 @@ async def handle(user):
 
 <div v-click="1">
 <div data-id="mm-decl" absolute style="left:612px;top:113px;width:1px;height:1px"></div>
-<div data-id="mm-get" absolute style="left:482px;top:185px;width:1px;height:1px"></div>
-<div data-id="mm-set" absolute style="left:310px;top:239px;width:1px;height:1px"></div>
+<div data-id="mm-get" absolute style="left:488px;top:185px;width:1px;height:1px"></div>
+<div data-id="mm-set" absolute style="left:316px;top:239px;width:1px;height:1px"></div>
 <div data-id="mm-ann-decl" absolute style="left:700px;top:102px;width:200px" class="mm-ann">declare: <b><code>ContextVar</code></b></div>
 <div data-id="mm-ann-get" absolute style="left:700px;top:172px;width:200px" class="mm-ann">read: <b><code>.get()</code></b></div>
-<div data-id="mm-ann-set" absolute style="left:700px;top:226px;width:200px" class="mm-ann">write: <b><code>.set()</code></b></div>
-<FancyArrow from="[data-id=mm-ann-decl] @ left" to="[data-id=mm-decl]" arc="0.1" />
-<FancyArrow from="[data-id=mm-ann-get] @ left" to="[data-id=mm-get]" arc="0.1" />
-<FancyArrow from="[data-id=mm-ann-set] @ left" to="[data-id=mm-set]" arc="-0.15" />
+<div data-id="mm-ann-set" absolute style="left:700px;top:229px;width:200px" class="mm-ann">write: <b><code>.set()</code></b></div>
+<FancyArrow from="[data-id=mm-ann-decl] @ left" to="[data-id=mm-decl]" arc="0" />
+<FancyArrow from="[data-id=mm-ann-get] @ left" to="[data-id=mm-get]" arc="0" />
+<FancyArrow from="[data-id=mm-ann-set] @ left" to="[data-id=mm-set]" arc="0" />
 </div>
 
 <style>

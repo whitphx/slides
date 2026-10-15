@@ -142,16 +142,16 @@ And you can find me in all the usual places.
 </div>
 
 <!--
-OK, so let's get into the talk. Here's a quick overview: three things you'll learn today.
+Here are three things you'll learn today.
 
 [click]
-First, what problem the `contextvars` module actually solves. It's a small API, but the problem behind it is easy to get wrong.
+First, what problem the `contextvars` module solves.
 
 [click]
-Second, how a value you store with `contextvars` moves around your program. Does it go along when your code crosses an await? When it starts a new task? When it runs a function in another thread? This is where the surprises live.
+Second, how a value stored with `contextvars` moves through your program: across an await, into a new task, into another thread.
 
 [click]
-And third, where the limits of `contextvars` are. There is a point where it stops helping, and I found it the hard way in a real project. That's the second half of the talk.
+And third, where `contextvars` stops helping. I found that limit in a real project, and that's the second half of the talk.
 -->
 
 ---
@@ -215,16 +215,16 @@ The **user** is not an argument. So where does it come from? 👻
 </style>
 
 <!--
-Let me show you a piece of code you've probably written a hundred times. A Flask app with one page. It says hello to whoever is logged in.
+Here's a piece of code you've probably written many times. A Flask app with one page that says hello to whoever is logged in.
 
 [click]
-`current_user` here is the user who sent this request. Flask-Login works it out for us.
+`current_user` is the user who sent this request. Flask-Login works it out for us.
 
 [click]
-Now look at the function itself. The `index` function takes no arguments. Nobody passes the user to it.
+But the `index` function takes no arguments. Nobody passes the user in.
 
 [click]
-So the current user is not an argument. It's just there when the function runs. How does Python manage a value like this?
+So the current user is just there when the function runs. How does Python manage a value like this?
 -->
 
 ---
@@ -269,9 +269,9 @@ plainBackground: true
 </style>
 
 <!--
-So how does the `index` function get the current user? To answer that, we first need to look at the server it runs on.
+To answer that, we first need to look at the server this code runs on.
 
-Our example runs on a classic web server. One process, a pool of threads, and each incoming request is handled in its own dedicated thread. That thread works on the request from start to finish, and only on that request.
+It's a classic web server. One process, a pool of threads, and each request is handled by its own thread, from start to finish.
 
 [click]
 So while alice's request is being handled, Thread 1 belongs to alice. One thread, one request.
@@ -324,24 +324,22 @@ Per-thread storage **is** per-request storage here. ✅
 </div>
 
 <!--
-So on that server, how does something like `current_user` work? Here is a simplified version. It is not Flask's real code. It shows what Flask and Flask-Login do for you, inside the library.
+So how does `current_user` work on that server? Here is a simplified version of what Flask and Flask-Login do inside.
 
 [click]
-The user changes from request to request, so a plain module-level global won't work in this case. On this thread-based web server, the answer is threading dot local: one value per thread.
+The user changes from request to request, so a plain global won't work. The answer is threading dot local: one value per thread.
 
 [click]
-At the top of each request, Flask sets the user on it, and then calls your route function. The server has already given this request a thread of its own, so the `handle` function runs on that thread.
+At the start of each request, Flask stores the user, then calls your route function, on the request's own thread.
 
 [click]
-The `current_user` function is the Flask-Login part. It reads the user straight back out.
+The `current_user` function is the Flask-Login part. It reads the user back.
 
 [click]
-And the route function is a stripped-down version of our `index` function from before. It still takes no arguments. Nobody passed the user down. But the `current_user` function still returns the user for this request, because it reads the value for the current thread. That's what threading dot local gives us.
+And the route function still takes no arguments, but it gets the user for this request, because it reads the value for the current thread.
 
 [click]
-And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
-
-This is roughly what Flask did in version one.
+On this server, that's exactly right. One thread per request means one value per request. This is not bad code. It's roughly what Flask did in version one.
 -->
 
 ---
@@ -373,15 +371,13 @@ The current request.
 The current user, our example.
 
 [click]
-The current database transaction. SQLAlchemy's `scoped_session`, for example, keeps one session per thread by default, with `threading.local()`.
+The current database transaction. SQLAlchemy's `scoped_session` keeps one session per thread by default.
 
 [click]
 The current runtime: which app is running, in a system that runs more than one app runtime.
 
 [click]
-None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
-
-And on a thread-per-request server, `threading.local()` is the classic tool for values like these. That's how they've been managed.
+No caller passes these in. Every layer just reads them when it needs them. And on a thread-per-request server, threading dot local is the classic tool for that.
 -->
 
 ---
@@ -454,22 +450,20 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-This is the thread-per-request server our code was written for. One process, many threads, one thread per request. Per-thread storage really is per-request storage.
-
-But once we go async, that stops being true.
+This is the thread-per-request server our code was written for. One thread per request, so per-thread storage is per-request storage.
 
 [click]
-And on the right is an async web server, built on asyncio. Same one process, the same requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All the tasks share the one thread. They take turns, and the event loop switches between them at every await.
+On the right is an async server, built on asyncio. Still one process, but only one thread. On that thread runs the event loop, which decides what runs next. Each request runs in its own task, and the event loop switches between tasks at every await.
 
 [click]
-So one thread is serving many requests at once.
+So one thread now serves many requests at once.
 
 [click]
-And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
+And that's the problem. threading dot local still gives one value per thread. But one thread is now many requests, so per-thread no longer means per-request.
 
-If you're wondering about your own apps: Flask on its threaded server is the picture on the left. An async framework like FastAPI or Starlette, with `async def` handlers, is the picture on the right.
+Flask on its threaded server is the picture on the left. FastAPI or Starlette with `async def` handlers is the picture on the right.
 
-And before we fix it, we should be precise about that new word on the right: task.
+Before we fix it, let's be precise about that new word: task.
 -->
 
 ---
@@ -545,22 +539,22 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
 So what is a task? The rest of the talk depends on this word.
 
 [click]
-A task doesn't appear on its own. Something starts it. Let's look at a small example.
+Something has to start a task. Let's look at a small example.
 
 [click]
-The `greet` function is defined with `async def`. So calling `greet("alice")` gives you a coroutine. A coroutine is a function call that can pause at each `await`.
+`greet` is an `async def` function, so calling it gives you a coroutine: a function call that can pause at each `await`.
 
 [click]
-We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you: Uvicorn, for example, starts one task for each request. Remember who starts a task. It matters later.
+We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you, one task per request.
 
 [click]
-Each task runs one coroutine. And `create_task()` doesn't wait for it to finish. So the `main` function keeps going and prints its line right away.
+Each task runs one coroutine. `create_task()` doesn't wait for it, so the `main` function prints its line right away.
 
 [click]
-And the event loop runs all the tasks, on one thread. So the tasks run concurrently, not in parallel. The event loop switches between them when the running coroutine reaches an `await`. For this talk, just remember: one thread, many tasks, taking turns.
+The event loop runs all the tasks on one thread. It switches between them when the running coroutine reaches an `await`.
 
 [click]
-So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.
+So: three requests, three tasks, one thread, taking turns. And taking turns is exactly what breaks our example.
 -->
 
 ---
@@ -667,36 +661,34 @@ html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
 </style>
 
 <!--
-Let me show you the failure. Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works.
+Here's the same app, made async. Again, this is a simplified version of what an async framework does.
 
 [click]
-The `handle` function plays the framework's part. It's told who the request is from, stores the user in `_local.user`, and calls the route function.
+The `handle` function plays the framework. It stores the user in `_local.user` and calls the route function.
 
 [click]
-The `index` function is the route function. It reads the user back, and it still takes no arguments.
+The `index` function reads the user back. It still takes no arguments.
 
 [click]
-The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. The timeline at the bottom follows these two tasks.
+The last line plays the server. `asyncio.gather()` runs alice's and bob's requests as two tasks on the same thread. The timeline at the bottom follows them.
 
 [click]
-Alice's task runs first. It stores "alice" in `_local.user`.
+Alice's task runs first and stores "alice".
 
 [click]
-Then the `index` function awaits. Alice's task stops here and waits, so the event loop runs the other task: bob's task.
+Then it hits the await and waits, so the event loop runs bob's task.
 
 [click]
-Bob's task runs the same line, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread.
+Bob's task stores "bob" in the same slot, because both tasks are on the same thread.
 
 [click]
-Then bob's task also reaches the await, and waits.
+Then bob's task also waits.
 
 [click]
-Now alice's task resumes and reads the slot. It gets "bob".
+Alice's task resumes and reads the slot. It gets "bob".
 
 [click]
-And alice gets greeted as bob. Both lines say bob. The timeline shows why: one slot, two tasks, and bob's write came between alice's write and alice's read.
-
-Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service, this is alice looking at bob's page. That's not a cosmetic bug. That's a data leak.
+So alice is greeted as bob. In a real service, that's alice seeing bob's page. That's a data leak.
 -->
 
 ---
@@ -712,9 +704,9 @@ State that belongs to the execution, not to the thread
 <!--
 So we need storage that follows the logical execution instead of the thread.
 
-What do I mean by logical execution? It's the code that runs for one request, from start to finish. On the async server, that's one task. The task stops at each `await`, other tasks run on the same thread, and later it picks up where it left off. The thread is shared, but the task's own line of work goes on.
+By logical execution, I mean the code that runs for one request, from start to finish. On the async server, that's one task. It pauses at each `await`, other tasks run, and later it picks up where it left off.
 
-So we want a value that belongs to that line of work, and goes with it across every `await`. That's exactly what the `contextvars` module gives us.
+We want a value that goes with that task across every `await`. That's what the `contextvars` module gives us.
 -->
 
 ---
@@ -748,21 +740,21 @@ Declared **once**, at module level. Read from **anywhere**, at any depth. 🪄
 </div>
 
 <!--
-So this is what the standard library gives us instead. A ContextVar is like threading dot local, except the value follows the logical execution rather than the thread. Same idea, right scope.
+A `ContextVar` is like threading dot local, except the value follows the logical execution, not the thread.
 
-The API is small. There are three things.
-
-[click]
-You declare a ContextVar once, at module level, like a global. The default is what you get when nobody has set it.
+The API has three parts.
 
 [click]
-You set it. And this is the important word: it binds the value in the current context. Not in a global, not on the thread. We'll unpack what "current context" means in a moment.
+You declare it once, at module level. The default is what you get when nothing has been set.
+
+[click]
+You set it. This binds the value in the current context. We'll see what "current context" means in a moment.
 
 [click]
 And you get it back.
 
 [click]
-The shape is the same as the threading dot local version. Declare in one place, read from anywhere, no passing it through every function. What changes is the thing it's attached to.
+Same shape as threading dot local: declare in one place, read from anywhere. Only what it's attached to changes.
 -->
 
 ---
@@ -846,12 +838,12 @@ bob sees: Hello, bob!
 So here's the same program again.
 
 [click]
-Three lines change. The `threading.local()` object becomes a `ContextVar`. Reading `_local.user` becomes `user_var.get()`. And writing `_local.user` becomes `user_var.set()`.
+Three lines change. The `threading.local()` object becomes a `ContextVar`, and reads and writes become `get()` and `set()`.
 
 [click]
-And now each task reads back its own value, across the await. The tasks still take turns in the same order, on the same single thread. But now we get the right answer.
+Now each task reads back its own value across the await. Same order, same single thread, right answer.
 
-That's the main idea of the `contextvars` module. Next, let's look at how it works inside, because how it works is what tells you where it stops working.
+Next, let's see how it works inside, because that tells you where it stops working.
 -->
 
 ---
@@ -935,21 +927,21 @@ ctx[user_var]  # "alice"
 </div>
 
 <!--
-The second concept is the Context itself, the thing every task carries around. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
+The next piece is the `Context` itself. Picture it as a dictionary: every context variable, mapped to its current value.
 
 [click]
-There is always a current context. Your code is running inside one right now, even if you never created it. `copy_context()` takes a snapshot of that current context, the whole mapping, and gives it back to you as one object.
+There is always a current context, even if you never created one. `copy_context()` takes a snapshot of it.
 
 [click]
-And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the current user. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.
+And you can run a function inside that snapshot. While `handler` runs inside `ctx`, every `get()` sees the snapshot's values.
 
 [click]
 You can also read a variable straight out of the snapshot, like a dictionary lookup.
 
 [click]
-So when I said `set()` binds a value in "the current context", I meant a `Context` like the mapping on the left. There is always exactly one current context. `set()` writes into it, and `get()` reads from it.
+So "the current context" means a mapping like this one. `set()` writes into it, and `get()` reads from it.
 
-Which leaves exactly one question. When a new task starts, where does its context come from?
+Which leaves one question. When a new task starts, where does its context come from?
 -->
 
 ---
@@ -1021,22 +1013,22 @@ await asyncio.gather(handle("alice"), handle("bob"))
 </style>
 
 <!--
-Now let's put tasks and contexts together. One rule connects them.
+One rule connects tasks and contexts.
 
 [click]
-Here's our fixed example again. The last line is the caller. It calls `gather()`. At that moment, the caller's context has no user set.
+Here's our fixed example again. The last line calls `gather()`. At that moment, the caller's context has no user set.
 
 [click]
-`gather()` creates one task for each request. Each new task gets a copy of the caller's context, taken at that moment.
+`gather()` creates one task per request. Each new task gets a copy of the caller's context.
 
 [click]
-Then each task runs `user_var.set(user)` in its own copy. Alice's copy gets "alice", and bob's copy gets "bob".
+Then each task sets the user in its own copy: "alice" in one, "bob" in the other.
 
 [click]
-So a task starts with everything the caller had set before.
+So a task starts with everything the caller had set.
 
 [click]
-And what a task sets stays in the task. The caller's context still has no user.
+And what a task sets stays in the task. The caller still has no user.
 -->
 
 ---
@@ -1354,26 +1346,22 @@ The usual example is 🪵 **logs**. It's **not just for logging**.
 </div>
 
 <!--
-So far, we've only used `contextvars` in our own small example. Now let's look at real tools that use it. You've probably used some of them already, without knowing `contextvars` was inside.
+Now let's look at real tools that use `contextvars`. You've probably used some of them already.
 
 [click]
-First, request IDs in logs. Many web apps put a request ID in every log line, so you can find all the lines for one request. A common way to do this with Python's standard `logging` module is a `logging.Filter`. The filter calls `get()` on a context variable that holds the current request ID, and adds it to each log record.
+Request IDs in logs. A `logging.Filter` reads the current request ID from a context variable and adds it to every log record.
 
 [click]
-Distributed tracing. OpenTelemetry's context API is contextvars underneath. That's how the current span knows which span it's inside, across awaits, without passing it around.
+Distributed tracing. OpenTelemetry's context is `contextvars` underneath. That's how the current span follows you across awaits.
 
 [click]
-Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
+Async database sessions. SQLAlchemy can scope a session to the current task.
 
 [click]
-And web frameworks. Since Flask version two point two, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
-
-So your stack already depends on it.
+And web frameworks. Since Flask version two point two, Flask's `request` lives in a context variable, and Flask-Login's `current_user` uses it too.
 
 [click]
-Request IDs in logs is the example you see most often. It's a good example, but a small one. It can make you think `contextvars` is just a logging tool.
-
-It is not. Three of these four have nothing to do with logging. contextvars is much more general than that.
+Request IDs in logs is the example you see most often. But it can make `contextvars` look like a logging tool. Three of these four have nothing to do with logging.
 -->
 
 ---
@@ -1389,11 +1377,11 @@ layout: statement
 </div>
 
 <!--
-So far, every example asked one question: which logical execution am I in? In other words, whose work am I doing right now? A request, a task, a callback. It's not the thread.
+Every example so far asked one question: which logical execution am I in? Whose work am I doing right now?
 
-`contextvars` answers that question. But that's all it does. Knowing the answer does not make anything safe.
+`contextvars` answers that question. But knowing the answer does not make anything safe.
 
-I learned this the hard way, in a real project. Let me show you that project.
+I learned this in a real project. Let me show you.
 -->
 
 ---
@@ -1407,7 +1395,7 @@ Streamlit in the browser, and one very global variable
 </div>
 
 <!--
-This is Stlite. It's the project where I hit the wall I just described.
+This is Stlite, the project where I learned that.
 -->
 
 ---
@@ -1437,19 +1425,19 @@ This is Stlite. It's the project where I hit the wall I just described.
 </div>
 
 <!--
-Quick introduction, because the architecture is the reason this talk exists.
+A quick introduction, because the architecture is why this talk exists.
 
 [click]
-Streamlit is a Python framework for building data apps. You write only a Python script. No JavaScript, no HTML, no frontend code at all. And that script becomes a web app.
+Streamlit is a Python framework for data apps. You write only a Python script, and it becomes a web app.
 
 [click]
 Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly.
 
 [click]
-And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.
+And there is no server. The Python interpreter runs inside the browser tab.
 
 [click]
-So the entire runtime — the framework, the interpreter, your script — ships as a static web page.
+So the whole runtime ships as a static web page.
 -->
 
 ---
@@ -1501,15 +1489,15 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 </style>
 
 <!--
-Here is an example of a Streamlit app running on Stlite. On the left is all of its source code. `app.py` is a short Streamlit script: a title, a slider, and a chart. `stlite.html` is a static HTML page that loads Stlite and runs `app.py`.
+Here's a Stlite app. On the left is all of its source code: `app.py`, a short Streamlit script, and `stlite.html`, a static page that runs it.
 
 [click]
-On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
+On the right is that page, running live in this slide. When I move the slider, the chart changes.
 
 [click]
-And notice what is not there. The whole app is two static files. There is no backend, and no API calls. When I move the slider, Python runs in this tab and draws the chart again.
+Two static files, no backend, no API calls. Python runs in this tab.
 
-That's the product. Now let me show you the part that made my life hard.
+Now let me show you the part that made my life hard.
 -->
 
 ---
@@ -1555,16 +1543,16 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 </div>
 
 <!--
-`app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
+`app.py` has no server code and no main loop. So who runs it?
 
 [click]
-The Streamlit runtime does. It is the host. It runs your script in the same Python interpreter, not in a separate process.
+The Streamlit runtime does. It's the host, and it runs your script in the same Python interpreter.
 
 [click]
-And this part is special to Stlite. Regular Streamlit runs one app per runtime, so it never needs this. But one Stlite runtime can run several apps. So before each run, Stlite prepares the world for that app: it moves to the app's own directory, and sets `HOME` for it.
+And one Stlite runtime can run several apps, which regular Streamlit never does. So before each run, Stlite moves to the app's own directory and sets `HOME` for it.
 
 [click]
-So there are two sides. The host calls `os.chdir()`. Your script does not know about any of that. It just opens files with relative paths, like `data.csv`, and expects them to be in its own directory.
+So the host calls `os.chdir()`, and your script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
 -->
 
 ---
@@ -1616,28 +1604,28 @@ Three apps, but **they all share one interpreter.** 😬
 </style>
 
 <!--
-Here's the setup. Let's go from the outside in.
+Here's the setup, from the outside in.
 
 [click]
-Everything runs in the browser. Stlite runs in a Web Worker, and that worker has one JavaScript thread.
+Stlite runs in a Web Worker, which has one JavaScript thread.
 
 [click]
-Inside it is Pyodide: one Python interpreter, compiled to WebAssembly.
+Inside it is Pyodide: one Python interpreter.
 
 [click]
-And that interpreter has only one thread. The browser environment is single-threaded here, so Python cannot start more threads. This is one of the big limitations of Pyodide.
+And that interpreter has one thread. Python cannot start more threads here.
 
 [click]
-On that one thread, there is one event loop.
+On that thread, there is one event loop.
 
 [click]
-And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
+And inside that loop, a page can run several Stlite apps. They are all tasks on the same loop, and each has its own home directory.
 
 [click]
-And here we meet a new kind of value. So far, everything we stored, like the user and the request, lived in our own variables, so we could move it into a context variable. The current working directory and the environment variables are different. Python keeps them for the whole process, not for a thread or a task. There is one current directory and one set of environment variables, and every app shares them.
+Now, the current directory and the environment variables are different from our user and request values. Python keeps them for the whole process. Every app shares them.
 
 [click]
-So to their developers, these are three separate apps. But there is exactly one of every global thing they need.
+So these are three separate apps, but there is only one of every global thing they need.
 -->
 
 ---
@@ -1788,28 +1776,28 @@ The host moved to App A's directory. App A **awaited**. The host moved to App B'
 </style>
 
 <!--
-This is what happens when it goes wrong. The code on the left is pseudocode. It is not Stlite's real code, but it does the same thing: it is how the host runs the apps.
+This is what goes wrong. The code is pseudocode, but it does what Stlite's host does.
 
 [click]
-The last line starts the apps. The host runs each app's script as its own task, with `gather()`. Here, App A and App B.
+The last line runs each app as its own task, with `gather()`.
 
 [click]
-Inside each task, the host first moves to that app's own directory, and sets `HOME` for it. Each app has its own files there.
+Each task first moves to its app's directory and sets `HOME`.
 
 [click]
-Then it runs the app's script and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+Then it runs the app's script. Everything the user's code does happens on this line.
 
 [click]
-Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+Here is App A's script. It waits for the network, then reads `data.csv` with a relative path.
 
 [click]
-While App A's script waits for the network, the event loop runs another task: App B's task, from the same `gather()`. So the host calls `os.chdir()` again, for App B.
+While App A waits, the event loop runs App B's task, and the host calls `os.chdir()` for App B.
 
 [click]
-Then App A's script resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found. The file exists. It is just in a different directory.
+Then App A resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found.
 
 [click]
-This is the same shape as the `threading.local()` bug from the first half. A value was overwritten during an `await`. But this time a better storage class does not help, because the current directory is shared by the whole process.
+Same shape as the threading dot local bug: a value overwritten during an `await`. But a better storage class does not help here, because the current directory belongs to the whole process.
 -->
 ---
 
@@ -1845,13 +1833,13 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 So how do we fix it? Step one: store each app's directory in a context variable.
 
 [click]
-Here is the context variable. It holds the home directory of the app that this task belongs to.
+Here it is. It holds the home directory of the app this task belongs to.
 
 [click]
-We set it when an app is asked to start, before its script runs. So the task that runs that app's script starts with the right value.
+We set it before the app's script runs, so the script's task starts with the right value.
 
 [click]
-Now any code, in any function, can get the directory that this task should use.
+Now any code can get the directory this task should use.
 -->
 
 ---
@@ -1861,13 +1849,9 @@ layout: statement
 ## The `ContextVar` knows the right directory.<br>But `os.getcwd()` is still wrong. 🤷
 
 <!--
-But this does not fix the bug yet.
+But that doesn't fix the bug yet.
 
-The context variable knows the right directory for each task. Any code can read it.
-
-But the process is still in the wrong directory. Nothing we have written so far calls `os.chdir()`.
-
-Knowing the right directory is not the same as being in it. contextvars did its job, and we still have the bug.
+The context variable knows the right directory, but nothing calls `os.chdir()`. Knowing the right directory is not the same as being in it.
 -->
 
 ---
@@ -1894,22 +1878,22 @@ Move in, run, **move back**. The directory is only **borrowed**. 🔁
 </div>
 
 <!--
-So step two. Now we use that value to change the real directory. Here is a simplified version, as pseudocode.
+Step two: use that value to change the real directory. This is pseudocode.
 
 [click]
-It's a context manager. It takes `home`, the directory this app should use. That is exactly the value step one put into the context variable.
+It's a context manager. It takes `home`, the value from step one.
 
 [click]
-On the way in, it remembers where the process is now. Then it moves to the app's directory and sets `HOME`. These are the same `os.chdir()` and `os.environ` calls as in the `run_app` function.
+On the way in, it remembers where the process is, then moves to the app's directory and sets `HOME`.
 
 [click]
-Then, at the `yield`, the app's code runs.
+At the `yield`, the app's code runs.
 
 [click]
-On the way out, it puts back what it found: change a value, then put the old one back. Here the value is process-wide state, not a context variable.
+On the way out, it puts back what it found.
 
 [click]
-So the app never owns the directory. It borrows it, and gives it back.
+So the app never owns the directory. It borrows it and gives it back.
 -->
 
 ---
@@ -1956,22 +1940,20 @@ class DirectorySyncCoroutineProxy(Coroutine):
 </div>
 
 <!--
-But where do we use this context manager? This is the part that took me the longest.
+But where do we use this context manager? This part took me the longest.
 
-The first idea is simple: wrap the whole script in it. Move in, run the script, move back.
-
-[click]
-But this does not work. The `with` block stays open while App A's script is paused at an `await`. While it is paused, App B's task runs, and moves the directory to App B's. When App A resumes, nothing moves it back. So we are back to the same bug.
-
-The problem is that a task does not run in one piece. It runs in steps. It runs until an `await` pauses it, and later the event loop resumes it. So we need to move in every time the task resumes, and move back every time it pauses. Is there a place that runs exactly at those moments?
+The first idea: wrap the whole script in it.
 
 [click]
-There is. We wrap the script's coroutine in a proxy. When it is created, it reads the app's directory from the context variable.
+That doesn't work. The `with` block stays open while App A is paused at an `await`. App B runs and moves the directory. When App A resumes, nothing moves it back.
+
+A task runs in steps, from one `await` to the next. So we need to move in every time it resumes, and move back every time it pauses.
 
 [click]
-And then `send()`. `send()` is the method the event loop calls every time it resumes a coroutine. It runs one step, until the next `await` pauses it.
+So we wrap the script's coroutine in a proxy. When it's created, it reads the app's directory from the context variable.
 
-So we wrap `send()` in our context manager. Every step of the script runs in its own app's directory, and the directory is put back as soon as the step pauses. Stlite wraps the script's coroutine in this proxy before it creates the task. The real class does the same for `throw()` and `close()`, so errors and cancellation are covered too.
+[click]
+And `send()` is the method the event loop calls every time it resumes a coroutine. It runs one step. We wrap `send()` in our context manager, so every step runs in the right directory. The real class does the same for `throw()` and `close()`.
 -->
 
 ---
@@ -2005,25 +1987,25 @@ Each resume **moves in** to its own directory; each <code>await</code> **moves b
 </div>
 
 <!--
-Putting it together, this is what the timeline looks like on that one thread.
+Here's the timeline on that one thread.
 
 [click]
-App A's task resumes. The proxy moves the process into App A's directory, and App A's code runs there.
+App A's task resumes. The proxy moves into App A's directory.
 
 [click]
-Then App A's code reaches an `await`. The step ends, so the proxy puts the directory back. The event loop hands the turn to the next task.
+App A reaches an `await`. The proxy puts the directory back, and the next task runs.
 
 [click]
-App B's task resumes, and the proxy moves the process into App B's directory.
+App B resumes, and the proxy moves into App B's directory.
 
 [click]
-App B also reaches an `await`. The directory is put back again, and the turn goes back to App A.
+App B reaches an `await`, and the directory is put back again.
 
 [click]
-App A's task resumes for its next step, and the proxy moves the process into App A's directory again.
+App A resumes for its next step, in App A's directory again.
 
 [click]
-So no task owns the process-wide directory. Each task borrows it for one step, and gives it back. That is the closest thing to "a current directory per task" you can build when the process only has one.
+No task owns the directory. Each one borrows it for one step and gives it back.
 -->
 
 ---
@@ -2082,13 +2064,11 @@ layout: statement
 ## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
 
 <!--
-If you remember one sentence from this talk, this is the one.
+If you remember one sentence from this talk, make it this one.
 
-contextvars is a mechanism for answering a question. Which logical execution is this?
+`contextvars` answers a question: which logical execution is this? It does not protect process-wide state, and it does not keep tasks apart.
 
-It does not make anything safe. It doesn't protect process-wide state, and it doesn't keep tasks away from each other. It answers one question, and that answer is useful. But it's all you get.
-
-What you do with the answer is still up to you. In Stlite, we used it to move the directory in and out on every step.
+What you do with the answer is up to you. In Stlite, we used it to move the directory in and out on every step.
 -->
 
 ---
@@ -2213,20 +2193,20 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 So, to wrap up.
 
 [click]
-threading dot local never broke. What broke is the assumption underneath it, that one thread means one request. Async took that away.
+threading dot local never broke. What broke is the assumption that one thread means one request.
 
 [click]
-A `ContextVar` follows the task, not the thread. Each task gets its own copy of the context, so each request sees its own value.
+A `ContextVar` follows the task. Each task gets its own copy of the context.
 
 [click]
-But `contextvars` only tells you which context you're in. It does not change process-wide state. The current directory and the environment variables are still shared by the whole process.
+But it only tells you which context you're in. The current directory and environment variables are still shared.
 
 [click]
-So when many tasks need their own version of process-wide state, like the current directory, you borrow it. Move in when the task resumes, and move back when it pauses. Every step, not once per task.
+So for process-wide state, borrow it: move in when the task resumes, move back when it pauses.
 
 [click]
 That's all from me. Thank you very much.
 The slides are behind the first QR code, and Stlite is behind the second.
-Please come and find me afterwards, I'd love to hear what you're building.
+Please come and find me afterwards.
 -->
 

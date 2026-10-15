@@ -1391,7 +1391,7 @@ This is Stlite. It's the project where I hit the wall I just described.
 Quick introduction, because the architecture is the reason this talk exists.
 
 [click]
-Streamlit is a Python framework for building data apps. You write a script, it becomes a web app.
+Streamlit is a Python framework for building data apps. You write only a Python script. No JavaScript, no HTML, no frontend code at all. And that script becomes a web app.
 
 [click]
 Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly, the same runtime as in the JavaScript callback example.

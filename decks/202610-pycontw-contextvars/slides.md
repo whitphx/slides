@@ -327,16 +327,16 @@ Per-thread storage **is** per-request storage here. ✅
 So on that server, how does something like `current_user` work? Here is a simplified version. It is not Flask's real code. It shows what Flask and Flask-Login do for you, inside the library.
 
 [click]
-The user changes from request to request, so a plain module-level global won't do. On this server, the classic answer is threading dot local: one value per thread.
+The user changes from request to request, so a plain module-level global won't work in this case. On this thread-based web server, the answer is threading dot local: one value per thread.
 
 [click]
-At the top of each request, Flask stashes the user on it, and then calls your route function. The server has already given this request a thread of its own, so `handle()` runs on that thread.
+At the top of each request, Flask sets the user on it, and then calls your route function. The server has already given this request a thread of its own, so the `handle` function runs on that thread.
 
 [click]
-`current_user()` is the Flask-Login part. It reads the user straight back out.
+The `current_user` function is the Flask-Login part. It reads the user straight back out.
 
 [click]
-And the route function is a stripped-down version of our `index()` from before. It still takes no arguments. Nobody passed the user down. It was just there.
+And the route function is a stripped-down version of our `index` function from before. It still takes no arguments. Nobody passed the user down. But the `current_user` function still returns the user for this request, because it reads the value for the current thread. That's what threading dot local gives us.
 
 [click]
 And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.

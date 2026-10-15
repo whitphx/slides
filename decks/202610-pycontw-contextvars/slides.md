@@ -640,7 +640,7 @@ bob sees: Hello, bob!
 .tl-axis-label { text-align: right; font-weight: 700; opacity: 0.8; }
 .tl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
 .tl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
-.tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
+.tl-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 2fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; }
 .tl-name { opacity: 0.75; }
 .tl-lane { border-radius: 0.4rem; padding: 0 0.3rem; background-image: linear-gradient(to right, transparent 7.5rem, rgb(128 128 128 / 0.6) 7.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
 .tl-lane .tl-name { opacity: 1; font-weight: 700; }
@@ -651,7 +651,7 @@ bob sees: Hello, bob!
 .tl-lane-b .tl-b { background: rgb(167 243 208); }
 html.dark .tl-lane-a .tl-a { background: rgb(7 89 133); }
 html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
-.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.4rem; text-align: center; white-space: nowrap; }
+.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; min-width: 0; }
 .tl-a { background: rgb(14 165 233 / 0.18); }
 .tl-b { background: rgb(16 185 129 / 0.2); }
 .tl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }

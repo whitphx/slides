@@ -1641,6 +1641,8 @@ So to their developers, these are three separate apps. But there is exactly one 
 -->
 
 ---
+hide: true
+---
 
 # Each app wants its own directory
 
@@ -1717,9 +1719,10 @@ And here is the problem. There is exactly one current working directory for the 
 
 <div class="bug-host">
 
-```py {*|5-7|2|3|3|*}
+```py {*|6-8|2-3|4|4|*}
 async def run_app(app):
     os.chdir(app.home)
+    os.environ["HOME"] = app.home
     await exec_script(app.code)
 
 await asyncio.gather(
@@ -1791,13 +1794,13 @@ This is what happens when it goes wrong. The code on the left is pseudocode. It 
 The last line starts the apps. The host runs each app's script as its own task, with `gather()`. Here, App A and App B.
 
 [click]
-Inside each task, the host first moves to that app's directory.
+Inside each task, the host first moves to that app's own directory, and sets `HOME` for it. Each app has its own files there.
 
 [click]
 Then it runs the app's script and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
 
 [click]
-Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path.
+Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 While App A's script waits for the network, the event loop runs another task: App B's task, from the same `gather()`. So the host calls `os.chdir()` again, for App B.
@@ -1873,7 +1876,7 @@ Knowing the right directory is not the same as being in it. contextvars did its 
 
 <div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
 
-```py {*|2|3-5|6|7-8|*}
+```py {*|2|3-5|6|7-8}
 @contextmanager
 def app_directory(home):
     saved = (os.getcwd(), os.environ.get("HOME"))
@@ -1884,7 +1887,7 @@ def app_directory(home):
     os.environ["HOME"] = saved[1]
 ```
 
-<div v-click="6" mt-4 text-5>
+<div v-click="5" mt-4 text-5>
 
 Move in, run, **move back**. The directory is only **borrowed**. 🔁
 
@@ -1897,10 +1900,10 @@ So step two. Now we use that value to change the real directory. Here is a simpl
 It's a context manager. It takes `home`, the directory this app should use. That is exactly the value step one put into the context variable.
 
 [click]
-On the way in, it remembers where the process is now. Then it moves to the app's directory and sets `HOME`. These are the same `os.chdir()` and `os.environ` calls the host made before.
+On the way in, it remembers where the process is now. Then it moves to the app's directory and sets `HOME`. These are the same `os.chdir()` and `os.environ` calls as in the `run_app` function.
 
 [click]
-Then the app's code runs, inside the `with` block.
+Then, at the `yield`, the app's code runs.
 
 [click]
 On the way out, it puts back what it found: change a value, then put the old one back. Here the value is process-wide state, not a context variable.

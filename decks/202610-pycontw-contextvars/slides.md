@@ -980,7 +980,7 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 <div flex="~ col" items-center gap-1 h-full justify-end>
 
-<div v-click="2" grid="~ cols-2" gap-2 w-full>
+<div v-click="3" grid="~ cols-2" gap-2 w-full>
 <div data-id="child-a" border="~ violet/50 rounded-lg" px-2 py-2 bg-violet:5>
 <div text-4 op70><b>alice's</b> task</div>
 <div text-4 whitespace-nowrap><code>user_var</code> = <b>"alice"</b></div>
@@ -991,9 +991,9 @@ await asyncio.gather(handle("alice"), handle("bob"))
 </div>
 </div>
 
-<div v-click="1" text-center op80 text-4 py-1>⬆️ <code>gather()</code>: one task each, each gets a <b>copy</b></div>
+<div v-click="2" text-center op80 text-4 py-1>⬆️ <code>gather()</code>: one task each, each gets a <b>copy</b></div>
 
-<div data-id="parent" border="~ sky/50 rounded-lg" px-3 py-1 bg-sky:5 w-full>
+<div v-click="1" data-id="parent" border="~ sky/50 rounded-lg" px-3 py-1 bg-sky:5 w-full>
 <div text-4><span op70>the <b>caller's</b> context:</span> <code>user_var</code> = <b>not set</b></div>
 </div>
 
@@ -1001,16 +1001,16 @@ await asyncio.gather(handle("alice"), handle("bob"))
 
 </div>
 
-<FancyArrow from="[data-id=parent] @ left" to="[data-id=rulecode] .line:nth-child(11) @ right" arc="0" />
-<FancyArrow v-click="2" from="[data-id=child-a] @ left" to="[data-id=rulecode] .line:nth-child(8) @ right" arc="0.1" />
+<FancyArrow v-click="1" from="[data-id=parent] @ left" to="[data-id=rulecode] .line:nth-child(11) @ right" arc="0" />
+<FancyArrow v-click="3" from="[data-id=child-a] @ left" to="[data-id=rulecode] .line:nth-child(8) @ right" arc="0.1" />
 
-<div v-click="3" mt-4 grid="~ cols-2" gap-6 text-5>
+<div v-click="4" mt-4 grid="~ cols-2" gap-6 text-5>
 
 <div border="~ emerald/40 rounded-lg" p-3 bg-emerald:5>
 ✅ the task <b>inherits</b> what you set before it started
 </div>
 
-<div v-click="4" border="~ rose/40 rounded-lg" p-3 bg-rose:5>
+<div v-click="5" border="~ rose/40 rounded-lg" p-3 bg-rose:5>
 ❌ what the task sets <b>never</b> comes back to you
 </div>
 
@@ -1021,21 +1021,22 @@ await asyncio.gather(handle("alice"), handle("bob"))
 </style>
 
 <!--
-So now put the two together. We have tasks, and we have contexts. One rule connects them, and it explains almost every surprise people hit.
-
-Here's our fixed example again. The last line is the caller: it calls `gather()`. At that point, the caller's context has no user set.
+Now let's put tasks and contexts together. One rule connects them.
 
 [click]
-`gather()` creates one task for each request. And when a task is created, it gets a copy of the context. Not the program's context, not some global one: a snapshot of the context of whoever created the task, taken at that moment. That is why I asked you to remember who starts a task.
+Here's our fixed example again. The last line is the caller. It calls `gather()`. At that moment, the caller's context has no user set.
 
 [click]
-So alice's task and bob's task each start with their own copy. Then each one runs `user_var.set(user)`. Alice's task writes "alice" into its copy, and bob's task writes "bob" into its copy. That's why each of them reads back the right user.
+`gather()` creates one task for each request. Each new task gets a copy of the caller's context, taken at that moment.
 
 [click]
-This means a task inherits everything that was set before it was created. If the caller had set a value before calling `gather()`, both tasks would see it.
+Then each task runs `user_var.set(user)` in its own copy. Alice's copy gets "alice", and bob's copy gets "bob".
 
 [click]
-And it means anything the task sets stays inside the task. It never goes back to the caller. After `gather()` finishes, the caller's context still has no user set. That sounds natural when I say it like this, but it's easy to forget when a library or a server starts the task for you.
+So a task starts with everything the caller had set before.
+
+[click]
+And what a task sets stays in the task. The caller's context still has no user.
 -->
 
 ---

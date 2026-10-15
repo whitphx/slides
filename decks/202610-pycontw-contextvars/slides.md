@@ -953,55 +953,84 @@ plainBackground: true
 
 # The rule behind most surprises
 
-<div mt-6 flex="~" items-center justify-center gap-8>
+<div mt-2 grid="~ cols-[1fr_1fr]" gap-6 items-stretch>
 
-<div data-id="parent" border="~ sky/50 rounded-lg" p-4 bg-sky:5 w-64>
-<div text-4 op70 mb-2>the <b>caller's</b> context</div>
-<div text-5><code>user_var</code> = <b>"alice"</b></div>
+<div class="rule-code">
+
+```py {'data-id':'rulecode'}
+user_var = ContextVar("user", default="anonymous")
+
+async def index():
+    await asyncio.sleep(0.01)
+    return f"Hello, {user_var.get()}!"
+
+async def handle(user):
+    user_var.set(user)
+    print(f"{user} sees: {await index()}")
+
+await asyncio.gather(handle("alice"), handle("bob"))
+```
+
 </div>
 
-<div v-click="1" data-id="mid" text-center op80 w-44>
-<div text-5><code>create_task()</code></div>
-<div text-4 mt-1>copies the context</div>
+<div flex="~ col" items-center gap-1 h-full justify-end>
+
+<div v-click="2" grid="~ cols-2" gap-2 w-full>
+<div data-id="child-a" border="~ violet/50 rounded-lg" px-2 py-2 bg-violet:5>
+<div text-4 op70><b>alice's</b> task</div>
+<div text-4 whitespace-nowrap><code>user_var</code> = <b>"alice"</b></div>
+</div>
+<div data-id="child-b" border="~ violet/50 rounded-lg" px-2 py-2 bg-violet:5>
+<div text-4 op70><b>bob's</b> task</div>
+<div text-4 whitespace-nowrap><code>user_var</code> = <b>"bob"</b></div>
+</div>
 </div>
 
-<div v-click="2" data-id="child" border="~ violet/50 rounded-lg" p-4 bg-violet:5 w-64>
-<div text-4 op70 mb-2>the <b>task's</b> context</div>
-<div text-5><code>user_var</code> = <b>"alice"</b></div>
+<div v-click="1" text-center op80 text-4 py-1>⬆️ <code>gather()</code>: one task each, each gets a <b>copy</b></div>
+
+<div data-id="parent" border="~ sky/50 rounded-lg" px-3 py-1 bg-sky:5 w-full>
+<div text-4><span op70>the <b>caller's</b> context:</span> <code>user_var</code> = <b>not set</b></div>
 </div>
 
 </div>
 
-<FancyArrow v-click="2" from="[data-id=parent] @ right" to="[data-id=child] @ left" arc="-0.4" />
+</div>
 
-<div v-click="3" mt-10 grid="~ cols-2" gap-6 text-5>
+<FancyArrow from="[data-id=parent] @ left" to="[data-id=rulecode] .line:nth-child(11) @ right" arc="0" />
+<FancyArrow v-click="2" from="[data-id=child-a] @ left" to="[data-id=rulecode] .line:nth-child(8) @ right" arc="0.1" />
 
-<div border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div v-click="3" mt-4 grid="~ cols-2" gap-6 text-5>
+
+<div border="~ emerald/40 rounded-lg" p-3 bg-emerald:5>
 ✅ the task <b>inherits</b> what you set before it started
 </div>
 
-<div v-click="4" border="~ rose/40 rounded-lg" p-4 bg-rose:5>
+<div v-click="4" border="~ rose/40 rounded-lg" p-3 bg-rose:5>
 ❌ what the task sets <b>never</b> comes back to you
 </div>
 
 </div>
 
+<style>
+.rule-code { --slidev-code-font-size: 14px; --slidev-code-line-height: 1.5; }
+</style>
+
 <!--
 So now put the two together. We have tasks, and we have contexts. One rule connects them, and it explains almost every surprise people hit.
 
-[click]
-When you create a task,
+Here's our fixed example again. The last line is the caller: it calls `gather()`. At that point, the caller's context has no user set.
 
 [click]
-the task gets a copy of that context. Not the program's context, not some global one: a snapshot of whoever called create_task, taken at the moment they called it. That is why I made you hold onto who starts a task.
+`gather()` creates one task for each request. And when a task is created, it gets a copy of the context. Not the program's context, not some global one: a snapshot of the context of whoever created the task, taken at that moment. That is why I asked you to remember who starts a task.
 
 [click]
-Which means the task inherits everything you had set before you spawned it. That's the part people expect.
+So alice's task and bob's task each start with their own copy. Then each one runs `user_var.set(user)`. Alice's task writes "alice" into its copy, and bob's task writes "bob" into its copy. That's why each of them reads back the right user.
 
 [click]
-And it means anything the task sets stays inside the task. It never propagates back out to you. That's the part that surprises people.
+This means a task inherits everything that was set before it was created. If the caller had set a value before calling `gather()`, both tasks would see it.
 
-That's also why alice and bob each kept their own user a few slides ago. `gather` made a task for each of them, and each task got its own copy.
+[click]
+And it means anything the task sets stays inside the task. It never goes back to the caller. After `gather()` finishes, the caller's context still has no user set. That sounds natural when I say it like this, but it's easy to forget when a library or a server starts the task for you.
 
 Copy, not share. Say it once and most of the confusion goes away.
 -->

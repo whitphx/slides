@@ -1,6 +1,6 @@
 {
   "name": "slidev-addon-review-annotations",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Apply review annotations left on Slidev decks with slidev-addon-review-annotations, then resolve them",
   "author": {
     "name": "Yuichiro Tachibana"

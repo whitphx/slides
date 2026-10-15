@@ -1,6 +1,6 @@
 {
   "name": "slidev-addon-review-annotations",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Leave review annotations on a Slidev deck in the browser and hand them to an AI coding agent",
   "author": "Yuichiro Tachibana <t.yic.yt@gmail.com>",

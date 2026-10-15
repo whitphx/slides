@@ -1,5 +1,21 @@
 # slidev-addon-review-annotations
 
+## 0.3.0
+
+### Minor Changes
+
+- [#41](https://github.com/whitphx/slides/pull/41) [`4bcf604`](https://github.com/whitphx/slides/commit/4bcf604c45938287817ead16d6ae6dff69b392d7) Thanks [@whitphx](https://github.com/whitphx)! - Annotate speaker notes. The toolbar now also appears in the presenter view, where annotating
+  the notes panel marks the annotation with `slidev-target: notes`. The PR comment labels such
+  annotations "speaker notes", and the agent skill edits the slide's notes instead of its
+  content. Only the current slide and its notes can be annotated: Slidev's navigation
+  controls and menus and the next-slide preview are refused with a notice.
+
+### Patch Changes
+
+- [#43](https://github.com/whitphx/slides/pull/43) [`384ba1f`](https://github.com/whitphx/slides/commit/384ba1f8ac322dee3f6bf4bea3925e64b7bf1ccb) Thanks [@whitphx](https://github.com/whitphx)! - Leave Slidev's own UI out of annotating. While the toolbar is active, hovering Slidev's
+  navigation controls, menus or the presenter's next-slide preview no longer highlights them,
+  and they keep working, so slides can be changed without leaving annotate mode.
+
 ## 0.2.0
 
 ### Minor Changes

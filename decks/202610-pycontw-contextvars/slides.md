@@ -174,11 +174,11 @@ plainBackground: true
 
 # A route function you've written a hundred times
 
-<div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-center>
+<div mt-6 grid="~ cols-[1.25fr_1fr]" gap-8 items-stretch>
 
 <div class="toy-code">
 
-```py {*|10|8|7|*}{'data-id':'toy'}
+```py {*|8|7|*}{'data-id':'toy'}
 from flask import Flask
 from flask_login import current_user
 
@@ -186,28 +186,24 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    with open("greeting.txt") as f:
-        greeting = f.read()
-    return f"{greeting}, {current_user.name}!"
+    return f"Hello, {current_user.name}!"
 ```
 
 </div>
 
-<div flex="~ col" gap-5 text-5>
-<div v-click="3" data-id="toy-args" border="~ rose/50 rounded-lg" p-3 bg-rose:5>🚫 <b>no arguments</b></div>
-<div v-click="2" data-id="toy-dir" border="~ amber/50 rounded-lg" p-3 bg-amber:5>📁 <b>current directory</b></div>
+<div flex="~ col" gap-3 text-5 self-end>
+<div v-click="2" data-id="toy-args" border="~ rose/50 rounded-lg" p-3 bg-rose:5>🚫 <b>no arguments</b></div>
 <div v-click="1" data-id="toy-user" border="~ sky/50 rounded-lg" p-3 bg-sky:5>👤 <b>current user</b></div>
 </div>
 
 </div>
 
-<FancyArrow v-click="1" from="[data-id=toy-user] @ left" to="[data-id=toy] .line:nth-child(10) @ right" arc="0.1" />
-<FancyArrow v-click="2" from="[data-id=toy-dir] @ left" to="[data-id=toy] .line:nth-child(8) @ right" arc="0.1" />
-<FancyArrow v-click="3" from="[data-id=toy-args] @ left" to="[data-id=toy] .line:nth-child(7) @ right" arc="-0.1" color="red" />
+<FancyArrow v-click="1" from="[data-id=toy-user] @ left" to="[data-id=toy] .line:nth-child(8) @ right" arc="0" />
+<FancyArrow v-click="2" from="[data-id=toy-args] @ left" to="[data-id=toy] .line:nth-child(7) @ right" arc="0" color="red" />
 
-<div v-click="4" mt-8 text-5 text-center>
+<div v-click="3" mt-8 text-5 text-center>
 
-The **user** and the **directory**: neither is an argument. 👻
+The **user** is not an argument. So where does it come from? 👻
 
 </div>
 
@@ -219,19 +215,16 @@ The **user** and the **directory**: neither is an argument. 👻
 </style>
 
 <!--
-Let me show you a piece of code you've probably written a hundred times. A Flask app with one page. It reads a greeting from a file and says hello to whoever is logged in.
+Let me show you a piece of code you've probably written a hundred times. A Flask app with one page. It says hello to whoever is logged in.
 
 [click]
 `current_user` here is the user who sent this request. Flask-Login works it out for us.
 
 [click]
-And `open("greeting.txt")` is a relative path. Which file it opens depends on the current working directory.
+Now look at the function itself. The `index` function takes no arguments. Nobody passes the user to it.
 
 [click]
-Now look at the function itself. `index()` takes no arguments. The user and the directory both come from somewhere else.
-
-[click]
-So the current user and the current directory are not arguments. They're just there when the function runs. How does Python manage values like these?
+So the current user is not an argument. It's just there when the function runs. How does Python manage a value like this?
 -->
 
 ---
@@ -276,9 +269,9 @@ plainBackground: true
 </style>
 
 <!--
-So how does `index()` get the current user? To answer that, we first need to look at the server it runs on.
+So how does the `index` function get the current user? To answer that, we first need to look at the server it runs on.
 
-Our example runs on a classic web server. One process, a pool of threads, and each incoming request gets a thread of its own. That thread handles the request from start to finish, and only that request.
+Our example runs on a classic web server. One process, a pool of threads, and each incoming request is handled in its own dedicated thread. That thread works on the request from start to finish, and only on that request.
 
 [click]
 So while alice's request is being handled, Thread 1 belongs to alice. One thread, one request.
@@ -1667,7 +1660,7 @@ Before it runs App A's script, the host moves to App A's directory. App A's file
 Before it runs App B's script, the host moves to App B's directory.
 
 [click]
-And this line, in App A's script, `app_a_script()` here, is why it matters. It is like `open("greeting.txt")` in the Flask route function at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+And this line, in App A's script, `app_a_script()` here, is why it matters. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.

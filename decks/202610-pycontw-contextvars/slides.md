@@ -1349,17 +1349,11 @@ layout: statement
 </div>
 
 <!--
-OK. Let's give a name to what we have seen so far.
+So far, every example asked one question: which logical execution am I in? In other words, whose work am I doing right now? A request, a task, a callback. It's not the thread.
 
-Alice's request. A task on the event loop. Work sent to a thread pool. A callback from JavaScript. Each time, the code needed to know one thing: whose work am I doing right now? Each of these units of work is what I call a logical execution. It is the unit your code thinks in. It is not the thread. One thread can run many of them, and one of them can move to another thread.
+`contextvars` answers that question. But that's all it does. Knowing the answer does not make anything safe.
 
-And contextvars follows the logical execution. Values are copied into new tasks. At the edges, where we leave the event loop or where outside code calls back in, we carry the context across ourselves.
-
-But notice what this gives us. We can answer one question: which logical execution is this? That's all.
-
-Knowing the answer does not make anything safe. I learned this in a real project, and it took me a long time.
-
-Let me show you that project.
+I learned this the hard way, in a real project. Let me show you that project.
 -->
 
 ---

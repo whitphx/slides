@@ -355,18 +355,16 @@ This is roughly what Flask 1.x did. The links to the real code are on the slide.
 
 # Python is full of "current"
 
-<div mt-8 grid="~ cols-3" gap-4 text-5>
+<div mt-8 grid="~ cols-2" gap-4 text-5>
 
 <div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
 <div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
 <div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
-<div v-click="5" border="~ amber/40 rounded-lg" p-4 bg-amber:5>📁 <b>current directory</b><br><span op70 text-4><code>os.getcwd()</code></span></div>
-<div v-click="6" border="~ amber/40 rounded-lg" p-4 bg-amber:5>🌍 <b>current environment</b><br><span op70 text-4><code>os.environ</code></span></div>
 
 </div>
 
-<div v-click="7" mt-8 text-5 text-center>
+<div v-click="5" mt-8 text-5 text-center>
 
 None of these are **passed as arguments**. 👻
 
@@ -388,15 +386,9 @@ The current database transaction. SQLAlchemy's `scoped_session`, for example, ke
 The current runtime: which app is running, in a system that runs more than one.
 
 [click]
-The current working directory, the other value our Flask route function used.
-
-[click]
-And the current environment variables. These last two are different from the others. There is only one of each for the whole process, not one per thread.
-
-[click]
 None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
 
-And for the per-thread ones, like the request and the user, `threading.local()` is the classic tool. That's how they've been managed.
+And on a thread-per-request server, `threading.local()` is the classic tool for values like these. That's how they've been managed.
 -->
 
 ---
@@ -1581,7 +1573,7 @@ That interpreter has one thread, because the browser gives it one. On that threa
 And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
 
 [click]
-But some things belong to the interpreter, not to an app. There is one current working directory, and one set of environment variables. Every app shares them.
+And here we meet a new kind of value. So far, everything we stored, like the user and the request, lived in our own variables, so we could move it into a context variable. The current working directory and the environment variables are different. Python keeps them for the whole process, not for a thread or a task. There is one current directory and one set of environment variables, and every app shares them.
 
 [click]
 So from Python's point of view these are three separate apps, but there is exactly one of every global thing they need.

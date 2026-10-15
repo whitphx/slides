@@ -1166,7 +1166,7 @@ plainBackground: true
 
 # The edges: called from outside Python
 
-<div mt-1 text-4 op70>🌐 Pyodide: Python in the browser, called back by <b>JavaScript</b></div>
+<div mt-1 text-4 op70>🔁 Python <b>called back</b> from outside: a C library, a GUI toolkit, <b>JavaScript</b> · example: 🌐 <b>Pyodide</b></div>
 
 <div mt-2 grid="~ cols-[1.6fr_1fr]" gap-5>
 
@@ -1238,12 +1238,14 @@ Every **entry point** back into Python is a boundary too. 🚪
 
 </div>
 
-<div v-click="5" absolute bottom-4 right-10 text-sm op60>Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/pyodide_proxy_context.py" target="_blank">stlite-lib/stlite_lib/pyodide_proxy_context.py</a></div>
+<div v-click="5" absolute bottom-4 right-10 text-4 op60>Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/pyodide_proxy_context.py" target="_blank">stlite-lib/stlite_lib/pyodide_proxy_context.py</a></div>
 
 <!--
-There's a second kind of edge: something outside Python calling back in. The edges so far all had a Python caller. A thread pool, to_thread, create_task: something in Python made the call, so there was a context to copy, or to forget to copy.
+There's a second kind of edge: code outside Python calling back into Python. The edges so far all had a Python caller. A thread pool, `to_thread`, `create_task`: something in Python made the call, so there was a context to copy, or to forget to copy.
 
-This is Pyodide, which is CPython compiled to WebAssembly and running in the browser. It's what powers the project in the case study coming up.
+But sometimes the caller is not Python at all. A C library calls your callback. A GUI toolkit calls your click handler. Or, in the browser, JavaScript calls your Python function. In all of these, there is no Python caller, so there is no context to copy.
+
+Let me show it with the one I know best: Pyodide. Pyodide is CPython compiled to WebAssembly, so Python runs in the browser, and JavaScript can call Python functions. I work with it every day, because Stlite, the project in the case study later, runs on Pyodide.
 
 Same `handle()` as before, running as its own task. It sets the user and hands a callback to JavaScript. The callback lives at module level, like our `index()`, so nobody gives it the user. It reads the variable. `create_proxy()` wraps the Python function so JavaScript can hold on to it, and `setTimeout()` is the browser's timer. It calls our function one second from now.
 
@@ -1262,7 +1264,7 @@ Why the extra `.copy()`? When we handed work to a thread pool, we called `copy_c
 [click]
 So the edges go both ways. Leaving the event loop is one. Coming back in from something that isn't Python is the other. A C library, a GUI toolkit, or JavaScript.
 
-And this one was a real bug. Streamlit, the data-app framework, needs its session for every call, and Stlite looked it up from the running task. A JavaScript callback runs in no task, so every Streamlit call from it failed, unless the app attached the session by hand. The fix put the session in a context variable, just like our user, and wraps `create_proxy()` like this. So every callback an app wraps with it runs in the snapshot.
+And this one was a real bug in Stlite. App code that ran from a JavaScript callback could not find its app's data, for the same reason we just saw. The fix is this same pattern: Stlite wraps `create_proxy()` so that every callback runs in a snapshot taken at the handoff. The link to that code is at the bottom of the slide.
 -->
 
 ---

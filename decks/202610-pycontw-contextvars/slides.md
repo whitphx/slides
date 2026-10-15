@@ -1558,7 +1558,7 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 `app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
 
 [click]
-The Streamlit runtime does. It is the host. It runs your script from top to bottom, and it runs it again every time the user does something, like moving the slider. It runs it in the same Python interpreter. Not in a separate process.
+The Streamlit runtime does. It is the host. It runs your script in the same Python interpreter, not in a separate process.
 
 [click]
 And this part is special to Stlite. Regular Streamlit runs one app per runtime, so it never needs this. But one Stlite runtime can run several apps. So before each run, Stlite prepares the world for that app: it moves to the app's own directory, and sets `HOME` for it.
@@ -1648,30 +1648,40 @@ So to their developers, these are three separate apps. But there is exactly one 
 
 <div>
 
-```py {*|4-5|7-8|2}{'data-id':'dirs'}
-def app_a_script():
-    df = pd.read_csv("data.csv")
+<div text-4 mb-1>🎈 <b>The host</b> <span op70>(pseudocode)</span></div>
 
-os.chdir("/home/app-a")
-os.environ["HOME"] = "/home/app-a"
+```py {*|6|7|*}{'data-id':'dirs'}
+def run_app(app):
+    os.chdir(app.home)
+    os.environ["HOME"] = app.home
+    exec(app.code)
 
-os.chdir("/home/app-b")
-os.environ["HOME"] = "/home/app-b"
+run_app(app_a)
+run_app(app_b)
+```
+
+<div v-click="3" mt-3>
+<div text-4 mb-1>📄 <b>App A's</b> <code>app.py</code></div>
+
+```py {'data-id':'appa'}
+df = pd.read_csv("data.csv")
 ```
 
 </div>
 
-<div flex="~ col" gap-6 text-4 mt-1>
-<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center>📄 <b>App A's</b> script</div>
-<div data-id="d-a" v-click="1" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App A</b></div>
-<div data-id="d-b" v-click="2" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App B</b></div>
+</div>
+
+<div flex="~ col" gap-1 text-4 style="margin-top: 10.3rem">
+<div data-id="d-a" v-click="1" border="~ amber/50 rounded-lg" p-1 bg-amber:5 text-center>🎈 <b>Host</b> runs <b>App A</b> in <code>/home/app-a</code></div>
+<div data-id="d-b" v-click="2" border="~ amber/50 rounded-lg" p-1 bg-amber:5 text-center>🎈 <b>Host</b> runs <b>App B</b> in <code>/home/app-b</code></div>
+<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center style="margin-top: 1rem">📄 <b>App A's</b> script: a relative path</div>
 </div>
 
 </div>
 
-<FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
-<FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0.15" />
-<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=dirs] .line:nth-child(2) @ right" arc="0.15" />
+<FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(6) @ right" arc="0" />
+<FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0" />
+<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=appa] .line:nth-child(1) @ right" arc="0" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1680,16 +1690,16 @@ os.environ["HOME"] = "/home/app-b"
 </div>
 
 <!--
-Now put the two pictures together: one interpreter, many apps, and a host that moves to each app's directory before it runs that app's script.
+Now put the two pictures together: one interpreter, many apps, and a host that moves to each app's directory before it runs that app's script. Here is the host's code, as pseudocode. The `run_app` function moves to the app's home directory, sets `HOME`, and then runs the app's script.
 
 [click]
-Before it runs App A's script, the host moves to App A's directory. App A's files live there.
+The host runs App A. So it moves to App A's directory first. App A's files live there.
 
 [click]
-Before it runs App B's script, the host moves to App B's directory.
+Then the host runs App B, and moves to App B's directory.
 
 [click]
-And this line, in App A's script, `app_a_script()` here, is why it matters. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+And this line, in App A's script, is why it matters. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
@@ -1708,12 +1718,12 @@ And here is the problem. There is exactly one current working directory for the 
 <div class="bug-host">
 
 ```py {*|5-7|2|3|3|*}
-async def run_script(app):
+async def run_app(app):
     os.chdir(app.home)
     await exec_script(app.code)
 
 await asyncio.gather(
-    run_script(app_a), run_script(app_b)
+    run_app(app_a), run_app(app_b)
 )
 ```
 
@@ -1908,7 +1918,7 @@ So the app never owns the directory. It borrows it, and gives it back.
 ````md magic-move {at:2}
 
 ```py
-async def run_script(app):
+async def run_app(app):
     with app_directory(app.home):
         await exec_script(app.code)
 ```

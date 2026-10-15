@@ -1027,23 +1027,22 @@ And it means anything the task sets stays inside the task. It never goes back to
 
 ---
 
-# Set it before you spawn it
+# The copy is made at `create_task()`
 
-<div mt-4 grid="~ cols-[1.1fr_1fr]" gap-5>
+<div mt-4 grid="~ cols-[1fr_1fr]" gap-6 items-start>
 
-<div>
+<div class="spawn-code">
 
-```py {*|4|5|2}{maxHeight:'270px'}
+```py {*|4|5|6|2|*}
 async def worker():
     print(user_var.get())
 
 task = asyncio.create_task(worker())
 user_var.set("alice")
+await task
 ```
 
-</div>
-
-<div v-click="3">
+<div v-click="4" mt-3>
 
 <WindowMockup title="Terminal" dark codeblock>
 
@@ -1053,32 +1052,58 @@ anonymous
 
 </WindowMockup>
 
-<div mt-3 text-4 op70>the default — the set never landed</div>
-
 </div>
 
 </div>
 
-<div v-click="4" mt-6 text-5>
+<div flex="~ col" gap-3 text-4>
 
-Swap the two lines and it prints `alice`. **The snapshot is taken at `create_task()`.** 📸
+<div v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5>
+📸 <code>create_task()</code>: the copy is made <b>now</b><br>
+<span op70><code>worker()</code> has <b>not started</b> yet · copy: <code>"anonymous"</code></span>
+</div>
+
+<div v-click="2" border="~ sky/50 rounded-lg" p-3 bg-sky:5>
+✏️ <code>set("alice")</code>: changes <b>only the caller's</b> context<br>
+<span op70>the task's copy stays <code>"anonymous"</code></span>
+</div>
+
+<div v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5>
+▶️ <code>await task</code>: <code>worker()</code> <b>starts running</b> only now<br>
+<span op70>it reads its own copy</span>
+</div>
 
 </div>
+
+</div>
+
+<div v-click="5" mt-4 text-5 text-center>
+
+Copied when the task is **created**, not when it **starts running**. Set first, then create. 📸
+
+</div>
+
+<style>
+.spawn-code { --slidev-code-font-size: 16px; }
+</style>
 
 <!--
-Because the task gets a copy, one detail matters: when exactly is the copy made? Here's a small example where it matters.
+Because the task gets a copy, one detail matters: when exactly is the copy made? You might guess: when the task starts running. It's not. Here's a small example.
 
 [click]
-We create the task. The snapshot is taken right here, on this line.
+We create the task. `create_task()` does not run `worker()` yet. It only schedules it, so the worker hasn't started. But the copy of the context is made right here, on this line. At this moment `user_var` is not set, so the copy holds the default, "anonymous".
 
 [click]
-And then we set the value. One line later, and it's already too late.
+Then we set the value, on the next line. The worker still hasn't started. But this `set()` changes only our own context. The task already has its copy, and the copy does not change.
 
 [click]
-So the worker prints the default. The set happened in our context, after the task had already taken its copy.
+Now we await the task. This is the first chance the event loop gets to run it. So `worker()` starts running only now, after the `set()`.
 
 [click]
-The fix is to swap two lines. And that's the whole point: the ordering matters because the copy happens at create_task, not when the task first runs. Set first, then spawn.
+And it prints "anonymous". The `set()` happened before the worker even started. But the worker reads its own copy, and that copy was made back at `create_task()`.
+
+[click]
+So the copy is made when the task is created, not when it starts running. If you want a task to see a value, set it before you create the task. Swap these two lines, and it prints "alice".
 -->
 
 ---
@@ -1976,7 +2001,7 @@ Now let's step back from Stlite and sum up what we learned.
 
 <v-clicks>
 
-- 📸 **Copied at task creation** — set the value *before* `create_task()`, or the task never sees it
+- 📸 **Copied at `create_task()`, not when the task starts** — set the value *before* you create the task
 - 🧵 **Threads inherit nothing** — `run_in_executor` drops it; `asyncio.to_thread` copies it for you
 - 🔇 **The failure is silent** — you get the *default*, not an exception
 - 🌍 **Process-wide state stays process-wide** — `os.getcwd()`, `os.environ`
@@ -1989,7 +2014,7 @@ Now let's step back from Stlite and sum up what we learned.
 Here are four common mistakes. We've seen all of them today.
 
 [click]
-The copy happens at task creation, so ordering matters. Set, then spawn.
+The copy is made when you call `create_task()`, not when the task starts running. So set the value first, then create the task.
 
 [click]
 Threads don't get your context on their own. A thread from a thread pool starts with an empty context, and that's what `run_in_executor` gives you. `to_thread` is different, because it copies the context for you.

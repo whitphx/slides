@@ -1526,19 +1526,19 @@ plainBackground: true
 
 <div mt-4 mx-auto max-w-200 text-4 class="nest">
 
-<div border="~ gray-400/50 rounded-xl" p-2 bg-gray-400:5>
+<div border="~ gray-400/50 rounded-xl" p-2 bg-gray-400:5 :class="{ hl: $clicks === 1 }">
 <div text-center op70 mb-1>🌐 <b>Browser</b>: one JavaScript thread (a Web Worker)</div>
 
-<div border="~ violet-400/50 rounded-lg" p-2 bg-violet-400:5>
+<div border="~ violet-400/50 rounded-lg" p-2 bg-violet-400:5 :class="{ hl: $clicks === 2 }">
 <div text-center op70 mb-1>🐍 <b>Pyodide</b>: one Python interpreter, on WebAssembly</div>
 
-<div border="~ sky-400/50 rounded-lg" p-2 bg-sky-400:5>
+<div border="~ sky-400/50 rounded-lg" p-2 bg-sky-400:5 :class="{ hl: $clicks === 3 }">
 <div text-center op70 mb-1>🧵 <b>one thread</b></div>
 
-<div border="~ rose-400/50 rounded-lg" p-2 bg-rose-400:5>
+<div border="~ rose-400/50 rounded-lg" p-2 bg-rose-400:5 :class="{ hl: $clicks === 4 }">
 <div text-center op70 mb-2>⚡ <b>one event loop</b></div>
 
-<div grid="~ cols-3" gap-2>
+<div grid="~ cols-3" gap-2 rounded-lg :class="{ hl: $clicks === 5 }">
 <div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App A</b><br><span op70><code>/home/app-a</code></span></div>
 <div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App B</b><br><span op70><code>/home/app-b</code></span></div>
 <div border="~ emerald-400/60 rounded-lg" p-2 bg-emerald-400:10 text-center><b>🎈 App C</b><br><span op70><code>/home/app-c</code></span></div>
@@ -1547,7 +1547,7 @@ plainBackground: true
 </div>
 </div>
 
-<div v-click="1" mt-2 border="~ amber-400/60 rounded-lg" p-2 bg-amber-400:10 text-center>
+<div v-click="6" mt-2 border="~ amber-400/60 rounded-lg" p-2 bg-amber-400:10 text-center>
 📁 one <code>os.getcwd()</code> · 🌍 one <code>os.environ</code> — <b>shared by every app</b>
 </div>
 
@@ -1556,28 +1556,39 @@ plainBackground: true
 
 </div>
 
-<div v-click="2" mt-4 text-5 text-center>
+<div v-click="7" mt-4 text-5 text-center>
 
 Three apps, but **they all share one interpreter.** 😬
 
 </div>
 
+<style>
+.nest .hl { outline: 3px solid rgb(245 158 11); outline-offset: 2px; transition: outline-color 0.3s; }
+</style>
+
 <!--
 Here's the setup. Let's go from the outside in.
 
+[click]
 Everything runs in the browser. Stlite runs in a Web Worker, and that worker has one JavaScript thread.
 
+[click]
 Inside it is Pyodide: one Python interpreter, compiled to WebAssembly.
 
-That interpreter has one thread, because the browser gives it one. On that thread there is one event loop.
+[click]
+And that interpreter has only one thread. The browser environment is single-threaded here, so Python cannot start more threads. This is one of the big limitations of Pyodide.
 
+[click]
+On that one thread, there is one event loop.
+
+[click]
 And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
 
 [click]
 And here we meet a new kind of value. So far, everything we stored, like the user and the request, lived in our own variables, so we could move it into a context variable. The current working directory and the environment variables are different. Python keeps them for the whole process, not for a thread or a task. There is one current directory and one set of environment variables, and every app shares them.
 
 [click]
-So from Python's point of view these are three separate apps, but there is exactly one of every global thing they need.
+So to their developers, these are three separate apps. But there is exactly one of every global thing they need.
 -->
 
 ---
@@ -1588,29 +1599,30 @@ So from Python's point of view these are three separate apps, but there is exact
 
 <div>
 
-```py {*|1-2|4-5|7}{'data-id':'dirs'}{maxHeight:'280px'}
+```py {*|4-5|7-8|2}{'data-id':'dirs'}
+def app_a_script():
+    df = pd.read_csv("data.csv")
+
 os.chdir("/home/app-a")
 os.environ["HOME"] = "/home/app-a"
 
 os.chdir("/home/app-b")
 os.environ["HOME"] = "/home/app-b"
-
-pd.read_csv("data.csv")
 ```
 
 </div>
 
 <div flex="~ col" gap-6 text-4 mt-1>
+<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center>📄 <b>App A's</b> script</div>
 <div data-id="d-a" v-click="1" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App A</b></div>
 <div data-id="d-b" v-click="2" border="~ amber/50 rounded-lg" p-3 bg-amber:5 text-center>🎈 <b>Host</b>, before running <b>App B</b></div>
-<div data-id="d-s" v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-center>📄 <b>App A's</b> script</div>
 </div>
 
 </div>
 
-<FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(1) @ right" arc="0.15" />
-<FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
-<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0.15" />
+<FancyArrow v-click="1" from="[data-id=d-a] @ left" to="[data-id=dirs] .line:nth-child(4) @ right" arc="0.15" />
+<FancyArrow v-click="2" from="[data-id=d-b] @ left" to="[data-id=dirs] .line:nth-child(7) @ right" arc="0.15" />
+<FancyArrow v-click="3" from="[data-id=d-s] @ left" to="[data-id=dirs] .line:nth-child(2) @ right" arc="0.15" />
 
 <div v-click="4" mt-6 text-5>
 
@@ -1628,7 +1640,7 @@ Before it runs App A's script, the host moves to App A's directory. App A's file
 Before it runs App B's script, the host moves to App B's directory.
 
 [click]
-And this line, in App A's script, is why it matters. It is like `open("greeting.txt")` in the Flask route function at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+And this line, in App A's script, `app_a_script()` here, is why it matters. It is like `open("greeting.txt")` in the Flask route function at the start of this talk. A user writes `read_csv` with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
 
 [click]
 And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
@@ -1638,19 +1650,27 @@ And here is the problem. There is exactly one current working directory for the 
 
 # So here's the bug
 
-<div mt-2 grid="~ cols-[1fr_1fr]" gap-5>
+<div mt-2 grid="~ cols-[minmax(0,1.1fr)_minmax(0,1fr)]" gap-5>
 
 <div>
 
 <div text-4 mb-1>🎈 <b>The host</b> <span op70>(pseudocode)</span></div>
 
-```py {*|2|3|*}
+<div class="bug-host">
+
+```py {*|5-7|2|3|3|*}
 async def run_script(app):
     os.chdir(app.home)
     await exec_script(app.code)
+
+await asyncio.gather(
+    run_script(app_a), run_script(app_b)
+)
 ```
 
-<div v-click="3" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
+</div>
+
+<div v-click="5" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
 
 ⏸️ App A's script **awaits**. The loop runs **App B**, and the host calls `os.chdir("/home/app-b")`.
 
@@ -1660,7 +1680,9 @@ async def run_script(app):
 
 <div>
 
-<div v-click="2">
+<div class="bug-app">
+
+<div v-click="4">
 
 <div text-4 mb-1>📄 <b>App A's</b> <code>app.py</code></div>
 
@@ -1671,7 +1693,7 @@ df = pd.read_csv("data.csv")
 
 </div>
 
-<div v-click="4" mt-3>
+<div v-click="6" mt-3>
 
 <WindowMockup title="App A" dark codeblock>
 
@@ -1690,25 +1712,36 @@ FileNotFoundError: [Errno 44]
 
 </div>
 
-<div v-click="5" mt-4 text-5>
+</div>
+
+<div v-click="7" mt-4 text-5>
 
 The host moved to App A's directory. App A **awaited**. The host moved to App B's. 💥
 
 </div>
 
+<style>
+.bug-host { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
+.bug-app { --slidev-code-font-size: 15px; }
+</style>
+
 <!--
-This is what happens when it goes wrong. The code on the left is pseudocode. It is not Streamlit's real code, but it does the same thing: it is how the host runs one app's script.
+This is what happens when it goes wrong. The code on the left is pseudocode. It is not Stlite's real code, but it does the same thing: it is how the host runs the apps.
 
 [click]
-First, the host moves to App A's directory.
+The last line starts the apps. The host runs each app's script as its own task, with `gather()`. Here, App A and App B.
 
 [click]
-Then it runs App A's script, the user's `app.py`, and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+Inside each task, the host first moves to that app's directory.
 
+[click]
+Then it runs the app's script and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+
+[click]
 Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path.
 
 [click]
-While App A's script waits for the network, the event loop runs another task. That task is App B's script. So the host calls `os.chdir()` again, for App B.
+While App A's script waits for the network, the event loop runs another task: App B's task, from the same `gather()`. So the host calls `os.chdir()` again, for App B.
 
 [click]
 Then App A's script resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found. The file exists. It is just in a different directory.

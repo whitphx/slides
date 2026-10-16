@@ -330,10 +330,10 @@ So how does `current_user` work on that server? Here is some pseudo code for wha
 The user changes from request to request, so a plain global won't work. The answer is threading dot local: one value per thread.
 
 [click]
-At the start of each request, Flask stores the user, then calls your route function, on the request's own thread.
+At the start of each request, in each thread, Flask stores the user, then calls your route function.
 
 [click]
-The `current_user` function is the Flask-Login part. It reads the user back.
+The `current_user` function is the Flask-Login part. It reads the user back, for the current thread.
 
 [click]
 And the route function still takes no arguments, but it gets the user for this request, because it reads the value for the current thread.

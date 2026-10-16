@@ -1599,7 +1599,7 @@ Three apps, but **they all share one interpreter.** 😬
 This diagram shows the layers that Stlite apps run inside, from the outside in.
 
 [click]
-Stlite runs in a Web Worker, which has one JavaScript thread.
+Stlite runs in a web browser environment, on one JavaScript thread.
 
 [click]
 Inside it is Pyodide: one Python interpreter.
@@ -1611,13 +1611,13 @@ And that interpreter has one thread. Python cannot start more threads here.
 On that thread, there is one event loop.
 
 [click]
-And inside that loop, a page can run several Stlite apps. They are all tasks on the same loop, and each has its own home directory.
+And inside that loop, a page can run several Stlite apps. They are all tasks on the same event loop, and each has its own home directory.
 
 [click]
-Now, the current directory and the environment variables are different from our user and request values. Python keeps them for the whole process. Every app shares them.
+But the current directory and the environment variables are shared across the whole process. Every app shares them.
 
 [click]
-So these are three separate apps, but there is only one of every global thing they need.
+So these are three separate apps, each relying on its own home directory. But there is only one current directory, and they all share it.
 -->
 
 ---

@@ -694,11 +694,11 @@ State that belongs to the execution, not to the thread
 </div>
 
 <!--
-So we need storage that follows the logical execution instead of the thread.
+So we need storage that follows something called a logical execution, instead of the thread.
 
-By logical execution, I mean the code that runs for one request, from start to finish. On the async server, that's one task. It pauses at each `await`, other tasks run, and later it picks up where it left off.
+By logical execution, I mean the code that runs for one request, from start to finish. On the async server, that's one task.
 
-We want a value that goes with that task across every `await`. That's what the `contextvars` module gives us.
+That's what the `contextvars` module gives us.
 -->
 
 ---
@@ -732,21 +732,21 @@ Declared **once**, at module level. Read from **anywhere**, at any depth. 🪄
 </div>
 
 <!--
-A `ContextVar` is like threading dot local, except the value follows the logical execution, not the thread.
+The `contextvars` module has a `ContextVar` class, which is one of its core APIs. A `ContextVar` is like threading dot local, except the value follows the logical execution, not the thread.
 
 The API has three parts.
 
 [click]
-You declare it once, at module level. The default is what you get when nothing has been set.
+You declare it once, at module level.
 
 [click]
-You set it. This binds the value in the current context. We'll see what "current context" means in a moment.
+You set its value with the `set` method. This binds the value in the current context. We'll see what "current context" means in a moment.
 
 [click]
-And you get it back.
+And you get the value with the `get` method.
 
 [click]
-Same shape as threading dot local: declare in one place, read from anywhere. Only what it's attached to changes.
+It's a similar shape to threading dot local, but the value follows the task, not the thread.
 -->
 
 ---
@@ -830,7 +830,7 @@ bob sees: Hello, bob!
 So here's the same program again.
 
 [click]
-Three lines change. The `threading.local()` object becomes a `ContextVar`, and reads and writes become `get()` and `set()`.
+But three lines change. The thread-local object becomes a `ContextVar`, and reads and writes become the `get` and `set` methods.
 
 [click]
 Now each task reads back its own value across the await. Same order, same single thread, right answer.

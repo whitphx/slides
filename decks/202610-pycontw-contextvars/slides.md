@@ -351,7 +351,7 @@ On this server, that's exactly right. One thread per request means one value per
 <div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
 <div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
-<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🎈 <b>current Streamlit session</b><br><span op70 text-4>where <code>st.write()</code> sends its output</span></div>
 
 </div>
 
@@ -374,10 +374,10 @@ The current user, our example.
 The current database transaction. SQLAlchemy's `scoped_session` keeps one session per thread by default.
 
 [click]
-The current runtime: which app is running, in a system that runs more than one app runtime.
+The current Streamlit session. Streamlit runs each user's script in its own thread, and stores which session it belongs to on that thread. That's how `st.write` knows where to send its output.
 
 [click]
-No caller passes these in. Every layer just reads them when it needs them. And on a thread-per-request server, threading dot local is the classic tool for that.
+No caller passes these in. Every layer just reads them when it needs them. And all of them are kept per thread: one thread handles one request, so one value per thread is one value per request. threading dot local is the classic tool for that.
 -->
 
 ---

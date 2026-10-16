@@ -893,16 +893,6 @@ ctx = copy_context()
 ctx.run(handler)
 ```
 
-```py
-from contextvars import copy_context
-
-ctx = copy_context()
-
-ctx.run(handler)
-
-ctx[user_var]  # "alice"
-```
-
 ````
 
 </div>
@@ -910,9 +900,9 @@ ctx[user_var]  # "alice"
 </div>
 
 <div data-id="ctx-run-line" absolute style="left:643px;top:209px;width:1px;height:1px"></div>
-<FancyArrow v-click="[2,3]" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
+<FancyArrow v-click="2" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
 
-<div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
+<div v-click="3" absolute bottom-10 inset-x-0 text-center text-5>
 
 `set()` and `get()` always use **the `Context` you are running in**. 🎯
 
@@ -925,15 +915,10 @@ The next piece is the `Context` itself. Picture it as a dictionary: every contex
 There is always a current context, even if you never created one. `copy_context()` takes a snapshot of it.
 
 [click]
-And you can run a function inside that snapshot. While `handler` runs inside `ctx`, every `get()` sees the snapshot's values.
-
-[click]
-You can also read a variable straight out of the snapshot, like a dictionary lookup.
+And you can run a function inside that snapshot, so that inside it, every context variable's `get()` returns the snapshot's value.
 
 [click]
 So "the current context" means a mapping like this one. `set()` writes into it, and `get()` reads from it.
-
-Which leaves one question. When a new task starts, where does its context come from?
 -->
 
 ---
@@ -999,7 +984,7 @@ await asyncio.gather(handle("alice"), handle("bob"))
 <!--
 One rule connects tasks and contexts.
 
-Here's our fixed example again. At the top, `user_var` is declared as a context variable, with the default "anonymous".
+Here's our fixed example again. At the top, `user_var` is declared as a context variable, with the default value "anonymous".
 
 [click]
 The last line calls `gather()`. At that moment, the caller's context has no user set.
@@ -1332,7 +1317,7 @@ The usual example is 🪵 **logs**. It's **not just for logging**.
 Now let's look at real tools that use `contextvars`. You've probably used some of them already.
 
 [click]
-Request IDs in logs. At the start of each request, a middleware stores a new request ID in a context variable. Then a `logging.Filter` reads it and adds it to every log record.
+Request IDs in logs. For example, in a FastAPI or Starlette app, the `asgi-correlation-id` middleware stores a new request ID in a context variable at the start of each request. Then a `logging.Filter` reads it and adds it to every log record.
 
 [click]
 Distributed tracing. OpenTelemetry records each operation as a span, and a new span needs to know which span is running now, so it can attach to it as a child. OpenTelemetry keeps that current span in a context variable, so it stays right across awaits.

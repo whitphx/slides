@@ -472,26 +472,24 @@ plainBackground: true
 
 # What is a task?
 
-<div mt-2 grid="~ cols-[1.4fr_1fr]" gap-8 items-start>
+<div mt-2 grid="~ cols-[minmax(0,1.15fr)_minmax(0,1fr)]" gap-6 items-start>
 
 <div text-4.5>
 
 <ul>
 <li v-click="1">🙋 <b>Someone starts it</b> — <code>create_task()</code>, <code>gather()</code>, the server</li>
-<li v-click="4">📦 <b>It runs one coroutine</b> — the caller doesn't wait</li>
-<li v-click="5">🔁 <b>The event loop runs them all</b> — one thread, switching at every <code>await</code></li>
+<li v-click="4">🔁 <b>The event loop runs them all</b> — one thread, switching at every <code>await</code></li>
 </ul>
 
 <div v-click="1" mt-3 class="task-code">
 
-```py {*|1-3|6|7|*}{at:2}
+```py {*|1-3|6|*}{at:2}
 async def greet(name):
     await asyncio.sleep(1)
     print(f"Hello, {name}!")
 
 async def main():
     task = asyncio.create_task(greet("alice"))
-    print("main() carries on")
     await task
 ```
 
@@ -499,30 +497,19 @@ async def main():
 
 </div>
 
-<div v-click="5" border="~ emerald/50 rounded" p-1 bg-emerald:5>
-<div text-4 mb-1><b>Thread 1</b></div>
-<div border="~ rose/50 rounded" p-1 bg-rose:5>
-<div text-4 mb-1><b>⚡ Event loop</b></div>
-<div flex="~ col" gap-1>
-<div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 1</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
-</div>
-<div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 2</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
-</div>
-<div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 3</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
-</div>
-</div>
-</div>
+<div v-click="4" text-4 class="sw">
+<div text-center op70 mb-1>🧵 one thread, over time ⬇️</div>
+<div class="sw-row sw-head"><div></div><div>alice's task</div><div>bob's task</div><div>carol's task</div></div>
+<div class="sw-row"><div class="sw-t">1</div><div class="sw-on">▶️ runs</div><div></div><div></div></div>
+<div class="sw-row"><div class="sw-t"></div><div class="sw-wait">⏸️ <code>await</code></div><div class="sw-on">▶️ runs</div><div></div></div>
+<div class="sw-row"><div class="sw-t"></div><div></div><div class="sw-wait">⏸️ <code>await</code></div><div class="sw-on">▶️ runs</div></div>
+<div class="sw-row"><div class="sw-t"></div><div class="sw-on">▶️ resumes</div><div></div><div class="sw-wait">⏸️ <code>await</code></div></div>
+<div class="sw-row"><div class="sw-t"></div><div></div><div class="sw-on">▶️ resumes</div><div></div></div>
 </div>
 
 </div>
 
-<div v-click="6" mt-4 text-5 text-center>
+<div v-click="5" mt-4 text-5 text-center>
 
 Three requests, three tasks, **one thread** — taking turns. 🔁
 
@@ -533,13 +520,21 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.4;
 }
+.sw { border: 1px solid rgb(16 185 129 / 0.5); border-radius: 0.5rem; padding: 0.4rem 0.6rem; background: rgb(16 185 129 / 0.05); }
+.sw-row { display: grid; grid-template-columns: 1.2rem repeat(3, minmax(0, 1fr)); gap: 0.4rem; align-items: center; margin: 0.25rem 0; }
+.sw-head { font-weight: 700; text-align: center; }
+.sw-row > div:not(.sw-t) { text-align: center; white-space: nowrap; }
+.sw-on { border-radius: 0.3rem; background: rgb(196 181 253 / 0.6); padding: 0.1rem 0; }
+html.dark .sw-on { background: rgb(91 33 182 / 0.7); }
+.sw-wait { border: 1px dashed rgb(128 128 128 / 0.7); border-radius: 0.3rem; padding: 0.05rem 0; opacity: 0.85; }
+.sw-t { visibility: hidden; }
 </style>
 
 <!--
 So what is a task? The rest of the talk depends on this word.
 
 [click]
-Something has to start a task. Let's look at a small example.
+Let's look at a small example.
 
 [click]
 `greet` is an `async def` function, so calling it gives you a coroutine: a function call that can pause at each `await`.
@@ -548,10 +543,7 @@ Something has to start a task. Let's look at a small example.
 We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you. Uvicorn, for example, starts one task per request.
 
 [click]
-Each task runs one coroutine. `create_task()` doesn't wait for it, so the `main` function prints its line right away.
-
-[click]
-The event loop runs all the tasks on one thread. It switches between them when the running coroutine reaches an `await`.
+The event loop runs all the tasks on one thread. On the right, time goes down. Alice's task runs until it reaches an `await`. Then the event loop switches to bob's task, then to carol's. When alice's `await` is done, her task resumes where it left off.
 
 [click]
 So: three requests, three tasks, one thread, taking turns. And taking turns is exactly what breaks our example.

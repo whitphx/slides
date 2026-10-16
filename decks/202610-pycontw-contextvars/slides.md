@@ -2171,7 +2171,7 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 
 <v-clicks>
 
-- 🧵 **`threading.local()` didn't break** — "one thread, one request" did
+- 🧵 **Async: one thread ≠ one request** — so `threading.local()` is not per request
 - 📸 **`ContextVar` follows the task** — each task gets its own copy of the context
 - 🧭 **It tells you the context; it does not change process-wide state** — `os.getcwd()` and `os.environ` stay shared
 - 🔁 **Process-wide state? Borrow it** — move in on every resume, move back on every pause
@@ -2247,7 +2247,7 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 So, to wrap up.
 
 [click]
-threading dot local never broke. What broke is the assumption that one thread means one request.
+In async code, one thread is no longer one request, so threading dot local is no longer per request.
 
 [click]
 A `ContextVar` follows the task. Each task gets its own copy of the context.

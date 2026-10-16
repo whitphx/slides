@@ -1922,13 +1922,13 @@ So the app-specific values in the process-wide state, like the current directory
 class DirectorySyncCoroutineProxy(Coroutine):
     def __init__(self, coro):
         self.iter = coro.__await__()
-        self.home = home_dir_contextvar.get()
+        self.app_home = home_dir_contextvar.get()
 
     def send(self, value):
         orig_cwd = os.getcwd()
         orig_home = os.environ.get("HOME")
-        os.chdir(self.home)
-        os.environ["HOME"] = self.home
+        os.chdir(self.app_home)
+        os.environ["HOME"] = self.app_home
         try:
             return self.iter.send(value)
         finally:
@@ -1956,7 +1956,7 @@ class DirectorySyncCoroutineProxy(Coroutine):
 Now we need a hook point: a place in each task where we can call `os.chdir()` and set `HOME`. And it must run every time the task resumes, because a task runs in steps, from one `await` to the next.
 
 [click]
-So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory path from the context variable.
+A coroutine is just an object with a few methods, like `send()`, and Python lets us write our own class with the same methods. So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory path from the context variable.
 
 [click]
 And `send()` is the method the event loop calls every time it resumes a coroutine. That's our hook point.
@@ -1968,10 +1968,10 @@ Before the step, it remembers the current settings, then moves to the app's dire
 Then it runs one step of the script, until its next `await`.
 
 [click]
-After the step, even if it fails, it puts the original settings back. The real class does the same for `throw()` and `close()`.
+After the step, it puts the original settings back. The real class does the same for `throw()` and `close()`.
 
 [click]
-So every step of every app runs in its own app's directory.
+In Stlite, the host does this wrapping: before it starts the task for an app's script, it wraps the script's coroutine in this class. So every step of every app runs in its own app's directory.
 -->
 
 ---
@@ -2041,7 +2041,7 @@ html.dark .btl-cb { background: rgb(6 95 70); }
 </style>
 
 <!--
-Here's the same timeline as the bug, now with the proxy in place.
+With these tricks, the bug is fixed. Here's the same timeline as before, now with the proxy in place.
 
 [click]
 App A's task resumes. The proxy moves into App A's directory.
@@ -2056,7 +2056,7 @@ App B's task resumes, and the proxy moves into App B's directory.
 App B reaches an `await`, and the directory is put back again.
 
 [click]
-App A resumes. The proxy moves into App A's directory again, so reading `data.csv` works this time.
+App A resumes. Because the event loop resumes it through `send()`, the proxy moves into App A's directory again, so reading `data.csv` works this time.
 
 [click]
 So each resume moves into its own app's directory, and each `await` moves back. The two apps never see each other's directory.
@@ -2120,9 +2120,9 @@ layout: statement
 <!--
 If you remember one sentence from this talk, make it this one.
 
-`contextvars` answers a question: which logical execution is this? It does not protect process-wide state, and it does not keep tasks apart.
+`contextvars` provides a way to keep a value for each logical execution, such as each task. It does not protect process-wide state, and it does not keep tasks apart.
 
-What you do with the answer is up to you. In Stlite, we used it to keep a directory setting per task. A custom class that wraps each script's coroutine gives us a hook on every step, and there we move the directory in and out.
+What you do with that value is up to you. In Stlite, we used it to keep a directory setting per task. A custom class that wraps each script's coroutine gives us a hook on every step, and there we move the directory in and out.
 -->
 
 ---

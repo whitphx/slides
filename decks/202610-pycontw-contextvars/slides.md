@@ -1729,7 +1729,7 @@ df = pd.read_csv("data.csv")
 
 </div>
 
-<div v-click="6" mt-3>
+<div v-click="9" mt-3>
 
 <WindowMockup title="App A" dark codeblock>
 
@@ -1754,30 +1754,30 @@ FileNotFoundError: [Errno 44]
 <div class="btl-row btl-lane btl-a">
 <div class="btl-name">App A's task</div>
 <div class="btl-ca">chdir <code>app-a</code></div>
-<div class="btl-ca">⏸️ <code>await</code></div>
+<div v-click="6" class="btl-ca">⏸️ <code>await</code></div>
 <div></div><div></div>
-<div v-click="6" class="btl-ca">read <code>data.csv</code> ❌</div>
+<div v-click="9" class="btl-ca">read <code>data.csv</code> ❌</div>
 </div>
 <div class="btl-row btl-lane btl-b">
 <div class="btl-name">App B's task</div>
 <div></div><div></div>
-<div class="btl-cb">chdir <code>app-b</code></div>
-<div class="btl-cb">⏸️ <code>await</code></div>
+<div v-click="7" class="btl-cb">chdir <code>app-b</code></div>
+<div v-click="8" class="btl-cb">⏸️ <code>await</code></div>
 <div></div>
 </div>
-<div class="btl-row btl-cwd" :class="{ 'btl-hl': $clicks >= 7 }">
+<div class="btl-row btl-cwd" :class="{ 'btl-hl': $clicks >= 10 }">
 <div class="btl-name"><code>os.getcwd()</code></div>
 <div class="btl-v">/home/app-a</div>
-<div class="btl-v">/home/app-a</div>
-<div class="btl-v btl-bad">/home/app-b</div>
-<div class="btl-v btl-bad">/home/app-b</div>
-<div v-click="6" class="btl-v btl-bad">/home/app-b</div>
+<div v-click="6" class="btl-v">/home/app-a</div>
+<div v-click="7" class="btl-v btl-bad">/home/app-b</div>
+<div v-click="8" class="btl-v btl-bad">/home/app-b</div>
+<div v-click="9" class="btl-v btl-bad">/home/app-b</div>
 </div>
 <div class="btl-row">
 <div class="btl-name btl-time">time</div>
 <div class="btl-axis"></div>
 </div>
-<div v-click="7" class="btl-tag">🌍 <code>os.getcwd()</code>: <b>one per process</b>, shared by both tasks</div>
+<div v-click="10" class="btl-tag">🌍 <code>os.getcwd()</code>: <b>one per process</b>, shared by both tasks</div>
 </div>
 
 <style>
@@ -1798,7 +1798,7 @@ html.dark .btl-cb { background: rgb(6 95 70); }
 .btl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
 .btl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
 .btl-cwd { transition: background-color 0.3s, border-color 0.3s; }
-.btl-hl { border-color: rgb(245 158 11); border-width: 1.5px; background-color: rgb(245 158 11 / 0.12); }
+.btl-hl { box-shadow: 0 0 0 1.5px rgb(245 158 11); background-color: rgb(245 158 11 / 0.12); }
 .btl-tag { margin-top: 0.2rem; text-align: center; color: rgb(217 119 6); }
 .btl-time { text-align: right; font-weight: 700; opacity: 0.8; }
 .btl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
@@ -1821,10 +1821,19 @@ Then it runs the app's script. Everything the user's code does happens on this l
 And assume App A's code looks like this. It has an `await`-ed call: it waits for the network, then reads `data.csv` with a relative path.
 
 [click]
-While App A waits, the event loop runs App B's task, and the host calls `os.chdir()` for App B. The timeline at the bottom shows the order.
+The timeline at the bottom shows what happens, step by step. First, App A's task moves to App A's directory.
 
 [click]
-Then App A resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found.
+App A's script reaches the `await`, and its task pauses.
+
+[click]
+So the event loop runs App B's task, and the host calls `os.chdir()` for App B.
+
+[click]
+App B's script also reaches an `await`, and pauses.
+
+[click]
+Now App A resumes and reads `data.csv`. But the process is still in App B's directory, so the file is not found.
 
 [click]
 Same shape as the threading dot local bug: a value overwritten during an `await`. But a better storage class does not help here, because the current directory belongs to the whole process.

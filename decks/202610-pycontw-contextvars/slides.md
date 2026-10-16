@@ -1573,7 +1573,7 @@ Three apps, but **they all share one interpreter.** 😬
 </style>
 
 <!--
-This diagram shows the layers that Stlite apps run inside, from the outside in.
+This diagram shows the layers that Stlite apps run inside.
 
 [click]
 Stlite runs in a web browser environment, on one JavaScript thread.
@@ -1783,7 +1783,7 @@ html.dark .btl-cb { background: rgb(6 95 70); }
 </style>
 
 <!--
-This is what goes wrong. The code is pseudocode, but it does what Stlite's host does.
+This is what goes wrong. The code is pseudocode, but it demonstrates what the real Stlite code does.
 
 [click]
 The last line runs each app as its own task, with `gather()`.
@@ -1792,7 +1792,7 @@ The last line runs each app as its own task, with `gather()`.
 Each task first moves to its app's directory and sets `HOME`.
 
 [click]
-Then it runs the app's script. Everything the user's code does happens on this line.
+Then it runs the app's script.
 
 [click]
 And assume App A's code looks like this. It has an `await`-ed call: it waits for the network, then reads `data.csv` with a relative path.
@@ -1813,7 +1813,7 @@ App B's script also reaches an `await`, and pauses.
 Now App A resumes and reads `data.csv`. But the process is still in App B's directory, so the file is not found.
 
 [click]
-Same shape as the threading dot local bug: a value overwritten during an `await`. But a better storage class does not help here, because the current directory belongs to the whole process.
+Same shape as the threading dot local bug: a value overwritten during an `await`. But a `ContextVar` does not help here by itself, because the current directory belongs to the whole process.
 -->
 ---
 
@@ -1846,7 +1846,7 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So how do we fix it? Step one: store each app's directory in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example. We will build on it in the next step.
+So how do we fix it? First, store each app's directory path in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example.
 
 [click]
 Now any code running in each task can get its app's directory.
@@ -1861,7 +1861,7 @@ layout: statement
 <!--
 But that doesn't fix the bug yet.
 
-The context variable knows the right directory, but nothing calls `os.chdir()`. Knowing the right directory is not the same as being in it.
+The context variable knows the right directory, but nothing calls `os.chdir()`. Just knowing the directory path is not enough.
 -->
 
 ---
@@ -1956,7 +1956,7 @@ class DirectorySyncCoroutineProxy(Coroutine):
 Now we need a hook point: a place in each task where we can call `os.chdir()` and set `HOME`. And it must run every time the task resumes, because a task runs in steps, from one `await` to the next.
 
 [click]
-So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory from the context variable from step one.
+So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory path from the context variable.
 
 [click]
 And `send()` is the method the event loop calls every time it resumes a coroutine. That's our hook point.

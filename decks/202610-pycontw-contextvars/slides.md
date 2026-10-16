@@ -1712,12 +1712,6 @@ await asyncio.gather(
 
 </div>
 
-<div v-click="5" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
-
-⏸️ App A's script **awaits**. The loop runs **App B**, and the host calls `os.chdir("/home/app-b")`.
-
-</div>
-
 </div>
 
 <div>
@@ -1756,15 +1750,59 @@ FileNotFoundError: [Errno 44]
 
 </div>
 
-<div v-click="7" mt-4 text-5>
-
-The host moved to App A's directory. App A **awaited**. The host moved to App B's. 💥
-
+<div v-click="5" mt-3 text-4 class="btl">
+<div class="btl-row btl-lane btl-a">
+<div class="btl-name">App A's task</div>
+<div class="btl-ca">chdir <code>app-a</code></div>
+<div class="btl-ca">⏸️ <code>await</code></div>
+<div></div><div></div>
+<div v-click="6" class="btl-ca">read <code>data.csv</code> ❌</div>
+</div>
+<div class="btl-row btl-lane btl-b">
+<div class="btl-name">App B's task</div>
+<div></div><div></div>
+<div class="btl-cb">chdir <code>app-b</code></div>
+<div class="btl-cb">⏸️ <code>await</code></div>
+<div></div>
+</div>
+<div class="btl-row btl-cwd" :class="{ 'btl-hl': $clicks >= 7 }">
+<div class="btl-name"><code>os.getcwd()</code></div>
+<div class="btl-v">/home/app-a</div>
+<div class="btl-v">/home/app-a</div>
+<div class="btl-v btl-bad">/home/app-b</div>
+<div class="btl-v btl-bad">/home/app-b</div>
+<div v-click="6" class="btl-v btl-bad">/home/app-b</div>
+</div>
+<div class="btl-row">
+<div class="btl-name btl-time">time</div>
+<div class="btl-axis"></div>
+</div>
+<div v-click="7" class="btl-tag">🌍 <code>os.getcwd()</code>: <b>one per process</b>, shared by both tasks</div>
 </div>
 
 <style>
 .bug-host { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
 .bug-app { --slidev-code-font-size: 15px; }
+.btl { border: 1px solid rgb(245 158 11 / 0.5); border-radius: 0.5rem; padding: 0.3rem 0.6rem; background: rgb(245 158 11 / 0.05); }
+.btl-row { display: grid; grid-template-columns: 9.5rem repeat(4, minmax(0, 1fr)) minmax(0, 1.35fr); gap: 0.4rem; align-items: center; margin: 0.15rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; border-radius: 0.4rem; }
+.btl-lane { border-width: 1.5px; background-image: linear-gradient(to right, transparent 9.5rem, rgb(128 128 128 / 0.6) 9.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
+.btl-a { border-color: rgb(14 165 233 / 0.6); background-color: rgb(14 165 233 / 0.08); }
+.btl-b { border-color: rgb(16 185 129 / 0.6); background-color: rgb(16 185 129 / 0.08); }
+.btl-lane .btl-name { font-weight: 700; }
+.btl-name { position: relative; white-space: nowrap; }
+.btl-ca, .btl-cb, .btl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; }
+.btl-ca { background: rgb(186 230 253); }
+.btl-cb { background: rgb(167 243 208); }
+html.dark .btl-ca { background: rgb(7 89 133); }
+html.dark .btl-cb { background: rgb(6 95 70); }
+.btl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.btl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.btl-cwd { transition: background-color 0.3s, border-color 0.3s; }
+.btl-hl { border-color: rgb(245 158 11); border-width: 1.5px; background-color: rgb(245 158 11 / 0.12); }
+.btl-tag { margin-top: 0.2rem; text-align: center; color: rgb(217 119 6); }
+.btl-time { text-align: right; font-weight: 700; opacity: 0.8; }
+.btl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
+.btl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
 </style>
 
 <!--
@@ -1780,10 +1818,10 @@ Each task first moves to its app's directory and sets `HOME`.
 Then it runs the app's script. Everything the user's code does happens on this line.
 
 [click]
-Here is App A's script. It waits for the network, then reads `data.csv` with a relative path.
+And assume App A's code looks like this. It has an `await`-ed call: it waits for the network, then reads `data.csv` with a relative path.
 
 [click]
-While App A waits, the event loop runs App B's task, and the host calls `os.chdir()` for App B.
+While App A waits, the event loop runs App B's task, and the host calls `os.chdir()` for App B. The timeline at the bottom shows the order.
 
 [click]
 Then App A resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found.

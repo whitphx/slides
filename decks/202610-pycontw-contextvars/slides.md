@@ -2003,50 +2003,86 @@ plainBackground: true
 
 # Two tasks, one directory, no collisions
 
-<div mt-10 grid="~ cols-[8rem_1fr_auto_1fr_auto_1fr]" gap-2 items-center>
+<div mt-24 text-4 class="btl">
+<div class="btl-row btl-lane btl-a">
+<div class="btl-name">App A's task</div>
+<div v-click="1" class="btl-ca">▶️ resume</div>
+<div v-click="2" class="btl-ca">⏸️ <code>await</code></div>
+<div></div><div></div>
+<div v-click="5" class="btl-ca">read <code>data.csv</code> ✅</div>
+</div>
+<div class="btl-row btl-lane btl-b">
+<div class="btl-name">App B's task</div>
+<div></div><div></div>
+<div v-click="3" class="btl-cb">▶️ resume</div>
+<div v-click="4" class="btl-cb">⏸️ <code>await</code></div>
+<div></div>
+</div>
+<div class="btl-row">
+<div class="btl-name"><code>os.getcwd()</code></div>
+<div v-click="1" class="btl-v btl-good">/home/app-a</div>
+<div v-click="2" class="btl-v btl-back">↩️ original</div>
+<div v-click="3" class="btl-v btl-good">/home/app-b</div>
+<div v-click="4" class="btl-v btl-back">↩️ original</div>
+<div v-click="5" class="btl-v btl-good">/home/app-a</div>
+</div>
+<div class="btl-row">
+<div class="btl-name btl-time">time</div>
+<div class="btl-axis"></div>
+</div>
+</div>
 
-<div text-4 op70>the thread runs</div>
-<div v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 1</div>
-<div v-click="2" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
-<div v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4 text-center><b>App B</b> · step 1</div>
-<div v-click="4" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
-<div v-click="5" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 2</div>
+<div v-click="6" mt-8 text-5 text-center>
 
-<div text-4 op70><code>os.getcwd()</code></div>
-<div v-click="1" text-4 text-center><code>/home/app-a</code></div>
-<div v-click="2" text-4 text-center op60>put back</div>
-<div v-click="3" text-4 text-center><code>/home/app-b</code></div>
-<div v-click="4" text-4 text-center op60>put back</div>
-<div v-click="5" text-4 text-center><code>/home/app-a</code></div>
+Each resume **moves in** to its own directory; each <code>await</code> **moves back**. ✅
 
 </div>
 
-<div v-click="6" mt-10 text-5 text-center>
-
-Each resume **moves in** to its own directory; each <code>await</code> **moves back**.<br>The directory is only ever **borrowed**. 🔐
-
-</div>
+<style>
+.btl { border: 1px solid rgb(245 158 11 / 0.5); border-radius: 0.5rem; padding: 0.3rem 0.6rem; background: rgb(245 158 11 / 0.05); }
+.btl-row { display: grid; grid-template-columns: 9.5rem repeat(4, minmax(0, 1fr)) minmax(0, 1.35fr); gap: 0.4rem; align-items: center; margin: 0.15rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; border-radius: 0.4rem; }
+.btl-lane { border-width: 1.5px; background-image: linear-gradient(to right, transparent 9.5rem, rgb(128 128 128 / 0.6) 9.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
+.btl-a { border-color: rgb(14 165 233 / 0.6); background-color: rgb(14 165 233 / 0.08); }
+.btl-b { border-color: rgb(16 185 129 / 0.6); background-color: rgb(16 185 129 / 0.08); }
+.btl-lane .btl-name { font-weight: 700; }
+.btl-name { position: relative; white-space: nowrap; }
+.btl-ca, .btl-cb, .btl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; }
+.btl-ca { background: rgb(186 230 253); }
+.btl-cb { background: rgb(167 243 208); }
+html.dark .btl-ca { background: rgb(7 89 133); }
+html.dark .btl-cb { background: rgb(6 95 70); }
+.btl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.btl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.btl-cwd { transition: background-color 0.3s, border-color 0.3s; }
+.btl-hl { box-shadow: 0 0 0 1.5px rgb(245 158 11); background-color: rgb(245 158 11 / 0.12); }
+.btl-tag { margin-top: 0.2rem; text-align: center; color: rgb(217 119 6); }
+.btl-time { text-align: right; font-weight: 700; opacity: 0.8; }
+.btl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
+.btl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.btl-good { border-color: rgb(16 185 129 / 0.7); color: rgb(5 150 105); }
+.btl-back { opacity: 0.7; font-family: inherit; }
+</style>
 
 <!--
-Here's the timeline on that one thread.
+Here's the same timeline as the bug, now with the proxy in place.
 
 [click]
 App A's task resumes. The proxy moves into App A's directory.
 
 [click]
-App A reaches an `await`. The proxy puts the directory back, and the next task runs.
+App A reaches an `await`. The proxy puts the original directory back, and the next task runs.
 
 [click]
-App B resumes, and the proxy moves into App B's directory.
+App B's task resumes, and the proxy moves into App B's directory.
 
 [click]
 App B reaches an `await`, and the directory is put back again.
 
 [click]
-App A resumes for its next step, in App A's directory again.
+App A resumes. The proxy moves into App A's directory again, so reading `data.csv` works this time.
 
 [click]
-No task owns the directory. Each one borrows it for one step and gives it back.
+So each resume moves into its own app's directory, and each `await` moves back. The two apps never see each other's directory.
 -->
 
 ---

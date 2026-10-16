@@ -1346,9 +1346,9 @@ one unit of work: a request, a task, a callback · **on any thread**
 </div>
 
 <!--
-Every example so far asked one question: which logical execution am I in? Whose work am I doing right now?
+In every example so far, `contextvars` told the code which logical execution it is in.
 
-`contextvars` answers that question. But knowing the answer does not make anything safe.
+But knowing that does not make anything safe.
 
 I learned this in a real project. Let me show you.
 -->
@@ -1394,7 +1394,7 @@ This is Stlite. I'm its author and maintainer, and it's the project where I lear
 </div>
 
 <!--
-A quick introduction, because the architecture is why this talk exists.
+A quick introduction, because its architecture matters for this story.
 
 [click]
 Streamlit is a Python framework for data apps. You write only a Python script, and it becomes a web app.
@@ -1458,10 +1458,10 @@ So the whole runtime ships as a static web page.
 </style>
 
 <!--
-Here's a Stlite app. On the left is the whole source code of this app: a short Streamlit script, and a web page that loads it.
+Here's a Stlite app. On the left is the whole source code of this app: a short Streamlit script written in Python, and a web page that loads it.
 
 [click]
-On the right is that page, running live in this slide. When I move the slider, the chart changes.
+On the right is that page, running live in this slide. When you open the page, it looks like this. When I move the slider, the chart changes.
 
 [click]
 It's only static files. There is no server. The Python code runs right here, in the browser tab.

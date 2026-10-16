@@ -1515,13 +1515,13 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 `app.py` is the application script, the one a Stlite user writes. It has no server code. So who runs it?
 
 [click]
-The Streamlit runtime does. It's the host, and it runs your script in the same Python interpreter.
+The Streamlit runtime does. It's the host, and it runs the application script in the same Python interpreter.
 
 [click]
-And one Stlite runtime can run several apps, which regular Streamlit never does. So before each run, Stlite moves to the app's own directory and sets the `HOME` environment variable for it.
+And one Stlite runtime can run several application scripts. So before each run, Stlite moves to the application script's own directory and sets the `HOME` environment variable for it.
 
 [click]
-So the host calls `os.chdir()` to prepare for running the app script, and your script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
+So the host calls `os.chdir()` to prepare for running the application script, and the application script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
 -->
 
 ---

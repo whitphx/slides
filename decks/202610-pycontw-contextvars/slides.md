@@ -450,7 +450,7 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-This is the thread-per-request server our code was written for. One thread per request, so per-thread storage is per-request storage.
+This is the thread-per-request server our code was written for. One thread per request, so per-thread storage is per-request storage, and that's what threading dot local gives us.
 
 [click]
 On the right is an async server, built on asyncio. Still one process, but only one thread, running an event loop. Each request runs in its own task, and the event loop switches between tasks at every await.
@@ -463,7 +463,7 @@ And that's the problem. threading dot local still gives one value per thread. Bu
 
 Flask on its threaded server is the picture on the left. FastAPI or Starlette with `async def` handlers is the picture on the right.
 
-Before we fix it, let's be precise about that new word: task.
+Before we address this issue, let's be precise about that new word: task.
 -->
 
 ---

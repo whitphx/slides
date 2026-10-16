@@ -833,9 +833,9 @@ So here's the same program again.
 But three lines change. The thread-local object becomes a `ContextVar`, and reads and writes become the `get` and `set` methods.
 
 [click]
-Now each task reads back its own value across the await. Same order, same single thread, right answer.
+Now each task can access its own isolated value, across the await, on the same single thread. Right answer.
 
-Next, let's see how it works inside, because that tells you where it stops working.
+Next, let's look a bit closer at how this works: what each task actually carries.
 -->
 
 ---

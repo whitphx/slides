@@ -1860,7 +1860,7 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So how do we fix it? Step one: store each app's directory in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example. We will build on it in the next steps.
+So how do we fix it? Step one: store each app's directory in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example. We will build on it in the next step.
 
 [click]
 Now any code running in each task can get its app's directory.
@@ -1878,6 +1878,8 @@ But that doesn't fix the bug yet.
 The context variable knows the right directory, but nothing calls `os.chdir()`. Knowing the right directory is not the same as being in it.
 -->
 
+---
+hide: true
 ---
 
 # Step 2: change the directory, then change it back
@@ -1922,62 +1924,68 @@ So the app-specific values in the process-wide state, like the current directory
 
 ---
 
-# Step 3: do it every time the task resumes
+# Step 2: change the directory on each resume
 
 <div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
 
-````md magic-move {at:2}
+<div grid="~ cols-[minmax(0,1.35fr)_minmax(0,1fr)]" gap-5>
 
-```py
-async def run_app(app):
-    with app_directory(app.home):
-        await exec_script(app.code)
-```
+<div class="hook-code">
 
-```py
+```py {*|1-4|6|7-10|11-12|13-15|*}
 class DirectorySyncCoroutineProxy(Coroutine):
     def __init__(self, coro):
         self.iter = coro.__await__()
         self.home = home_dir_contextvar.get()
 
     def send(self, value):
-        with app_directory(self.home):
+        orig_cwd = os.getcwd()
+        orig_home = os.environ.get("HOME")
+        os.chdir(self.home)
+        os.environ["HOME"] = self.home
+        try:
             return self.iter.send(value)
+        finally:
+            os.chdir(orig_cwd)
+            os.environ["HOME"] = orig_home
 ```
 
-````
-
-<div mt-3 grid>
-
-<div v-click="[1,2]" style="grid-area: 1 / 1" text-5 border="~ rose/40 rounded-lg" p-3 bg-rose:5>
-
-❌ The `with` stays open while App A is **paused** at `await`. App B moves the directory. App A **resumes** in the wrong one.
-
 </div>
 
-<div v-click="3" style="grid-area: 1 / 1" text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
-
-`send()` is what the **event loop** calls to **resume** a coroutine. So **every step** runs in the right directory. 🎯
-
+<div flex="~ col" gap-3 text-5>
+<div v-click="2" border="~ sky/40 rounded-lg" px-3 py-2 bg-sky:5>🪝 <code>send()</code>: called by the <b>event loop</b> on <b>every resume</b></div>
+<div v-click="3" border="~ amber/40 rounded-lg" px-3 py-2 bg-amber:5>📁 before the step: <b>move in</b></div>
+<div v-click="4" border="~ violet/40 rounded-lg" px-3 py-2 bg-violet:5>▶️ <b>one step</b>, up to the next <code>await</code></div>
+<div v-click="5" border="~ amber/40 rounded-lg" px-3 py-2 bg-amber:5>↩️ after the step: <b>move back</b></div>
+<div v-click="6" border="~ emerald/40 rounded-lg" px-3 py-2 bg-emerald:5>🎯 every step runs in <b>its own app's directory</b></div>
 </div>
 
 </div>
+
+<style>
+.hook-code { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.4; }
+</style>
 
 <!--
-But where do we use this context manager? This part took me the longest.
-
-The first idea: wrap the whole script in it.
+Now we need a hook point: a place in each task where we can call `os.chdir()` and set `HOME`. And it must run every time the task resumes, because a task runs in steps, from one `await` to the next.
 
 [click]
-That doesn't work. The `with` block stays open while App A is paused at an `await`. App B runs and moves the directory. When App A resumes, nothing moves it back.
-
-A task runs in steps, from one `await` to the next. So we need to move in every time it resumes, and move back every time it pauses.
+So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory from the context variable from step one.
 
 [click]
-So we wrap the script's coroutine in a proxy. When it's created, it reads the app's directory from the context variable.
+And `send()` is the method the event loop calls every time it resumes a coroutine. That's our hook point.
 
 [click]
-And `send()` is the method the event loop calls every time it resumes a coroutine. It runs one step. We wrap `send()` in our context manager, so every step runs in the right directory. The real class does the same for `throw()` and `close()`.
+Before the step, it remembers the current settings, then moves to the app's directory and sets `HOME`.
+
+[click]
+Then it runs one step of the script, until its next `await`.
+
+[click]
+After the step, even if it fails, it puts the original settings back. The real class does the same for `throw()` and `close()`.
+
+[click]
+So every step of every app runs in its own app's directory.
 -->
 
 ---
@@ -2092,7 +2100,7 @@ If you remember one sentence from this talk, make it this one.
 
 `contextvars` answers a question: which logical execution is this? It does not protect process-wide state, and it does not keep tasks apart.
 
-What you do with the answer is up to you. In Stlite, we used it to move the directory in and out on every step.
+What you do with the answer is up to you. In Stlite, we used it to keep a directory setting per task. A custom class that wraps each script's coroutine gives us a hook on every step, and there we move the directory in and out.
 -->
 
 ---

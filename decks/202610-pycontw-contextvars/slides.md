@@ -511,7 +511,7 @@ async def main():
 
 <div v-click="5" mt-4 text-5 text-center>
 
-Three requests, three tasks, **one thread** — taking turns. 🔁
+Many requests, many tasks, **one thread** — switching at each `await`. 🔁
 
 </div>
 
@@ -546,7 +546,7 @@ We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a 
 The event loop runs all the tasks on one thread. On the right, time goes down. Alice's task runs until it reaches an `await`. Then the event loop switches to bob's task, then to carol's. When alice's `await` is done, her task resumes where it left off.
 
 [click]
-So: three requests, three tasks, one thread, taking turns. And taking turns is exactly what breaks our example.
+So: many requests, many tasks, one thread. The tasks run one after another, switching at each `await`. And this switching is exactly what breaks our example.
 -->
 
 ---
@@ -653,22 +653,22 @@ html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
 </style>
 
 <!--
-Here's the same app, made async. Again, this is a simplified version of what an async framework does.
+Here is an app like our first Flask example, but made async. Again, this is a simplified version of what an async framework does.
 
 [click]
-The `handle` function plays the framework. It stores the user in `_local.user` and calls the route function.
+The `handle` function plays the framework. It stores the user in `_local.user`, a thread-local variable, and calls the route function.
 
 [click]
-The `index` function reads the user back. It still takes no arguments.
+The `index` function reads the stored user. It still takes no arguments.
 
 [click]
 The last line plays the server. `asyncio.gather()` runs alice's and bob's requests as two tasks on the same thread. The timeline at the bottom follows them.
 
 [click]
-Alice's task runs first and stores "alice".
+Alice's task runs first and stores "alice" in the thread-local variable.
 
 [click]
-Then it hits the await and waits, so the event loop runs bob's task.
+Then it reaches the `await`, so the event loop switches and runs bob's task.
 
 [click]
 Bob's task stores "bob" in the same slot, because both tasks are on the same thread.
@@ -680,7 +680,7 @@ Then bob's task also waits.
 Alice's task resumes and reads the slot. It gets "bob".
 
 [click]
-So alice is greeted as bob. In a real service, that's alice seeing bob's page. That's a data leak.
+So alice is greeted as bob, which is not what we want. This happens because the two tasks run on the same thread in this async setting. In a real service, that's alice seeing bob's page.
 -->
 
 ---

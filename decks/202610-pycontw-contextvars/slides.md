@@ -1309,7 +1309,7 @@ And this matters most if you write a library. A polite library may change a cont
 
 <div v-click="5" absolute bottom-10 inset-x-0 text-center text-5>
 
-The usual example is 🪵 **logs**. It's **not just for logging**.
+`current_user` is just **one** of many real-world uses. 🌍
 
 </div>
 
@@ -1320,16 +1320,16 @@ Now let's look at real tools that use `contextvars`. You've probably used some o
 Request IDs in logs. For example, in a FastAPI or Starlette app, the `asgi-correlation-id` middleware stores a new request ID in a context variable at the start of each request. Then a `logging.Filter` reads it and adds it to every log record.
 
 [click]
-Distributed tracing. OpenTelemetry records each operation as a span, and a new span needs to know which span is running now, so it can attach to it as a child. OpenTelemetry keeps that current span in a context variable, so it stays right across awaits.
+Distributed tracing. OpenTelemetry keeps the current span in a context variable.
 
 [click]
 Async database sessions. SQLAlchemy can scope a session to the current task.
 
 [click]
-And web frameworks. Since Flask version two point two, Flask's `request` lives in a context variable, and Flask-Login's `current_user` uses it too.
+And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` uses it too.
 
 [click]
-Request IDs in logs is the example you see most often. But it can make `contextvars` look like a logging tool. Three of these four have nothing to do with logging.
+So `current_user` is not the only use case. There are several different real-world use cases.
 -->
 
 ---

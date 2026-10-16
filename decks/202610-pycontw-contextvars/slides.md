@@ -1833,7 +1833,7 @@ Same shape as the threading dot local bug: a value overwritten during an `await`
 
 # Step 1: store each app's directory in a `ContextVar`
 
-```py {*|1-3|5}{maxHeight:'230px'}
+```py {maxHeight:'230px'}
 home_dir_contextvar: ContextVar[str | None] = ContextVar(
     "home_dir", default=None
 )
@@ -1841,15 +1841,15 @@ home_dir_contextvar: ContextVar[str | None] = ContextVar(
 home_dir_contextvar.set(app_home_dir)
 ```
 
-<div v-click="2" mt-4 text-5>
+<div mt-4 text-5>
 
 Set **when an app is started**, before its script runs. 🚪
 
 </div>
 
-<div v-click="3" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div v-click="1" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 
-Now any code can get **the directory this task should use**. ✅
+Any code in each task can get **its app's directory**. ✅
 
 </div>
 
@@ -1860,16 +1860,10 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So how do we fix it? Step one: store each app's directory in a context variable.
+So how do we fix it? Step one: store each app's directory in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example. We will build on it in the next steps.
 
 [click]
-Here it is. It holds the home directory of the app this task belongs to.
-
-[click]
-We set it before the app's script runs, so the script's task starts with the right value.
-
-[click]
-Now any code can get the directory this task should use.
+Now any code running in each task can get its app's directory.
 -->
 
 ---
@@ -1893,17 +1887,17 @@ The context variable knows the right directory, but nothing calls `os.chdir()`. 
 ```py {*|2|3-5|6|7-8}
 @contextmanager
 def app_directory(home):
-    saved = (os.getcwd(), os.environ.get("HOME"))
+    orig_cwd, orig_home = os.getcwd(), os.environ.get("HOME")
     os.chdir(home)
     os.environ["HOME"] = home
     yield
-    os.chdir(saved[0])
-    os.environ["HOME"] = saved[1]
+    os.chdir(orig_cwd)
+    os.environ["HOME"] = orig_home
 ```
 
 <div v-click="5" mt-4 text-5>
 
-Move in, run, **move back**. The directory is only **borrowed**. 🔁
+Change, run, **revert**. The change is only **temporary**. 🔁
 
 </div>
 
@@ -1917,13 +1911,13 @@ It's a context manager. It takes `home`, the value from step one.
 On the way in, it remembers where the process is, then moves to the app's directory and sets `HOME`.
 
 [click]
-At the `yield`, the app's code runs.
+At the `yield`, the code wrapped by this context manager runs.
 
 [click]
-On the way out, it puts back what it found.
+On the way out, it reverts the changed settings.
 
 [click]
-So the app never owns the directory. It borrows it and gives it back.
+So the app-specific values in the process-wide state, like the current directory, are only temporary, and they are always reverted.
 -->
 
 ---

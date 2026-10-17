@@ -142,16 +142,16 @@ And you can find me in all the usual places.
 </div>
 
 <!--
-OK, so let's get into the talk. Here's a quick overview: three things you'll learn today.
+Here are three things you'll learn today.
 
 [click]
-First, what problem the `contextvars` module actually solves. It's a small API, but the problem behind it is easy to get wrong.
+First, what problem the `contextvars` module solves.
 
 [click]
-Second, how a value you store with `contextvars` moves around your program. Does it go along when your code crosses an await? When it starts a new task? When it runs a function in another thread? This is where the surprises live.
+Second, how a value stored with `contextvars` moves through your program: across an await, into a new task, into another thread.
 
 [click]
-And third, where the limits of `contextvars` are. There is a point where it stops helping, and I found it the hard way in a real project. That's the second half of the talk.
+And third, where `contextvars` stops helping. I found that limit in a real project, and that's the second half of the talk.
 -->
 
 ---
@@ -215,16 +215,16 @@ The **user** is not an argument. So where does it come from? 👻
 </style>
 
 <!--
-Let me show you a piece of code you've probably written a hundred times. A Flask app with one page. It says hello to whoever is logged in.
+Here's a piece of code you've probably written many times. A Flask app with one page that says hello to whoever is logged in.
 
 [click]
-`current_user` here is the user who sent this request. Flask-Login works it out for us.
+`current_user` is the user who sent this request. Flask-Login works it out for us.
 
 [click]
-Now look at the function itself. The `index` function takes no arguments. Nobody passes the user to it.
+But the `index` function takes no arguments. Nobody passes the user in.
 
 [click]
-So the current user is not an argument. It's just there when the function runs. How does Python manage a value like this?
+So the current user is just there when the function runs. How does Python manage a value like this?
 -->
 
 ---
@@ -269,9 +269,9 @@ plainBackground: true
 </style>
 
 <!--
-So how does the `index` function get the current user? To answer that, we first need to look at the server it runs on.
+To answer that, we first need to look at the server this code runs on.
 
-Our example runs on a classic web server. One process, a pool of threads, and each incoming request is handled in its own dedicated thread. That thread works on the request from start to finish, and only on that request.
+It's a classic web server. One process, a pool of threads, and each request is handled by its own thread, from start to finish.
 
 [click]
 So while alice's request is being handled, Thread 1 belongs to alice. One thread, one request.
@@ -324,24 +324,22 @@ Per-thread storage **is** per-request storage here. ✅
 </div>
 
 <!--
-So on that server, how does something like `current_user` work? Here is a simplified version. It is not Flask's real code. It shows what Flask and Flask-Login do for you, inside the library.
+So how does `current_user` work on that server? Here is some pseudo code for what Flask and Flask-Login do inside.
 
 [click]
-The user changes from request to request, so a plain module-level global won't work in this case. On this thread-based web server, the answer is threading dot local: one value per thread.
+The user changes from request to request, so a plain global won't work. The answer is threading dot local: one value per thread.
 
 [click]
-At the top of each request, Flask sets the user on it, and then calls your route function. The server has already given this request a thread of its own, so the `handle` function runs on that thread.
+At the start of each request, in each thread, Flask stores the user, then calls your route function.
 
 [click]
-The `current_user` function is the Flask-Login part. It reads the user straight back out.
+The `current_user` function is the Flask-Login part. It reads the user back, for the current thread.
 
 [click]
-And the route function is a stripped-down version of our `index` function from before. It still takes no arguments. Nobody passed the user down. But the `current_user` function still returns the user for this request, because it reads the value for the current thread. That's what threading dot local gives us.
+And the route function still takes no arguments, but it gets the user for this request, because it reads the value for the current thread.
 
 [click]
-And on this server, that's exactly right. Each thread handles one request, so one value per thread means one value per request. This is not bad code.
-
-This is roughly what Flask did in version one.
+On this server, that's exactly right. One thread per request means one value per request. This is not bad code. It's roughly what Flask did in version one.
 -->
 
 ---
@@ -353,7 +351,7 @@ This is roughly what Flask did in version one.
 <div v-click="1" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🌐 <b>current request</b><br><span op70 text-4>what was asked</span></div>
 <div v-click="2" border="~ sky/40 rounded-lg" p-4 bg-sky:5>👤 <b>current user</b><br><span op70 text-4>on whose behalf</span></div>
 <div v-click="3" border="~ sky/40 rounded-lg" p-4 bg-sky:5>💾 <b>current transaction</b><br><span op70 text-4>which session commits</span></div>
-<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>⚙️ <b>current runtime</b><br><span op70 text-4>which app is running</span></div>
+<div v-click="4" border="~ sky/40 rounded-lg" p-4 bg-sky:5>🎈 <b>current Streamlit session</b><br><span op70 text-4>where <code>st.write()</code> sends its output</span></div>
 
 </div>
 
@@ -373,15 +371,13 @@ The current request.
 The current user, our example.
 
 [click]
-The current database transaction. SQLAlchemy's `scoped_session`, for example, keeps one session per thread by default, with `threading.local()`.
+The current database transaction. SQLAlchemy's `scoped_session` keeps one session per thread by default.
 
 [click]
-The current runtime: which app is running, in a system that runs more than one app runtime.
+The current Streamlit session. Streamlit runs each user's script in its own thread, and stores which session it belongs to on that thread. That's how `st.write` knows where to send its output.
 
 [click]
-None of these appear in a function signature. No caller passes them in. Every layer just reads them when it needs them.
-
-And on a thread-per-request server, `threading.local()` is the classic tool for values like these. That's how they've been managed.
+No caller passes these in. Every layer just reads them when it needs them. And all of them are kept per thread: one thread handles one request, so one value per thread is one value per request. threading dot local is the classic tool for that.
 -->
 
 ---
@@ -454,22 +450,20 @@ In async code, `threading.local()` **no longer means per-request**. 💥
 </style>
 
 <!--
-This is the thread-per-request server our code was written for. One process, many threads, one thread per request. Per-thread storage really is per-request storage.
-
-But once we go async, that stops being true.
+This is the thread-per-request server our code was written for. One thread per request, so per-thread storage is per-request storage, and that's what threading dot local gives us.
 
 [click]
-And on the right is an async web server, built on asyncio. Same one process, the same requests. But there is only one thread, and it has two new layers inside it. The first is the event loop. It is the scheduler that runs on that thread and decides what runs next. Inside the event loop, each request runs in something called a task. In the usual async web setup, the server puts each request into its own task, and the event loop runs those tasks. All the tasks share the one thread. They take turns, and the event loop switches between them at every await.
+On the right is an async server, built on asyncio. Still one process, but only one thread, running an event loop. Each request runs in its own task, and the event loop switches between tasks at every await.
 
 [click]
-So one thread is serving many requests at once.
+So one thread now serves many requests at once.
 
 [click]
-And that's the problem. In an async setup, threading dot local does not give you what you want. It still does exactly what it promises, one value per thread. But one thread is now many requests, so per-thread no longer means per-request. The tool is fine. The mapping you were relying on is gone.
+And that's the problem. threading dot local still gives one value per thread. But one thread is now many requests, so per-thread no longer means per-request.
 
-If you're wondering about your own apps: Flask on its threaded server is the picture on the left. An async framework like FastAPI or Starlette, with `async def` handlers, is the picture on the right.
+Flask on its threaded server is the picture on the left. FastAPI or Starlette with `async def` handlers is the picture on the right.
 
-And before we fix it, we should be precise about that new word on the right: task.
+Before we address this issue, let's be precise about that new word: task.
 -->
 
 ---
@@ -478,26 +472,24 @@ plainBackground: true
 
 # What is a task?
 
-<div mt-2 grid="~ cols-[1.4fr_1fr]" gap-8 items-start>
+<div mt-2 grid="~ cols-[minmax(0,1.15fr)_minmax(0,1fr)]" gap-6 items-start>
 
 <div text-4.5>
 
 <ul>
 <li v-click="1">🙋 <b>Someone starts it</b> — <code>create_task()</code>, <code>gather()</code>, the server</li>
-<li v-click="4">📦 <b>It runs one coroutine</b> — the caller doesn't wait</li>
-<li v-click="5">🔁 <b>The event loop runs them all</b> — one thread, switching at every <code>await</code></li>
+<li v-click="4">🔁 <b>The event loop runs them all</b> — one thread, switching at every <code>await</code></li>
 </ul>
 
 <div v-click="1" mt-3 class="task-code">
 
-```py {*|1-3|6|7|*}{at:2}
+```py {*|1-3|6|*}{at:2}
 async def greet(name):
     await asyncio.sleep(1)
     print(f"Hello, {name}!")
 
 async def main():
     task = asyncio.create_task(greet("alice"))
-    print("main() carries on")
     await task
 ```
 
@@ -505,32 +497,21 @@ async def main():
 
 </div>
 
-<div v-click="5" border="~ emerald/50 rounded" p-1 bg-emerald:5>
-<div text-4 mb-1><b>Thread 1</b></div>
-<div border="~ rose/50 rounded" p-1 bg-rose:5>
-<div text-4 mb-1><b>⚡ Event loop</b></div>
-<div flex="~ col" gap-1>
-<div data-id="k1" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 1</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>alice's request</div>
-</div>
-<div data-id="k2" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 2</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>bob's request</div>
-</div>
-<div data-id="k3" border="~ violet/50 rounded" p-1 bg-violet:5>
-<div text-4 mb-1><b>Task 3</b></div>
-<div border="~ violet/40 rounded" px-2 bg-white dark:bg-black text-4 text-center>carol's request</div>
-</div>
-</div>
-</div>
+<div v-click="4" text-4 class="sw">
+<div text-center op70 mb-1>🧵 one thread, over time ⬇️</div>
+<div class="sw-row sw-head"><div></div><div>alice's task</div><div>bob's task</div><div>carol's task</div></div>
+<div class="sw-row"><div class="sw-t">1</div><div class="sw-on">▶️ runs</div><div></div><div></div></div>
+<div class="sw-row"><div class="sw-t"></div><div class="sw-wait">⏸️ <code>await</code></div><div class="sw-on">▶️ runs</div><div></div></div>
+<div class="sw-row"><div class="sw-t"></div><div></div><div class="sw-wait">⏸️ <code>await</code></div><div class="sw-on">▶️ runs</div></div>
+<div class="sw-row"><div class="sw-t"></div><div class="sw-on">▶️ resumes</div><div></div><div class="sw-wait">⏸️ <code>await</code></div></div>
+<div class="sw-row"><div class="sw-t"></div><div></div><div class="sw-on">▶️ resumes</div><div></div></div>
 </div>
 
 </div>
 
-<div v-click="6" mt-4 text-5 text-center>
+<div v-click="5" mt-4 text-5 text-center>
 
-Three requests, three tasks, **one thread** — taking turns. 🔁
+Many requests, many tasks, **one thread** — switching at each `await`. 🔁
 
 </div>
 
@@ -539,28 +520,33 @@ Three requests, three tasks, **one thread** — taking turns. 🔁
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.4;
 }
+.sw { border: 1px solid rgb(16 185 129 / 0.5); border-radius: 0.5rem; padding: 0.4rem 0.6rem; background: rgb(16 185 129 / 0.05); }
+.sw-row { display: grid; grid-template-columns: 1.2rem repeat(3, minmax(0, 1fr)); gap: 0.4rem; align-items: center; margin: 0.25rem 0; }
+.sw-head { font-weight: 700; text-align: center; }
+.sw-row > div:not(.sw-t) { text-align: center; white-space: nowrap; }
+.sw-on { border-radius: 0.3rem; background: rgb(196 181 253 / 0.6); padding: 0.1rem 0; }
+html.dark .sw-on { background: rgb(91 33 182 / 0.7); }
+.sw-wait { border: 1px dashed rgb(128 128 128 / 0.7); border-radius: 0.3rem; padding: 0.05rem 0; opacity: 0.85; }
+.sw-t { visibility: hidden; }
 </style>
 
 <!--
 So what is a task? The rest of the talk depends on this word.
 
 [click]
-A task doesn't appear on its own. Something starts it. Let's look at a small example.
+Let's look at a small example.
 
 [click]
-The `greet` function is defined with `async def`. So calling `greet("alice")` gives you a coroutine. A coroutine is a function call that can pause at each `await`.
+`greet` is an `async def` function, so calling it gives you a coroutine: a function call that can pause at each `await`.
 
 [click]
-We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you: Uvicorn, for example, starts one task for each request. Remember who starts a task. It matters later.
+We pass that coroutine to `asyncio.create_task()`, and that starts a task. In a web app, the server does this for you. Uvicorn, for example, starts one task per request.
 
 [click]
-Each task runs one coroutine. And `create_task()` doesn't wait for it to finish. So the `main` function keeps going and prints its line right away.
+The event loop runs all the tasks on one thread. On the right, time goes down. Alice's task runs until it reaches an `await`. Then the event loop switches to bob's task, then to carol's. When alice's `await` is done, her task resumes where it left off.
 
 [click]
-And the event loop runs all the tasks, on one thread. So the tasks run concurrently, not in parallel. The event loop switches between them when the running coroutine reaches an `await`. For this talk, just remember: one thread, many tasks, taking turns.
-
-[click]
-So: three requests, three tasks, one thread, taking turns. That is the execution model for the rest of the talk. And taking turns is exactly what is about to break our example.
+So: many requests, many tasks, one thread. The tasks run one after another, switching at each `await`. And this switching is exactly what breaks our example.
 -->
 
 ---
@@ -646,7 +632,7 @@ bob sees: Hello, bob!
 .tl-axis-label { text-align: right; font-weight: 700; opacity: 0.8; }
 .tl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
 .tl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
-.tl-row { display: grid; grid-template-columns: 7.5rem repeat(5, 1fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; }
+.tl-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 2fr); gap: 0.4rem; align-items: center; margin: 0.1rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; }
 .tl-name { opacity: 0.75; }
 .tl-lane { border-radius: 0.4rem; padding: 0 0.3rem; background-image: linear-gradient(to right, transparent 7.5rem, rgb(128 128 128 / 0.6) 7.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
 .tl-lane .tl-name { opacity: 1; font-weight: 700; }
@@ -657,7 +643,7 @@ bob sees: Hello, bob!
 .tl-lane-b .tl-b { background: rgb(167 243 208); }
 html.dark .tl-lane-a .tl-a { background: rgb(7 89 133); }
 html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
-.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.4rem; text-align: center; white-space: nowrap; }
+.tl-a, .tl-b, .tl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; min-width: 0; }
 .tl-a { background: rgb(14 165 233 / 0.18); }
 .tl-b { background: rgb(16 185 129 / 0.2); }
 .tl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
@@ -667,36 +653,34 @@ html.dark .tl-lane-b .tl-b { background: rgb(6 95 70); }
 </style>
 
 <!--
-Let me show you the failure. Here's the same app, made async. Like before, this is not real framework code. It runs, but it is a simplified version that shows how an async web framework works.
+Here is an app like our first Flask example, but made async. Again, this is a simplified version of what an async framework does.
 
 [click]
-The `handle` function plays the framework's part. It's told who the request is from, stores the user in `_local.user`, and calls the route function.
+The `handle` function plays the framework. It stores the user in `_local.user`, a thread-local variable, and calls the route function.
 
 [click]
-The `index` function is the route function. It reads the user back, and it still takes no arguments.
+The `index` function reads the stored user. It still takes no arguments.
 
 [click]
-The last line plays the server receiving two requests. `asyncio.gather()` runs `handle("alice")` and `handle("bob")` as two tasks, one per request, on the same thread. The timeline at the bottom follows these two tasks.
+The last line plays the server. `asyncio.gather()` runs alice's and bob's requests as two tasks on the same thread. The timeline at the bottom follows them.
 
 [click]
-Alice's task runs first. It stores "alice" in `_local.user`.
+Alice's task runs first and stores "alice" in the thread-local variable.
 
 [click]
-Then the `index` function awaits. Alice's task stops here and waits, so the event loop runs the other task: bob's task.
+Then it reaches the `await`, so the event loop switches and runs bob's task.
 
 [click]
-Bob's task runs the same line, and stores "bob" in the same slot. It is the same slot because both tasks are on the same thread.
+Bob's task stores "bob" in the same slot, because both tasks are on the same thread.
 
 [click]
-Then bob's task also reaches the await, and waits.
+Then bob's task also waits.
 
 [click]
-Now alice's task resumes and reads the slot. It gets "bob".
+Alice's task resumes and reads the slot. It gets "bob".
 
 [click]
-And alice gets greeted as bob. Both lines say bob. The timeline shows why: one slot, two tasks, and bob's write came between alice's write and alice's read.
-
-Nobody did anything wrong here. There's one slot per thread, and two requests took turns writing into it. In a real service, this is alice looking at bob's page. That's not a cosmetic bug. That's a data leak.
+So alice is greeted as bob, which is not what we want. This happens because the two tasks run on the same thread in this async setting. In a real service, that's alice seeing bob's page.
 -->
 
 ---
@@ -710,11 +694,11 @@ State that belongs to the execution, not to the thread
 </div>
 
 <!--
-So we need storage that follows the logical execution instead of the thread.
+So we need storage that follows something called a logical execution, instead of the thread.
 
-What do I mean by logical execution? It's the code that runs for one request, from start to finish. On the async server, that's one task. The task stops at each `await`, other tasks run on the same thread, and later it picks up where it left off. The thread is shared, but the task's own line of work goes on.
+By logical execution, I mean the code that runs for one request, from start to finish. On the async server, that's one task.
 
-So we want a value that belongs to that line of work, and goes with it across every `await`. That's exactly what the `contextvars` module gives us.
+That's what the `contextvars` module gives us.
 -->
 
 ---
@@ -748,21 +732,21 @@ Declared **once**, at module level. Read from **anywhere**, at any depth. 🪄
 </div>
 
 <!--
-So this is what the standard library gives us instead. A ContextVar is like threading dot local, except the value follows the logical execution rather than the thread. Same idea, right scope.
+The `contextvars` module has a `ContextVar` class, which is one of its core APIs. A `ContextVar` is like threading dot local, except the value follows the logical execution, not the thread.
 
-The API is small. There are three things.
-
-[click]
-You declare a ContextVar once, at module level, like a global. The default is what you get when nobody has set it.
+The API has three parts.
 
 [click]
-You set it. And this is the important word: it binds the value in the current context. Not in a global, not on the thread. We'll unpack what "current context" means in a moment.
+You declare it once, at module level.
 
 [click]
-And you get it back.
+You set its value with the `set` method. This binds the value in the current context. We'll see what "current context" means in a moment.
 
 [click]
-The shape is the same as the threading dot local version. Declare in one place, read from anywhere, no passing it through every function. What changes is the thing it's attached to.
+And you get the value with the `get` method.
+
+[click]
+It's a similar shape to threading dot local, but the value follows the task, not the thread.
 -->
 
 ---
@@ -846,12 +830,12 @@ bob sees: Hello, bob!
 So here's the same program again.
 
 [click]
-Three lines change. The `threading.local()` object becomes a `ContextVar`. Reading `_local.user` becomes `user_var.get()`. And writing `_local.user` becomes `user_var.set()`.
+But three lines change. The thread-local object becomes a `ContextVar`, and reads and writes become the `get` and `set` methods.
 
 [click]
-And now each task reads back its own value, across the await. The tasks still take turns in the same order, on the same single thread. But now we get the right answer.
+Now each task can access its own isolated value, across the await, on the same single thread. Right answer.
 
-That's the main idea of the `contextvars` module. Next, let's look at how it works inside, because how it works is what tells you where it stops working.
+Next, let's look a bit closer at how this works: what each task actually carries.
 -->
 
 ---
@@ -909,47 +893,32 @@ ctx = copy_context()
 ctx.run(handler)
 ```
 
-```py
-from contextvars import copy_context
-
-ctx = copy_context()
-
-ctx.run(handler)
-
-ctx[user_var]  # "alice"
-```
-
 ````
 
 </div>
 
 </div>
 
-<div data-id="ctx-run-line" absolute style="left:490px;top:195px;width:1px;height:1px"></div>
+<div data-id="ctx-run-line" absolute style="left:643px;top:209px;width:1px;height:1px"></div>
 <FancyArrow v-click="2" from="[data-id=handler-def] @ right" to="[data-id=ctx-run-line]" arc="-0.3" />
 
-<div v-click="4" absolute bottom-10 inset-x-0 text-center text-5>
+<div v-click="3" absolute bottom-10 inset-x-0 text-center text-5>
 
 `set()` and `get()` always use **the `Context` you are running in**. 🎯
 
 </div>
 
 <!--
-The second concept is the Context itself, the thing every task carries around. Picture it as a dictionary: every context variable in the program, mapped to whatever value it holds right now.
+The next piece is the `Context` itself. Picture it as a dictionary: every context variable, mapped to its current value.
 
 [click]
-There is always a current context. Your code is running inside one right now, even if you never created it. `copy_context()` takes a snapshot of that current context, the whole mapping, and gives it back to you as one object.
+There is always a current context, even if you never created one. `copy_context()` takes a snapshot of it.
 
 [click]
-And you can run a function inside that snapshot. handler here is nothing special, just an ordinary function that reads the current user. But while it runs inside ctx, every get call sees the values from the snapshot, not from wherever we happen to be standing when we call it.
+And you can run a function inside that snapshot, so that inside it, every context variable's `get()` returns the snapshot's value.
 
 [click]
-You can also read a variable straight out of the snapshot, like a dictionary lookup.
-
-[click]
-So when I said `set()` binds a value in "the current context", I meant a `Context` like the mapping on the left. There is always exactly one current context. `set()` writes into it, and `get()` reads from it.
-
-Which leaves exactly one question. When a new task starts, where does its context come from?
+So "the current context" means a mapping like this one. `set()` writes into it, and `get()` reads from it.
 -->
 
 ---
@@ -1004,16 +973,8 @@ await asyncio.gather(handle("alice"), handle("bob"))
 <FancyArrow v-click="1" from="[data-id=parent] @ left" to="[data-id=rulecode] .line:nth-child(11) @ right" arc="0" />
 <FancyArrow v-click="3" from="[data-id=child-a] @ left" to="[data-id=rulecode] .line:nth-child(8) @ right" arc="0.1" />
 
-<div v-click="4" mt-4 grid="~ cols-2" gap-6 text-5>
-
-<div border="~ emerald/40 rounded-lg" p-3 bg-emerald:5>
+<div v-click="4" mt-4 text-5 border="~ emerald/40 rounded-lg" p-3 bg-emerald:5 text-center>
 ✅ the task <b>inherits</b> what you set before it started
-</div>
-
-<div v-click="5" border="~ rose/40 rounded-lg" p-3 bg-rose:5>
-❌ what the task sets <b>never</b> comes back to you
-</div>
-
 </div>
 
 <style>
@@ -1021,22 +982,21 @@ await asyncio.gather(handle("alice"), handle("bob"))
 </style>
 
 <!--
-Now let's put tasks and contexts together. One rule connects them.
+One rule connects tasks and contexts.
+
+Here's our fixed example again. At the top, `user_var` is declared as a context variable, with the default value "anonymous".
 
 [click]
-Here's our fixed example again. The last line is the caller. It calls `gather()`. At that moment, the caller's context has no user set.
+The last line calls `gather()`. At that moment, the caller's context has no user set.
 
 [click]
-`gather()` creates one task for each request. Each new task gets a copy of the caller's context, taken at that moment.
+`gather()` turns each `handle` coroutine into a task, one per request. Each new task gets a copy of the caller's context.
 
 [click]
-Then each task runs `user_var.set(user)` in its own copy. Alice's copy gets "alice", and bob's copy gets "bob".
+Then each task sets the user in its own copy of the context: "alice" in one, "bob" in the other.
 
 [click]
-So a task starts with everything the caller had set before.
-
-[click]
-And what a task sets stays in the task. The caller's context still has no user.
+So a task starts with everything the caller had set.
 -->
 
 ---
@@ -1349,31 +1309,27 @@ And this matters most if you write a library. A polite library may change a cont
 
 <div v-click="5" absolute bottom-10 inset-x-0 text-center text-5>
 
-The usual example is 🪵 **logs**. It's **not just for logging**.
+`current_user` is just **one** of many real-world uses. 🌍
 
 </div>
 
 <!--
-So far, we've only used `contextvars` in our own small example. Now let's look at real tools that use it. You've probably used some of them already, without knowing `contextvars` was inside.
+Now let's look at real tools that use `contextvars`. You've probably used some of them already.
 
 [click]
-First, request IDs in logs. Many web apps put a request ID in every log line, so you can find all the lines for one request. A common way to do this with Python's standard `logging` module is a `logging.Filter`. The filter calls `get()` on a context variable that holds the current request ID, and adds it to each log record.
+Request IDs in logs. For example, in a FastAPI or Starlette app, the `asgi-correlation-id` middleware stores a new request ID in a context variable at the start of each request. Then a `logging.Filter` reads it and adds it to every log record.
 
 [click]
-Distributed tracing. OpenTelemetry's context API is contextvars underneath. That's how the current span knows which span it's inside, across awaits, without passing it around.
+Distributed tracing. OpenTelemetry keeps the current span in a context variable.
 
 [click]
-Async database sessions. SQLAlchemy can scope a session to the context, so "the current session" means the current task's session.
+Async database sessions. SQLAlchemy can scope a session to the current task.
 
 [click]
-And web frameworks. Since Flask version two point two, Flask's `request` lives in a context variable, and Flask-Login's `current_user` is looked up through Flask's context variables too. So the `current_user` in our very first route function was sitting on this all along.
-
-So your stack already depends on it.
+And web frameworks. Since Flask 2.2, Flask's `request` lives in a context variable, and Flask-Login's `current_user` uses it too.
 
 [click]
-Request IDs in logs is the example you see most often. It's a good example, but a small one. It can make you think `contextvars` is just a logging tool.
-
-It is not. Three of these four have nothing to do with logging. contextvars is much more general than that.
+So `current_user` is not the only use case. There are several different real-world use cases.
 -->
 
 ---
@@ -1384,16 +1340,17 @@ layout: statement
 
 <div mt-8 op70 text-5>
 
-🧠 **logical execution**: one unit of work (a request, a task, a callback), **on any thread**
+🧠 **logical execution**<br>
+one unit of work: a request, a task, a callback · **on any thread**
 
 </div>
 
 <!--
-So far, every example asked one question: which logical execution am I in? In other words, whose work am I doing right now? A request, a task, a callback. It's not the thread.
+In every example so far, `contextvars` told the code which logical execution it is in.
 
-`contextvars` answers that question. But that's all it does. Knowing the answer does not make anything safe.
+But knowing that does not make anything safe.
 
-I learned this the hard way, in a real project. Let me show you that project.
+I learned this in a real project. Let me show you.
 -->
 
 ---
@@ -1407,7 +1364,7 @@ Streamlit in the browser, and one very global variable
 </div>
 
 <!--
-This is Stlite. It's the project where I hit the wall I just described.
+This is Stlite. I'm its author and maintainer, and it's the project where I learned that.
 -->
 
 ---
@@ -1437,19 +1394,19 @@ This is Stlite. It's the project where I hit the wall I just described.
 </div>
 
 <!--
-Quick introduction, because the architecture is the reason this talk exists.
+A quick introduction, because its architecture matters for this story.
 
 [click]
-Streamlit is a Python framework for building data apps. You write only a Python script. No JavaScript, no HTML, no frontend code at all. And that script becomes a web app.
+Streamlit is a Python framework for data apps. You write only a Python script, and it becomes a web app.
 
 [click]
 Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly.
 
 [click]
-And the key word is no server. There's no backend anywhere. The Python interpreter is running inside the browser tab.
+And there is no server. The Python interpreter runs inside the browser tab.
 
 [click]
-So the entire runtime — the framework, the interpreter, your script — ships as a static web page.
+So the whole runtime ships as a static web page.
 -->
 
 ---
@@ -1501,15 +1458,15 @@ So the entire runtime — the framework, the interpreter, your script — ships 
 </style>
 
 <!--
-Here is an example of a Streamlit app running on Stlite. On the left is all of its source code. `app.py` is a short Streamlit script: a title, a slider, and a chart. `stlite.html` is a static HTML page that loads Stlite and runs `app.py`.
+Here's a Stlite app. On the left is the whole source code of this app: a short Streamlit script written in Python, and a web page that loads it.
 
 [click]
-On the right is that same page, running live inside this slide. When I move the slider, the chart changes.
+On the right is that page, running live in this slide. When you open the page, it looks like this. When I move the slider, the chart changes.
 
 [click]
-And notice what is not there. The whole app is two static files. There is no backend, and no API calls. When I move the slider, Python runs in this tab and draws the chart again.
+It's only static files. There is no server. The Python code runs right here, in the browser tab.
 
-That's the product. Now let me show you the part that made my life hard.
+Now let me show you the part that made my life hard.
 -->
 
 ---
@@ -1555,16 +1512,16 @@ The **host** calls `os.chdir()`. **Your script** just uses relative paths. 📂
 </div>
 
 <!--
-`app.py` was an ordinary script. It has no server code and no main loop. So who runs it?
+`app.py` is the application script, the one a Stlite user writes. It has no server code. So who runs it?
 
 [click]
-The Streamlit runtime does. It is the host. It runs your script in the same Python interpreter, not in a separate process.
+The Streamlit runtime does. It's the host, and it runs the application script in the same Python interpreter.
 
 [click]
-And this part is special to Stlite. Regular Streamlit runs one app per runtime, so it never needs this. But one Stlite runtime can run several apps. So before each run, Stlite prepares the world for that app: it moves to the app's own directory, and sets `HOME` for it.
+And one Stlite runtime can run several application scripts. So before each run, Stlite moves to the application script's own directory and sets the `HOME` environment variable for it.
 
 [click]
-So there are two sides. The host calls `os.chdir()`. Your script does not know about any of that. It just opens files with relative paths, like `data.csv`, and expects them to be in its own directory.
+So the host calls `os.chdir()` to prepare for running the application script, and the application script knows nothing about it. It just opens `data.csv` and expects it to be in its own directory.
 -->
 
 ---
@@ -1616,28 +1573,28 @@ Three apps, but **they all share one interpreter.** 😬
 </style>
 
 <!--
-Here's the setup. Let's go from the outside in.
+This diagram shows the layers that Stlite apps run inside.
 
 [click]
-Everything runs in the browser. Stlite runs in a Web Worker, and that worker has one JavaScript thread.
+Stlite runs in a web browser environment, on one JavaScript thread.
 
 [click]
-Inside it is Pyodide: one Python interpreter, compiled to WebAssembly.
+Inside it is Pyodide: one Python interpreter.
 
 [click]
-And that interpreter has only one thread. The browser environment is single-threaded here, so Python cannot start more threads. This is one of the big limitations of Pyodide.
+And that interpreter has one thread. Python cannot start more threads here.
 
 [click]
-On that one thread, there is one event loop.
+On that thread, there is one event loop.
 
 [click]
-And inside that one event loop, a page can run several Stlite apps. Here, three. They are not separated by threads or by processes. They are all tasks on the same loop. Each app has its own home directory, because each app has its own files.
+And inside that loop, a page can run several Stlite apps. They are all tasks on the same event loop, and each has its own home directory.
 
 [click]
-And here we meet a new kind of value. So far, everything we stored, like the user and the request, lived in our own variables, so we could move it into a context variable. The current working directory and the environment variables are different. Python keeps them for the whole process, not for a thread or a task. There is one current directory and one set of environment variables, and every app shares them.
+But the current directory and the environment variables are shared across the whole process. Every app shares them.
 
 [click]
-So to their developers, these are three separate apps. But there is exactly one of every global thing they need.
+So these are three separate apps, each relying on its own home directory. But there is only one current directory, and they all share it.
 -->
 
 ---
@@ -1732,12 +1689,6 @@ await asyncio.gather(
 
 </div>
 
-<div v-click="5" mt-3 text-4 border="~ amber/50 rounded-lg" p-3 bg-amber:5>
-
-⏸️ App A's script **awaits**. The loop runs **App B**, and the host calls `os.chdir("/home/app-b")`.
-
-</div>
-
 </div>
 
 <div>
@@ -1755,7 +1706,7 @@ df = pd.read_csv("data.csv")
 
 </div>
 
-<div v-click="6" mt-3>
+<div v-click="9" mt-3>
 
 <WindowMockup title="App A" dark codeblock>
 
@@ -1776,46 +1727,99 @@ FileNotFoundError: [Errno 44]
 
 </div>
 
-<div v-click="7" mt-4 text-5>
-
-The host moved to App A's directory. App A **awaited**. The host moved to App B's. 💥
-
+<div v-click="5" mt-3 text-4 class="btl">
+<div class="btl-row btl-lane btl-a">
+<div class="btl-name">App A's task</div>
+<div class="btl-ca">chdir <code>app-a</code></div>
+<div v-click="6" class="btl-ca">⏸️ <code>await</code></div>
+<div></div><div></div>
+<div v-click="9" class="btl-ca">read <code>data.csv</code> ❌</div>
+</div>
+<div class="btl-row btl-lane btl-b">
+<div class="btl-name">App B's task</div>
+<div></div><div></div>
+<div v-click="7" class="btl-cb">chdir <code>app-b</code></div>
+<div v-click="8" class="btl-cb">⏸️ <code>await</code></div>
+<div></div>
+</div>
+<div class="btl-row btl-cwd" :class="{ 'btl-hl': $clicks >= 10 }">
+<div class="btl-name"><code>os.getcwd()</code></div>
+<div class="btl-v">/home/app-a</div>
+<div v-click="6" class="btl-v">/home/app-a</div>
+<div v-click="7" class="btl-v btl-bad">/home/app-b</div>
+<div v-click="8" class="btl-v btl-bad">/home/app-b</div>
+<div v-click="9" class="btl-v btl-bad">/home/app-b</div>
+</div>
+<div class="btl-row">
+<div class="btl-name btl-time">time</div>
+<div class="btl-axis"></div>
+</div>
+<div v-click="10" class="btl-tag">🌍 <code>os.getcwd()</code>: <b>one per process</b>, shared by both tasks</div>
 </div>
 
 <style>
 .bug-host { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
 .bug-app { --slidev-code-font-size: 15px; }
+.btl { border: 1px solid rgb(245 158 11 / 0.5); border-radius: 0.5rem; padding: 0.3rem 0.6rem; background: rgb(245 158 11 / 0.05); }
+.btl-row { display: grid; grid-template-columns: 9.5rem repeat(4, minmax(0, 1fr)) minmax(0, 1.35fr); gap: 0.4rem; align-items: center; margin: 0.15rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; border-radius: 0.4rem; }
+.btl-lane { border-width: 1.5px; background-image: linear-gradient(to right, transparent 9.5rem, rgb(128 128 128 / 0.6) 9.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
+.btl-a { border-color: rgb(14 165 233 / 0.6); background-color: rgb(14 165 233 / 0.08); }
+.btl-b { border-color: rgb(16 185 129 / 0.6); background-color: rgb(16 185 129 / 0.08); }
+.btl-lane .btl-name { font-weight: 700; }
+.btl-name { position: relative; white-space: nowrap; }
+.btl-ca, .btl-cb, .btl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; }
+.btl-ca { background: rgb(186 230 253); }
+.btl-cb { background: rgb(167 243 208); }
+html.dark .btl-ca { background: rgb(7 89 133); }
+html.dark .btl-cb { background: rgb(6 95 70); }
+.btl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.btl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.btl-cwd { transition: background-color 0.3s, border-color 0.3s; }
+.btl-hl { box-shadow: 0 0 0 1.5px rgb(245 158 11); background-color: rgb(245 158 11 / 0.12); }
+.btl-tag { margin-top: 0.2rem; text-align: center; color: rgb(217 119 6); }
+.btl-time { text-align: right; font-weight: 700; opacity: 0.8; }
+.btl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
+.btl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
 </style>
 
 <!--
-This is what happens when it goes wrong. The code on the left is pseudocode. It is not Stlite's real code, but it does the same thing: it is how the host runs the apps.
+This is what goes wrong. The code is pseudocode, but it demonstrates what the real Stlite code does.
 
 [click]
-The last line starts the apps. The host runs each app's script as its own task, with `gather()`. Here, App A and App B.
+The last line runs each app as its own task, with `gather()`.
 
 [click]
-Inside each task, the host first moves to that app's own directory, and sets `HOME` for it. Each app has its own files there.
+Each task first moves to its app's directory and sets `HOME`.
 
 [click]
-Then it runs the app's script and awaits it. Everything the user's code does happens inside this one line. And that code reads global state, like the current directory, without anyone passing it in.
+Then it runs the app's script.
 
 [click]
-Here is App A's script. In Stlite, a script can use `await`. This one first waits for the network, and then reads a CSV file with a relative path, like anyone would. Which file that opens depends on the current directory at that moment.
+And assume App A's code looks like this. It has an `await`-ed call: it waits for the network, then reads `data.csv` with a relative path.
 
 [click]
-While App A's script waits for the network, the event loop runs another task: App B's task, from the same `gather()`. So the host calls `os.chdir()` again, for App B.
+The timeline at the bottom shows what happens, step by step. First, App A's task moves to App A's directory.
 
 [click]
-Then App A's script resumes and reads `data.csv`. But the process is now in App B's directory, so the file is not found. The file exists. It is just in a different directory.
+App A's script reaches the `await`, and its task pauses.
 
 [click]
-This is the same shape as the `threading.local()` bug from the first half. A value was overwritten during an `await`. But this time a better storage class does not help, because the current directory is shared by the whole process.
+So the event loop runs App B's task, and the host calls `os.chdir()` for App B.
+
+[click]
+App B's script also reaches an `await`, and pauses.
+
+[click]
+Now App A resumes and reads `data.csv`. But the process is still in App B's directory, so the file is not found.
+
+[click]
+Same shape as the threading dot local bug: a value overwritten during an `await`. But a `ContextVar` does not help here by itself, because the current directory belongs to the whole process.
 -->
 ---
 
 # Step 1: store each app's directory in a `ContextVar`
 
-```py {*|1-3|5}{maxHeight:'230px'}
+```py {maxHeight:'230px'}
 home_dir_contextvar: ContextVar[str | None] = ContextVar(
     "home_dir", default=None
 )
@@ -1823,15 +1827,15 @@ home_dir_contextvar: ContextVar[str | None] = ContextVar(
 home_dir_contextvar.set(app_home_dir)
 ```
 
-<div v-click="2" mt-4 text-5>
+<div mt-4 text-5>
 
 Set **when an app is started**, before its script runs. 🚪
 
 </div>
 
-<div v-click="3" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div v-click="1" mt-6 text-5 border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 
-Now any code can get **the directory this task should use**. ✅
+Any code in each task can get **its app's directory**. ✅
 
 </div>
 
@@ -1842,16 +1846,10 @@ Source: <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/
 </div>
 
 <!--
-So how do we fix it? Step one: store each app's directory in a context variable.
+So how do we fix it? First, store each app's directory path in a context variable when the app starts. So far, this looks the same as storing per-task data, like the user in our first example.
 
 [click]
-Here is the context variable. It holds the home directory of the app that this task belongs to.
-
-[click]
-We set it when an app is asked to start, before its script runs. So the task that runs that app's script starts with the right value.
-
-[click]
-Now any code, in any function, can get the directory that this task should use.
+Now any code running in each task can get its app's directory.
 -->
 
 ---
@@ -1861,15 +1859,13 @@ layout: statement
 ## The `ContextVar` knows the right directory.<br>But `os.getcwd()` is still wrong. 🤷
 
 <!--
-But this does not fix the bug yet.
+But that doesn't fix the bug yet.
 
-The context variable knows the right directory for each task. Any code can read it.
-
-But the process is still in the wrong directory. Nothing we have written so far calls `os.chdir()`.
-
-Knowing the right directory is not the same as being in it. contextvars did its job, and we still have the bug.
+The context variable knows the right directory, but nothing calls `os.chdir()`. Just knowing the directory path is not enough.
 -->
 
+---
+hide: true
 ---
 
 # Step 2: change the directory, then change it back
@@ -1879,99 +1875,103 @@ Knowing the right directory is not the same as being in it. contextvars did its 
 ```py {*|2|3-5|6|7-8}
 @contextmanager
 def app_directory(home):
-    saved = (os.getcwd(), os.environ.get("HOME"))
+    orig_cwd, orig_home = os.getcwd(), os.environ.get("HOME")
     os.chdir(home)
     os.environ["HOME"] = home
     yield
-    os.chdir(saved[0])
-    os.environ["HOME"] = saved[1]
+    os.chdir(orig_cwd)
+    os.environ["HOME"] = orig_home
 ```
 
 <div v-click="5" mt-4 text-5>
 
-Move in, run, **move back**. The directory is only **borrowed**. 🔁
+Change, run, **revert**. The change is only **temporary**. 🔁
 
 </div>
 
 <!--
-So step two. Now we use that value to change the real directory. Here is a simplified version, as pseudocode.
+Step two: use that value to change the real directory. This is pseudocode.
 
 [click]
-It's a context manager. It takes `home`, the directory this app should use. That is exactly the value step one put into the context variable.
+It's a context manager. It takes `home`, the value from step one.
 
 [click]
-On the way in, it remembers where the process is now. Then it moves to the app's directory and sets `HOME`. These are the same `os.chdir()` and `os.environ` calls as in the `run_app` function.
+On the way in, it remembers where the process is, then moves to the app's directory and sets `HOME`.
 
 [click]
-Then, at the `yield`, the app's code runs.
+At the `yield`, the code wrapped by this context manager runs.
 
 [click]
-On the way out, it puts back what it found: change a value, then put the old one back. Here the value is process-wide state, not a context variable.
+On the way out, it reverts the changed settings.
 
 [click]
-So the app never owns the directory. It borrows it, and gives it back.
+So the app-specific values in the process-wide state, like the current directory, are only temporary, and they are always reverted.
 -->
 
 ---
 
-# Step 3: do it every time the task resumes
+# Step 2: change the directory on each resume
 
 <div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
 
-````md magic-move {at:2}
+<div grid="~ cols-[minmax(0,1.35fr)_minmax(0,1fr)]" gap-5>
 
-```py
-async def run_app(app):
-    with app_directory(app.home):
-        await exec_script(app.code)
-```
+<div class="hook-code">
 
-```py
+```py {*|1-4|6|7-10|11-12|13-15|*}
 class DirectorySyncCoroutineProxy(Coroutine):
     def __init__(self, coro):
         self.iter = coro.__await__()
-        self.home = home_dir_contextvar.get()
+        self.app_home = home_dir_contextvar.get()
 
     def send(self, value):
-        with app_directory(self.home):
+        orig_cwd = os.getcwd()
+        orig_home = os.environ.get("HOME")
+        os.chdir(self.app_home)
+        os.environ["HOME"] = self.app_home
+        try:
             return self.iter.send(value)
+        finally:
+            os.chdir(orig_cwd)
+            os.environ["HOME"] = orig_home
 ```
 
-````
-
-<div mt-3 grid>
-
-<div v-click="[1,2]" style="grid-area: 1 / 1" text-5 border="~ rose/40 rounded-lg" p-3 bg-rose:5>
-
-❌ The `with` stays open while App A is **paused** at `await`. App B moves the directory. App A **resumes** in the wrong one.
-
 </div>
 
-<div v-click="3" style="grid-area: 1 / 1" text-5 border="~ sky/40 rounded-lg" p-3 bg-sky:5>
-
-`send()` is what the **event loop** calls to **resume** a coroutine. So **every step** runs in the right directory. 🎯
-
+<div flex="~ col" gap-3 text-5>
+<div v-click="2" border="~ sky/40 rounded-lg" px-3 py-2 bg-sky:5>🪝 <code>send()</code>: called by the <b>event loop</b> on <b>every resume</b></div>
+<div v-click="3" border="~ amber/40 rounded-lg" px-3 py-2 bg-amber:5>📁 before the step: <b>move in</b></div>
+<div v-click="4" border="~ violet/40 rounded-lg" px-3 py-2 bg-violet:5>▶️ <b>one step</b>, up to the next <code>await</code></div>
+<div v-click="5" border="~ amber/40 rounded-lg" px-3 py-2 bg-amber:5>↩️ after the step: <b>move back</b></div>
+<div v-click="6" border="~ emerald/40 rounded-lg" px-3 py-2 bg-emerald:5>🎯 every step runs in <b>its own app's directory</b></div>
 </div>
 
 </div>
+
+<style>
+.hook-code { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.4; }
+</style>
 
 <!--
-But where do we use this context manager? This is the part that took me the longest.
-
-The first idea is simple: wrap the whole script in it. Move in, run the script, move back.
+Now we need a hook point: a place in each task where we can call `os.chdir()` and set `HOME`. And it must run every time the task resumes, because a task runs in steps, from one `await` to the next.
 
 [click]
-But this does not work. The `with` block stays open while App A's script is paused at an `await`. While it is paused, App B's task runs, and moves the directory to App B's. When App A resumes, nothing moves it back. So we are back to the same bug.
-
-The problem is that a task does not run in one piece. It runs in steps. It runs until an `await` pauses it, and later the event loop resumes it. So we need to move in every time the task resumes, and move back every time it pauses. Is there a place that runs exactly at those moments?
+A coroutine is just an object with a few methods, like `send()`, and Python lets us write our own class with the same methods. So we wrap the script's coroutine in a proxy class. When the proxy is created, it reads the app's directory path from the context variable.
 
 [click]
-There is. We wrap the script's coroutine in a proxy. When it is created, it reads the app's directory from the context variable.
+And `send()` is the method the event loop calls every time it resumes a coroutine. That's our hook point.
 
 [click]
-And then `send()`. `send()` is the method the event loop calls every time it resumes a coroutine. It runs one step, until the next `await` pauses it.
+Before the step, it remembers the current settings, then moves to the app's directory and sets `HOME`.
 
-So we wrap `send()` in our context manager. Every step of the script runs in its own app's directory, and the directory is put back as soon as the step pauses. Stlite wraps the script's coroutine in this proxy before it creates the task. The real class does the same for `throw()` and `close()`, so errors and cancellation are covered too.
+[click]
+Then it runs one step of the script, until its next `await`.
+
+[click]
+After the step, it puts the original settings back. The real class does the same for `throw()` and `close()`.
+
+[click]
+In Stlite, the host does this wrapping: before it starts the task for an app's script, it wraps the script's coroutine in this class. So every step of every app runs in its own app's directory.
 -->
 
 ---
@@ -1980,50 +1980,86 @@ plainBackground: true
 
 # Two tasks, one directory, no collisions
 
-<div mt-10 grid="~ cols-[8rem_1fr_auto_1fr_auto_1fr]" gap-2 items-center>
+<div mt-24 text-4 class="btl">
+<div class="btl-row btl-lane btl-a">
+<div class="btl-name">App A's task</div>
+<div v-click="1" class="btl-ca">▶️ resume</div>
+<div v-click="2" class="btl-ca">⏸️ <code>await</code></div>
+<div></div><div></div>
+<div v-click="5" class="btl-ca">read <code>data.csv</code> ✅</div>
+</div>
+<div class="btl-row btl-lane btl-b">
+<div class="btl-name">App B's task</div>
+<div></div><div></div>
+<div v-click="3" class="btl-cb">▶️ resume</div>
+<div v-click="4" class="btl-cb">⏸️ <code>await</code></div>
+<div></div>
+</div>
+<div class="btl-row">
+<div class="btl-name"><code>os.getcwd()</code></div>
+<div v-click="1" class="btl-v btl-good">/home/app-a</div>
+<div v-click="2" class="btl-v btl-back">↩️ original</div>
+<div v-click="3" class="btl-v btl-good">/home/app-b</div>
+<div v-click="4" class="btl-v btl-back">↩️ original</div>
+<div v-click="5" class="btl-v btl-good">/home/app-a</div>
+</div>
+<div class="btl-row">
+<div class="btl-name btl-time">time</div>
+<div class="btl-axis"></div>
+</div>
+</div>
 
-<div text-4 op70>the thread runs</div>
-<div v-click="1" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 1</div>
-<div v-click="2" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
-<div v-click="3" border="~ emerald/50 rounded-lg" p-3 bg-emerald:5 text-4 text-center><b>App B</b> · step 1</div>
-<div v-click="4" border="~ dashed gray/60 rounded-lg" px-2 py-3 text-4 text-center>⏸️ <code>await</code><br><span op70>→ next task</span></div>
-<div v-click="5" border="~ violet/50 rounded-lg" p-3 bg-violet:5 text-4 text-center><b>App A</b> · step 2</div>
+<div v-click="6" mt-8 text-5 text-center>
 
-<div text-4 op70><code>os.getcwd()</code></div>
-<div v-click="1" text-4 text-center><code>/home/app-a</code></div>
-<div v-click="2" text-4 text-center op60>put back</div>
-<div v-click="3" text-4 text-center><code>/home/app-b</code></div>
-<div v-click="4" text-4 text-center op60>put back</div>
-<div v-click="5" text-4 text-center><code>/home/app-a</code></div>
+Each resume **moves in** to its own directory; each <code>await</code> **moves back**. ✅
 
 </div>
 
-<div v-click="6" mt-10 text-5 text-center>
-
-Each resume **moves in** to its own directory; each <code>await</code> **moves back**.<br>The directory is only ever **borrowed**. 🔐
-
-</div>
+<style>
+.btl { border: 1px solid rgb(245 158 11 / 0.5); border-radius: 0.5rem; padding: 0.3rem 0.6rem; background: rgb(245 158 11 / 0.05); }
+.btl-row { display: grid; grid-template-columns: 9.5rem repeat(4, minmax(0, 1fr)) minmax(0, 1.35fr); gap: 0.4rem; align-items: center; margin: 0.15rem 0; padding: 0 0.3rem; border: solid transparent; border-width: 0 1.5px; border-radius: 0.4rem; }
+.btl-lane { border-width: 1.5px; background-image: linear-gradient(to right, transparent 9.5rem, rgb(128 128 128 / 0.6) 9.5rem); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 50%; }
+.btl-a { border-color: rgb(14 165 233 / 0.6); background-color: rgb(14 165 233 / 0.08); }
+.btl-b { border-color: rgb(16 185 129 / 0.6); background-color: rgb(16 185 129 / 0.08); }
+.btl-lane .btl-name { font-weight: 700; }
+.btl-name { position: relative; white-space: nowrap; }
+.btl-ca, .btl-cb, .btl-v { border-radius: 0.25rem; padding: 0 0.25rem; text-align: center; white-space: nowrap; }
+.btl-ca { background: rgb(186 230 253); }
+.btl-cb { background: rgb(167 243 208); }
+html.dark .btl-ca { background: rgb(7 89 133); }
+html.dark .btl-cb { background: rgb(6 95 70); }
+.btl-v { font-family: var(--slidev-code-font-family, monospace); border: 1px solid rgb(128 128 128 / 0.45); }
+.btl-bad { border-color: rgb(244 63 94 / 0.7); color: rgb(225 29 72); }
+.btl-cwd { transition: background-color 0.3s, border-color 0.3s; }
+.btl-hl { box-shadow: 0 0 0 1.5px rgb(245 158 11); background-color: rgb(245 158 11 / 0.12); }
+.btl-tag { margin-top: 0.2rem; text-align: center; color: rgb(217 119 6); }
+.btl-time { text-align: right; font-weight: 700; opacity: 0.8; }
+.btl-axis { grid-column: 2 / span 5; position: relative; height: 0; border-top: 2px solid currentColor; opacity: 0.7; margin-right: 10px; }
+.btl-axis::after { content: ''; position: absolute; right: -10px; top: -7px; border-left: 12px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.btl-good { border-color: rgb(16 185 129 / 0.7); color: rgb(5 150 105); }
+.btl-back { opacity: 0.7; font-family: inherit; }
+</style>
 
 <!--
-Putting it together, this is what the timeline looks like on that one thread.
+With these tricks, the bug is fixed. Here's the same timeline as before, now with the proxy in place.
 
 [click]
-App A's task resumes. The proxy moves the process into App A's directory, and App A's code runs there.
+App A's task resumes. The proxy moves into App A's directory.
 
 [click]
-Then App A's code reaches an `await`. The step ends, so the proxy puts the directory back. The event loop hands the turn to the next task.
+App A reaches an `await`. The proxy puts the original directory back, and the next task runs.
 
 [click]
-App B's task resumes, and the proxy moves the process into App B's directory.
+App B's task resumes, and the proxy moves into App B's directory.
 
 [click]
-App B also reaches an `await`. The directory is put back again, and the turn goes back to App A.
+App B reaches an `await`, and the directory is put back again.
 
 [click]
-App A's task resumes for its next step, and the proxy moves the process into App A's directory again.
+App A resumes. Because the event loop resumes it through `send()`, the proxy moves into App A's directory again, so reading `data.csv` works this time.
 
 [click]
-So no task owns the process-wide directory. Each task borrows it for one step, and gives it back. That is the closest thing to "a current directory per task" you can build when the process only has one.
+So each resume moves into its own app's directory, and each `await` moves back. The two apps never see each other's directory.
 -->
 
 ---
@@ -2082,13 +2118,11 @@ layout: statement
 ## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
 
 <!--
-If you remember one sentence from this talk, this is the one.
+If you remember one sentence from this talk, make it this one.
 
-contextvars is a mechanism for answering a question. Which logical execution is this?
+`contextvars` provides a way to keep a value for each logical execution, such as each task. It does not protect process-wide state, and it does not keep tasks apart.
 
-It does not make anything safe. It doesn't protect process-wide state, and it doesn't keep tasks away from each other. It answers one question, and that answer is useful. But it's all you get.
-
-What you do with the answer is still up to you. In Stlite, we used it to move the directory in and out on every step.
+What you do with that value is up to you. In Stlite, we used it to keep a directory setting per task. A custom class that wraps each script's coroutine gives us a hook on every step, and there we move the directory in and out.
 -->
 
 ---
@@ -2137,7 +2171,7 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 
 <v-clicks>
 
-- 🧵 **`threading.local()` didn't break** — "one thread, one request" did
+- 🧵 **Async: one thread ≠ one request** — so `threading.local()` is not per request
 - 📸 **`ContextVar` follows the task** — each task gets its own copy of the context
 - 🧭 **It tells you the context; it does not change process-wide state** — `os.getcwd()` and `os.environ` stay shared
 - 🔁 **Process-wide state? Borrow it** — move in on every resume, move back on every pause
@@ -2213,20 +2247,20 @@ So hidden context has a cost: the code is harder to read and test. Sometimes tha
 So, to wrap up.
 
 [click]
-threading dot local never broke. What broke is the assumption underneath it, that one thread means one request. Async took that away.
+In async code, one thread is no longer one request, so threading dot local is no longer per request.
 
 [click]
-A `ContextVar` follows the task, not the thread. Each task gets its own copy of the context, so each request sees its own value.
+A `ContextVar` follows the task. Each task gets its own copy of the context.
 
 [click]
-But `contextvars` only tells you which context you're in. It does not change process-wide state. The current directory and the environment variables are still shared by the whole process.
+But it only tells you which context you're in. The current directory and environment variables are still shared.
 
 [click]
-So when many tasks need their own version of process-wide state, like the current directory, you borrow it. Move in when the task resumes, and move back when it pauses. Every step, not once per task.
+So for process-wide state, borrow it: move in when the task resumes, move back when it pauses.
 
 [click]
 That's all from me. Thank you very much.
 The slides are behind the first QR code, and Stlite is behind the second.
-Please come and find me afterwards, I'd love to hear what you're building.
+Please come and find me afterwards.
 -->
 

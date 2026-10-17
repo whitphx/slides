@@ -2180,7 +2180,7 @@ And the fourth one is the Stlite lesson. Process-wide state stays process-wide. 
 layout: statement
 ---
 
-## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
+## `contextvars` gives each task its own value.<br>Process-wide state stays shared. 🧭
 
 <!--
 If you remember one sentence from this talk, make it this one.

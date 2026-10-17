@@ -1728,6 +1728,8 @@ And here is the problem. There is exactly one current working directory for the 
 -->
 
 ---
+plainBackground: true
+---
 
 # So here's the bug
 

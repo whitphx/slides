@@ -1420,7 +1420,7 @@ Stlite is built on Streamlit, so let's start with Streamlit.
 Streamlit is a Python framework for data apps. On the left is a short Streamlit script. It shows a title, a slider and a line chart.
 
 [click]
-And this is the app that the script makes, running live in this slide. When I move the slider, the chart changes.
+And this is the app that the script makes. It's an interactive web app: when I move the slider, the chart changes.
 
 [click]
 I wrote only Python. No HTML, no JavaScript. Streamlit turns the Python script into a web app.

@@ -2033,10 +2033,62 @@ Before the step, it remembers the current settings, then moves to the app's dire
 Then it runs one step of the script, until its next `await`.
 
 [click]
-After the step, it puts the original settings back. The real class does the same for `throw()` and `close()`.
+After the step, it puts the original settings back.
 
 [click]
-In Stlite, the host does this wrapping: before it starts the task for an app's script, it wraps the script's coroutine in this class. So every step of every app runs in its own app's directory.
+So once a coroutine is wrapped in this class, every step of it runs in its app's directory.
+-->
+
+---
+
+# Step 2: wrap each app's script
+
+<div text-4 op70 mb-2>🎈 the host · <b>simplified</b> pseudocode</div>
+
+<div grid="~ cols-[minmax(0,1.35fr)_minmax(0,1fr)]" gap-5>
+
+<div>
+
+```py {*|2|3-5|6|*}
+def start_script(app):
+    home_dir_contextvar.set(app.home_dir)
+    coro = DirectorySyncCoroutineProxy(
+        app.run_script()
+    )
+    task = asyncio.create_task(coro)
+```
+
+</div>
+
+<div flex="~ col" gap-3 text-5>
+<div v-click="1" border="~ sky/40 rounded-lg" px-3 py-2 bg-sky:5>🚪 step 1: <b>set</b> the app's directory</div>
+<div v-click="2" border="~ amber/40 rounded-lg" px-3 py-2 bg-amber:5>🎁 <b>wrap</b> the script's coroutine</div>
+<div v-click="3" border="~ violet/40 rounded-lg" px-3 py-2 bg-violet:5>▶️ run the <b>wrapper</b> as a task</div>
+<div v-click="4" border="~ emerald/40 rounded-lg" px-3 py-2 bg-emerald:5>🎯 every app's script runs in <b>its own directory</b></div>
+</div>
+
+</div>
+
+<div absolute bottom-6 left-14 text-4 op60>
+
+Source: <a href="https://github.com/whitphx/streamlit/blob/9c524f4efbc8cda4574872384e9d4456b3889575/lib/streamlit/runtime/scriptrunner/script_runner.py#L354-L367" target="_blank">Stlite's Streamlit fork: scriptrunner/script_runner.py</a>
+
+</div>
+
+<!--
+So who wraps the coroutine? In Stlite, the host does it when it starts an app's script. This is simplified pseudocode.
+
+[click]
+First, it sets the app's directory in the context variable. That's step one.
+
+[click]
+Then it calls the script's async function, which gives a coroutine, and wraps that coroutine in the proxy class. Creating the proxy reads the directory from the context variable.
+
+[click]
+Then it starts the wrapper as a task. From now on, every time the task resumes, the event loop calls the proxy's `send()`, not the script's.
+
+[click]
+So every step of every app's script runs in its own app's directory.
 -->
 
 ---

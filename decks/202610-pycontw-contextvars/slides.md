@@ -550,6 +550,8 @@ So: many requests, many tasks, one thread. The tasks run one after another, swit
 -->
 
 ---
+plainBackground: true
+---
 
 # Watch `threading.local()` break
 
@@ -1369,6 +1371,63 @@ This is Stlite. I'm its author and maintainer, and it's the project where I lear
 
 ---
 
+# What is Streamlit?
+
+<div grid="~ cols-[1.15fr_1fr]" gap-5 mt-0 items-start class="stlite-grid">
+
+<div>
+
+<div text-4 mb-1>📄 <b>app.py</b>: a Streamlit script</div>
+
+<<< @/samples/stlite-demo/app.py py
+
+<div v-click="2" mt-4 text-5>
+
+🎈 **Python only** → a web app<br>
+<span op70 text-4>no HTML · no JavaScript</span>
+
+</div>
+
+</div>
+
+<div v-click="1">
+
+<LiveEmbed url="/stlite-demo/stlite.html" title="Sales dashboard" light padding="0.4rem" height="280px" :zoom="0.5">
+
+<img src="/stlite-demo.png" alt="The Sales dashboard app" style="width: 100%; height: auto;" />
+
+</LiveEmbed>
+
+</div>
+
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.5;
+}
+/* A code block will not shrink below its longest line, which would widen its
+   track and push the window off the slide. */
+.stlite-grid > * {
+  min-width: 0;
+}
+</style>
+
+<!--
+Stlite is built on Streamlit, so let's start with Streamlit.
+
+Streamlit is a Python framework for data apps. On the left is a short Streamlit script. It shows a title, a slider and a line chart.
+
+[click]
+And this is the app that the script makes. It's an interactive web app: when I move the slider, the chart changes.
+
+[click]
+I wrote only Python. No HTML, no JavaScript. Streamlit turns the Python script into a web app.
+-->
+
+---
+
 # What is Stlite?
 
 <div mt-6 grid="~ cols-[1fr_auto]" gap-8 items-center>
@@ -1377,8 +1436,8 @@ This is Stlite. I'm its author and maintainer, and it's the project where I lear
 
 <v-clicks>
 
-- 🎈 **Streamlit** — the Python framework for data apps
-- 🌐 **…running in the browser** — on Pyodide, CPython compiled to WebAssembly
+- 🌐 **Streamlit in the browser**
+- 🐍 **On Pyodide** — CPython compiled to WebAssembly
 - 🚫 **No server** — no backend, no deploy; the Python is in the tab
 - 📦 **The whole runtime ships as a web page**
 
@@ -1394,13 +1453,13 @@ This is Stlite. I'm its author and maintainer, and it's the project where I lear
 </div>
 
 <!--
-A quick introduction, because its architecture matters for this story.
+So that is Streamlit. Now, what is Stlite?
 
 [click]
-Streamlit is a Python framework for data apps. You write only a Python script, and it becomes a web app.
+Stlite is Streamlit running in the browser.
 
 [click]
-Stlite is Streamlit running in the browser, on Pyodide: CPython compiled to WebAssembly.
+It runs on Pyodide: CPython compiled to WebAssembly.
 
 [click]
 And there is no server. The Python interpreter runs inside the browser tab.
@@ -1411,7 +1470,7 @@ So the whole runtime ships as a static web page.
 
 ---
 
-# No backend, just a tab
+# The same app, running in the browser
 
 <div grid="~ cols-[1.15fr_1fr]" gap-5 mt-0 items-start class="stlite-grid">
 
@@ -1421,13 +1480,17 @@ So the whole runtime ships as a static web page.
 
 <<< @/samples/stlite-demo/app.py py
 
+<div v-click="1">
+
 <div text-4 mt-2 mb-1>🌐 <b>stlite.html</b>: a static page (+ Stlite's <code>&lt;script&gt;</code>)</div>
 
 <<< @/samples/stlite-demo/stlite.html#slide-mount html
 
 </div>
 
-<div v-click="1">
+</div>
+
+<div>
 
 <LiveEmbed url="/stlite-demo/stlite.html" title="stlite.html" light padding="0.4rem" height="280px" :zoom="0.5">
 
@@ -1458,10 +1521,10 @@ So the whole runtime ships as a static web page.
 </style>
 
 <!--
-Here's a Stlite app. On the left is the whole source code of this app: a short Streamlit script written in Python, and a web page that loads it.
+Here is the same Streamlit app again: the same script, and the same dashboard on the right.
 
 [click]
-On the right is that page, running live in this slide. When you open the page, it looks like this. When I move the slider, the chart changes.
+Now let me show you how this app is served. It is this static web page. It loads Stlite's script and points it at `app.py`. So this app was running on Stlite the whole time.
 
 [click]
 It's only static files. There is no server. The Python code runs right here, in the browser tab.
@@ -1664,6 +1727,8 @@ And this line, in App A's script, is why it matters. A user writes `read_csv` wi
 And here is the problem. There is exactly one current working directory for the whole process. Python has no "current directory for this task". So you cannot give each app its own.
 -->
 
+---
+plainBackground: true
 ---
 
 # So here's the bug
@@ -2115,7 +2180,7 @@ And the fourth one is the Stlite lesson. Process-wide state stays process-wide. 
 layout: statement
 ---
 
-## `contextvars` tells *you* which context you're in.<br>It does not change process-wide state. 🧭
+## `contextvars` gives each task its own value.<br>Process-wide state stays shared. 🧭
 
 <!--
 If you remember one sentence from this talk, make it this one.

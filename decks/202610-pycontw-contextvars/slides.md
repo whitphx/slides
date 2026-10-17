@@ -550,6 +550,8 @@ So: many requests, many tasks, one thread. The tasks run one after another, swit
 -->
 
 ---
+plainBackground: true
+---
 
 # Watch `threading.local()` break
 

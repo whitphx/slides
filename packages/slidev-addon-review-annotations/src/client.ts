@@ -291,9 +291,11 @@ export async function checkCanCreate(config: ReviewAnnotationsClientConfig) {
   const answer = await askCanCreate(config)
   if (!answer)
     return offlineCanCreate(config)
+  // Not logged in yet: keep the annotation. Its save waits in the outbox, which asks the
+  // reviewer to log in, and goes through once they have (the deck reloads after login).
   if (answer.status === 401)
-    showNotice('Log in before adding annotations; this annotation was not added.', { label: 'Log in', href: loginUrl(config) })
-  else if (!answer.can)
+    return true
+  if (!answer.can)
     showNotice(`You can't add annotations here (HTTP ${answer.status}); this annotation was not added.`)
   return answer.can
 }
@@ -339,7 +341,7 @@ export function createSync(config: ReviewAnnotationsClientConfig, onFlushed?: (r
     // Tell the reviewer when this changes, not on every try, so a dismissed notice stays dismissed.
     if (result.stopped !== stopped) {
       if (result.stopped === 'login')
-        showNotice('Your annotations are kept in this browser until you log in again.', { label: 'Log in', href: loginUrl(config) }, { replace: true })
+        showNotice('Log in to save your annotations; until then they are kept in this browser.', { label: 'Log in', href: loginUrl(config) }, { replace: true })
       else if (result.stopped === 'unreachable')
         showNotice('Offline: your annotations are kept in this browser and will be saved when the connection is back. Keep annotating, but don\'t clear this site\'s data.', undefined, { replace: true })
       else

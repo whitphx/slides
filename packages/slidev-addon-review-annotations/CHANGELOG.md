@@ -1,5 +1,13 @@
 # slidev-addon-review-annotations
 
+## 0.3.1
+
+### Patch Changes
+
+- [#45](https://github.com/whitphx/slides/pull/45) [`9f9a1c4`](https://github.com/whitphx/slides/commit/9f9a1c4706a054c259fbf76f9657009cbcfcd422) Thanks [@whitphx](https://github.com/whitphx)! - Keep annotations made before logging in. They used to be refused when saved, losing the
+  text typed into them. Now they wait in the browser with a notice asking the reviewer to log
+  in, and are saved once they have.
+
 ## 0.3.0
 
 ### Minor Changes

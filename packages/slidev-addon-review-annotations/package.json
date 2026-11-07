@@ -38,7 +38,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "npx -y -p typescript@5.9.3 tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
     "prepack": "pnpm run build",
     "test": "node --test src/*.test.ts"
   },
@@ -82,6 +82,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^22.16.2"
+    "@types/node": "^22.16.2",
+    "typescript": "5.9.3"
   }
 }

@@ -178,6 +178,14 @@ The existing appendix slide "Step 2b: the same bridge, in a Web Worker" picks up
 - **Slide 26** (Streamlit + Stlite): on click 4 the terminal is replaced by the `stlite.html` snippet on the left and the Streamlit app by the Stlite page on the right; `app.py` stays on screen as "the same `app.py`". To fit the column, `samples/streamlit-demo/stlite.html` now breaks the `entrypoint` attribute onto its own line.
 - **Slide 27**: the Shinylive / Gradio-Lite line replaces the punchline on the last click instead of adding a line, because the comparison has no spare height below it.
 
+### Alignment with the HK proposal (added after the build)
+
+`whitphx/pycon-proposals` → `proposal.2026.hk.2.md` promises, in its abstract and takeaway 2, WebSocket sessions, lifespan events and PEP 567 context variables. The KR deck had moved the first two to its appendix and never covered the third. The author chose to keep the approved structure (Cloudflare beat included) and close the gap lightly:
+
+- **New main slide 28, "A real framework needs more than one request"**, after the Streamlit vs. Stlite comparison: WebSocket, lifespan and `contextvars` as three boxes, one click each, ending on "details in the appendix". About 45 seconds; the talk is now ~2,960 words of notes, about 27 minutes.
+- **New appendix slide, "`contextvars`: many apps, one Pyodide"**, at the end: Stlite's `home_dir` `ContextVar` (pseudocode after `stlite_lib/server/task_context.py`, as in `202610-pycontw-contextvars`), the copy-per-task rule, and the caveat that `os.getcwd()` stays process-wide. The contextvars talk (`proposal.2026.hk.md`) is not being given at HK, so this is the deck's only coverage of it.
+- The proposal's outline puts the browser demo first and "ASGI in 90 seconds" after it; the approved arc keeps ASGI first. Cloudflare Workers is not in the proposal but stays.
+
 ### Known issue, inherited from the KR deck
 
 The `uv.lock` files in `samples/raw-asgi`, `samples/fastapi-is-asgi` and `samples/streamlit-demo` resolve against a private mirror, not pypi.org, so `uv run --frozen` fails for anyone else (see `samples/README.md` for how to re-lock). Not fixed here; the tests were run in a separate environment installed from PyPI.

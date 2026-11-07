@@ -1862,10 +1862,15 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 .punchline-stack > * {
   grid-area: 1 / 1;
 }
+/* Markdown wraps each line in a paragraph, whose margin would push the pair
+   below the slide. */
+.punchline-stack p {
+  margin: 0;
+}
 /* The runtime box gained a row for Starlette, which this two-column
    comparison has no spare height for, so the pair scales to the slide. */
 .cmp-fit {
-  zoom: 0.95;
+  zoom: 0.92;
 }
 </style>
 
@@ -1889,6 +1894,57 @@ It's the same swap as our demo, but carrying a whole framework.
 [click]
 And Streamlit is not the only one. Shiny for Python and Gradio are ASGI apps too.
 With the same trick, Posit built Shinylive, and I worked with the Gradio team on Gradio-Lite, though it's not maintained now.
+-->
+
+---
+
+# A real framework needs more than one request
+
+<div mt-6 grid="~ cols-3" gap-4>
+
+<div v-click="1" border="~ violet/40 rounded-lg" p-4 bg-violet:5>
+<div text-6 mb-2>🔌 <b>WebSocket</b></div>
+<div text-5><b>long-lived</b> session</div>
+<div text-4 op80 mt-2>JS pushes → <code>asyncio.Queue</code> → <code>await receive()</code></div>
+</div>
+
+<div v-click="2" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
+<div text-6 mb-2>♻️ <b>Lifespan</b></div>
+<div text-5><b>startup / shutdown</b> events</div>
+<div text-4 op80 mt-2>the bridge sends them <b>on page load</b></div>
+</div>
+
+<div v-click="3" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div text-6 mb-2>🧭 <b><code>contextvars</code></b></div>
+<div text-5><b>many apps</b>, one Pyodide</div>
+<div text-4 op80 mt-2>a <code>ContextVar</code> holds <b>each app's</b> home directory <span op70>(PEP 567)</span></div>
+</div>
+
+</div>
+
+<div v-click="4" mt-10 text-center text-xl>
+
+Same `scope` · `receive` · `send` — **details in the appendix** 📎
+
+</div>
+
+<!--
+Streamlit needs more than the single request and response that we built. Here are three more things that Stlite's bridge handles.
+
+[click]
+WebSockets. Streamlit's frontend keeps one long-lived WebSocket session.
+JavaScript pushes each message when it arrives, but the app pulls with `await receive()`. So the bridge puts the messages in an `asyncio` queue, and `receive` waits on it.
+
+[click]
+Lifespan. The app expects startup and shutdown events, the ones Uvicorn sends when the process starts and stops.
+In the browser, the bridge sends startup when the page loads.
+
+[click]
+And context variables, from PEP 567. Stlite can run several apps in one Pyodide, on one thread.
+Each app runs as its own task, and a `ContextVar` holds that app's home directory. So code in each task finds its own app's directory.
+
+[click]
+All three use the same `scope`, `receive` and `send`. The details are in the appendix, if you want to ask about them later.
 -->
 
 ---
@@ -3189,4 +3245,68 @@ And either side can close it.
 
 [click]
 So it's the same loop as HTTP. Only the event names and the lifetime differ.
+-->
+
+---
+
+# `contextvars`: many apps, one Pyodide
+
+<div mt-2 text-5>
+
+**Several apps**, one interpreter, one thread — **one task per app**:
+
+</div>
+
+```py {*|1-3|5-7|9|*}{maxHeight:'300px'}
+home_dir_contextvar: ContextVar[str | None] = ContextVar(
+    "home_dir", default=None
+)
+
+async def run_app(app):
+    home_dir_contextvar.set(app.home_dir)
+    await run_script(app)
+
+await asyncio.gather(run_app(app_a), run_app(app_b))
+```
+
+<div mt-4 grid="~ cols-2" gap-4 text-5>
+
+<div v-click="4" border="~ emerald/40 rounded-lg" p-3 bg-emerald:5>
+✅ Each task gets <b>a copy of the context</b> → a <code>set()</code> stays in <b>its own task</b>
+</div>
+
+<div v-click="5" border="~ amber/40 rounded-lg" p-3 bg-amber:5>
+⚠️ <code>os.getcwd()</code> is still <b>one per process</b> → re-applied <b>each time a task resumes</b>
+</div>
+
+</div>
+
+<div absolute top-4 right-6 text-4 op60>
+Pseudocode, based on <a href="https://github.com/whitphx/stlite/blob/main/packages/kernel/py/stlite-lib/stlite_lib/server/task_context.py" target="_blank">stlite_lib/server/task_context.py</a>
+</div>
+
+<style>
+* {
+  --slidev-code-font-size: 17px;
+  --slidev-code-line-height: 1.45;
+}
+</style>
+
+<!--
+Stlite can run several apps in one Pyodide. One interpreter, one thread, one event loop, and each app runs as its own task.
+
+[click]
+So we declare a context variable for the app's home directory.
+
+[click]
+When an app starts, its task sets the variable, and then runs the app's script.
+
+[click]
+And the apps run side by side, as separate tasks.
+
+[click]
+Each task gets its own copy of the context when it's created. So the value one task sets is not seen by the other task. Any code in App A's task gets App A's directory.
+
+[click]
+But this only tells each task which directory is right. Process-wide state, like the current working directory, is still shared. So Stlite also sets the directory again every time a task resumes.
 -->

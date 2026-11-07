@@ -540,6 +540,7 @@ And it just works. It returns the HTTP response.
 [click]
 Uvicorn doesn't care that there's no framework.
 It just calls the `app` callable.
+This app never calls `receive`, because a GET request has no body. An app calls `receive` when it needs the request body, for example for a POST.
 -->
 
 ---
@@ -1045,7 +1046,7 @@ So now Python runs in the page. Can we run our server-side app inside the browse
 Let's line up what we have.
 
 [click]
-We can load our `main.py` into Pyodide.
+We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with its own installer, `micropip`, and we copy `main.py` into Pyodide's virtual file system.
 Pyodide has a function called `pyimport`, which imports a Python module from JavaScript.
 So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
 
@@ -1152,6 +1153,7 @@ Fill in the blanks and you have **an ASGI server** 🛠️
 </style>
 
 <!--
+We write the conversion in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
 What we have to write is just one Python function
 that takes the `app` object and a request from the JavaScript `fetch`.
 And in the middle it makes the ASGI call to the `app` object,
@@ -1282,12 +1284,11 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 
 </div>
 
-```py {*|1-3|7-13|*}{'data-id':'wire-up'}
+```py {*|1-4|6-12|*}{'data-id':'wire-up'}
+    request_body = bytes(request["body"])
     async def receive():
         return {"type": "http.request",
                 "body": request_body, "more_body": False}
-
-
 
     status, headers, chunks = None, [], []
     async def send(event):
@@ -1299,7 +1300,7 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 ```
 
 <div v-click="1">
-<div data-id="ann-receive" class="wire-note" absolute top-34 right-20 flex items-center border="~ violet/50 rounded-lg" px-8 py-2 gap-4 bg-white dark:bg-black>
+<div data-id="ann-receive" class="wire-note" absolute top-26 right-4 flex items-center border="~ violet/50 rounded-lg" px-3 py-2 gap-3 bg-white dark:bg-black>
 <span>🐍 app</span>
 <div>
 <div text-center op60>—— calls <code>receive()</code> ——▸</div>
@@ -1307,7 +1308,7 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 </div>
 <span>🌉 bridge</span>
 </div>
-<FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(1) @ right" arc="-0.05" />
+<FancyArrow from="[data-id=ann-receive] @ left" to="[data-id=wire-up] .line:nth-child(2) @ right" arc="-0.05" />
 </div>
 
 <div v-click="2">
@@ -1319,7 +1320,7 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 </div>
 <span>🌉 bridge</span>
 </div>
-<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=wire-up] .line:nth-child(8) @ right" arc="0.15" />
+<FancyArrow from="[data-id=ann-send] @ bottom" to="[data-id=wire-up] .line:nth-child(7) @ right" arc="0.15" />
 </div>
 
 <style>
@@ -1339,8 +1340,8 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 The next blank is the two callables.
 
 [click]
-`receive` is how the app asks for the request body.
-Our `receive` returns the body that came from JavaScript, as an `http.request` event.
+`receive` is the async callable that the app awaits when it wants the request body.
+First we take the body that came from JavaScript, as bytes. Our `receive` returns it as an `http.request` event. `more_body` is `False`, which means "this is the whole body".
 
 [click]
 `send` is the opposite. The app calls it to send the response, in pieces.
@@ -1474,7 +1475,8 @@ No sockets, no HTTP parsing, no port and no process. Just a function that satisf
 [click]
 Now let's call this `dispatch` function from JavaScript.
 This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and it returns a `Response` object, the same as the built-in one.
-We get `app` and `dispatch` from Python with `pyimport`, as before.
+The `app` and `dispatch` objects were imported from Python with `pyimport` when the page loaded.
+The helpers in the middle only convert data: `toPy` turns the JavaScript request into a Python dict, and `toJs` turns the Python result back into JavaScript.
 
 [click]
 And in the middle, it calls `dispatch`, with the `app` and the request from JavaScript.
@@ -1561,7 +1563,8 @@ So let's see it running.
 [click]
 This is a static page, served by a plain file server.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
-When I click the button, it says the platform is emscripten.
+The page uses htmx, and one small hook in the page sends every request it makes to `asgiFetch` instead of the network.
+When I click the button, it says the platform is emscripten, and a different Python version: Pyodide's own build of Python.
 The app is telling us it runs inside the browser, on WebAssembly.
 
 [click]
@@ -1631,7 +1634,7 @@ On the server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-In production, we run Pyodide in a Web Worker, so that Python does not block the page's main thread.
+In production, we run Pyodide in a Web Worker, which is a background thread in the browser, so that Python does not block the page.
 
 [click]
 Everything above this box is untouched. The same app, called through the same interface. Only the ASGI server underneath changed.
@@ -1870,7 +1873,7 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 /* The runtime box gained a row for Starlette, which this two-column
    comparison has no spare height for, so the pair scales to the slide. */
 .cmp-fit {
-  zoom: 0.92;
+  zoom: 0.9;
 }
 </style>
 
@@ -1888,8 +1891,8 @@ The Streamlit runtime, the files it serves, and its ASGI interface are the same 
 
 [click]
 And these are the blocks that changed.
-Uvicorn is replaced by our own bridge, which turns requests from the page into ASGI calls to the `app` on Pyodide.
-It's the same swap as our demo, but carrying a whole framework.
+Uvicorn is replaced by Stlite's own bridge, which turns requests from the page into ASGI calls to the `app` on Pyodide.
+It's the same idea as the bridge we wrote, but carrying a whole framework, so it has to do more. We'll see what in a moment.
 
 [click]
 And Streamlit is not the only one. Shiny for Python and Gradio are ASGI apps too.
@@ -1898,7 +1901,7 @@ With the same trick, Posit built Shinylive, and I worked with the Gradio team on
 
 ---
 
-# A real framework needs more than one request
+# What Stlite's bridge adds beyond one HTTP request
 
 <div mt-6 grid="~ cols-3" gap-4>
 
@@ -1917,19 +1920,19 @@ With the same trick, Posit built Shinylive, and I worked with the Gradio team on
 <div v-click="3" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
 <div text-6 mb-2>🧭 <b><code>contextvars</code></b></div>
 <div text-5><b>many apps</b>, one Pyodide</div>
-<div text-4 op80 mt-2>a <code>ContextVar</code> holds <b>each app's</b> home directory <span op70>(PEP 567)</span></div>
+<div text-4 op80 mt-2>a <code>ContextVar</code> holds <b>each app's</b> home directory, so each app reads <b>its own files</b> <span op70>(PEP 567)</span></div>
 </div>
 
 </div>
 
 <div v-click="4" mt-10 text-center text-xl>
 
-Same `scope` · `receive` · `send` — **details in the appendix** 📎
+WebSocket & lifespan: **same `receive` / `send`** — details in the appendix 📎
 
 </div>
 
 <!--
-Streamlit needs more than the single request and response that we built. Here are three more things that Stlite's bridge handles.
+Streamlit needs more than the single request and response that we built. Here are three things that Stlite's bridge adds.
 
 [click]
 WebSockets. Streamlit's frontend keeps one long-lived WebSocket session.
@@ -1941,10 +1944,10 @@ In the browser, the bridge sends startup when the page loads.
 
 [click]
 And context variables, from PEP 567. Stlite can run several apps in one Pyodide, on one thread.
-Each app runs as its own task, and a `ContextVar` holds that app's home directory. So code in each task finds its own app's directory.
+Each app runs as its own task, and a `ContextVar` holds that app's home directory. So code in each task reads its own app's files.
 
 [click]
-All three use the same `scope`, `receive` and `send`. The details are in the appendix, if you want to ask about them later.
+WebSockets and lifespan go through the same `receive` and `send`. The details of all three are in the appendix, if you want to ask about them later.
 -->
 
 ---
@@ -1960,7 +1963,7 @@ Then the browser can't be the only unusual caller… 😏
 </div>
 
 <!--
-So the ASGI application doesn't care who calls it. Uvicorn, or our forty-five lines of code.
+So whether it's our forty-five lines or Stlite's bridge, the ASGI application doesn't care who calls it. Uvicorn, or something else.
 
 [click]
 And then the browser can't be the only unusual caller.
@@ -1997,10 +2000,11 @@ So let me show you another one, which goes even further.
 
 <!--
 [click]
-Cloudflare Workers are serverless functions running on Cloudflare's edge network, utilizing JavaScript technology.
+Cloudflare Workers are serverless functions that run on Cloudflare's edge network, which means servers in many cities, close to the users.
+Their runtime runs only JavaScript and WebAssembly.
 
 [click]
-And they added Python support by using Pyodide.
+So, to support Python, they use Pyodide. This is not related to the Web Worker in the browser; the names are just similar.
 It's the same WebAssembly CPython we just used in the browser, but running server-side now.
 -->
 
@@ -2208,8 +2212,8 @@ So this architecture works. But when do we actually want it?
 <div flex="~ col" gap-2 text-5>
 <div>🧵 <b>No threads</b> <span op70 text-4>— <code>async def</code> only</span></div>
 <div>📦 <b>Packages</b> <span op70 text-4>— pure Python, or built for WASM</span></div>
-<div>🔑 <b>No secrets</b> <span op70 text-4>— the page ships to the client</span></div>
-<div>📥 <b>No inbound requests</b> <span op70 text-4>— no webhooks</span></div>
+<div>🔑 <b>No secrets</b> <span op70 text-4>— in the browser</span></div>
+<div>📥 <b>No webhooks</b> <span op70 text-4>— in the browser</span></div>
 </div>
 </div>
 
@@ -2239,7 +2243,7 @@ And the limits.
 Pyodide can't start threads, for example.
 Some libraries don't work on Pyodide yet, though the coverage is growing.
 In the browser, everything is sent to the client, so you can't put any secrets in the app.
-And there is no public address, so no webhooks.
+And in the browser there is no public address, so no webhooks. These two are about the browser, not about Cloudflare.
 
 [click]
 And this is already in production. The Streamlit Playground runs on Stlite.
@@ -2261,7 +2265,7 @@ So this works together with real servers. It doesn't replace them.
 - 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
 - 🔁 **One app, unchanged, across all of them** — that's the portability
 - 🏭 **In production today** — Stlite · Streamlit Playground · Cloudflare Python Workers · `Mangum` …
-- 🧠 **I learned ASGI by writing the other side of it**
+- 🧠 **I learned ASGI by writing an ASGI server**
 
 </v-clicks>
 

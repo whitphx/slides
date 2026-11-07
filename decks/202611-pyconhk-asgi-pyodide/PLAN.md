@@ -195,3 +195,14 @@ The `uv.lock` files in `samples/raw-asgi`, `samples/fastapi-is-asgi` and `sample
 - The talk is in English, as at KR, for a similar audience.
 - No new content is added. Every minute in the new budget comes from material the KR deck already has.
 - Hidden slides in the KR deck stay hidden.
+
+### Audience review (post-build)
+
+Fixed, mostly gaps left by the cuts:
+- `receive`: slide 8's notes say why the GET app never calls it; slide 20 now shows where `request_body` comes from and says what `more_body: False` means.
+- How the demo reaches Pyodide: slide 15's notes mention `micropip` and copying `main.py` into Pyodide's file system; slide 23's notes mention the htmx hook that sends every request to `asgiFetch`; slide 18 says why `dispatch` is written in Python; slide 21's notes explain `toPy` / `toJs`.
+- Slide 24 explains "Web Worker"; slide 31's notes explain "edge" and why Cloudflare needs Pyodide.
+- Slides 27–29: "our bridge" is now "Stlite's bridge"; slide 28 is retitled "What Stlite's bridge adds beyond one HTTP request" and no longer claims contextvars goes through `receive` / `send`.
+- Slide 35 marks the secrets and webhook limits as browser-only. The last takeaway now reads "I learned ASGI by writing an ASGI server".
+
+Not changed, because the wording is the KR deck's and was approved as is: titles such as "The boundary you use every day", "ASGI 101", "3 transports" and "The interface holds"; the two transition slides 16–17; the "~45 lines" figure.

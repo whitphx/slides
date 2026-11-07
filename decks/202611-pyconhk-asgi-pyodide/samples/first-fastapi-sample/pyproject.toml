@@ -1,0 +1,19 @@
+[project]
+name = "first-fastapi-sample"
+version = "0.1.0"
+description = "A basic FastAPI app example"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "pytest>=8",
+    "pytest-asyncio>=1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

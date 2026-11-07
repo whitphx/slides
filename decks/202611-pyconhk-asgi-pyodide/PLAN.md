@@ -1,6 +1,6 @@
 # PLAN — ASGI on Pyodide (PyCon Hong Kong, 25–30 min cut)
 
-**Status:** Stage 1 (narrative arc + time budget) approved. Awaiting approval of Stage 2 (slide list). No deck files exist yet in this directory; building starts only after Stage 2 is approved.
+**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 35 main slides + 15 appendix), overflow-checked and screenshot-checked on the changed slides. Remaining: rehearsal timing, and the author's review.
 
 **Source deck:** `decks/202608-pyconkr-asgi-pyodide` (PyCon KR 2026, 40-minute slot). Its `PLAN.md` holds the original rationale; this plan only records what changes.
 
@@ -164,12 +164,23 @@ The existing appendix slide "Step 2b: the same bridge, in a Web Worker" picks up
 | 45 Stlite went to the edge, too | → appendix |
 | 47 + 48 Applications / Honest limits | merged (slide 34) |
 
-## Build notes (for when Stage 2 is approved)
+## Build notes (as built)
 
-- Copy the KR deck directory (`components/`, `samples/`, `scripts/`, `public/`, `package.json`) into this directory, rename the package, then edit `slides.md`. The KR deck is left as it was presented.
-- Replace `PyCon KR` with `PyCon HK` in the title slide, the bio note, and the `hello, PyCon KR` strings in `samples/` and the terminal output shown on slides. Re-run the `samples/` tests after the string change, so the terminal output on the slides stays true.
-- New assets: a screenshot of the step-1 page (slide 10) and of the step-3 Workers response (slide 31). Both from the real demo, saved as WebP.
-- After building: check overflow on the merged slides (21, 26, 34), match `[click]` counts to the new click specs, then run the `audience-reviewer` pass. Time a full read of the notes aloud, or count words, to confirm ~26 minutes.
+- The directory is a copy of the KR deck's tracked files (`components/`, `samples/`, `scripts/`, `public/`, `package.json`), with the package renamed. The KR deck is left as it was presented. `pnpm-lock.yaml` gains only an importer entry for this deck, copied from the KR deck's (same dependencies).
+- `PyCon KR` → `PyCon HK` everywhere: title slide, bio (the circled flag is now 🇭🇰HK), and the strings in `samples/` and the terminal output on the slides. The `raw-asgi` and `fastapi-is-asgi` tests pass after the change.
+- Presenter notes on the 35 main slides: **~2,780 words** (target ~2,700).
+
+### Changes from the Stage 2 list
+
+- **No new screenshot assets for steps 1 and 3.** Slides 10 and 31 keep their `LiveEmbed`, which already shows a drawn mock of the page when the app is not reachable. With `pnpm dev:live` running, or the Workers deployment warm, the embed shows the real app; either way the notes no longer stop for an interactive demo there.
+- **The Web Worker click on slide 24 stays.** The step-3 figure (slide 32) draws a Web Worker row in the browser column, so dropping its one-sentence introduction would leave that row unexplained. The aside costs one click and one sentence.
+- **Slide 21** (run the app + call it from JavaScript): the JavaScript pane slides in over the Python pane in the same space, rather than sitting beside it; the two do not fit side by side at a readable size. A floating note points at the `dispatch` call on the last click.
+- **Slide 26** (Streamlit + Stlite): on click 4 the terminal is replaced by the `stlite.html` snippet on the left and the Streamlit app by the Stlite page on the right; `app.py` stays on screen as "the same `app.py`". To fit the column, `samples/streamlit-demo/stlite.html` now breaks the `entrypoint` attribute onto its own line.
+- **Slide 27**: the Shinylive / Gradio-Lite line replaces the punchline on the last click instead of adding a line, because the comparison has no spare height below it.
+
+### Known issue, inherited from the KR deck
+
+The `uv.lock` files in `samples/raw-asgi`, `samples/fastapi-is-asgi` and `samples/streamlit-demo` resolve against a private mirror, not pypi.org, so `uv run --frozen` fails for anyone else (see `samples/README.md` for how to re-lock). Not fixed here; the tests were run in a separate environment installed from PyPI.
 
 ## What I assumed
 

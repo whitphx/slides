@@ -320,6 +320,31 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@6.0.3)
 
+  decks/202611-pyconhk-asgi-pyodide:
+    dependencies:
+      '@iconify-json/ri':
+        specifier: ^1.2.10
+        version: 1.2.10
+      '@slidev/cli':
+        specifier: ^52.19.0
+        version: 52.19.0(@nuxt/kit@3.15.4(magicast@0.3.5))(@oxc-project/types@0.143.0)(@types/markdown-it@14.1.2)(@types/node@22.16.2)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.1(@types/node@22.16.2)(esbuild@0.27.4)(jiti@2.7.0)(tsx@4.19.2)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.41)(cac@7.0.0)(esbuild@0.27.4)(hono@4.13.0)(lightningcss@1.33.0)(magicast@0.3.5)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(oxc-parser@0.131.0)(postcss@8.5.26)(react@18.3.1)(rolldown@1.2.3)(rollup@4.44.2)(srvx@0.12.5)(tsx@4.19.2)
+      slidev-addon-fancy-arrow:
+        specifier: ^0.16.1
+        version: 0.16.1(typescript@6.0.3)
+      slidev-addon-qrcode:
+        specifier: ^1.0.2
+        version: 1.0.2
+      slidev-addon-review-annotations:
+        specifier: workspace:*
+        version: link:../../packages/slidev-addon-review-annotations
+      slidev-addon-window-mockup:
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@6.0.3)
+    devDependencies:
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.4
+
   decks/anipres-and-slidev:
     dependencies:
       '@slidev/cli':

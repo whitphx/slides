@@ -186,9 +186,9 @@ The existing appendix slide "Step 2b: the same bridge, in a Web Worker" picks up
 - **New appendix slide, "`contextvars`: many apps, one Pyodide"**, at the end: Stlite's `home_dir` `ContextVar` (pseudocode after `stlite_lib/server/task_context.py`, as in `202610-pycontw-contextvars`), the copy-per-task rule, and the caveat that `os.getcwd()` stays process-wide. The contextvars talk (`proposal.2026.hk.md`) is not being given at HK, so this is the deck's only coverage of it.
 - The proposal's outline puts the browser demo first and "ASGI in 90 seconds" after it; the approved arc keeps ASGI first. Cloudflare Workers is not in the proposal but stays.
 
-### Known issue, inherited from the KR deck
+### Lockfiles pointing at a private mirror (fixed)
 
-The `uv.lock` files in `samples/raw-asgi`, `samples/fastapi-is-asgi` and `samples/streamlit-demo` resolve against a private mirror, not pypi.org, so `uv run --frozen` fails for anyone else (see `samples/README.md` for how to re-lock). Not fixed here; the tests were run in a separate environment installed from PyPI.
+The `uv.lock` files in `samples/raw-asgi`, `samples/fastapi-is-asgi` and `samples/streamlit-demo`, in this deck and in the KR deck, pinned a private mirror instead of pypi.org, so `uv run --frozen` failed for anyone else. The mirror serves PyPI's own `packages/<hash>/` paths, so the fix rewrites only the two URL prefixes (`/simple` → `https://pypi.org/simple`, `/files/packages/` → `https://files.pythonhosted.org/packages/`). Versions and hashes are unchanged; `uv lock --check` and `uv sync --frozen` pass from public PyPI, and the sample tests pass under `uv run --frozen`.
 
 ## What I assumed
 

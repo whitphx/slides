@@ -1,6 +1,6 @@
 # PLAN — ASGI on Pyodide (PyCon Hong Kong, 25–30 min cut)
 
-**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 35 main slides + 15 appendix), overflow-checked and screenshot-checked on the changed slides. Remaining: rehearsal timing, and the author's review.
+**Status:** Stages 1 and 2 approved; deck built (`slides.md`, 35 main slides + 16 appendix), overflow-checked and screenshot-checked on the changed slides. Remaining: rehearsal timing, and the author's review.
 
 **Source deck:** `decks/202608-pyconkr-asgi-pyodide` (PyCon KR 2026, 40-minute slot). Its `PLAN.md` holds the original rationale; this plan only records what changes.
 
@@ -168,7 +168,7 @@ The existing appendix slide "Step 2b: the same bridge, in a Web Worker" picks up
 
 - The directory is a copy of the KR deck's tracked files (`components/`, `samples/`, `scripts/`, `public/`, `package.json`), with the package renamed. The KR deck is left as it was presented. `pnpm-lock.yaml` gains only an importer entry for this deck, copied from the KR deck's (same dependencies).
 - `PyCon KR` → `PyCon HK` everywhere: title slide, bio (the circled flag is now 🇭🇰HK), and the strings in `samples/` and the terminal output on the slides. The `raw-asgi` and `fastapi-is-asgi` tests pass after the change.
-- Presenter notes on the 35 main slides: **~2,780 words** (target ~2,700).
+- Presenter notes on the 35 main slides: **~3,010 words** after the audience-review fixes (target ~2,700), about 27 minutes with the one live demo.
 
 ### Changes from the Stage 2 list
 
@@ -182,7 +182,7 @@ The existing appendix slide "Step 2b: the same bridge, in a Web Worker" picks up
 
 `whitphx/pycon-proposals` → `proposal.2026.hk.2.md` promises, in its abstract and takeaway 2, WebSocket sessions, lifespan events and PEP 567 context variables. The KR deck had moved the first two to its appendix and never covered the third. The author chose to keep the approved structure (Cloudflare beat included) and close the gap lightly:
 
-- **New main slide 28, "A real framework needs more than one request"**, after the Streamlit vs. Stlite comparison: WebSocket, lifespan and `contextvars` as three boxes, one click each, ending on "details in the appendix". About 45 seconds; the talk is now ~2,960 words of notes, about 27 minutes.
+- ~~New main slide 28, "A real framework needs more than one request"~~ (WebSocket, lifespan and `contextvars` in three boxes). **Removed again** after the conference committee confirmed that leaving out lifespan and WebSocket is fine and asked for focus on the core ASGI/Pyodide story. All three stay in the appendix for Q&A.
 - **New appendix slide, "`contextvars`: many apps, one Pyodide"**, at the end: Stlite's `home_dir` `ContextVar` (pseudocode after `stlite_lib/server/task_context.py`, as in `202610-pycontw-contextvars`), the copy-per-task rule, and the caveat that `os.getcwd()` stays process-wide. The contextvars talk (`proposal.2026.hk.md`) is not being given at HK, so this is the deck's only coverage of it.
 - The proposal's outline puts the browser demo first and "ASGI in 90 seconds" after it; the approved arc keeps ASGI first. Cloudflare Workers is not in the proposal but stays.
 

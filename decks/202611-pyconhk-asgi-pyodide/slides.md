@@ -1892,62 +1892,11 @@ The Streamlit runtime, the files it serves, and its ASGI interface are the same 
 [click]
 And these are the blocks that changed.
 Uvicorn is replaced by Stlite's own bridge, which turns requests from the page into ASGI calls to the `app` on Pyodide.
-It's the same idea as the bridge we wrote, but carrying a whole framework, so it has to do more. We'll see what in a moment.
+It's the same idea as the bridge we wrote, but carrying a whole framework.
 
 [click]
 And Streamlit is not the only one. Shiny for Python and Gradio are ASGI apps too.
 With the same trick, Posit built Shinylive, and I worked with the Gradio team on Gradio-Lite, though it's not maintained now.
--->
-
----
-
-# What Stlite's bridge adds beyond one HTTP request
-
-<div mt-6 grid="~ cols-3" gap-4>
-
-<div v-click="1" border="~ violet/40 rounded-lg" p-4 bg-violet:5>
-<div text-6 mb-2>🔌 <b>WebSocket</b></div>
-<div text-5><b>long-lived</b> session</div>
-<div text-4 op80 mt-2>JS pushes → <code>asyncio.Queue</code> → <code>await receive()</code></div>
-</div>
-
-<div v-click="2" border="~ amber/40 rounded-lg" p-4 bg-amber:5>
-<div text-6 mb-2>♻️ <b>Lifespan</b></div>
-<div text-5><b>startup / shutdown</b> events</div>
-<div text-4 op80 mt-2>the bridge sends them <b>on page load</b></div>
-</div>
-
-<div v-click="3" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-<div text-6 mb-2>🧭 <b><code>contextvars</code></b></div>
-<div text-5><b>many apps</b>, one Pyodide</div>
-<div text-4 op80 mt-2>a <code>ContextVar</code> holds <b>each app's</b> home directory, so each app reads <b>its own files</b> <span op70>(PEP 567)</span></div>
-</div>
-
-</div>
-
-<div v-click="4" mt-10 text-center text-xl>
-
-WebSocket & lifespan: **same `receive` / `send`** — details in the appendix 📎
-
-</div>
-
-<!--
-Streamlit needs more than the single request and response that we built. Here are three things that Stlite's bridge adds.
-
-[click]
-WebSockets. Streamlit's frontend keeps one long-lived WebSocket session.
-JavaScript pushes each message when it arrives, but the app pulls with `await receive()`. So the bridge puts the messages in an `asyncio` queue, and `receive` waits on it.
-
-[click]
-Lifespan. The app expects startup and shutdown events, the ones Uvicorn sends when the process starts and stops.
-In the browser, the bridge sends startup when the page loads.
-
-[click]
-And context variables, from PEP 567. Stlite can run several apps in one Pyodide, on one thread.
-Each app runs as its own task, and a `ContextVar` holds that app's home directory. So code in each task reads its own app's files.
-
-[click]
-WebSockets and lifespan go through the same `receive` and `send`. The details of all three are in the appendix, if you want to ask about them later.
 -->
 
 ---

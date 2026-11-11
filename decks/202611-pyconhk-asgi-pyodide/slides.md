@@ -2169,7 +2169,6 @@ Uvicorn, our own bridge, and Cloudflare's asgi module.
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
 - 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
 - 🔁 **One app, unchanged, across all of them** — that's the portability
-- 🏭 **In production today** — Stlite · Streamlit Playground · Cloudflare Python Workers · `Mangum` …
 - 🧠 **I learned ASGI by writing an ASGI server**
 
 </v-clicks>
@@ -2253,9 +2252,6 @@ So a server is anything that satisfies it.
 
 [click]
 And the same application can run on any server that implements ASGI, without any change.
-
-[click]
-And it's already proven in production.
 
 [click]
 And this is what I got personally. I learned ASGI by writing the server side of ASGI, rather than the application side, in the Stlite project.

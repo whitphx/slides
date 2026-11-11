@@ -1542,7 +1542,7 @@ So let's actually run it.
 
 <div class="demo2-grid" mt-4>
 
-<div text-lg>
+<div>
 
 <v-clicks>
 
@@ -1555,12 +1555,12 @@ So let's actually run it.
 
 <div>
 
-<LiveEmbed url="http://localhost:8080/step2-browser/" title="localhost:8080/step2-browser/" light height="270px" :zoom="0.55">
+<LiveEmbed url="http://localhost:8080/step2-browser/" title="localhost:8080/step2-browser/" light height="270px" :zoom="0.75">
 
 <div p-3 class="mock-page">
-<div text-base font-bold mb-2>Runtime</div>
-<button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
-<div mt-2 font-mono text-sm>Python 3.14 on <b>emscripten/wasm32</b> 🤯</div>
+<div text-6 font-bold mb-2>Runtime</div>
+<button border="~ gray/40 rounded" px-2 py-1 text-4 bg-gray:10>Where am I running?</button>
+<div mt-2 font-mono text-5>Python 3.14 on <b>emscripten/wasm32</b> 🤯</div>
 </div>
 
 </LiveEmbed>
@@ -1569,7 +1569,7 @@ So let's actually run it.
 
 </div>
 
-<div v-click mt-4 text-center text-xl>
+<div v-click class="demo2-punchline" mt-6 text-center>
 
 Responses made **inside the tab** — nothing leaves it.
 
@@ -1578,14 +1578,23 @@ Responses made **inside the tab** — nothing leaves it.
 <style>
 .demo2-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 1.5rem;
   align-items: start;
+}
+/* Keep each point on one line; the window takes the rest of the width. */
+.demo2-grid li {
+  white-space: nowrap;
 }
 /* `light` on the window pins the frame white but leaves slot content on the
    theme's text colour, so the page being mocked has to pin its own. */
 .mock-page {
   color: #1f2937;
+}
+/* The typography preset sizes `p` directly, so the size goes on the paragraph. */
+.demo2-punchline p {
+  font-size: 2rem;
+  line-height: 1.4;
 }
 </style>
 
@@ -1597,7 +1606,7 @@ This is step two of the demo: the same application, with no server.
 [click]
 This is a static page, served by a plain file server.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
-The page uses htmx, and one small hook in the page sends every request it makes to `asgiFetch` instead of the network.
+One small hook in the page sends every request it makes to `asgiFetch` instead of the network.
 When I click the button, it says the platform is emscripten, and a different Python version: Pyodide's own build of Python.
 The application is telling us it runs inside the browser, on WebAssembly.
 
@@ -1668,10 +1677,10 @@ On the server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-In production, we run Pyodide in a Web Worker, which is a background thread in the browser, so that Python does not block the page.
+One more detail: in our demo, Pyodide actually runs in a Web Worker, which is a background thread in the browser. That way, Python does not block the page.
 
 [click]
-Everything above this box is untouched. The same application, called through the same interface. Only the ASGI server underneath changed.
+The ASGI application, the `app` object, is untouched. It's called through the same interface. Only the ASGI server underneath changed.
 -->
 
 ---

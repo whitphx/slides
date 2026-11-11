@@ -2158,81 +2158,6 @@ Uvicorn, our own bridge, and Cloudflare's asgi module.
 -->
 
 ---
-layout: section
----
-
-# 🧭 When to reach for this
-
-<div mt-4 op70>
-Practical uses — and honest limits
-</div>
-
-<!--
-So this architecture works. But when do we actually want it?
--->
-
----
-
-# Where it fits, and where it stops
-
-<div mt-4 grid="~ cols-2" gap-6>
-
-<div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-<div text-6 font-bold mb-3>✅ Good fit</div>
-<div flex="~ col" gap-2 text-5>
-<div>📡 <b>Static-hosted apps</b> <span op70 text-4>— no backend</span></div>
-<div>📖 <b>Runnable docs</b> <span op70 text-4>— live examples</span></div>
-<div>🎓 <b>Education</b> <span op70 text-4>— zero setup</span></div>
-<div>🔒 <b>Privacy</b> <span op70 text-4>— data stays on the device</span></div>
-</div>
-</div>
-
-<div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
-<div text-6 font-bold mb-3>⚠️ Limits</div>
-<div flex="~ col" gap-2 text-5>
-<div>🧵 <b>No threads</b> <span op70 text-4>— <code>async def</code> only</span></div>
-<div>📦 <b>Packages</b> <span op70 text-4>— pure Python, or built for WASM</span></div>
-<div>🔑 <b>No secrets</b> <span op70 text-4>— in the browser</span></div>
-<div>📥 <b>No webhooks</b> <span op70 text-4>— in the browser</span></div>
-</div>
-</div>
-
-</div>
-
-<div v-click="3" mt-6 text-center text-5>
-
-In production: [Streamlit Playground](https://streamlit.io/playground), powered by Stlite
-
-</div>
-
-<div v-click="4" mt-3 text-center text-xl>
-
-**Works with** real servers — doesn't replace them 🤝
-
-</div>
-
-<!--
-[click]
-Where does it fit?
-We can ship a whole web application as static files, on services such as GitHub Pages or Cloudflare Pages. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
-Documentation can have live examples. In education, there is nothing to set up.
-And everything runs on the device, so the data never leaves it.
-
-[click]
-And the limits.
-Pyodide can't start threads, for example.
-Some libraries don't work on Pyodide yet, though the coverage is growing.
-In the browser, everything is sent to the client, so you can't put any secrets in the application.
-And in the browser there is no public address, so no webhooks. These two are about the browser, not about Cloudflare.
-
-[click]
-And this is already in production. The Streamlit Playground runs on Stlite.
-
-[click]
-To be clear, this doesn't replace real servers. It works alongside them, for the cases where running without a server is the point.
--->
-
----
 
 # Key takeaways
 
@@ -2944,6 +2869,69 @@ And today we added the last two.
 [click]
 All of them do what we wrote. Build a scope, prepare receive and send, and await the application.
 And one interesting fact is Mangum is maintained by the same person who maintains Uvicorn and Starlette.
+-->
+
+---
+
+# Where it fits, and where it stops
+
+<div mt-4 grid="~ cols-2" gap-6>
+
+<div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div text-6 font-bold mb-3>✅ Good fit</div>
+<div flex="~ col" gap-2 text-5>
+<div>📡 <b>Static-hosted apps</b> <span op70 text-4>— no backend</span></div>
+<div>📖 <b>Runnable docs</b> <span op70 text-4>— live examples</span></div>
+<div>🎓 <b>Education</b> <span op70 text-4>— zero setup</span></div>
+<div>🔒 <b>Privacy</b> <span op70 text-4>— data stays on the device</span></div>
+</div>
+</div>
+
+<div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
+<div text-6 font-bold mb-3>⚠️ Limits</div>
+<div flex="~ col" gap-2 text-5>
+<div>🧵 <b>No threads</b> <span op70 text-4>— <code>async def</code> only</span></div>
+<div>📦 <b>Packages</b> <span op70 text-4>— pure Python, or built for WASM</span></div>
+<div>🔑 <b>No secrets</b> <span op70 text-4>— in the browser</span></div>
+<div>📥 <b>No webhooks</b> <span op70 text-4>— in the browser</span></div>
+</div>
+</div>
+
+</div>
+
+<div v-click="3" mt-6 text-center text-5>
+
+In production: [Streamlit Playground](https://streamlit.io/playground), powered by Stlite
+
+</div>
+
+<div v-click="4" mt-3 text-center text-xl>
+
+**Works with** real servers — doesn't replace them 🤝
+
+</div>
+
+<!--
+So this architecture works. But when do we actually want it?
+
+[click]
+Where does it fit?
+We can ship a whole web application as static files, on services such as GitHub Pages or Cloudflare Pages. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
+Documentation can have live examples. In education, there is nothing to set up.
+And everything runs on the device, so the data never leaves it.
+
+[click]
+And the limits.
+Pyodide can't start threads, for example.
+Some libraries don't work on Pyodide yet, though the coverage is growing.
+In the browser, everything is sent to the client, so you can't put any secrets in the application.
+And in the browser there is no public address, so no webhooks. These two are about the browser, not about Cloudflare.
+
+[click]
+And this is already in production. The Streamlit Playground runs on Stlite.
+
+[click]
+To be clear, this doesn't replace real servers. It works alongside them, for the cases where running without a server is the point.
 -->
 
 ---

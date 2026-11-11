@@ -23,7 +23,7 @@ ASGI on Pyodide
 </h1>
 
 <div mt-12 text-xl op80>
-Yuichi / 유이치 (@whitphx)
+Yuichi (@whitphx)
 </div>
 
 <div absolute bottom-8 right-10 text-sm op60>
@@ -56,7 +56,7 @@ Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web serve
 
 ---
 
-<h1>Yuichi / 유이치 (@whitphx)</h1>
+<h1>Yuichi (@whitphx)</h1>
 
 <div mt-8>
 Software Artisan / Indie Dev / OSS Enthusiast
@@ -109,7 +109,7 @@ Software Artisan / Indie Dev / OSS Enthusiast
 I'm Yuichi, a software developer who loves OSS and its communities.
 
 [click]
-I build and maintain several OSS projects, including Stlite, and I contribute to Streamlit and Gradio.
+I build and maintain several OSS projects, including Stlite, and I have been contributing to Streamlit and Gradio.
 This talk is built on what I learned from those projects.
 
 I've given talks at PyCons around the world, and this time,

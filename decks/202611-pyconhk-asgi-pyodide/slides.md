@@ -890,17 +890,30 @@ layout: statement
 
 ## The contract has no sockets in it.
 
-<div mt-8 text-2xl op80>
+<div class="contract-lines" mt-10 op80>
 
 <v-clicks>
 
-Being an **ASGI server**: supply `scope` · `receive` · `send` → **call the app**
+Being an **ASGI server**:<br>supply `scope` · `receive` · `send` → **call the app**
 
 🤔 So where does that have to *run*?
 
 </v-clicks>
 
 </div>
+
+<style>
+/* The theme and the typography preset size `h2` and `p` directly, so the sizes
+   have to be set on them rather than on a wrapper. */
+.slidev-layout h2 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+.contract-lines p {
+  font-size: 2rem;
+  line-height: 1.4;
+}
+</style>
 
 <!--
 Now let's look at the contract again, that is, the ASGI interface.
@@ -946,9 +959,9 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 
 </div>
 
-<div grid="~ cols-[2fr_1fr]" gap-8 mt-6 items-center>
+<div grid="~ cols-[auto_1fr]" gap-3 mt-6 items-center>
 
-<div h-full>
+<div class="pyodide-points" h-full>
 
 <v-clicks>
 
@@ -959,7 +972,7 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 
 </div>
 
-<div v-click="3" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
+<div v-click="3" border="~ gray/40 rounded-lg" p-2 bg-gray:5 text-center whitespace-nowrap>
 <div text-5 op70 mb-2>Browser tab</div>
 <div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-4 op80>CPython on WASM</span></div>
 <div text-xl op50 my-1>⇅</div>
@@ -971,6 +984,13 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 <div absolute bottom-3 right-4 text-xs op40>
 Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
+
+<style>
+/* Keep each point on one line; the grid gives this column the width it needs. */
+.pyodide-points li {
+  white-space: nowrap;
+}
+</style>
 
 <!--
 To run an ASGI application in a browser, we first need Python in the browser.
@@ -1065,15 +1085,16 @@ So we can take the `app` object out of the `main` module, and hold it in a JavaS
 
 [click]
 On the other side, a web page talks to an HTTP API with `fetch`, JavaScript's built-in function for it.
-This is our page calling the `/api/runtime` endpoint.
+It sends an HTTP request to a URL, and gives us the response.
 
 [click]
 So let's connect the two.
-We write our own `fetch`, named `asgiFetch`. It takes the same arguments as the original, but it calls our `app` on Pyodide instead of going to the network.
+If an HTTP request from `fetch` could be turned into an ASGI call to the `app` object, our JavaScript could talk HTTP with the Python `app`, the ASGI application, just like it talks to a server.
+So we write our own `fetch`, named `asgiFetch`. It takes the same arguments as the original, but instead of going to the network, it calls our `app` on Pyodide.
 
 [click]
 But there's a hole in the middle.
-Something has to turn the HTTP request from `fetch` into an ASGI call: build the `scope`, and prepare `receive` and `send`.
+Who does that conversion? Something has to build the `scope`, and prepare `receive` and `send`.
 On a server, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
 -->
 
@@ -1103,7 +1124,7 @@ layout: section
 # 🛠️ Building the bridge
 
 <div mt-4 op70>
-Doing Uvicorn's job, one piece at a time
+Doing Uvicorn's job ourselves
 </div>
 
 <!--
@@ -1168,7 +1189,7 @@ Fill in the blanks and you have **an ASGI server** 🛠️
 <!--
 What we have to write is just one Python function
 that takes the `app` object and a request from the JavaScript `fetch`.
-In the middle it makes the ASGI call to the `app` object,
+In the middle, it turns the `request` into an ASGI call to the `app` object,
 and finally it returns the response to its caller.
 We write it in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
 
@@ -1353,12 +1374,12 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 The next blank is the two callables.
 
 [click]
-`receive` is the async callable that the application awaits when it wants the request body.
-First we take the body that came from JavaScript, as bytes. Our `receive` returns it as an `http.request` event. `more_body` is `False`, which means "this is the whole body".
+`receive` is the async callable that the ASGI application awaits when it wants the request body.
+First we take the body that came from JavaScript. Our `receive` returns it as an `http.request` event.
 
 [click]
-`send` is the opposite. The application calls it to send the response, in pieces.
-Our `send` collects the status, the headers and the body, so that we have the full response at the end.
+`send` is the opposite. The ASGI application calls it to send the response, as events: first the status and headers, then the body.
+Our `send` collects them, so that we have the full response at the end.
 
 [click]
 So both of them are just closures over a few local variables.
@@ -1482,14 +1503,14 @@ When it returns, our `send` has already filled in the response variables.
 So we pack them up, and give them back to JavaScript.
 
 [click]
-So this is what an ASGI server is.
+So in our case, this is the whole ASGI server.
 No sockets, no HTTP parsing, no port and no process. Just a function that satisfies the contract defined by ASGI.
 
 [click]
 Now let's call this `dispatch` function from JavaScript.
-This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and it returns a `Response` object, the same as the built-in one.
-The `app` and `dispatch` objects were imported from Python with `pyimport` when the page loaded.
-The helpers in the middle only convert data: `toPy` turns the JavaScript request into a Python dict, and `toJs` turns the Python result back into JavaScript.
+Note that this code is JavaScript, running in the page.
+This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and gives back the same kind of result, so the page can use it in place of the original.
+With Pyodide's APIs, this JavaScript function can use the Python objects we prepared, the `app` and our `dispatch` function, and pass data between the two languages.
 
 [click]
 And in the middle, it calls `dispatch`, with the `app` and the request from JavaScript.

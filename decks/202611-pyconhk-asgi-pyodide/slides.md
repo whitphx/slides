@@ -2158,6 +2158,99 @@ Uvicorn, our own bridge, and Cloudflare's asgi module.
 -->
 
 ---
+clicks: 5
+---
+
+# So far: one app, four places
+
+<div class="recap-grid" mt-6>
+<div class="recap-head">Where it ran</div>
+<div class="recap-head">The app</div>
+<div class="recap-head">Who called it</div>
+
+<div v-click="1" class="recap-row">
+<div>🖥️ <b>Server</b></div>
+<div><code>main.py</code></div>
+<div>Uvicorn</div>
+</div>
+
+<div v-click="2" class="recap-row">
+<div>🌐 <b>Browser tab</b></div>
+<div>the same <code>main.py</code></div>
+<div>our <code>bridge.py</code></div>
+</div>
+
+<div v-click="3" class="recap-row">
+<div>🎈 <b>Browser tab</b> <span op70 text-5>(Stlite)</span></div>
+<div>the original Streamlit</div>
+<div>Stlite's bridge</div>
+</div>
+
+<div v-click="4" class="recap-row">
+<div>☁️ <b>Cloudflare edge</b></div>
+<div>the same <code>main.py</code></div>
+<div><code>asgi.fetch</code></div>
+</div>
+</div>
+
+<div v-click="5" class="recap-punchline" mt-8 text-center>
+
+The app **never changed** — only the caller did 🔁
+
+</div>
+
+<style>
+.recap-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 2.5rem;
+  row-gap: 0.75rem;
+  justify-content: center;
+}
+/* Each row is one click, so its cells sit in the shared grid through
+   `display: contents` and still line up in columns. */
+.recap-row {
+  display: contents;
+}
+.recap-row > div {
+  transition: opacity 400ms ease;
+}
+.recap-row.slidev-vclick-hidden > div {
+  opacity: 0;
+}
+.recap-head {
+  font-size: 1.25rem;
+  opacity: 0.6;
+  border-bottom: 1px solid rgb(156 163 175 / 0.4);
+  padding-bottom: 0.25rem;
+}
+/* The typography preset sizes `p` directly, so the size goes on the paragraph. */
+.recap-punchline p {
+  font-size: 2rem;
+  line-height: 1.4;
+}
+</style>
+
+<!--
+Let's look back at what we did today.
+
+[click]
+We started with a FastAPI application, `main.py`, on a normal server. Uvicorn called it.
+
+[click]
+Then we moved the same `main.py` into a browser tab. There was no Uvicorn there, so we wrote the caller ourselves, in about forty-five lines.
+
+[click]
+Stlite does the same thing with a full framework. The original Streamlit runs in the browser, and Stlite's own bridge calls it.
+
+[click]
+And on Cloudflare Workers, the same `main.py` again. This time, Cloudflare's `asgi` module calls it.
+
+[click]
+In all four places, the application never changed. Only the caller changed, and every caller kept the same ASGI contract.
+-->
+
+---
 
 # Key takeaways
 

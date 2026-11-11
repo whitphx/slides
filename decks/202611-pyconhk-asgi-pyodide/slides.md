@@ -1677,7 +1677,8 @@ On the server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-One more detail: in our demo, Pyodide actually runs in a Web Worker, which is a background thread in the browser. That way, Python does not block the page.
+One more detail: our demo runs Pyodide on the page's main thread, to keep it simple.
+A real application runs it in a Web Worker, which is a background thread in the browser, so that Python does not block the page.
 
 [click]
 The ASGI application, the `app` object, is untouched. It's called through the same interface. Only the ASGI server underneath changed.
@@ -1846,7 +1847,7 @@ No server, no install —<br>**Python & Streamlit in your browser** 🎈
 Streamlit is a popular Python framework for building interactive web applications with only Python.
 
 [click]
-We write just a Python script,
+You write just a Python script,
 
 [click]
 and run it with the `streamlit` command.
@@ -1866,7 +1867,7 @@ There is no server here, and the visitor has no Python installed. Python and Str
 -->
 
 ---
-clicks: 4
+clicks: 3
 plainBackground: true
 ---
 
@@ -1880,21 +1881,9 @@ plainBackground: true
   <template #stlite><StliteStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
 </StackCompare>
 
-<!-- The other frameworks take the punchline's place rather than a line of their
-     own: the comparison has no spare height below it. -->
-<div class="punchline-stack" mt-1 text-center>
-
-<div class="punchline" :class="$clicks >= 1 && $clicks < 4 ? 'op100' : 'op0'">
+<div class="punchline" mt-1 text-center :class="$clicks >= 1 ? 'op100' : 'op0'">
 
 Same app, same Streamlit — **only the server half and the runtime change** 🎈
-
-</div>
-
-<div class="punchline" :class="$clicks >= 4 ? 'op100' : 'op0'">
-
-Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span op70>(Shiny, by Posit)</span> · **[Gradio-Lite](https://github.com/gradio-app/gradio-lite)** <span op70>(Gradio)</span>
-
-</div>
 
 </div>
 
@@ -1902,15 +1891,9 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 .punchline {
   transition: opacity 700ms ease 250ms;
 }
-.punchline-stack {
-  display: grid;
-}
-.punchline-stack > * {
-  grid-area: 1 / 1;
-}
-/* Markdown wraps each line in a paragraph, whose margin would push the pair
-   below the slide. */
-.punchline-stack p {
+/* Markdown wraps the line in a paragraph, whose margin would push it below
+   the slide. */
+.punchline p {
   margin: 0;
 }
 /* The runtime box gained a row for Starlette, which this two-column
@@ -1921,25 +1904,21 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 </style>
 
 <!--
-Stlite is much bigger than our demo, but what happens is basically the same.
-This is standard Streamlit. Uvicorn handles HTTP on the server, and Streamlit's application, built on Starlette, runs on it.
+Streamlit, or Stlite, is much bigger than our demo, but what happens is basically the same.
+This figure shows standard Streamlit. Uvicorn handles HTTP on the server, and Streamlit's application, built on Starlette, runs on it.
 The frontend application talks to it.
 
 [click]
 And this is Stlite.
 
 [click]
-Streamlit itself is the real one here, not a reimplementation.
+Stlite runs the original Streamlit, not a rewrite of it.
 The Streamlit runtime, the files it serves, and its ASGI interface are the same on both sides.
 
 [click]
-And these are the blocks that changed.
+And these are the blocks that Stlite changed from standard Streamlit.
 Uvicorn is replaced by Stlite's own bridge, which turns requests from the page into ASGI calls to the `app` on Pyodide.
-It's the same idea as the bridge we wrote, but carrying a whole framework.
-
-[click]
-And Streamlit is not the only one. Shiny for Python and Gradio are ASGI applications too.
-With the same trick, Posit built Shinylive, and I worked with the Gradio team on Gradio-Lite, though it's not maintained now.
+It's the same idea as the bridge we wrote.
 -->
 
 ---
@@ -1979,16 +1958,25 @@ So let me show you another place, which goes even further: Pyodide, back on the 
 
 # Cloudflare Workers run Python — on Pyodide
 
-<div mt-8 text-6 leading-13>
+<div class="cf-points" mt-8>
 
 <v-clicks>
 
-- ☁️ **Cloudflare Workers** — serverless at the edge, on **workerd** (JS/WASM)
-- 🐍 **Python Workers = Pyodide** — the same WASM CPython, now *server-side*
+- ☁️ **Cloudflare Workers**<br><span op80>serverless at the edge, on **workerd** (JS/WASM)</span>
+- 🐍 **Python Workers = Pyodide**<br><span op80>the same WASM CPython, now *server-side*</span>
 
 </v-clicks>
 
 </div>
+
+<style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.cf-points li {
+  font-size: 2rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+</style>
 
 <!--
 [click]
@@ -2279,7 +2267,7 @@ To be clear, this doesn't replace real servers. It works alongside them, for the
 
 <div flex="~ gap-2" items-center>
 <div i-ri-file-text-line text-xl op50 />
-<div><a href="https://asgi.readthedocs.io/" target="_blank">asgi.readthedocs.io</a> · <a href="https://pyodide.org/" target="_blank">pyodide.org</a> · <a href="https://shiny.posit.co/py/docs/shinylive.html" target="_blank">Shinylive</a> · <a href="https://github.com/gradio-app/gradio/pull/4402" target="_blank">gradio#4402</a></div>
+<div><a href="https://asgi.readthedocs.io/" target="_blank">asgi.readthedocs.io</a> · <a href="https://pyodide.org/" target="_blank">pyodide.org</a></div>
 </div>
 
 <div mt-4 w-min flex="~ gap-1" items-center>

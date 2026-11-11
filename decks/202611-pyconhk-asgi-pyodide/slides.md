@@ -973,7 +973,8 @@ Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
 <!--
-Running Python in a browser is possible thanks to Pyodide.
+To run an ASGI application in a browser, we first need Python in the browser.
+That's what Pyodide gives us.
 It is CPython compiled to WebAssembly, so it runs inside a browser tab.
 
 [click]
@@ -1055,8 +1056,7 @@ async function asgiFetch(url, options) {
 </style>
 
 <!--
-So now Python runs in the page. Can we run our server-side application inside the browser too?
-Let's line up what we have.
+Now that Python runs in the page, let's line up the pieces we have in the browser tab, and see what's missing.
 
 [click]
 We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with a custom installer, and we copy `main.py` into Pyodide's virtual file system.
@@ -1090,7 +1090,7 @@ It's small enough to read in a talk ✍️
 </div>
 
 <!--
-So let's write that layer by ourselves.
+If there's no Uvicorn, we can write that layer by ourselves.
 
 [click]
 And it is small enough to read here, so let's go through the whole thing.
@@ -1166,11 +1166,11 @@ Fill in the blanks and you have **an ASGI server** 🛠️
 </style>
 
 <!--
-We write the conversion in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
 What we have to write is just one Python function
 that takes the `app` object and a request from the JavaScript `fetch`.
-And in the middle it makes the ASGI call to the `app` object,
-and finally returns the response to its caller.
+In the middle it makes the ASGI call to the `app` object,
+and finally it returns the response to its caller.
+We write it in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
 
 [click]
 And we have two blanks.
@@ -1569,7 +1569,7 @@ Responses made **inside the tab** — nothing leaves it.
 </style>
 
 <!--
-So let's see it running.
+This is step two of the demo: the same application, with no server.
 
 [DEMO SETUP] Serve the repo root, not step2-browser/ — the page loads ../main.py by relative fetch, and from inside the subdirectory that path falls outside the document root and Pyodide never boots. Open /step2-browser/. Also let Pyodide finish booting before killing the file server; the runtime and packages come from the CDN, but main.py and bridge.py come from that server. `pnpm dev:live` serves it on port 8080, which is the embed on this slide; `pkill -f "http.server 8080"` is the kill for the last beat.
 
@@ -1925,10 +1925,10 @@ Then the browser can't be the only unusual caller… 😏
 </div>
 
 <!--
-So whether it's our forty-five lines or Stlite's bridge, the ASGI application doesn't care who calls it. Uvicorn, or something else.
+So whether it's Uvicorn, our forty-five lines or Stlite's bridge, the ASGI application doesn't care who calls it, as long as the caller keeps the contract.
 
 [click]
-And then the browser can't be the only unusual caller.
+And if any caller works, the browser shouldn't be the only unusual place to run one.
 -->
 
 ---
@@ -1942,7 +1942,7 @@ The browser runtime, running someone's production traffic
 </div>
 
 <!--
-So let me show you another one, which goes even further.
+So let me show you another place, which goes even further: Pyodide, back on the server side.
 -->
 
 ---
@@ -2079,7 +2079,7 @@ That's the contract of Cloudflare Workers.
 [click]
 And here's the part I wanted to show you.
 Cloudflare's SDK ships a module called `asgi`, and `asgi.fetch` does what we wrote by hand for the browser.
-They ship it as a product feature.
+So the bridge we wrote is not just a demo trick. Cloudflare ships the same idea as a product feature.
 
 [click]
 And it's deployed. The same application, on Cloudflare Workers, with no changes.
@@ -2211,7 +2211,7 @@ And in the browser there is no public address, so no webhooks. These two are abo
 And this is already in production. The Streamlit Playground runs on Stlite.
 
 [click]
-So this works together with real servers. It doesn't replace them.
+To be clear, this doesn't replace real servers. It works alongside them, for the cases where running without a server is the point.
 -->
 
 ---

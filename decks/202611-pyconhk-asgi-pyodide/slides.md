@@ -2254,21 +2254,20 @@ In all four places, the application never changed. Only the caller changed, and 
 
 # Key takeaways
 
-<div mt-6 text-xl>
+<div class="takeaways" mt-4>
 
 <v-clicks>
 
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
-- 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
+- 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · a tab · the edge
 - 🔁 **One app, unchanged, across all of them** — that's the portability
-- 🧠 **I learned ASGI by writing an ASGI server**
 
 </v-clicks>
 
 </div>
 
-<div v-click mt-6 grid="~ cols-[1fr_auto]" gap-8 items-center>
+<div v-click absolute bottom-6 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
 
 <div text-base flex="~ col" gap-2>
 
@@ -2321,6 +2320,12 @@ In all four places, the application never changed. Only the caller changed, and 
 </div>
 
 <style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.takeaways li {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
 /* The two codes carry URLs of different lengths, so they differ in module count
    and each needs its own exact-multiple width to avoid qr-code-styling's dot
    flooring. Scaling both SVGs to one box is what makes them the same size. */
@@ -2345,10 +2350,6 @@ So a server is anything that satisfies it.
 
 [click]
 And the same application can run on any server that implements ASGI, without any change.
-
-[click]
-And this is what I got personally. I learned ASGI by writing the server side of ASGI, rather than the application side, in the Stlite project.
-It's an interesting way to go.
 
 [click]
 That's all from me. Thank you very much.

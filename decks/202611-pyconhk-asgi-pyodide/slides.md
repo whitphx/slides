@@ -977,11 +977,11 @@ Running Python in a browser is possible thanks to Pyodide.
 It is CPython compiled to WebAssembly, so it runs inside a browser tab.
 
 [click]
-There's no backend here. It's a Python interpreter, running in the visitor's browser.
+There's no server-side Python process here. It's a Python interpreter, running in the browser.
 
 [click]
 And Pyodide gives us cross-language APIs.
-From JavaScript, we can call into Python. And from Python, we can call back into JavaScript.
+From JavaScript, we can access Python data and call Python functions. And from Python, we can do the same with JavaScript.
 
 [click]
 So now a browser tab has two runtimes in it. JavaScript, and Python, provided by Pyodide.

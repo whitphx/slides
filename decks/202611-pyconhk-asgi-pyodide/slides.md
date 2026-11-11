@@ -904,16 +904,18 @@ Being an **ASGI server**: supply `scope` · `receive` · `send` → **call the a
 
 <!--
 Now let's look at the contract again, that is, the ASGI interface.
-It's a dict and two async callables: `scope`, `receive` and `send`.
+The ASGI application promises only one thing to the outside world: this signature.
+A dict and two async callables, `scope`, `receive` and `send`.
 It says nothing about sockets, ports or processes.
-Uvicorn reads HTTP off a TCP socket, but that's Uvicorn's own business, not part of ASGI.
 
 [click]
-So, to be an ASGI server, all you have to do is prepare `scope`, `receive` and `send`, and call the application with them.
+Calling the application with that signature properly is the job of the ASGI server, outside the application.
+On a usual Linux server, that outer layer is Uvicorn. It talks to the network through sockets, and turns each request into a call with `scope`, `receive` and `send`.
 
 [click]
-Nothing in that needs a socket, or even a server machine.
-So where does an ASGI server have to run?
+So everything about the outside world lies outside the application.
+Then what if we move to an environment without those ports, or even without a Linux server at all?
+Can we swap only the outer layer, and keep the ASGI application running as it is?
 -->
 
 ---
@@ -927,7 +929,9 @@ A server inside your browser
 </div>
 
 <!--
-So let's take the application and its server somewhere different. Inside a web browser.
+Here is an example of that actually being done: running an ASGI application right inside a web browser.
+Yes, we can do it. Let's take a look at an actual example.
+It's certainly an extreme case, but it's technically fascinating, and full of interesting details.
 -->
 
 ---

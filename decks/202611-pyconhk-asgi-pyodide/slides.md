@@ -525,12 +525,13 @@ Again, it's an async callable with three arguments.
 
 [click]
 Here we check that the connection type in `scope` is HTTP.
+Like this, `scope` contains the connection info as a dictionary.
 
 [click]
-Then we call `send` with the first event. Its type is `http.response.start`, and it carries the status and the headers.
+Then we call the `send` callable with the first event. Its type is `http.response.start`, which represents the start of an HTTP response, and it carries the status and the headers.
 
 [click]
-The next `send` call pushes the response body.
+The next `send` call pushes the response body, following the previous event.
 
 [click]
 Two calls of `send`, and the response is done.
@@ -544,7 +545,7 @@ And it just works. It returns the HTTP response.
 [click]
 Uvicorn doesn't care that there's no framework.
 It just calls the `app` callable.
-This application never calls `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
+In this example, the application didn't call `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
 -->
 
 ---

@@ -659,8 +659,8 @@ and its parameters are scope, receive and send.
 So a FastAPI application is an ASGI application, just like the one we wrote.
 
 [click]
-A framework is a way to create an ASGI callable.
-And it adds useful features such as routing, parsing and validation, to make that easier.
+So, in short, a framework is a way to create an ASGI callable.
+And on top of that, it adds useful features such as routing, parsing and validation, to make that easier.
 -->
 
 ---
@@ -841,7 +841,8 @@ We run it the usual way, with Uvicorn,
 
 [click]
 and open the page.
-When we click the button, it says Python 3.12 on darwin arm64. That's my laptop.
+The page's frontend is a small HTMX application that calls the API endpoints we just defined.
+So when we click the button, it calls `/api/runtime`, and shows the result: Python 3.12 on darwin arm64. That's my laptop.
 -->
 
 ---
@@ -858,12 +859,12 @@ plainBackground: true
 
 <div v-click="5" mt-4 text-center text-xl>
 
-The ASGI server = **🦄 Uvicorn**.
+The caller of the ASGI application = the ASGI server = **🦄 Uvicorn**
 
 </div>
 
 <!--
-Let's review what we just ran.
+Let's review what ran under the hood.
 This is CPython, on a server machine. Here, my laptop.
 
 [click]

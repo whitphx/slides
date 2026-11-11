@@ -1059,7 +1059,7 @@ So now Python runs in the page. Can we run our server-side application inside th
 Let's line up what we have.
 
 [click]
-We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with its own installer, `micropip`, and we copy `main.py` into Pyodide's virtual file system.
+We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with a custom installer, and we copy `main.py` into Pyodide's virtual file system.
 Pyodide has a function called `pyimport`, which imports a Python module from JavaScript.
 So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
 

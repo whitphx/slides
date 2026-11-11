@@ -2850,14 +2850,12 @@ plainBackground: true
   <template #edge><StliteEdgeStackFigure aligned :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
 </StackCompare>
 
-<div v-click="2" mt-2 text-center text-xl>
-
-**Same app, same bridge — only the caller changed** 🔁
-
+<div v-click="2" absolute top-14 right-6 text-4>
+<b>Same app, same bridge — only the caller changed</b> 🔁
 </div>
 
-<div class="punchline" absolute top-14 right-6 text-sm :class="$clicks >= 1 ? 'op60' : 'op0'">
-<code>@stlite/cloudflare</code> — <a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental
+<div class="punchline" absolute top-3 right-6 text-4 :class="$clicks >= 1 ? 'op70' : 'op0'">
+<code>@stlite/cloudflare</code> · live: <a href="https://stlite-cloudflare.whitphx.workers.dev/" target="_blank">stlite-cloudflare.whitphx.workers.dev</a> · <a href="https://github.com/whitphx/stlite/pull/2077" target="_blank">stlite#2077</a>, experimental
 </div>
 
 <style>

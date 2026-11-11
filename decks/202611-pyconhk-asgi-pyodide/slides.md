@@ -903,14 +903,17 @@ Being an **ASGI server**: supply `scope` · `receive` · `send` → **call the a
 </div>
 
 <!--
-Now let's look at the contract again.
-It's a dict and two async callables. It says nothing about sockets, ports or processes.
+Now let's look at the contract again, that is, the ASGI interface.
+It's a dict and two async callables: `scope`, `receive` and `send`.
+It says nothing about sockets, ports or processes.
+Uvicorn reads HTTP off a TCP socket, but that's Uvicorn's own business, not part of ASGI.
 
 [click]
-So the job of an ASGI server is this: supply `scope`, `receive` and `send`, and call the application.
+So, to be an ASGI server, all you have to do is prepare `scope`, `receive` and `send`, and call the application with them.
 
 [click]
-There are no sockets in that. So where does it have to run?
+Nothing in that needs a socket, or even a server machine.
+So where does an ASGI server have to run?
 -->
 
 ---

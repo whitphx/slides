@@ -58,6 +58,16 @@ Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web serve
 
 <h1>Yuichi (@whitphx)</h1>
 
+<!-- The title slide's QR code stays up through the intro, so people still
+     scanning it don't lose it on the first slide change. -->
+<div absolute top-17 right-10 flex="~ col" items-center gap-2>
+<div class="qr-box" w-36 h-36>
+<QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202611-pyconhk-asgi-pyodide/"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+<div op70 text-sm text-center leading-tight>These slides</div>
+</div>
+
 <div mt-8>
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
@@ -68,9 +78,9 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
 - <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🌏APAC, 🇪🇺Euro, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🇰🇷KR, <span v-mark.circle.red="2">🇭🇰HK</span></span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍SciPyData2026</span>
 
-<div absolute top-48 right-0>
+<div absolute top-62 right-0>
 <a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
-<img src="/github_whitphx.png" alt="GitHub @whitphx" w="400px">
+<img src="/github_whitphx.png" alt="GitHub @whitphx" w="330px">
 </a>
 </div>
 
@@ -90,6 +100,11 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <style>
   .portfolio {
     font-size: 1.0rem;
+  }
+  .qr-box :deep(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .item {
     height: 1.8rem;
@@ -122,6 +137,46 @@ You can find me as whitphx on GitHub and social media. Please talk to me if anyt
 -->
 
 ---
+clicks: 3
+---
+
+# Today
+
+<div class="agenda" mt-10>
+
+<v-clicks>
+
+1. ⚡ **ASGI** — what it is, and what it gives us
+2. 🐍 **Pyodide** — Python inside a web browser
+3. 🌐 **ASGI on Pyodide** — a server in a browser tab
+
+</v-clicks>
+
+</div>
+
+<style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.agenda li {
+  font-size: 2rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+</style>
+
+<!--
+This talk is about ASGI.
+
+[click]
+I will first explain what ASGI is and what it brings to us when we build a web server.
+
+[click]
+Then we will combine it with Pyodide, a Python runtime that runs inside a web browser,
+
+[click]
+and see a web application server run inside a browser tab, and even beyond.
+-->
+
+---
 layout: section
 ---
 
@@ -132,10 +187,6 @@ layout: section
 </div>
 
 <!--
-This talk is about ASGI.
-I will first explain what ASGI is and what it brings to us when we build a web server.
-Then we will combine it with Pyodide, a Python runtime that runs inside a web browser, and see a web application server run inside a browser tab, and even beyond.
-
 Let's start with a very basic example that you may already be familiar with.
 -->
 
@@ -175,22 +226,25 @@ HTTP/1.1 200 OK
 server: uvicorn
 content-type: application/json
 
-"Python 3.12.7 on darwin"
+"Python 3.14.6 on darwin"
 ```
 
 </div>
 
 </WindowMockup>
 
-<div v-click="3" mt-2 text-lg>
-
-App: **Your logic**<br>
-Uvicorn: **HTTP handling, connected to socket**
-
 </div>
 
 </div>
 
+<!-- Under both columns rather than under the terminal: the terminal leaves no
+     room below it for two lines. -->
+<div v-click="3" absolute bottom-3 inset-x-0 flex justify-center>
+<div class="note-box note-sm">
+
+App: **Your logic** · Uvicorn: **HTTP handling, connected to socket**
+
+</div>
 </div>
 
 <style>
@@ -296,11 +350,11 @@ The other is Uvicorn, which handles the HTTP communication through the socket.
 <FancyArrow from="[data-id=env-lambda] @ top" to="[data-id=srv-mangum] @ bottom" arc="0.1" color="red" />
 </div>
 
-<div v-click="5" mt-20 text-5 op90 text-center italic>Asynchronous Server Gateway Interface</div>
+<div v-click="5" mt-18 text-7 op90 text-center italic>Asynchronous Server Gateway Interface</div>
 
-<div v-click="6" mt-10 text-2xl op90 text-center>
+<div v-click="6" class="big-line" mt-8 op90 text-center>
 
-Each side evolves **independently** — nobody coordinates 🤝
+Each side evolves **independently** —<br>the two are **decoupled** 🤝
 
 </div>
 
@@ -335,7 +389,7 @@ Python had the same idea before. WSGI, from 2003, was the same kind of contract,
 
 [click]
 Because of this interface, we can develop or switch a package on one side without caring about the other side.
-We usually take this for granted. But what is this contract actually made of? Let's look under the hood.
+We usually take this for granted. But what is this contract actually made of?
 -->
 
 ---
@@ -345,8 +399,7 @@ layout: section
 # ⚡ ASGI 101
 
 <!--
-So, this is what ASGI actually looks like.
-If you already know it, this is just a quick review.
+Let's look under the hood.
 -->
 
 ---
@@ -368,24 +421,24 @@ async def app(scope, receive, send):
     ...
 ```
 
-<div mt-8 grid="~ cols-3" gap-6 text-lg>
+<div mt-8 grid="~ cols-3" gap-6 text-center>
 
 <div v-click="2">
-<div data-id="ann-scope" text-6 border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
-📋 <b><code>scope</code></b><br><span op80>connection type<br>path · headers</span>
+<div data-id="ann-scope" text-7 border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
+📋 <b><code>scope</code></b><br><span op80>connection type<br><span whitespace-nowrap>path · headers …</span></span>
 </div>
 <FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="-0.2" />
 </div>
 
 <div v-click="3">
-<div data-id="ann-receive" text-6 border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-receive" text-7 border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
 📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
 
 <div v-click="4">
-<div data-id="ann-send" text-6 border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-send" text-7 border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
 📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.1" />
@@ -528,13 +581,13 @@ Here we check that the connection type in `scope` is HTTP.
 Like this, `scope` contains the connection info as a dictionary.
 
 [click]
-Then we call the `send` callable with the first event. Its type is `http.response.start`, which represents the start of an HTTP response, and it carries the status and the headers.
+Then we call the `send` callable with the first outgoing event. Its type is `http.response.start`, which represents the start of an HTTP response, and it carries the status and the headers.
 
 [click]
 The next `send` call pushes the response body, following the previous event.
 
 [click]
-Two calls of `send`, and the response is done.
+We just call `send` twice here, and with that, the response is done.
 
 [click]
 Let's run it with Uvicorn. We pass this `app` to Uvicorn, the same way as the FastAPI application before.
@@ -545,7 +598,7 @@ And it just works. It returns the HTTP response.
 [click]
 Uvicorn doesn't care that there's no framework.
 It just calls the `app` callable.
-In this example, the application didn't call `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
+By the way, in this example, the application didn't call `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
 -->
 
 ---
@@ -596,7 +649,7 @@ True
 ['scope', 'receive', 'send']
 ```
 
-<div v-click="4" mt-3 text-center text-lg leading-tight>
+<div v-click="4" class="note-box" mt-3 text-center text-lg leading-tight>
 
 🎁 A framework is a **nicer way to write the same callable**
 
@@ -659,7 +712,7 @@ and its parameters are scope, receive and send.
 So a FastAPI application is an ASGI application, just like the one we wrote.
 
 [click]
-So, in short, a framework is a way to create an ASGI callable.
+So, in short, a framework is a way to create an ASGI application: a callable that takes the three parameters, `scope`, `receive` and `send`.
 And on top of that, it adds useful features such as routing, parsing and validation, to make that easier.
 -->
 
@@ -687,7 +740,7 @@ app = FastAPI()
 
 <div class="demo-layer demo-repl">
 
-<div text-5 mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
+<div text-5 mb-1>…and this <code>app</code> is <b>an ASGI application</b></div>
 
 ```py {*}
 >>> callable(app)
@@ -724,7 +777,7 @@ INFO:  Uvicorn running on
 <div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>
 <button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
-<div mt-2 font-mono text-sm>Python 3.12 on <b>darwin/arm64</b> 🖥️</div>
+<div mt-2 font-mono text-sm>Python 3.14 on <b>darwin/arm64</b> 🖥️</div>
 </div>
 
 </LiveEmbed>
@@ -842,7 +895,7 @@ We run it the usual way, with Uvicorn,
 [click]
 and open the page.
 The page's frontend is a small HTMX application that calls the API endpoints we just defined.
-So when we click the button, it calls `/api/runtime`, and shows the result: Python 3.12 on darwin arm64. That's my laptop.
+So when we click the button, it calls `/api/runtime`, and shows the result: Python three point fourteen on darwin arm64. That's my laptop.
 -->
 
 ---
@@ -875,7 +928,7 @@ The `app` is called through the ASGI interface, with `scope`, `receive` and `sen
 
 [click]
 by Uvicorn.
-Uvicorn takes the HTTP request off the TCP socket, and makes that call.
+Uvicorn takes the HTTP request off the TCP socket, and makes that function call.
 
 [click]
 And the page in the browser talks to the application with HTTP, over the network.
@@ -890,17 +943,18 @@ layout: statement
 
 ## The contract has no sockets in it.
 
-<div mt-8 text-2xl op80>
+<div mt-10 op80>
 
 <v-clicks>
 
-Being an **ASGI server**: supply `scope` · `receive` · `send` → **call the app**
+Being an **ASGI server**:<br>supply `scope` · `receive` · `send` → **call the app**
 
 🤔 So where does that have to *run*?
 
 </v-clicks>
 
 </div>
+
 
 <!--
 Now let's look at the contract again, that is, the ASGI interface.
@@ -913,6 +967,7 @@ Calling the application with that signature properly is the job of the ASGI serv
 On a usual Linux server, that outer layer is Uvicorn. It talks to the network through sockets, and turns each request into a call with `scope`, `receive` and `send`.
 
 [click]
+This is the decoupling we saw at the start: the application on one side, the server on the other, and only ASGI between them.
 So everything about the outside world lies outside the application.
 Then what if we move to an environment without those ports, or even without a Linux server at all?
 Can we swap only the outer layer, and keep the ASGI application running as it is?
@@ -940,29 +995,29 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 
 <img src="/pyodide-logo.svg" alt="Pyodide" absolute top-10 right-12 h-16 />
 
-<div mt-4 text-lg>
+<div mt-4>
 
 [Pyodide](https://pyodide.org/): **CPython compiled to WebAssembly** — real Python, in a browser tab
 
 </div>
 
-<div grid="~ cols-[2fr_1fr]" gap-8 mt-6 items-center>
+<div grid="~ cols-[auto_1fr]" gap-3 mt-6 items-center>
 
-<div h-full>
+<div class="pyodide-points" h-full>
 
 <v-clicks>
 
-- **No backend** — a Python interpreter in the browser
-- Python ⇄ JavaScript, direct calls
+- **No backend**<br><span op80>a Python interpreter in the browser</span>
+- **Python ⇄ JavaScript**<br><span op80>direct calls</span>
 
 </v-clicks>
 
 </div>
 
-<div v-click="3" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center>
-<div text-5 op70 mb-2>Browser tab</div>
-<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-4 op80>CPython on WASM</span></div>
-<div text-xl op50 my-1>⇅</div>
+<div v-click="3" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center text-7 whitespace-nowrap>
+<div text-6 op70 mb-2>Browser tab</div>
+<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-5 op80>CPython on WASM</span></div>
+<div op50 my-1>⇅</div>
 <div border="~ sky/40 rounded" p-2 bg-sky:5>🌐 JavaScript / DOM</div>
 </div>
 
@@ -971,6 +1026,17 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 <div absolute bottom-3 right-4 text-xs op40>
 Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
+
+<style>
+/* Each point breaks after its label, so the column keeps the width of its
+   longest line. The typography preset sizes `li` directly. */
+.pyodide-points li {
+  white-space: nowrap;
+  font-size: 1.75rem;
+  line-height: 1.35;
+  margin-bottom: 1rem;
+}
+</style>
 
 <!--
 To run an ASGI application in a browser, we first need Python in the browser.
@@ -1000,7 +1066,7 @@ clicks: 4
 
 <div v-click="1">
 
-Now we can reach **`app`** from JavaScript:
+JavaScript now holds **`app`**:
 
 ```js
 const { app } = pyodide.pyimport("main");
@@ -1024,7 +1090,7 @@ const res = await fetch("/api/runtime", {
 
 <div v-click="3">
 
-So if we had **our own `fetch`**, the page could call the Python app directly:
+To bridge the two: **our own `fetch`**, which calls **`app`**:
 
 ```js
 async function asgiFetch(url, options) {
@@ -1059,21 +1125,24 @@ async function asgiFetch(url, options) {
 Now that Python runs in the page, let's line up the pieces we have in the browser tab, and see what's missing.
 
 [click]
-We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with a custom installer, and we copy `main.py` into Pyodide's virtual file system.
-Pyodide has a function called `pyimport`, which imports a Python module from JavaScript.
-So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
+First, we need our `app` object inside Pyodide.
+`main.py` imports FastAPI, so FastAPI has to be installed first. Pyodide has its own installer that can install packages from PyPI, so we install FastAPI with it.
+Then we copy `main.py` into Pyodide's virtual file system, so that Python can import it.
+Now JavaScript can import the `main` module with Pyodide's `pyimport` function, and take the `app` object out of it.
+So our ASGI application is now held in a JavaScript variable.
 
 [click]
 On the other side, a web page talks to an HTTP API with `fetch`, JavaScript's built-in function for it.
-This is our page calling the `/api/runtime` endpoint.
+It sends an HTTP request to a URL, and gives us the response.
 
 [click]
-So let's connect the two.
-We write our own `fetch`, named `asgiFetch`. It takes the same arguments as the original, but it calls our `app` on Pyodide instead of going to the network.
+So let's connect the two. There is a gap between them: `fetch` speaks HTTP, and the `app` object expects an ASGI call.
+If we have something that fills this gap, the page can talk HTTP with our Python app, the ASGI application, just like it talks to a server.
+Here, we write that piece as a replacement for the original `fetch`, named `asgiFetch`. It takes the same arguments as the original, but instead of going to the network, it calls our `app` on Pyodide.
 
 [click]
-But there's a hole in the middle.
-Something has to turn the HTTP request from `fetch` into an ASGI call: build the `scope`, and prepare `receive` and `send`.
+But look inside `asgiFetch`. The middle part is still missing: the conversion itself.
+Something has to build the `scope`, and prepare `receive` and `send`.
 On a server, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
 -->
 
@@ -1103,7 +1172,7 @@ layout: section
 # 🛠️ Building the bridge
 
 <div mt-4 op70>
-Doing Uvicorn's job, one piece at a time
+Doing Uvicorn's job ourselves
 </div>
 
 <!--
@@ -1121,7 +1190,7 @@ Everything on the next few slides is real code from the demo repository, just sh
 </div>
 
 ```py {*}{'data-id':'skeleton'}
-async def dispatch(app, request):
+async def handle_fetch(app, request):
     ...
 
     await app(scope, receive, send)
@@ -1134,7 +1203,7 @@ async def dispatch(app, request):
 <div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 183px" aria-hidden="true">❓</div>
 <div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 315px" aria-hidden="true">❓</div>
 
-<div v-click="2" absolute bottom-12 inset-x-0 text-xl text-center>
+<div v-click="2" class="big-line" absolute bottom-12 inset-x-0 text-center>
 
 Fill in the blanks and you have **an ASGI server** 🛠️
 
@@ -1168,7 +1237,7 @@ Fill in the blanks and you have **an ASGI server** 🛠️
 <!--
 What we have to write is just one Python function
 that takes the `app` object and a request from the JavaScript `fetch`.
-In the middle it makes the ASGI call to the `app` object,
+In the middle, it turns the `request` into an ASGI call to the `app` object,
 and finally it returns the response to its caller.
 We write it in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
 
@@ -1198,7 +1267,7 @@ JS request → **the dict ASGI specifies**:
 <div class="scope-code">
 
 ```py {*|3|7-8|10-11|*}
-async def dispatch(app, request):
+async def handle_fetch(app, request):
     scope = {
         "type": "http",
         "asgi": {"version": "3.0", "spec_version": "2.3"},
@@ -1351,17 +1420,16 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 
 <!--
 The next blank is the two callables.
+You don't have to follow every line of this code. It's the real code from the demo, and I'm showing it as proof that this part is small.
 
 [click]
-`receive` is the async callable that the application awaits when it wants the request body.
-First we take the body that came from JavaScript, as bytes. Our `receive` returns it as an `http.request` event. `more_body` is `False`, which means "this is the whole body".
+`receive` gives the request body to the ASGI application.
 
 [click]
-`send` is the opposite. The application calls it to send the response, in pieces.
-Our `send` collects the status, the headers and the body, so that we have the full response at the end.
+`send` collects the response that the ASGI application sends back.
 
 [click]
-So both of them are just closures over a few local variables.
+That's all. Both are just small functions over a few local variables.
 -->
 
 ---
@@ -1407,9 +1475,9 @@ clicks: 5
 </div>
 
 <div v-click="5" class="dispatch-layer">
-<div data-id="ann-dispatch" class="js-note" absolute bg-white dark:bg-black px-3 py-2 border="~ teal/60 rounded-lg" style="top: 222px; left: 580px;">
+<div data-id="ann-dispatch" class="js-note" absolute bg-white dark:bg-black px-3 py-2 border="~ teal/60 rounded-lg" style="top: 186px; left: 600px;">
 
-calls **our `dispatch`** with the `app`
+calls **our `handle_fetch`**
 
 </div>
 <FancyArrow from="[data-id=ann-dispatch] @ bottomleft" to="[data-id=dispatch-js] .line:nth-child(6) @ right" arc="0.2" color="red" />
@@ -1482,17 +1550,17 @@ When it returns, our `send` has already filled in the response variables.
 So we pack them up, and give them back to JavaScript.
 
 [click]
-So this is what an ASGI server is.
+So in our case, this is the whole ASGI server.
 No sockets, no HTTP parsing, no port and no process. Just a function that satisfies the contract defined by ASGI.
 
 [click]
-Now let's call this `dispatch` function from JavaScript.
-This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and it returns a `Response` object, the same as the built-in one.
-The `app` and `dispatch` objects were imported from Python with `pyimport` when the page loaded.
-The helpers in the middle only convert data: `toPy` turns the JavaScript request into a Python dict, and `toJs` turns the Python result back into JavaScript.
+Now let's call this `handle_fetch` function from JavaScript.
+Note that this code is JavaScript, running in the page.
+This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and gives back the same kind of result, so the page can use it in place of the original.
+With Pyodide's APIs, this JavaScript function can use the Python objects we prepared, the `app` and our `handle_fetch` function, and pass data between the two languages.
 
 [click]
-And in the middle, it calls `dispatch`, with the `app` and the request from JavaScript.
+And in the middle, it calls `handle_fetch`, with the `app` and the request from JavaScript.
 -->
 
 ---
@@ -1521,25 +1589,33 @@ So let's actually run it.
 
 <div class="demo2-grid" mt-4>
 
-<div text-lg>
+<div>
 
 <v-clicks>
 
-- 📄 Static page + Pyodide + **the same `main.py`**
+- 📄 Static page + Pyodide<br>+ **the same `main.py`**
 - 🕵️ **Works offline**
 
 </v-clicks>
+
+<div v-click="1" mt-2>
+
+```shell
+$ python -m http.server 8080
+```
+
+</div>
 
 </div>
 
 <div>
 
-<LiveEmbed url="http://localhost:8080/step2-browser/" title="localhost:8080/step2-browser/" light height="270px" :zoom="0.55">
+<LiveEmbed url="http://localhost:8080/step2-browser/" title="localhost:8080/step2-browser/" light height="270px" :zoom="0.75">
 
 <div p-3 class="mock-page">
-<div text-base font-bold mb-2>Runtime</div>
-<button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
-<div mt-2 font-mono text-sm>Python 3.14 on <b>emscripten/wasm32</b> 🤯</div>
+<div text-6 font-bold mb-2>Runtime</div>
+<button border="~ gray/40 rounded" px-2 py-1 text-4 bg-gray:10>Where am I running?</button>
+<div mt-2 font-mono text-5>Python 3.14 on <b>emscripten/wasm32</b> 🤯</div>
 </div>
 
 </LiveEmbed>
@@ -1548,7 +1624,7 @@ So let's actually run it.
 
 </div>
 
-<div v-click mt-4 text-center text-xl>
+<div v-click class="demo2-punchline" mt-6 text-center>
 
 Responses made **inside the tab** — nothing leaves it.
 
@@ -1557,14 +1633,26 @@ Responses made **inside the tab** — nothing leaves it.
 <style>
 .demo2-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 1.5rem;
   align-items: start;
+}
+/* Keep each point on one line; the window takes the rest of the width. */
+.demo2-grid li {
+  white-space: nowrap;
+  font-size: 1.75rem;
+  line-height: 1.35;
+  margin-bottom: 1rem;
 }
 /* `light` on the window pins the frame white but leaves slot content on the
    theme's text colour, so the page being mocked has to pin its own. */
 .mock-page {
   color: #1f2937;
+}
+/* The typography preset sizes `p` directly, so the size goes on the paragraph. */
+.demo2-punchline p {
+  font-size: 2rem;
+  line-height: 1.4;
 }
 </style>
 
@@ -1575,9 +1663,10 @@ This is step two of the demo: the same application, with no server.
 
 [click]
 This is a static page, served by a plain file server.
+Here it's Python's built-in one: `python -m http.server`. It only sends files; there is no application server behind it.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
-The page uses htmx, and one small hook in the page sends every request it makes to `asgiFetch` instead of the network.
-When I click the button, it says the platform is emscripten, and a different Python version: Pyodide's own build of Python.
+One small hook in the page sends every request it makes to `asgiFetch` instead of the network.
+When I click the button, it says the platform is emscripten: this is Pyodide's own build of Python, compiled to WebAssembly.
 The application is telling us it runs inside the browser, on WebAssembly.
 
 [click]
@@ -1603,7 +1692,7 @@ plainBackground: true
   <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" :worker="$clicks >= 4" :worker-highlight="$clicks === 4" /></template>
 </StackCompare>
 
-<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 5 ? 'op100' : 'op0'">
+<div class="punchline big-line" mt-4 text-center :class="$clicks >= 5 ? 'op100' : 'op0'">
 
 One box swapped — **the bridge plays Uvicorn's role** 🛠️
 
@@ -1639,18 +1728,19 @@ And here is the browser version, next to it.
 Let's compare them from the top.
 
 [click]
-The `main.py` and its `app` object are the same, and so is the interface it's called through.
+The `main.py` and its `app` object are the same.
+The interface between the app and the server is also the same: ASGI.
 
 [click]
 What changed is this layer.
-On the server, on the left, CPython runs Uvicorn as the ASGI server.
+On the Linux server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-In production, we run Pyodide in a Web Worker, which is a background thread in the browser, so that Python does not block the page.
+By the way, real applications run Pyodide in a Web Worker, a background thread in the browser, so that the page doesn't freeze.
 
 [click]
-Everything above this box is untouched. The same application, called through the same interface. Only the ASGI server underneath changed.
+The ASGI application, the `app` object, is untouched. It's called through the same interface. Only the ASGI server underneath changed.
 -->
 
 ---
@@ -1740,9 +1830,9 @@ $ streamlit run app.py
 
 </div>
 
-<div v-click="5" mt-4 text-center text-5>
+<div v-click="5" class="note-box" mt-4 text-center text-5>
 
-No server, no install —<br>**Python & Streamlit in your browser** 🎈
+No server, no install —<br>**Python & Streamlit<br>in your browser** 🎈
 
 </div>
 
@@ -1816,7 +1906,7 @@ No server, no install —<br>**Python & Streamlit in your browser** 🎈
 Streamlit is a popular Python framework for building interactive web applications with only Python.
 
 [click]
-We write just a Python script,
+You write just a Python script with the Streamlit API,
 
 [click]
 and run it with the `streamlit` command.
@@ -1824,6 +1914,7 @@ and run it with the `streamlit` command.
 [click]
 And we get a styled, interactive web application.
 The `streamlit` package ships both a server, Starlette on Uvicorn, and a frontend application.
+It's a complete server-and-client web application.
 So it has the same shape as our demo application.
 
 [click]
@@ -1836,7 +1927,7 @@ There is no server here, and the visitor has no Python installed. Python and Str
 -->
 
 ---
-clicks: 4
+clicks: 3
 plainBackground: true
 ---
 
@@ -1850,21 +1941,9 @@ plainBackground: true
   <template #stlite><StliteStackFigure :highlight="$clicks >= 2" :highlight-swapped="$clicks >= 3" /></template>
 </StackCompare>
 
-<!-- The other frameworks take the punchline's place rather than a line of their
-     own: the comparison has no spare height below it. -->
-<div class="punchline-stack" mt-1 text-center>
-
-<div class="punchline" :class="$clicks >= 1 && $clicks < 4 ? 'op100' : 'op0'">
+<div class="punchline" mt-1 text-center :class="$clicks >= 1 ? 'op100' : 'op0'">
 
 Same app, same Streamlit — **only the server half and the runtime change** 🎈
-
-</div>
-
-<div class="punchline" :class="$clicks >= 4 ? 'op100' : 'op0'">
-
-Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span op70>(Shiny, by Posit)</span> · **[Gradio-Lite](https://github.com/gradio-app/gradio-lite)** <span op70>(Gradio)</span>
-
-</div>
 
 </div>
 
@@ -1872,15 +1951,9 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 .punchline {
   transition: opacity 700ms ease 250ms;
 }
-.punchline-stack {
-  display: grid;
-}
-.punchline-stack > * {
-  grid-area: 1 / 1;
-}
-/* Markdown wraps each line in a paragraph, whose margin would push the pair
-   below the slide. */
-.punchline-stack p {
+/* Markdown wraps the line in a paragraph, whose margin would push it below
+   the slide. */
+.punchline p {
   margin: 0;
 }
 /* The runtime box gained a row for Starlette, which this two-column
@@ -1891,25 +1964,22 @@ Same idea: **[Shinylive](https://shiny.posit.co/py/docs/shinylive.html)** <span 
 </style>
 
 <!--
-Stlite is much bigger than our demo, but what happens is basically the same.
-This is standard Streamlit. Uvicorn handles HTTP on the server, and Streamlit's application, built on Starlette, runs on it.
+Streamlit, or Stlite, is much bigger than our demo, but what happens is basically the same.
+This figure shows standard Streamlit. Uvicorn handles HTTP on the server, and Streamlit's application, built on Starlette, runs on it.
 The frontend application talks to it.
 
 [click]
 And this is Stlite.
+You don't have to follow every box in this figure. The point is that some parts are the same, and some parts are changed.
 
 [click]
-Streamlit itself is the real one here, not a reimplementation.
+Stlite runs the original Streamlit, not a rewrite of it.
 The Streamlit runtime, the files it serves, and its ASGI interface are the same on both sides.
 
 [click]
-And these are the blocks that changed.
+And these are the blocks that Stlite changed from standard Streamlit.
 Uvicorn is replaced by Stlite's own bridge, which turns requests from the page into ASGI calls to the `app` on Pyodide.
-It's the same idea as the bridge we wrote, but carrying a whole framework.
-
-[click]
-And Streamlit is not the only one. Shiny for Python and Gradio are ASGI applications too.
-With the same trick, Posit built Shinylive, and I worked with the Gradio team on Gradio-Lite, though it's not maintained now.
+It's the same idea as the bridge we wrote.
 -->
 
 ---
@@ -1949,16 +2019,25 @@ So let me show you another place, which goes even further: Pyodide, back on the 
 
 # Cloudflare Workers run Python — on Pyodide
 
-<div mt-8 text-6 leading-13>
+<div class="cf-points" mt-8>
 
 <v-clicks>
 
-- ☁️ **Cloudflare Workers** — serverless at the edge, on **workerd** (JS/WASM)
-- 🐍 **Python Workers = Pyodide** — the same WASM CPython, now *server-side*
+- ☁️ **Cloudflare Workers**<br><span op80>serverless at the edge, on **workerd** (JS/WASM)</span>
+- 🐍 **Python Workers = Pyodide**<br><span op80>the same WASM CPython, now *server-side*</span>
 
 </v-clicks>
 
 </div>
+
+<style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.cf-points li {
+  font-size: 2rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+</style>
 
 <!--
 [click]
@@ -1966,7 +2045,7 @@ Cloudflare Workers are serverless functions that run on Cloudflare's edge networ
 Their runtime runs only JavaScript and WebAssembly.
 
 [click]
-So, to support Python, they use Pyodide. This is not related to the Web Worker in the browser; the names are just similar.
+So, to support Python, they use Pyodide.
 It's the same WebAssembly CPython we just used in the browser, but running server-side now.
 -->
 
@@ -2010,10 +2089,12 @@ The whole file — nothing left out:
 
 <!-- The frame's title bar cannot hold the whole host, and the address is the part
      the audience writes down, so it gets its own line under both columns. -->
-<div class="edge-url" mt-2 text-center :class="$clicks >= 4 ? '' : 'op0'">
+<div class="edge-url" mt-2 flex justify-center :class="$clicks >= 4 ? '' : 'op0'">
+<div class="note-box" text-center>
 
 <a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> — **live, right now** 🌍
 
+</div>
 </div>
 
 <div class="entry-notes" :class="$clicks >= 4 ? 'op0' : ''">
@@ -2070,7 +2151,7 @@ So this is what it takes to run our application there. The whole file, nothing l
 [DEMO SETUP] Deploy well before the talk and open the URL once to warm it, so the embed on this slide loads the live application. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. If it is not up, the embed shows its fallback; don't stop to debug it.
 
 [click]
-This import is our application, the same one as steps one and two.
+This import is our application: the `app` object from `main.py`, the same one as steps one and two.
 
 [click]
 Then the entrypoint, with a fetch handler.
@@ -2140,100 +2221,109 @@ Uvicorn, our own bridge, and Cloudflare's asgi module.
 -->
 
 ---
-layout: section
+clicks: 4
 ---
 
-# 🧭 When to reach for this
+# So far: one app, three places
 
-<div mt-4 op70>
-Practical uses — and honest limits
+<div class="recap-grid" mt-6>
+<div class="recap-head">Where it ran</div>
+<div class="recap-head">The app</div>
+<div class="recap-head">Who called it</div>
+
+<div v-click="1" class="recap-row">
+<div>🖥️ <b>Server</b></div>
+<div><code>main.py</code></div>
+<div>Uvicorn</div>
 </div>
+
+<div v-click="2" class="recap-row">
+<div>🌐 <b>Browser tab</b></div>
+<div>the same <code>main.py</code><br><span op70 text-5>🎈 e.g. Streamlit, with Stlite</span></div>
+<div>our <code>bridge.py</code><br><span op70 text-5>Stlite's bridge</span></div>
+</div>
+
+<div v-click="3" class="recap-row">
+<div>☁️ <b>Cloudflare edge</b></div>
+<div>the same <code>main.py</code></div>
+<div><code>asgi.fetch</code></div>
+</div>
+</div>
+
+<div v-click="4" class="recap-punchline" mt-8 text-center>
+
+The app **never changed** — only the caller did 🔁
+
+</div>
+
+<style>
+.recap-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 2.5rem;
+  row-gap: 0.75rem;
+  justify-content: center;
+}
+/* Each row is one click, so its cells sit in the shared grid through
+   `display: contents` and still line up in columns. */
+.recap-row {
+  display: contents;
+}
+.recap-row > div {
+  transition: opacity 400ms ease;
+}
+.recap-row.slidev-vclick-hidden > div {
+  opacity: 0;
+}
+.recap-head {
+  font-size: 1.25rem;
+  opacity: 0.6;
+  border-bottom: 1px solid rgb(156 163 175 / 0.4);
+  padding-bottom: 0.25rem;
+}
+/* The typography preset sizes `p` directly, so the size goes on the paragraph. */
+.recap-punchline p {
+  font-size: 2rem;
+  line-height: 1.4;
+}
+</style>
 
 <!--
-So this architecture works. But when do we actually want it?
--->
-
----
-
-# Where it fits, and where it stops
-
-<div mt-4 grid="~ cols-2" gap-6>
-
-<div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
-<div text-6 font-bold mb-3>✅ Good fit</div>
-<div flex="~ col" gap-2 text-5>
-<div>📡 <b>Static-hosted apps</b> <span op70 text-4>— no backend</span></div>
-<div>📖 <b>Runnable docs</b> <span op70 text-4>— live examples</span></div>
-<div>🎓 <b>Education</b> <span op70 text-4>— zero setup</span></div>
-<div>🔒 <b>Privacy</b> <span op70 text-4>— data stays on the device</span></div>
-</div>
-</div>
-
-<div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
-<div text-6 font-bold mb-3>⚠️ Limits</div>
-<div flex="~ col" gap-2 text-5>
-<div>🧵 <b>No threads</b> <span op70 text-4>— <code>async def</code> only</span></div>
-<div>📦 <b>Packages</b> <span op70 text-4>— pure Python, or built for WASM</span></div>
-<div>🔑 <b>No secrets</b> <span op70 text-4>— in the browser</span></div>
-<div>📥 <b>No webhooks</b> <span op70 text-4>— in the browser</span></div>
-</div>
-</div>
-
-</div>
-
-<div v-click="3" mt-6 text-center text-5>
-
-In production: [Streamlit Playground](https://streamlit.io/playground), powered by Stlite
-
-</div>
-
-<div v-click="4" mt-3 text-center text-xl>
-
-**Works with** real servers — doesn't replace them 🤝
-
-</div>
-
-<!--
-[click]
-Where does it fit?
-We can ship a whole web application as static files, on services such as GitHub Pages or Cloudflare Pages. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
-Documentation can have live examples. In education, there is nothing to set up.
-And everything runs on the device, so the data never leaves it.
+Let's look back at what we did today.
 
 [click]
-And the limits.
-Pyodide can't start threads, for example.
-Some libraries don't work on Pyodide yet, though the coverage is growing.
-In the browser, everything is sent to the client, so you can't put any secrets in the application.
-And in the browser there is no public address, so no webhooks. These two are about the browser, not about Cloudflare.
+We started with a FastAPI application, the `app` object in `main.py`, on a normal server. Uvicorn called it.
 
 [click]
-And this is already in production. The Streamlit Playground runs on Stlite.
+Then we moved the same `main.py` into a browser tab. There was no Uvicorn there, so we wrote the caller ourselves, in about forty-five lines.
+Stlite makes the same thing possible for a full framework, with the same trick. The original Streamlit runs in the browser.
 
 [click]
-To be clear, this doesn't replace real servers. It works alongside them, for the cases where running without a server is the point.
+And on Cloudflare Workers, the same `main.py` again. This time, Cloudflare's `asgi` module calls it.
+
+[click]
+In all three places, the application never changed. Only the caller changed, and every caller kept the same ASGI contract.
+I think this is one interesting example of the power of the decoupling that ASGI makes possible.
 -->
 
 ---
 
 # Key takeaways
 
-<div mt-6 text-xl>
+<div class="takeaways" mt-4>
 
 <v-clicks>
 
 - 🧩 **ASGI = a clean interface** — your app on one side, *any caller* on the other
 - ⚡ The whole contract: **`scope` · `receive` · `send`** — no sockets in it
-- 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · Lambda · the edge · a tab
+- 🌉 **An ASGI server = anything that fulfills it** — Uvicorn · a tab · the edge
 - 🔁 **One app, unchanged, across all of them** — that's the portability
-- 🏭 **In production today** — Stlite · Streamlit Playground · Cloudflare Python Workers · `Mangum` …
-- 🧠 **I learned ASGI by writing an ASGI server**
 
 </v-clicks>
 
 </div>
 
-<div v-click mt-6 grid="~ cols-[1fr_auto]" gap-8 items-center>
+<div v-click absolute bottom-20 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
 
 <div text-base flex="~ col" gap-2>
 
@@ -2249,7 +2339,7 @@ To be clear, this doesn't replace real servers. It works alongside them, for the
 
 <div flex="~ gap-2" items-center>
 <div i-ri-file-text-line text-xl op50 />
-<div><a href="https://asgi.readthedocs.io/" target="_blank">asgi.readthedocs.io</a> · <a href="https://pyodide.org/" target="_blank">pyodide.org</a> · <a href="https://shiny.posit.co/py/docs/shinylive.html" target="_blank">Shinylive</a> · <a href="https://github.com/gradio-app/gradio/pull/4402" target="_blank">gradio#4402</a></div>
+<div><a href="https://asgi.readthedocs.io/" target="_blank">asgi.readthedocs.io</a> · <a href="https://pyodide.org/" target="_blank">pyodide.org</a></div>
 </div>
 
 <div mt-4 w-min flex="~ gap-1" items-center>
@@ -2286,6 +2376,12 @@ To be clear, this doesn't replace real servers. It works alongside them, for the
 </div>
 
 <style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.takeaways li {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
 /* The two codes carry URLs of different lengths, so they differ in module count
    and each needs its own exact-multiple width to avoid qr-code-styling's dot
    flooring. Scaling both SVGs to one box is what makes them the same size. */
@@ -2310,13 +2406,6 @@ So a server is anything that satisfies it.
 
 [click]
 And the same application can run on any server that implements ASGI, without any change.
-
-[click]
-And it's already proven in production.
-
-[click]
-And this is what I got personally. I learned ASGI by writing the server side of ASGI, rather than the application side, in the Stlite project.
-It's an interesting way to go.
 
 [click]
 That's all from me. Thank you very much.
@@ -2671,13 +2760,13 @@ Python on the page's main thread **blocks rendering** while it runs. Production 
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2 — main thread</div>
-<div text-center>asgiFetch → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → <b><code>handle_fetch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>one call · easiest to read</div>
 </div>
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2b — Web Worker</div>
-<div text-center>asgiFetch → message → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → message → <b><code>handle_fetch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>UI stays responsive · what Stlite ships</div>
 </div>
 
@@ -2696,7 +2785,7 @@ Same <code>bridge.py</code>, same ASGI call — **only the thread changes** 🧵
 </div>
 
 <!--
-Our demo ran Python on the main thread, because it makes the call easy to see. asgiFetch calls dispatch, with nothing in between.
+Our demo ran Python on the main thread, because it makes the call easy to see. asgiFetch calls handle_fetch, with nothing in between.
 But while Python is working, the page can't paint or respond. With three endpoints we don't notice it. With a real application we always do.
 So production runs Pyodide in a Web Worker, and asgiFetch posts a message instead, matching the replies by id.
 And everything below that is identical. The same bridge, the same ASGI call, the same application.
@@ -2930,6 +3019,69 @@ And one interesting fact is Mangum is maintained by the same person who maintain
 
 ---
 
+# Where it fits, and where it stops
+
+<div mt-4 grid="~ cols-2" gap-6>
+
+<div v-click="1" border="~ emerald/40 rounded-lg" p-4 bg-emerald:5>
+<div text-6 font-bold mb-3>✅ Good fit</div>
+<div flex="~ col" gap-2 text-5>
+<div>📡 <b>Static-hosted apps</b> <span op70 text-4>— no backend</span></div>
+<div>📖 <b>Runnable docs</b> <span op70 text-4>— live examples</span></div>
+<div>🎓 <b>Education</b> <span op70 text-4>— zero setup</span></div>
+<div>🔒 <b>Privacy</b> <span op70 text-4>— data stays on the device</span></div>
+</div>
+</div>
+
+<div v-click="2" border="~ red/40 rounded-lg" p-4 bg-red:5>
+<div text-6 font-bold mb-3>⚠️ Limits</div>
+<div flex="~ col" gap-2 text-5>
+<div>🧵 <b>No threads</b> <span op70 text-4>— <code>async def</code> only</span></div>
+<div>📦 <b>Packages</b> <span op70 text-4>— pure Python, or built for WASM</span></div>
+<div>🔑 <b>No secrets</b> <span op70 text-4>— in the browser</span></div>
+<div>📥 <b>No webhooks</b> <span op70 text-4>— in the browser</span></div>
+</div>
+</div>
+
+</div>
+
+<div v-click="3" mt-6 text-center text-5>
+
+In production: [Streamlit Playground](https://streamlit.io/playground), powered by Stlite
+
+</div>
+
+<div v-click="4" mt-3 text-center text-xl>
+
+**Works with** real servers — doesn't replace them 🤝
+
+</div>
+
+<!--
+So this architecture works. But when do we actually want it?
+
+[click]
+Where does it fit?
+We can ship a whole web application as static files, on services such as GitHub Pages or Cloudflare Pages. There is no backend to run or to pay for, and it scales with the visitors, because each visitor brings their own compute.
+Documentation can have live examples. In education, there is nothing to set up.
+And everything runs on the device, so the data never leaves it.
+
+[click]
+And the limits.
+Pyodide can't start threads, for example.
+Some libraries don't work on Pyodide yet, though the coverage is growing.
+In the browser, everything is sent to the client, so you can't put any secrets in the application.
+And in the browser there is no public address, so no webhooks. These two are about the browser, not about Cloudflare.
+
+[click]
+And this is already in production. The Streamlit Playground runs on Stlite.
+
+[click]
+To be clear, this doesn't replace real servers. It works alongside them, for the cases where running without a server is the point.
+-->
+
+---
+
 # `scope["type"]`: the three connection types
 
 <div mt-4 text-lg>
@@ -3073,7 +3225,7 @@ Chunk → JS `ReadableStream` **as it's sent** — token streams work in-browser
 </div>
 
 <!--
-Our dispatch collects the whole response, and returns it at the end.
+Our handle_fetch collects the whole response, and returns it at the end.
 That works until the application streams, like server-sent events, or a chatbot sending tokens one by one.
 If we collect everything first, the user sees nothing until it's finished.
 

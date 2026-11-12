@@ -19,9 +19,9 @@ async function boot() {
 
   // region slide-call
   const { app } = pyodide.pyimport("main");
-  const { dispatch } = pyodide.pyimport("bridge");
+  const { handle_fetch } = pyodide.pyimport("bridge");
   // endregion slide-call
-  return { pyodide, app, dispatch };
+  return { pyodide, app, handle_fetch };
 }
 
 const bootPromise = boot();
@@ -40,11 +40,11 @@ async function toJsRequest(input, init) {
 
 // region slide-fetch
 export async function asgiFetch(input, init) {
-  const { pyodide, app, dispatch } = await bootPromise;
+  const { pyodide, app, handle_fetch } = await bootPromise;
   const jsRequest = await toJsRequest(input, init);
 
   const pyRequest = pyodide.toPy(jsRequest);
-  const result = await dispatch(app, pyRequest);
+  const result = await handle_fetch(app, pyRequest);
   const response = result.toJs({ dict_converter: Object.fromEntries });
 
   return new Response(response.body, {

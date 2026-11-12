@@ -19,9 +19,9 @@ async function boot() {
 
   // region slide-call
   const { app } = pyodide.pyimport("main");
-  const { dispatch } = pyodide.pyimport("bridge");
+  const { handle_fetch } = pyodide.pyimport("bridge");
   // endregion slide-call
-  return { app, dispatch, toPy: (value) => pyodide.toPy(value) };
+  return { app, handle_fetch, toPy: (value) => pyodide.toPy(value) };
 }
 
 const bootPromise = boot();
@@ -29,9 +29,9 @@ const bootPromise = boot();
 self.onmessage = async (event) => {
   const { id, request } = event.data;
   try {
-    const { app, dispatch, toPy } = await bootPromise;
+    const { app, handle_fetch, toPy } = await bootPromise;
     // region slide-dispatch
-    const result = await dispatch(app, toPy(request));
+    const result = await handle_fetch(app, toPy(request));
     const response = result.toJs({ dict_converter: Object.fromEntries });
     self.postMessage({ id, response }, [response.body.buffer]);
     // endregion slide-dispatch

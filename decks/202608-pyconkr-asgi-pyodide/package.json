@@ -7,7 +7,9 @@
     "dev": "node scripts/sync-demo-assets.mjs && slidev --open",
     "export": "node scripts/sync-demo-assets.mjs && slidev export",
     "dev:live": "concurrently -k -n slides,uvicorn,streamlit,static -c cyan,green,magenta,yellow 'node scripts/sync-demo-assets.mjs && slidev --open ${SLIDEV_DEV_ARGS:-}' 'cd samples/runtime-agnostic-asgi-app && uv run --frozen uvicorn main:app --port 8000' 'cd samples/streamlit-demo && uv run --frozen streamlit run app.py --server.port 8501 --server.headless true' 'cd samples/runtime-agnostic-asgi-app && python3 -m http.server 8080'",
-    "dev:live:remote": "SLIDEV_DEV_ARGS=\"--remote=${SLIDEV_REMOTE_PASSWORD:?set a password: --remote serves the presenter unauthenticated without one}\" pnpm dev:live"
+    "dev:live:remote": "SLIDEV_DEV_ARGS=\"--remote=${SLIDEV_REMOTE_PASSWORD:?set a password: --remote serves the presenter unauthenticated without one}\" pnpm dev:live",
+    "present": "SLIDEV_REVIEW_ANNOTATIONS=0 pnpm dev:live",
+    "present:remote": "SLIDEV_REVIEW_ANNOTATIONS=0 pnpm dev:live:remote"
   },
   "dependencies": {
     "@iconify-json/ri": "^1.2.10",

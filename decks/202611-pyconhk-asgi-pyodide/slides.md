@@ -1190,7 +1190,7 @@ Everything on the next few slides is real code from the demo repository, just sh
 </div>
 
 ```py {*}{'data-id':'skeleton'}
-async def dispatch(app, request):
+async def handle_fetch(app, request):
     ...
 
     await app(scope, receive, send)
@@ -1267,7 +1267,7 @@ JS request → **the dict ASGI specifies**:
 <div class="scope-code">
 
 ```py {*|3|7-8|10-11|*}
-async def dispatch(app, request):
+async def handle_fetch(app, request):
     scope = {
         "type": "http",
         "asgi": {"version": "3.0", "spec_version": "2.3"},
@@ -1475,9 +1475,9 @@ clicks: 5
 </div>
 
 <div v-click="5" class="dispatch-layer">
-<div data-id="ann-dispatch" class="js-note" absolute bg-white dark:bg-black px-3 py-2 border="~ teal/60 rounded-lg" style="top: 222px; left: 580px;">
+<div data-id="ann-dispatch" class="js-note" absolute bg-white dark:bg-black px-3 py-2 border="~ teal/60 rounded-lg" style="top: 186px; left: 600px;">
 
-calls **our `dispatch`** with the `app`
+calls **our `handle_fetch`**
 
 </div>
 <FancyArrow from="[data-id=ann-dispatch] @ bottomleft" to="[data-id=dispatch-js] .line:nth-child(6) @ right" arc="0.2" color="red" />
@@ -1554,13 +1554,13 @@ So in our case, this is the whole ASGI server.
 No sockets, no HTTP parsing, no port and no process. Just a function that satisfies the contract defined by ASGI.
 
 [click]
-Now let's call this `dispatch` function from JavaScript.
+Now let's call this `handle_fetch` function from JavaScript.
 Note that this code is JavaScript, running in the page.
 This is our own `fetch`, named `asgiFetch`. It takes the same arguments as the built-in `fetch`, and gives back the same kind of result, so the page can use it in place of the original.
-With Pyodide's APIs, this JavaScript function can use the Python objects we prepared, the `app` and our `dispatch` function, and pass data between the two languages.
+With Pyodide's APIs, this JavaScript function can use the Python objects we prepared, the `app` and our `handle_fetch` function, and pass data between the two languages.
 
 [click]
-And in the middle, it calls `dispatch`, with the `app` and the request from JavaScript.
+And in the middle, it calls `handle_fetch`, with the `app` and the request from JavaScript.
 -->
 
 ---
@@ -2760,13 +2760,13 @@ Python on the page's main thread **blocks rendering** while it runs. Production 
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2 — main thread</div>
-<div text-center>asgiFetch → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → <b><code>handle_fetch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>one call · easiest to read</div>
 </div>
 
 <div border="~ gray/40 rounded-xl" p-3 bg-gray:5>
 <div text-center text-xs op60 mb-2>Step 2b — Web Worker</div>
-<div text-center>asgiFetch → message → <b><code>dispatch(app, req)</code></b></div>
+<div text-center>asgiFetch → message → <b><code>handle_fetch(app, req)</code></b></div>
 <div text-center text-xs op70 mt-2>UI stays responsive · what Stlite ships</div>
 </div>
 
@@ -2785,7 +2785,7 @@ Same <code>bridge.py</code>, same ASGI call — **only the thread changes** 🧵
 </div>
 
 <!--
-Our demo ran Python on the main thread, because it makes the call easy to see. asgiFetch calls dispatch, with nothing in between.
+Our demo ran Python on the main thread, because it makes the call easy to see. asgiFetch calls handle_fetch, with nothing in between.
 But while Python is working, the page can't paint or respond. With three endpoints we don't notice it. With a real application we always do.
 So production runs Pyodide in a Web Worker, and asgiFetch posts a message instead, matching the replies by id.
 And everything below that is identical. The same bridge, the same ASGI call, the same application.
@@ -3225,7 +3225,7 @@ Chunk → JS `ReadableStream` **as it's sent** — token streams work in-browser
 </div>
 
 <!--
-Our dispatch collects the whole response, and returns it at the end.
+Our handle_fetch collects the whole response, and returns it at the end.
 That works until the application streams, like server-sent events, or a chatbot sending tokens one by one.
 If we collect everything first, the user sees nothing until it's finished.
 

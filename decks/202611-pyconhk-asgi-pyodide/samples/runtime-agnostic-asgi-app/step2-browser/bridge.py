@@ -12,7 +12,7 @@ streaming, WebSocket, and error handling taken out:
 """
 
 
-async def dispatch(app, request):
+async def handle_fetch(app, request):
     """Call the ASGI ``app`` with one request and collect its whole response.
 
     ``request``: dict with "method", "path", "query" (str), "headers"

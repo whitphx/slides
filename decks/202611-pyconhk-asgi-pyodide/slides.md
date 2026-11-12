@@ -58,6 +58,16 @@ Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web serve
 
 <h1>Yuichi (@whitphx)</h1>
 
+<!-- The title slide's QR code stays up through the intro, so people still
+     scanning it don't lose it on the first slide change. -->
+<div absolute top-17 right-10 flex="~ col" items-center gap-2>
+<div class="qr-box" w-36 h-36>
+<QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202611-pyconhk-asgi-pyodide/"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+<div op70 text-sm text-center leading-tight>These slides</div>
+</div>
+
 <div mt-8>
 Software Artisan / Indie Dev / OSS Enthusiast
 </div>
@@ -68,9 +78,9 @@ Software Artisan / Indie Dev / OSS Enthusiast
 - <span class="heading">Contributed to</span>: <span class="item"><img src="/portfolio/streamlit-mark-color.svg" style="height: 0.8em;">Streamlit</span>, <span class="item"><img src="/portfolio/gradio.svg">Gradio</span>
 - <span class="heading">Talks</span>: <span class="item">PyCon 🇯🇵JP, 🌏APAC, 🇪🇺Euro, 🇹🇼TW, 🇩🇪DE, 🇫🇷FR, 🇱🇹LT, 🇰🇷KR, <span v-mark.circle.red="2">🇭🇰HK</span></span>, <span class="item">FEDAY in 🇨🇳Xiamen</span>, <span class="item">🐍SciPyData2026</span>
 
-<div absolute top-48 right-0>
+<div absolute top-62 right-0>
 <a href="https://github.com/whitphx" target="_blank" rel="noopener noreferrer">
-<img src="/github_whitphx.png" alt="GitHub @whitphx" w="400px">
+<img src="/github_whitphx.png" alt="GitHub @whitphx" w="330px">
 </a>
 </div>
 
@@ -90,6 +100,11 @@ Software Artisan / Indie Dev / OSS Enthusiast
 <style>
   .portfolio {
     font-size: 1.0rem;
+  }
+  .qr-box :deep(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .item {
     height: 1.8rem;
@@ -122,6 +137,46 @@ You can find me as whitphx on GitHub and social media. Please talk to me if anyt
 -->
 
 ---
+clicks: 3
+---
+
+# Today
+
+<div class="agenda" mt-10>
+
+<v-clicks>
+
+1. ⚡ **ASGI** — what it is, and what it gives us
+2. 🐍 **Pyodide** — Python inside a web browser
+3. 🌐 **ASGI on Pyodide** — a server in a browser tab
+
+</v-clicks>
+
+</div>
+
+<style>
+/* The typography preset sizes `li` directly, so the size goes on the items. */
+.agenda li {
+  font-size: 2rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+</style>
+
+<!--
+This talk is about ASGI.
+
+[click]
+I will first explain what ASGI is and what it brings to us when we build a web server.
+
+[click]
+Then we will combine it with Pyodide, a Python runtime that runs inside a web browser,
+
+[click]
+and see a web application server run inside a browser tab, and even beyond.
+-->
+
+---
 layout: section
 ---
 
@@ -132,10 +187,6 @@ layout: section
 </div>
 
 <!--
-This talk is about ASGI.
-I will first explain what ASGI is and what it brings to us when we build a web server.
-Then we will combine it with Pyodide, a Python runtime that runs inside a web browser, and see a web application server run inside a browser tab, and even beyond.
-
 Let's start with a very basic example that you may already be familiar with.
 -->
 

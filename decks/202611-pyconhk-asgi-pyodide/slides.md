@@ -303,7 +303,7 @@ The other is Uvicorn, which handles the HTTP communication through the socket.
 
 <div v-click="6" class="big-line" mt-8 op90 text-center>
 
-Each side evolves **independently** —<br>nobody coordinates 🤝
+Each side evolves **independently** —<br>the two are **decoupled** 🤝
 
 </div>
 
@@ -371,24 +371,24 @@ async def app(scope, receive, send):
     ...
 ```
 
-<div mt-8 grid="~ cols-3" gap-6 text-lg>
+<div mt-8 grid="~ cols-3" gap-6 text-center>
 
 <div v-click="2">
-<div data-id="ann-scope" text-6 border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
-📋 <b><code>scope</code></b><br><span op80>connection type<br>path · headers</span>
+<div data-id="ann-scope" text-7 border="~ sky/40 rounded-lg" p-3 bg-white dark:bg-black>
+📋 <b><code>scope</code></b><br><span op80>connection type<br><span whitespace-nowrap>path · headers …</span></span>
 </div>
 <FancyArrow from="[data-id=ann-scope] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(5) @ bottom" arc="-0.2" />
 </div>
 
 <div v-click="3">
-<div data-id="ann-receive" text-6 border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-receive" text-7 border="~ violet/40 rounded-lg" p-3 bg-white dark:bg-black>
 📥 <b><code>receive()</code></b><br><span op80>async <b>inbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-receive] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(7) @ bottom" arc="-0.05" />
 </div>
 
 <div v-click="4">
-<div data-id="ann-send" text-6 border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
+<div data-id="ann-send" text-7 border="~ emerald/40 rounded-lg" p-3 bg-white dark:bg-black>
 📤 <b><code>send()</code></b><br><span op80>async <b>outbox</b></span>
 </div>
 <FancyArrow from="[data-id=ann-send] @ top" to="[data-id=asgi-signature] .line:nth-child(1) span:nth-child(9) @ bottom" arc="0.1" />
@@ -944,7 +944,7 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 
 <img src="/pyodide-logo.svg" alt="Pyodide" absolute top-10 right-12 h-16 />
 
-<div mt-4 text-lg>
+<div mt-4>
 
 [Pyodide](https://pyodide.org/): **CPython compiled to WebAssembly** — real Python, in a browser tab
 
@@ -956,17 +956,17 @@ It's certainly an extreme case, but it's technically fascinating, and full of in
 
 <v-clicks>
 
-- **No backend** — a Python interpreter in the browser
-- Python ⇄ JavaScript, direct calls
+- **No backend**<br><span op80>a Python interpreter in the browser</span>
+- **Python ⇄ JavaScript**<br><span op80>direct calls</span>
 
 </v-clicks>
 
 </div>
 
-<div v-click="3" border="~ gray/40 rounded-lg" p-2 bg-gray:5 text-center whitespace-nowrap>
-<div text-5 op70 mb-2>Browser tab</div>
-<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-4 op80>CPython on WASM</span></div>
-<div text-xl op50 my-1>⇅</div>
+<div v-click="3" border="~ gray/40 rounded-lg" p-3 bg-gray:5 text-center text-7 whitespace-nowrap>
+<div text-6 op70 mb-2>Browser tab</div>
+<div border="~ violet/40 rounded" p-2 bg-violet:5>🐍 Pyodide<br><span text-5 op80>CPython on WASM</span></div>
+<div op50 my-1>⇅</div>
 <div border="~ sky/40 rounded" p-2 bg-sky:5>🌐 JavaScript / DOM</div>
 </div>
 
@@ -977,9 +977,13 @@ Pyodide logo by the Pyodide project, CC BY 4.0
 </div>
 
 <style>
-/* Keep each point on one line; the grid gives this column the width it needs. */
+/* Each point breaks after its label, so the column keeps the width of its
+   longest line. The typography preset sizes `li` directly. */
 .pyodide-points li {
   white-space: nowrap;
+  font-size: 1.75rem;
+  line-height: 1.35;
+  margin-bottom: 1rem;
 }
 </style>
 
@@ -1011,7 +1015,7 @@ clicks: 4
 
 <div v-click="1">
 
-Now we can reach **`app`** from JavaScript:
+JavaScript now holds **`app`**:
 
 ```js
 const { app } = pyodide.pyimport("main");
@@ -1035,7 +1039,7 @@ const res = await fetch("/api/runtime", {
 
 <div v-click="3">
 
-So if we had **our own `fetch`**, the page could call the Python app directly:
+To bridge the two: **our own `fetch`**, which calls **`app`**:
 
 ```js
 async function asgiFetch(url, options) {
@@ -1079,13 +1083,13 @@ On the other side, a web page talks to an HTTP API with `fetch`, JavaScript's bu
 It sends an HTTP request to a URL, and gives us the response.
 
 [click]
-So let's connect the two.
-If an HTTP request from `fetch` could be turned into an ASGI call to the `app` object, our JavaScript could talk HTTP with the Python `app`, the ASGI application, just like it talks to a server.
-So we write our own `fetch`, named `asgiFetch`. It takes the same arguments as the original, but instead of going to the network, it calls our `app` on Pyodide.
+So let's connect the two. There is a gap between them: `fetch` speaks HTTP, and the `app` object expects an ASGI call.
+If we have something that fills this gap, the page can talk HTTP with our Python app, the ASGI application, just like it talks to a server.
+Here, we write that piece as a replacement for the original `fetch`, named `asgiFetch`. It takes the same arguments as the original, but instead of going to the network, it calls our `app` on Pyodide.
 
 [click]
-But there's a hole in the middle.
-Who does that conversion? Something has to build the `scope`, and prepare `receive` and `send`.
+But look inside `asgiFetch`. The middle part is still missing: the conversion itself.
+Something has to build the `scope`, and prepare `receive` and `send`.
 On a server, that's Uvicorn's job. And there's no Uvicorn in a browser tab.
 -->
 
@@ -1537,7 +1541,7 @@ So let's actually run it.
 
 <v-clicks>
 
-- 📄 Static page + Pyodide + **the same `main.py`**
+- 📄 Static page + Pyodide<br>+ **the same `main.py`**
 - 🕵️ **Works offline**
 
 </v-clicks>
@@ -1576,6 +1580,9 @@ Responses made **inside the tab** — nothing leaves it.
 /* Keep each point on one line; the window takes the rest of the width. */
 .demo2-grid li {
   white-space: nowrap;
+  font-size: 1.75rem;
+  line-height: 1.35;
+  margin-bottom: 1rem;
 }
 /* `light` on the window pins the frame white but leaves slot content on the
    theme's text colour, so the page being mocked has to pin its own. */
@@ -2252,7 +2259,7 @@ In all three places, the application never changed. Only the caller changed, and
 
 </div>
 
-<div v-click absolute bottom-12 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
+<div v-click absolute bottom-20 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
 
 <div text-base flex="~ col" gap-2>
 

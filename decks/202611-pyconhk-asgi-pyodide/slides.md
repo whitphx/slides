@@ -1598,6 +1598,14 @@ So let's actually run it.
 
 </v-clicks>
 
+<div v-click="1" mt-2>
+
+```shell
+$ python -m http.server 8080
+```
+
+</div>
+
 </div>
 
 <div>
@@ -1655,6 +1663,7 @@ This is step two of the demo: the same application, with no server.
 
 [click]
 This is a static page, served by a plain file server.
+Here it's Python's built-in one: `python -m http.server`. It only sends files; there is no application server behind it.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
 One small hook in the page sends every request it makes to `asgiFetch` instead of the network.
 When I click the button, it says the platform is emscripten: this is Pyodide's own build of Python, compiled to WebAssembly.
@@ -1719,16 +1728,16 @@ And here is the browser version, next to it.
 Let's compare them from the top.
 
 [click]
-The `main.py` and its `app` object are the same, and so is the interface it's called through.
+The `main.py` and its `app` object are the same.
+The interface between the app and the server is also the same: ASGI.
 
 [click]
 What changed is this layer.
-On the server, on the left, CPython runs Uvicorn as the ASGI server.
+On the Linux server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-One more detail: our demo runs Pyodide on the page's main thread, to keep it simple.
-A real application runs it in a Web Worker, which is a background thread in the browser, so that Python does not block the page.
+By the way, real applications run Pyodide in a Web Worker, a background thread in the browser, so that the page doesn't freeze.
 
 [click]
 The ASGI application, the `app` object, is untouched. It's called through the same interface. Only the ASGI server underneath changed.
@@ -1897,7 +1906,7 @@ No server, no install —<br>**Python & Streamlit<br>in your browser** 🎈
 Streamlit is a popular Python framework for building interactive web applications with only Python.
 
 [click]
-You write just a Python script,
+You write just a Python script with the Streamlit API,
 
 [click]
 and run it with the `streamlit` command.
@@ -1905,6 +1914,7 @@ and run it with the `streamlit` command.
 [click]
 And we get a styled, interactive web application.
 The `streamlit` package ships both a server, Starlette on Uvicorn, and a frontend application.
+It's a complete server-and-client web application.
 So it has the same shape as our demo application.
 
 [click]

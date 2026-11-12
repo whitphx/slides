@@ -389,7 +389,7 @@ Python had the same idea before. WSGI, from 2003, was the same kind of contract,
 
 [click]
 Because of this interface, we can develop or switch a package on one side without caring about the other side.
-We usually take this for granted. But what is this contract actually made of? Let's look under the hood.
+We usually take this for granted. But what is this contract actually made of?
 -->
 
 ---
@@ -399,8 +399,7 @@ layout: section
 # ⚡ ASGI 101
 
 <!--
-So, this is what ASGI actually looks like.
-If you already know it, this is just a quick review.
+Let's look under the hood.
 -->
 
 ---

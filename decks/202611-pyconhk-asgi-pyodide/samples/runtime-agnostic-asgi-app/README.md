@@ -23,7 +23,7 @@ uv sync
 uv run uvicorn main:app --reload
 ```
 
-Open http://127.0.0.1:8000. The "Where am I running?" button reports something like `Python 3.12 on darwin/arm64`.
+Open http://127.0.0.1:8000. The "Where am I running?" button reports something like `Python 3.14 on darwin/arm64`.
 
 ## Step 2: run it in the browser
 

@@ -226,7 +226,7 @@ HTTP/1.1 200 OK
 server: uvicorn
 content-type: application/json
 
-"Python 3.12.7 on darwin"
+"Python 3.14.6 on darwin"
 ```
 
 </div>
@@ -581,13 +581,13 @@ Here we check that the connection type in `scope` is HTTP.
 Like this, `scope` contains the connection info as a dictionary.
 
 [click]
-Then we call the `send` callable with the first event. Its type is `http.response.start`, which represents the start of an HTTP response, and it carries the status and the headers.
+Then we call the `send` callable with the first outgoing event. Its type is `http.response.start`, which represents the start of an HTTP response, and it carries the status and the headers.
 
 [click]
 The next `send` call pushes the response body, following the previous event.
 
 [click]
-Two calls of `send`, and the response is done.
+We just call `send` twice here, and with that, the response is done.
 
 [click]
 Let's run it with Uvicorn. We pass this `app` to Uvicorn, the same way as the FastAPI application before.
@@ -598,7 +598,7 @@ And it just works. It returns the HTTP response.
 [click]
 Uvicorn doesn't care that there's no framework.
 It just calls the `app` callable.
-In this example, the application didn't call `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
+By the way, in this example, the application didn't call `receive`, because a GET request has no body. An application calls `receive` when it needs the request body, for example for a POST.
 -->
 
 ---
@@ -712,7 +712,7 @@ and its parameters are scope, receive and send.
 So a FastAPI application is an ASGI application, just like the one we wrote.
 
 [click]
-So, in short, a framework is a way to create an ASGI callable.
+So, in short, a framework is a way to create an ASGI application: a callable that takes the three parameters, `scope`, `receive` and `send`.
 And on top of that, it adds useful features such as routing, parsing and validation, to make that easier.
 -->
 
@@ -740,7 +740,7 @@ app = FastAPI()
 
 <div class="demo-layer demo-repl">
 
-<div text-5 mb-1>…and this <code>app</code> is <b>the ASGI callable</b></div>
+<div text-5 mb-1>…and this <code>app</code> is <b>an ASGI application</b></div>
 
 ```py {*}
 >>> callable(app)
@@ -777,7 +777,7 @@ INFO:  Uvicorn running on
 <div p-3 class="mock-page">
 <div text-base font-bold mb-2>Runtime</div>
 <button border="~ gray/40 rounded" px-2 py-1 text-xs bg-gray:10>Where am I running?</button>
-<div mt-2 font-mono text-sm>Python 3.12 on <b>darwin/arm64</b> 🖥️</div>
+<div mt-2 font-mono text-sm>Python 3.14 on <b>darwin/arm64</b> 🖥️</div>
 </div>
 
 </LiveEmbed>
@@ -895,7 +895,7 @@ We run it the usual way, with Uvicorn,
 [click]
 and open the page.
 The page's frontend is a small HTMX application that calls the API endpoints we just defined.
-So when we click the button, it calls `/api/runtime`, and shows the result: Python 3.12 on darwin arm64. That's my laptop.
+So when we click the button, it calls `/api/runtime`, and shows the result: Python three point fourteen on darwin arm64. That's my laptop.
 -->
 
 ---
@@ -928,7 +928,7 @@ The `app` is called through the ASGI interface, with `scope`, `receive` and `sen
 
 [click]
 by Uvicorn.
-Uvicorn takes the HTTP request off the TCP socket, and makes that call.
+Uvicorn takes the HTTP request off the TCP socket, and makes that function call.
 
 [click]
 And the page in the browser talks to the application with HTTP, over the network.
@@ -967,6 +967,7 @@ Calling the application with that signature properly is the job of the ASGI serv
 On a usual Linux server, that outer layer is Uvicorn. It talks to the network through sockets, and turns each request into a call with `scope`, `receive` and `send`.
 
 [click]
+This is the decoupling we saw at the start: the application on one side, the server on the other, and only ASGI between them.
 So everything about the outside world lies outside the application.
 Then what if we move to an environment without those ports, or even without a Linux server at all?
 Can we swap only the outer layer, and keep the ASGI application running as it is?
@@ -1124,9 +1125,11 @@ async function asgiFetch(url, options) {
 Now that Python runs in the page, let's line up the pieces we have in the browser tab, and see what's missing.
 
 [click]
-We can load our `main.py` into Pyodide. Pyodide installs FastAPI from PyPI with a custom installer, and we copy `main.py` into Pyodide's virtual file system.
-Pyodide has a function called `pyimport`, which imports a Python module from JavaScript.
-So we can take the `app` object out of the `main` module, and hold it in a JavaScript variable.
+First, we need our `app` object inside Pyodide.
+`main.py` imports FastAPI, so FastAPI has to be installed first. Pyodide has its own installer that can install packages from PyPI, so we install FastAPI with it.
+Then we copy `main.py` into Pyodide's virtual file system, so that Python can import it.
+Now JavaScript can import the `main` module with Pyodide's `pyimport` function, and take the `app` object out of it.
+So our ASGI application is now held in a JavaScript variable.
 
 [click]
 On the other side, a web page talks to an HTTP API with `fetch`, JavaScript's built-in function for it.
@@ -1655,7 +1658,7 @@ This is step two of the demo: the same application, with no server.
 This is a static page, served by a plain file server.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
 One small hook in the page sends every request it makes to `asgiFetch` instead of the network.
-When I click the button, it says the platform is emscripten, and a different Python version: Pyodide's own build of Python.
+When I click the button, it says the platform is emscripten: this is Pyodide's own build of Python, compiled to WebAssembly.
 The application is telling us it runs inside the browser, on WebAssembly.
 
 [click]

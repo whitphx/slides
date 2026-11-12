@@ -1970,6 +1970,7 @@ The frontend application talks to it.
 
 [click]
 And this is Stlite.
+You don't have to follow every box in this figure. The point is that some parts are the same, and some parts are changed.
 
 [click]
 Stlite runs the original Streamlit, not a rewrite of it.
@@ -2044,7 +2045,7 @@ Cloudflare Workers are serverless functions that run on Cloudflare's edge networ
 Their runtime runs only JavaScript and WebAssembly.
 
 [click]
-So, to support Python, they use Pyodide. This is not related to the Web Worker in the browser; the names are just similar.
+So, to support Python, they use Pyodide.
 It's the same WebAssembly CPython we just used in the browser, but running server-side now.
 -->
 
@@ -2150,7 +2151,7 @@ So this is what it takes to run our application there. The whole file, nothing l
 [DEMO SETUP] Deploy well before the talk and open the URL once to warm it, so the embed on this slide loads the live application. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. If it is not up, the embed shows its fallback; don't stop to debug it.
 
 [click]
-This import is our application, the same one as steps one and two.
+This import is our application: the `app` object from `main.py`, the same one as steps one and two.
 
 [click]
 Then the entrypoint, with a fetch handler.
@@ -2291,17 +2292,18 @@ The app **never changed** — only the caller did 🔁
 Let's look back at what we did today.
 
 [click]
-We started with a FastAPI application, `main.py`, on a normal server. Uvicorn called it.
+We started with a FastAPI application, the `app` object in `main.py`, on a normal server. Uvicorn called it.
 
 [click]
 Then we moved the same `main.py` into a browser tab. There was no Uvicorn there, so we wrote the caller ourselves, in about forty-five lines.
-Stlite does the same thing with a full framework. The original Streamlit runs in the browser, and Stlite's own bridge calls it.
+Stlite makes the same thing possible for a full framework, with the same trick. The original Streamlit runs in the browser.
 
 [click]
 And on Cloudflare Workers, the same `main.py` again. This time, Cloudflare's `asgi` module calls it.
 
 [click]
 In all three places, the application never changed. Only the caller changed, and every caller kept the same ASGI contract.
+I think this is one interesting example of the power of the decoupling that ASGI makes possible.
 -->
 
 ---

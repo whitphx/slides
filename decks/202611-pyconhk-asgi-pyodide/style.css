@@ -1,0 +1,38 @@
+/* Statement slides carry one claim and one follow-up line, so both are sized
+   up from the theme's defaults to be read from the back of the room. The
+   typography preset sizes `h2` and `p` directly, so the sizes go on them. */
+.slidev-layout.statement h2 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+.slidev-layout.statement p {
+  font-size: 2rem;
+  line-height: 1.4;
+}
+
+/* A single punchline under a figure or code block, sized up the same way. */
+.big-line p {
+  font-size: 2rem;
+  line-height: 1.4;
+}
+
+/* Text that would otherwise sit straight on the background texture. */
+.note-box {
+  background: white;
+  border: 1px solid rgb(156 163 175 / 0.4);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+.dark .note-box {
+  background: black;
+}
+.note-box p {
+  margin: 0;
+}
+
+/* For a note-box that has to fit under a figure: the typography preset sizes
+   `p` directly, so a text utility on the box would not reach it. */
+.note-box.note-sm p {
+  font-size: 1.25rem;
+  line-height: 1.35;
+}

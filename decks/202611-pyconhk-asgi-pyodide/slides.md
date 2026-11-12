@@ -182,15 +182,18 @@ content-type: application/json
 
 </WindowMockup>
 
-<div v-click="3" mt-2 text-lg>
-
-App: **Your logic**<br>
-Uvicorn: **HTTP handling, connected to socket**
-
 </div>
 
 </div>
 
+<!-- Under both columns rather than under the terminal: the terminal leaves no
+     room below it for two lines. -->
+<div v-click="3" absolute bottom-3 inset-x-0 flex justify-center>
+<div class="note-box note-sm">
+
+App: **Your logic** · Uvicorn: **HTTP handling, connected to socket**
+
+</div>
 </div>
 
 <style>
@@ -296,11 +299,11 @@ The other is Uvicorn, which handles the HTTP communication through the socket.
 <FancyArrow from="[data-id=env-lambda] @ top" to="[data-id=srv-mangum] @ bottom" arc="0.1" color="red" />
 </div>
 
-<div v-click="5" mt-20 text-5 op90 text-center italic>Asynchronous Server Gateway Interface</div>
+<div v-click="5" mt-18 text-7 op90 text-center italic>Asynchronous Server Gateway Interface</div>
 
-<div v-click="6" mt-10 text-2xl op90 text-center>
+<div v-click="6" class="big-line" mt-8 op90 text-center>
 
-Each side evolves **independently** — nobody coordinates 🤝
+Each side evolves **independently** —<br>nobody coordinates 🤝
 
 </div>
 
@@ -596,7 +599,7 @@ True
 ['scope', 'receive', 'send']
 ```
 
-<div v-click="4" mt-3 text-center text-lg leading-tight>
+<div v-click="4" class="note-box" mt-3 text-center text-lg leading-tight>
 
 🎁 A framework is a **nicer way to write the same callable**
 
@@ -890,7 +893,7 @@ layout: statement
 
 ## The contract has no sockets in it.
 
-<div class="contract-lines" mt-10 op80>
+<div mt-10 op80>
 
 <v-clicks>
 
@@ -902,18 +905,6 @@ Being an **ASGI server**:<br>supply `scope` · `receive` · `send` → **call th
 
 </div>
 
-<style>
-/* The theme and the typography preset size `h2` and `p` directly, so the sizes
-   have to be set on them rather than on a wrapper. */
-.slidev-layout h2 {
-  font-size: 3rem;
-  line-height: 1.2;
-}
-.contract-lines p {
-  font-size: 2rem;
-  line-height: 1.4;
-}
-</style>
 
 <!--
 Now let's look at the contract again, that is, the ASGI interface.
@@ -1155,7 +1146,7 @@ async def dispatch(app, request):
 <div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 183px" aria-hidden="true">❓</div>
 <div class="blank-mark" :class="$clicks >= 1 ? 'shown' : ''" absolute text-4xl style="left: 168px; top: 315px" aria-hidden="true">❓</div>
 
-<div v-click="2" absolute bottom-12 inset-x-0 text-xl text-center>
+<div v-click="2" class="big-line" absolute bottom-12 inset-x-0 text-center>
 
 Fill in the blanks and you have **an ASGI server** 🛠️
 
@@ -1633,7 +1624,7 @@ plainBackground: true
   <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" :worker="$clicks >= 4" :worker-highlight="$clicks === 4" /></template>
 </StackCompare>
 
-<div class="punchline" mt-4 text-center text-xl :class="$clicks >= 5 ? 'op100' : 'op0'">
+<div class="punchline big-line" mt-4 text-center :class="$clicks >= 5 ? 'op100' : 'op0'">
 
 One box swapped — **the bridge plays Uvicorn's role** 🛠️
 
@@ -1771,9 +1762,9 @@ $ streamlit run app.py
 
 </div>
 
-<div v-click="5" mt-4 text-center text-5>
+<div v-click="5" class="note-box" mt-4 text-center text-5>
 
-No server, no install —<br>**Python & Streamlit in your browser** 🎈
+No server, no install —<br>**Python & Streamlit<br>in your browser** 🎈
 
 </div>
 
@@ -2028,10 +2019,12 @@ The whole file — nothing left out:
 
 <!-- The frame's title bar cannot hold the whole host, and the address is the part
      the audience writes down, so it gets its own line under both columns. -->
-<div class="edge-url" mt-2 text-center :class="$clicks >= 4 ? '' : 'op0'">
+<div class="edge-url" mt-2 flex justify-center :class="$clicks >= 4 ? '' : 'op0'">
+<div class="note-box" text-center>
 
 <a href="https://runtime-agnostic-asgi-app.whitphx.workers.dev" target="_blank">runtime-agnostic-asgi-app.whitphx.workers.dev</a> — **live, right now** 🌍
 
+</div>
 </div>
 
 <div class="entry-notes" :class="$clicks >= 4 ? 'op0' : ''">
@@ -2259,7 +2252,7 @@ In all three places, the application never changed. Only the caller changed, and
 
 </div>
 
-<div v-click absolute bottom-6 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
+<div v-click absolute bottom-12 inset-x-14 grid="~ cols-[1fr_auto]" gap-8 items-end>
 
 <div text-base flex="~ col" gap-2>
 

@@ -1420,17 +1420,16 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 
 <!--
 The next blank is the two callables.
+You don't have to follow every line of this code. It's the real code from the demo, and I'm showing it as proof that this part is small.
 
 [click]
-`receive` is the async callable that the ASGI application awaits when it wants the request body.
-First we take the body that came from JavaScript. Our `receive` returns it as an `http.request` event.
+`receive` gives the request body to the ASGI application.
 
 [click]
-`send` is the opposite. The ASGI application calls it to send the response, as events: first the status and headers, then the body.
-Our `send` collects them, so that we have the full response at the end.
+`send` collects the response that the ASGI application sends back.
 
 [click]
-So both of them are just closures over a few local variables.
+That's all. Both are just small functions over a few local variables.
 -->
 
 ---

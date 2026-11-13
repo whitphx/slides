@@ -58,8 +58,8 @@ Hi everyone, thanks for coming to my talk, ASGI on Pyodide, building a web serve
 
 <h1>Yuichi (@whitphx)</h1>
 
-<!-- The title slide's QR code stays up through the intro, so people still
-     scanning it don't lose it on the first slide change. -->
+<!-- The title slide's QR code stays up through the intro and the agenda, so
+     people still scanning it don't lose it on the first slide changes. -->
 <div absolute top-17 right-10 flex="~ col" items-center gap-2>
 <div class="qr-box" w-36 h-36>
 <QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202611-pyconhk-asgi-pyodide/"
@@ -142,6 +142,15 @@ clicks: 3
 
 # Today
 
+<!-- Same QR code as on the previous slide, kept up through the agenda. -->
+<div absolute top-17 right-10 flex="~ col" items-center gap-2>
+<div class="qr-box" w-36 h-36>
+<QRCode :width="185" :height="185" type="svg" data="https://slides.whitphx.info/202611-pyconhk-asgi-pyodide/"
+  :dotsOptions="{ type: 'extra-rounded', color: '#36709E' }" />
+</div>
+<div op70 text-sm text-center leading-tight>These slides</div>
+</div>
+
 <div class="agenda" mt-10>
 
 <v-clicks>
@@ -155,6 +164,11 @@ clicks: 3
 </div>
 
 <style>
+.qr-box :deep(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* The typography preset sizes `li` directly, so the size goes on the items. */
 .agenda li {
   font-size: 2rem;
@@ -385,11 +399,11 @@ And the interface between the two sides is ASGI.
 
 [click]
 The Asynchronous Server Gateway Interface.
-Python had the same idea before. WSGI, from 2003, was the same kind of contract, but only for synchronous code. ASGI added async, WebSockets and streaming.
+It is the async successor of WSGI, which many of you may know.
 
 [click]
 Because of this interface, we can develop or switch a package on one side without caring about the other side.
-We usually take this for granted. But what is this contract actually made of?
+We usually take this for granted. But what is this interface actually made of?
 -->
 
 ---
@@ -928,7 +942,7 @@ The `app` is called through the ASGI interface, with `scope`, `receive` and `sen
 
 [click]
 by Uvicorn.
-Uvicorn takes the HTTP request off the TCP socket, and makes that function call.
+Uvicorn receives the HTTP request arriving from the network, and makes that function call.
 
 [click]
 And the page in the browser talks to the application with HTTP, over the network.

@@ -955,7 +955,7 @@ So here, the server that calls the ASGI application is Uvicorn. Let's keep an ey
 layout: statement
 ---
 
-## The contract has no sockets in it.
+## The ASGI interface has no network connection in it.
 
 <div mt-10 op80>
 
@@ -974,11 +974,11 @@ Being an **ASGI server**:<br>supply `scope` · `receive` · `send` → **call th
 Now let's look at the contract again, that is, the ASGI interface.
 The ASGI application promises only one thing to the outside world: this signature.
 A dict and two async callables, `scope`, `receive` and `send`.
-It says nothing about sockets, ports or processes.
+It says nothing about network connections, or anything like that.
 
 [click]
 Calling the application with that signature properly is the job of the ASGI server, outside the application.
-On a usual Linux server, that outer layer is Uvicorn. It talks to the network through sockets, and turns each request into a call with `scope`, `receive` and `send`.
+On a usual Linux server, that outer layer is Uvicorn. It receives requests from the network, and turns each one into a call with `scope`, `receive` and `send`.
 
 [click]
 This is the decoupling we saw at the start: the application on one side, the server on the other, and only ASGI between them.

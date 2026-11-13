@@ -1253,12 +1253,10 @@ What we have to write is just one Python function
 that takes the `app` object and a request from the JavaScript `fetch`.
 In the middle, it turns the `request` into an ASGI call to the `app` object,
 and finally it returns the response to its caller.
-We write it in Python, because the `scope` dict and the two callables are easier to build there. `asgiFetch` will only call it.
+We write it in Python, because the `scope` dict and the two callables are easier to build there. The JavaScript side will only call it.
 
 [click]
-And we have two blanks.
-The first one is to build the scope, and to prepare receive and send.
-The second one is to collect what the application sent back.
+Let's fill these blanks one by one.
 
 [click]
 So let's fill in these blanks.
@@ -1354,8 +1352,7 @@ async def handle_fetch(app, request):
 </style>
 
 <!--
-The first blank is the scope.
-JavaScript gives us a request in its own format, and we reshape it into the dict that ASGI defines.
+First, we build the `scope` dict from the JavaScript request.
 
 [click]
 The `http` type tells the application that this is an HTTP connection.
@@ -1433,7 +1430,7 @@ And we're not guessing. The spec defines every key and its type, and we follow i
 </style>
 
 <!--
-The next blank is the two callables.
+Next, we create the two callables, `receive` and `send`.
 You don't have to follow every line of this code. It's the real code from the demo, and I'm showing it as proof that this part is small.
 
 [click]
@@ -1677,7 +1674,6 @@ This is step two of the demo: the same application, with no server.
 
 [click]
 This is a static page, served by a plain file server.
-Here it's Python's built-in one: `python -m http.server`. It only sends files; there is no application server behind it.
 The JavaScript loads Pyodide and runs the same `main.py` from step one, through the bridge we just wrote.
 One small hook in the page sends every request it makes to `asgiFetch` instead of the network.
 When I click the button, it says the platform is emscripten: this is Pyodide's own build of Python, compiled to WebAssembly.
@@ -1692,7 +1688,7 @@ The forty-five lines we just read made it possible.
 -->
 
 ---
-clicks: 5
+clicks: 4
 plainBackground: true
 ---
 
@@ -1702,11 +1698,11 @@ plainBackground: true
   { key: 'server', label: '① Server' },
   { key: 'browser', label: '② Browser', hidden: $clicks < 1 },
 ]">
-  <template #server><ServerStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" /></template>
-  <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 5" :worker="$clicks >= 4" :worker-highlight="$clicks === 4" /></template>
+  <template #server><ServerStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 4" /></template>
+  <template #browser><BrowserStackFigure aligned :highlight="$clicks === 2" :highlight-swapped="$clicks === 3 || $clicks === 4" worker /></template>
 </StackCompare>
 
-<div class="punchline big-line" mt-4 text-center :class="$clicks >= 5 ? 'op100' : 'op0'">
+<div class="punchline big-line" mt-4 text-center :class="$clicks >= 4 ? 'op100' : 'op0'">
 
 One box swapped — **the bridge plays Uvicorn's role** 🛠️
 
@@ -1751,9 +1747,6 @@ On the Linux server, on the left, CPython runs Uvicorn as the ASGI server.
 In the browser, on the right, Pyodide runs instead of CPython, and our bridge does Uvicorn's job.
 
 [click]
-By the way, real applications run Pyodide in a Web Worker, a background thread in the browser, so that the page doesn't freeze.
-
-[click]
 The ASGI application, the `app` object, is untouched. It's called through the same interface. Only the ASGI server underneath changed.
 -->
 
@@ -1768,8 +1761,8 @@ Does this work for a real framework?
 </div>
 
 <!--
-But our demo application has only three endpoints. Real applications and frameworks are much bigger, with many Python files and static files.
-So, does this work for them too?
+But our demo was very small and simple.
+So, does this work for real applications too?
 It does. And I can say that because I've built it, with Streamlit.
 -->
 
@@ -2055,7 +2048,7 @@ So let me show you another place, which goes even further: Pyodide, back on the 
 
 <!--
 [click]
-Cloudflare Workers are serverless functions that run on Cloudflare's edge network, which means servers in many cities, close to the users.
+Cloudflare Workers are serverless functions that run on Cloudflare's infrastructure.
 Their runtime runs only JavaScript and WebAssembly.
 
 [click]
@@ -2160,7 +2153,7 @@ The whole file — nothing left out:
 </style>
 
 <!--
-So this is what it takes to run our application there. The whole file, nothing left out.
+So this is the bridging code that runs our application there. The whole file, nothing left out.
 
 [DEMO SETUP] Deploy well before the talk and open the URL once to warm it, so the embed on this slide loads the live application. For about a minute after a deploy, requests intermittently come back as edge errors while the new version propagates, and a cold isolate takes around three seconds against roughly one second warm. If it is not up, the embed shows its fallback; don't stop to debug it.
 

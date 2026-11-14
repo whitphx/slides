@@ -1104,7 +1104,13 @@ const res = await fetch("/api/runtime", {
 
 <div v-click="3">
 
-To bridge the two: **our own `fetch`**, which calls **`app`**:
+<div class="gap-flow" flex items-stretch justify-between gap-1 mt-5 mb-4>
+<div class="gf-box" border="~ teal/50 rounded-lg" bg-teal:5><div>📄 page</div><div class="gf-sub">speaks <b>HTTP</b></div></div>
+<div class="gf-arrow">→</div>
+<div class="gf-box" border="~ 2 dashed amber/70 rounded-lg" bg-amber:10><div><b>our own <code>fetch</code></b></div><div class="gf-sub">fills the gap</div></div>
+<div class="gf-arrow">→</div>
+<div class="gf-box" border="~ violet/50 rounded-lg" bg-violet:5><div>🐍 <code>app</code></div><div class="gf-sub">expects an <b>ASGI call</b></div></div>
+</div>
 
 ```js
 async function asgiFetch(url, options) {
@@ -1132,6 +1138,22 @@ async function asgiFetch(url, options) {
 * {
   --slidev-code-font-size: 15px;
   --slidev-code-line-height: 1.5;
+}
+.gf-box {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+  font-size: 20px;
+  line-height: 1.3;
+}
+.gf-sub {
+  font-size: 16px;
+  opacity: 0.8;
+}
+.gf-arrow {
+  align-self: center;
+  font-size: 24px;
+  opacity: 0.6;
 }
 </style>
 

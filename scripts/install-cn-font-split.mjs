@@ -8,10 +8,14 @@
 // (pnpm.ignoredBuiltDependencies) and this runs from the root `postinstall`, asking for a
 // listed release explicitly.
 //
-// Upstream fix: https://github.com/KonghaYao/cn-font-split/pull/219 (fails clearly instead of
-// reporting success, and adds CN_FONT_SPLIT_VERSION to pin the release). Once a release with
-// it is out, this script and the ignoredBuiltDependencies entry can go: let cn-font-split's
-// own install script run, with CN_FONT_SPLIT_VERSION set to the release listed below.
+// Upstream fix: cn-font-split 8.0 (https://github.com/KonghaYao/cn-font-split/pull/221) drops
+// the install-time download altogether. The native library ships in per-platform npm packages
+// (@cn-font-split/<platform>, as optionalDependencies), so there is no install script, release
+// lookup or ungh.cc left. It supersedes our patch to the old install script
+// (https://github.com/KonghaYao/cn-font-split/pull/219, closed unmerged).
+// Once 8.x is on npm and slidev-addon-anipres works with it, bump the `cn-font-split` override
+// in package.json, then delete this script, the root `postinstall` and the
+// ignoredBuiltDependencies entry.
 
 import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'
